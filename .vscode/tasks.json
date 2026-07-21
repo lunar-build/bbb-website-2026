@@ -1,0 +1,58 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "docker:start",
+			"type": "shell",
+			"command": "docker desktop start",
+		},
+		{
+			"label": "ddev:start",
+			"type": "shell",
+			"command": "ddev start",
+            "options": {
+				"cwd": "${workspaceFolder}/site"
+			}
+		},
+        {
+			"label": "ssh:site",
+			"type": "shell",
+			"command": "ddev ssh",
+			"presentation": {
+				"group": "ssh"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/site"
+			}
+		},
+        {
+			"label": "ssh:sage",
+			"type": "shell",
+            "command": "ddev ssh -d /var/www/html/web/app/themes/sage",
+			"presentation": {
+				"group": "ssh"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/site"
+			}
+		},
+        {
+			"label": "ssh:panels",
+			"type": "shell",
+            "dependsOn": ["ssh:site", "ssh:sage"],
+            "dependsOrder": "parallel",
+			"options": {
+				"cwd": "${workspaceFolder}/site"
+			}
+		},
+		{
+			"label": "start-up",
+			"dependsOn": ["docker:start", "ddev:start", "ssh:panels"],
+			"dependsOrder": "sequence",
+			"runOptions": {
+				"runOn": "folderOpen",
+			},
+			"problemMatcher": [],
+		},
+	]
+}

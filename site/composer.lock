@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "70f6d257779745b3cdf781c119d57c24",
+    "content-hash": "64681cb8f47d8a47c5b8b20ce0f44160",
     "packages": [
         {
             "name": "composer/installers",
@@ -1040,6 +1040,52 @@
                 }
             ],
             "time": "2026-07-06T19:11:50+00:00"
+        },
+        {
+            "name": "wpengine/advanced-custom-fields",
+            "version": "6.8.6",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:lunar-build/advanced-custom-fields-pro.git",
+                "reference": "52c24cc73266c8b0499ccfaaf83875c048649bf8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lunar-build/advanced-custom-fields-pro/zipball/52c24cc73266c8b0499ccfaaf83875c048649bf8",
+                "reference": "52c24cc73266c8b0499ccfaaf83875c048649bf8",
+                "shasum": ""
+            },
+            "type": "wordpress-plugin",
+            "autoload": {
+                "psr-4": {
+                    "ACF\\": "src/"
+                }
+            },
+            "scripts": {
+                "post-autoload-dump": [
+                    "sed -i.bak '/InstalledVersions.php/d' vendor/composer/autoload_static.php && rm -f vendor/composer/autoload_static.php.bak"
+                ]
+            },
+            "license": [
+                "GPLv2 or later"
+            ],
+            "authors": [
+                {
+                    "name": "WP Engine"
+                }
+            ],
+            "description": "Advanced Custom Fields",
+            "support": {
+                "source": "https://github.com/lunar-build/advanced-custom-fields-pro/tree/6.8.6",
+                "issues": "https://github.com/lunar-build/advanced-custom-fields-pro/issues"
+            },
+            "funding": [
+                {
+                    "type": "github",
+                    "url": "https://github.com/sterner-stuff"
+                }
+            ],
+            "time": "2026-07-15T00:27:43+00:00"
         }
     ],
     "packages-dev": [

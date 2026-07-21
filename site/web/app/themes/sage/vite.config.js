@@ -5,7 +5,7 @@ import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
 
 // Set APP_URL if it doesn't exist for Laravel Vite plugin
 if (! process.env.APP_URL) {
-  process.env.APP_URL = 'http://example.test';
+  process.env.APP_URL = 'https://bbb-rebuild.test';
 }
 
 export default defineConfig({
@@ -40,6 +40,21 @@ export default defineConfig({
       '@styles': '/resources/css',
       '@fonts': '/resources/fonts',
       '@images': '/resources/images',
+    },
+  },
+  server: {
+    // Respond to all network requests
+    host: "0.0.0.0",
+    port: 5173,
+    strictPort: true,
+    // Defines the origin of the generated asset URLs during development,
+    // this must be set to the Vite dev server URL and selected port.
+    origin: `${process.env.DDEV_PRIMARY_URL_WITHOUT_PORT}:5173`,
+    // Configure CORS securely for the Vite dev server to allow requests
+    // from *.ddev.site domains, supports additional hostnames (via regex).
+    // If you use another `project_tld`, adjust this value accordingly.
+    cors: {
+      origin: /https?:\/\/([A-Za-z0-9\-\.]+)?(\.test)(?::\d+)?$/,
     },
   },
 })
