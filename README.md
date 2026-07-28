@@ -41,6 +41,14 @@ ddev exec "npm --prefix web/app/themes/sage run build"
 
 Composer caches this token in `auth.json` (gitignored) so you shouldn't be prompted again after the first successful install.
 
+### First run / after installing WordPress
+
+Once WP install screen has run (site loads, DB set up):
+
+1. Grab `ACF_PRO_KEY` from 1Password and set it in `site/.env`
+2. Activate ACF Pro plugin in WP admin (Plugins)
+3. Confirm active theme is **Sage** (`web/app/themes/sage`) — WP admin > Appearance > Themes
+
 # [ACF Composer](https://github.com/log1x/acf-composer)
 
 Provides an artisan-like CLI for managing ACF fields and blocks in a WordPress project. Checkout the link above for example usage and documentation. See the below example.
