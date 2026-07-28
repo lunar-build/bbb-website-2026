@@ -31,6 +31,16 @@ ddev exec "composer --working-dir web/app/themes/sage install"
 ddev exec "npm --prefix web/app/themes/sage run build"
 ```
 
+### Troubleshooting: site `composer install` prompts for a GitHub token / ACF Pro fails to download
+
+`composer.json` pulls ACF Pro from a private repo (`lunar-build/advanced-custom-fields-pro`). If `composer install` fails with a 404 downloading `wpengine/advanced-custom-fields`, or you're never prompted for a token and it just fails silently:
+
+1. Delete `site/composer.lock`
+2. Re-run `ddev exec "composer install"` — this forces Composer to re-resolve and it should prompt for a GitHub token
+3. Generate a token at https://github.com/settings/tokens (needs access to the `lunar-build` org / the private repo) and paste it in when prompted
+
+Composer caches this token in `auth.json` (gitignored) so you shouldn't be prompted again after the first successful install.
+
 # [ACF Composer](https://github.com/log1x/acf-composer)
 
 Provides an artisan-like CLI for managing ACF fields and blocks in a WordPress project. Checkout the link above for example usage and documentation. See the below example.
