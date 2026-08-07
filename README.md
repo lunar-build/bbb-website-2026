@@ -58,3 +58,18 @@ Provides an artisan-like CLI for managing ACF fields and blocks in a WordPress p
 Blade file: [site/web/app/themes/sage/resources/views/blocks/text-hero.blade.php](site/web/app/themes/sage/resources/views/blocks/text-hero.blade.php)
 
 This block uses the core/heading and core/paragraph blocks as content. The block is registered in the `TextHero.php` file and the fields are defined in the `fields()` method. The block is rendered in the `with()` method, which passes the block data to the Blade template. The `template` property defines the default inner blocks for the block.
+
+# [Lunar UI Components](https://github.com/lunar-build/ui-components)
+
+`@lunar.build/lunar-ui-components` is a small Lit-based web component library (`<lunar-nav>`, `<lunar-site-header>`, `<lunar-site-footer>`), registered globally via `import '@lunar.build/lunar-ui-components/main.js';` in `resources/js/app.js`, the same pattern used for Web Awesome. Component styles are bundled per-component (Lit Shadow DOM) — nothing extra to import for that.
+
+**Shaping WP/ACF data for structured component props:** these components take structured `Array`/`Object` props (e.g. `lunar-nav`'s `items`, `lunar-site-footer`'s `columns`/`legal`), and WordPress's native data (menu items, ACF fields) never matches that shape 1:1 — a small conversion step is needed every time. Handily, Lit auto-`JSON.parse`s a matching HTML attribute for `Array`/`Object`-typed props with no custom converter, so Blade can just write `items="{{ json_encode($shaped) }}"` — no JS bridge or extra dependency (e.g. Alpine) needed.
+
+Convention for this and any future component library used the same way:
+
+1. Check the component's source (its `static properties` block, for Lit components) to confirm the exact shape it expects.
+2. Write one small pure function converting WP/ACF data → that shape, in [site/web/app/themes/sage/app/helpers.php](site/web/app/themes/sage/app/helpers.php) (autoloaded via `composer.json`'s `autoload.files`), named `thing_to_shape()`.
+3. Reuse it across blocks rather than re-deriving the same mapping inline in Blade. See `menu_items_to_array()` and `menu_items_to_footer_columns()` (the latter reuses the former) for the pattern.
+4. Keep the Blade view thin: call the helper, `json_encode()` the result into the attribute.
+
+See [site/web/app/themes/sage/resources/views/sections/header.blade.php](site/web/app/themes/sage/resources/views/sections/header.blade.php) and [.../sections/footer.blade.php](site/web/app/themes/sage/resources/views/sections/footer.blade.php) for the canonical usage.

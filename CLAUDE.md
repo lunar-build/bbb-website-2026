@@ -68,6 +68,13 @@ Theme translations (from `/site/web/app/themes/sage`): `npm run translate` (pot 
 
 When adding a new block: create the `App\Blocks\*` class, define fields with `Builder`, add the matching Blade view under `resources/views/blocks/`, and reference `app/Blocks/TextHero.php` / `resources/views/blocks/text-hero.blade.php` as the canonical example.
 
+**Shaping WP/ACF data for structured component props:** whenever a block's Blade view hands data to a component that expects a structured `Array`/`Object` prop (Lunar's `items`/`columns`/`legal`, or similar on any future component library), WordPress's native data shape (menu items, ACF repeater rows, `WP_Query` results) will not match the component's expected shape 1:1 — a small conversion step is required every time, not just for Lunar. Convention:
+
+1. Check the component's source (e.g. its `static properties` block, for Lit components) to confirm the exact keys/shape it expects.
+2. Write one small pure function converting WP/ACF data → that shape, named `thing_to_shape()`.
+3. Put it in `app/helpers.php` (autoloaded via `composer.json`'s `autoload.files`) and reuse it across blocks — don't re-derive the same walker/mapping inline in Blade each time. See `menu_items_to_array()` and `menu_items_to_footer_columns()` (the latter reuses the former rather than re-walking the menu) for the pattern.
+4. Keep the Blade view thin: call the helper, `json_encode()` the result into the attribute, done.
+
 ## Web Awesome
 
 [Web Awesome](https://webawesome.com/) (`@awesome.me/webawesome`, from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package, which ships the full **core** component set — there is no paid Pro tier dependency wired in.
