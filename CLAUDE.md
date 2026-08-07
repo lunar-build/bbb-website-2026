@@ -81,6 +81,14 @@ When adding a new block: create the `App\Blocks\*` class, define fields with `Bu
 - Because components are just custom elements, use them directly in Blade views (e.g. `<wa-button variant="brand">Submit</wa-button>`) with no additional PHP/JS wiring needed — no components are in use in `resources/views/` yet, so there's no existing in-repo usage pattern to follow.
 - Full component docs/props/slots/events: https://webawesome.com/docs/components/. To check what's available locally (versions can drift from the docs), list `node_modules/@awesome.me/webawesome/dist/components/`.
 
+## Lunar UI Components
+
+`@lunar.build/lunar-ui-components` (`node_modules/@lunar.build/lunar-ui-components`) is a small internal Lit-based web component library — currently `<lunar-nav>`, `<lunar-site-header>`, `<lunar-site-footer>`. Registered globally the same way as Web Awesome, via `import '@lunar.build/lunar-ui-components/main.js';` in `resources/js/app.js`. Component styles are already bundled per-component (Lit shadow DOM).
+
+**Passing PHP/Blade data into a component's `Array`/`Object`-typed properties:** Lit's default property converter auto-`JSON.parse`s a matching HTML attribute for any property declared `{ type: Array }` or `{ type: Object }` with no custom `converter` (see `node_modules/@lit/reactive-element/development/reactive-element.js`). So Blade can write a plain JSON string attribute — e.g. `items="{{ json_encode($items) }}"` for `<lunar-nav items="...">` — and the component parses it itself; no JS bridge or extra dependency (Alpine, etc.) is needed. Before relying on this for a new component/prop, check the component's `index.js` `static properties` block confirms the type and that no custom `converter` is set. Only reach for something like Alpine if a prop needs true property assignment (non-JSON-safe values, functions, DOM refs) or the block needs standalone client interactivity.
+
+`app/helpers.php` (autoloaded via `composer.json`'s `autoload.files`) holds `menu_items_to_array(string $location): array`, which converts a WP nav menu theme location into the nested `{ label, href, current, children }` shape `<lunar-nav items="...">` expects — reuse it for any other block/section that needs menu data in this shape rather than re-deriving the walker. See `resources/views/sections/header.blade.php` for the canonical usage with `<lunar-site-header>` + `<lunar-nav>`.
+
 ## Notes
 
 - `web/app/plugins/advanced-custom-fields` and WordPress core (`web/wp`) are dependency-managed via Composer (see repositories in `site/composer.json`, including a private `advanced-custom-fields-pro` VCS repo) — don't edit them directly.
