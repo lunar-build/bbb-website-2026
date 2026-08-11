@@ -26,10 +26,34 @@ For every piece of UI in the new block, pick one:
   used this way in `resources/views/blocks/cta-strip.blade.php` and `video-hero.blade.php`.
   Check what's available locally: `node_modules/@awesome.me/webawesome/dist/components/`.
   Docs: https://webawesome.com/docs/components/
+
+  Styles are already registered globally (`resources/js/app.js` imports
+  `@awesome.me/webawesome/dist/styles/webawesome.css`). **But each component's JS must be
+  imported individually** — add `import '@awesome.me/webawesome/dist/components/<name>/<name>.js';`
+  to `resources/js/app.js` the first time a new `<wa-*>` tag is used (currently imported:
+  `button`, `card`). Do **not** import `@awesome.me/webawesome/dist/webawesome.js` instead
+  — that's a CDN-style autoloader that lazy-fetches components by detecting its own
+  `<script src="webawesome.js">` tag to compute a base path; bundled through Vite there's
+  no such tag, so it silently fails to find any component and every `<wa-*>` tag stays an
+  inert, undefined custom element — no console error, no network 404, just dead markup
+  (this bit `CtaStrip`'s button once already). Not imported in `resources/js/editor.js`
+  either, so `<wa-*>` components aren't available inside the block editor yet.
+
 - **(c) An existing Lunar component** — `<lunar-nav>`, `<lunar-site-header>`,
   `<lunar-site-footer>` today. Check `node_modules/@lunar.build/lunar-ui-components/components/`
   for the current list, and that component's `index.js` `static properties` block for its
-  exact prop shape before wiring data into it.
+  exact prop shape before wiring data into it. Registered globally the same way as Web
+  Awesome, via `import '@lunar.build/lunar-ui-components/main.js';` in `resources/js/app.js`
+  (styles are bundled per-component via Lit shadow DOM, nothing extra to import).
+
+  Passing structured data in: Lit auto-`JSON.parse`s a matching HTML attribute for any
+  property declared `{ type: Array }` or `{ type: Object }` with no custom `converter` —
+  so Blade can just write `items="{{ json_encode($shaped) }}"` and the component parses
+  it itself, no JS bridge (Alpine etc.) needed. Confirm the property's declared as
+  `Array`/`Object` with no custom `converter` in the component's `index.js` before relying
+  on this. `app/helpers.php` already has `menu_items_to_array()` (WP menu → `<lunar-nav
+  items="...">`'s nested shape) and `menu_items_to_footer_columns()` (reuses it) as
+  reference conversions — see "Shaping WP/ACF data" below for the general pattern.
 - **(d) A new Lunar component is needed** — stop here. Don't scaffold the block yet.
   Jump to "Requesting a new Lunar component" below, produce the prompt, and wait for the
   developer to build + publish it in `ui-components` and bump the dependency in this
@@ -58,6 +82,31 @@ It creates exactly two files:
 **No manual registration step.** `Log1x\AcfComposer\AcfComposer` auto-discovers any
 class under `app/Blocks/*.php` extending `Block` — don't add anything to
 `ThemeServiceProvider` or `setup.php`.
+
+**`$mode` is always `'preview'`, with `supports.mode` (and `supports.jsx`) both `true`.**
+Every block in this theme uses this combination so editors get a rendered preview by
+default and only see the ACF fields (in the block's Inspector sidebar, not an inline
+edit form) once they click into the block — not the reverse. Don't leave `$mode` unset
+or set it to `'edit'`/`'auto'`.
+
+```php
+/**
+ * The default block mode.
+ *
+ * @var string
+ */
+public $mode = 'preview';
+```
+
+**If a block appears permanently stuck in edit mode** despite this being set correctly,
+it's very likely a stale ACF Composer cache serving an old field-group/mode snapshot
+from before the block's fields last changed (`config/acf.php`'s `generators.manifest`
+caches compiled block/field-group definitions to `storage/framework/cache`). Clear it:
+```bash
+ddev exec "wp acorn acf:clear"
+```
+Run this any time a block's `fields()`/`$mode`/`$supports` changes and the editor
+doesn't seem to reflect it — this is a real, recurring gotcha, not a one-off.
 
 **Non-interactive pitfall:** `wp acorn acf:block` uses `laravel/prompts`, which needs a
 real TTY. Run it through a normal `ddev ssh` / interactive terminal and answer the
@@ -131,12 +180,29 @@ than nesting two `<section>`s (see `video-hero.blade.php`'s `.c-video-hero__inne
 `$attributes->class([...])` merges Gutenberg's wrapper classes with your own BEM root
 class. Use `$attributes` bare (no `->class()`) if you don't need an extra class.
 
-If a field's WP/ACF shape doesn't already match what a component expects (e.g. a
-repeater feeding a Lunar component's array-typed `items` prop), don't re-derive the
-mapping inline in Blade — follow the `thing_to_shape()` convention already documented
-in the root `CLAUDE.md` ("Shaping WP/ACF data for structured component props") and put
-the pure conversion function in `app/helpers.php`, reusing `menu_items_to_array()` /
-`menu_items_to_footer_columns()` as examples.
+### Shaping WP/ACF data for structured component props
+
+Whenever a block's Blade view hands data to a component expecting a structured
+`Array`/`Object` prop (Lunar's `items`/`columns`/`legal`, or similar on any future
+component library), WordPress's native data shape (menu items, ACF repeater rows,
+`WP_Query` results) won't match the component's expected shape 1:1 — a small conversion
+step is needed every time. One small pure function per **shape**, not per block or one
+generic converter (ACF/WP key names almost never match a component's declared prop
+names, so there's no way to write a single converter that handles every case):
+
+1. Check the component's source (its `static properties` block, for Lit components) to
+   confirm the exact keys/shape it expects.
+2. Write one small pure function converting WP/ACF data → that shape, named after the
+   *shape it produces* (e.g. `menu_items_to_array`, `repeater_to_feature_grid_items`),
+   not after the block that happens to use it first — so a later, unrelated block
+   needing the same shape reuses it as-is instead of duplicating it.
+3. Put it in `app/helpers.php` (autoloaded via `composer.json`'s `autoload.files`).
+   See `menu_items_to_array()` and `menu_items_to_footer_columns()` (the latter reuses
+   the former rather than re-walking the menu) for the pattern.
+4. Keep the Blade view thin: call the helper, `json_encode()` the result into the
+   attribute, done. Not every field needs a helper — if a field's raw shape already
+   matches the component's prop (or the component just wants a plain string), pass it
+   straight through.
 
 ## 5. Verify
 
