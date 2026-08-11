@@ -38,37 +38,37 @@ function menu_items_to_array(string $location): array
 }
 
 /**
- * Convert a WordPress nav menu theme location into the `{ columns, legal }`
- * shape expected by lunar-ui-components' `<lunar-site-footer columns="..." legal="...">`.
- *
- * Top-level items with children become a column (item label as the column
- * title, its children as the column's links); top-level items without
- * children are treated as legal links instead, since lunar-site-footer
- * only renders a column's `links` when its `children` array is non-empty.
+ * Convert a WordPress nav menu theme location into the `columns` shape
+ * expected by lunar-ui-components' `<lunar-site-footer columns="...">`:
+ * one column per top-level item (item label as the column title, its
+ * children as the column's links).
  */
 function menu_items_to_footer_columns(string $location): array
 {
     $items = menu_items_to_array($location);
 
-    $columns = [];
-    $legal = [];
+    return array_map(fn($item) => [
+        'title' => $item['label'],
+        'links' => array_map(fn($child) => [
+            'label' => $child['label'],
+            'href' => $child['href'],
+        ], $item['children']),
+    ], $items);
+}
 
-    foreach ($items as $item) {
-        if (! empty($item['children'])) {
-            $columns[] = [
-                'title' => $item['label'],
-                'links' => array_map(fn($child) => [
-                    'label' => $child['label'],
-                    'href' => $child['href'],
-                ], $item['children']),
-            ];
-        } else {
-            $legal[] = [
-                'label' => $item['label'],
-                'href' => $item['href'],
-            ];
-        }
-    }
+/**
+ * Convert the Theme Options "Legal Links" repeater into the `legal` shape
+ * expected by lunar-ui-components' `<lunar-site-footer legal="...">`.
+ * Sourced independently from the footer nav menu (not derived from it),
+ * since not every project using this theme will want legal links to be
+ * whichever footer menu items happen to have no children.
+ */
+function legal_links_from_options(): array
+{
+    $rows = get_field('legal_links', 'option') ?: [];
 
-    return ['columns' => $columns, 'legal' => $legal];
+    return array_map(fn($row) => [
+        'label' => $row['label'],
+        'href' => $row['href'],
+    ], $rows);
 }

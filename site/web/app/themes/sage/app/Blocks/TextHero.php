@@ -139,16 +139,6 @@ class TextHero extends Block
     public $styles = ['light', 'dark'];
 
     /**
-     * The block preview example data.
-     *
-     * @var array
-     */
-    public $example = [
-        'heading' => 'Example Heading',
-        'tagline' => 'Example Tagline',
-    ];
-
-    /**
      * The block template.
      *
      * @var array
@@ -163,9 +153,7 @@ class TextHero extends Block
      */
     public function with(): array
     {
-        return [
-            'heading' => $this->heading(),
-        ];
+        return [];
     }
 
     /**
@@ -175,26 +163,6 @@ class TextHero extends Block
     {
         $fields = Builder::make('text_hero');
         return $fields->build();
-    }
-
-    /**
-     * Retrieve the heading.
-     *
-     * @return array
-     */
-    public function heading()
-    {
-        return get_field('heading') ?: $this->example['heading'];
-    }
-
-    /**
-     * Retrieve the tagline.
-     *
-     * @return array
-     */
-    public function tagline()
-    {
-        return get_field('tagline') ?: $this->example['tagline'];
     }
 
     /**

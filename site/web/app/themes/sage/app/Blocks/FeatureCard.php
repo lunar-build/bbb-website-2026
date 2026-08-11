@@ -151,8 +151,6 @@ class FeatureCard extends Block
      * @var array
      */
     public $example = [
-        'heading' => 'Volunteer with us',
-        'body' => 'Join our team of bike mechanics and help keep the scheme running.',
         'link' => [
             'title' => 'Get involved',
             'url' => 'https://betterbybike.info/get-involved/',
@@ -161,13 +159,21 @@ class FeatureCard extends Block
     ];
 
     /**
+     * The block template.
+     *
+     * @var array
+     */
+    public $template = [
+        'core/heading' => ['placeholder' => 'Heading', 'level' => 3],
+        'core/paragraph' => ['placeholder' => 'Body text…'],
+    ];
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
         return [
-            'heading' => $this->heading(),
-            'body' => $this->body(),
             'link' => $this->link(),
         ];
     }
@@ -180,40 +186,12 @@ class FeatureCard extends Block
         $fields = Builder::make('feature_card');
 
         $fields
-            ->addText('heading', [
-                'label' => 'Heading',
-            ])
-            ->addTextarea('body', [
-                'label' => 'Body text',
-                'rows' => 3,
-                'new_lines' => 'br',
-            ])
             ->addLink('link', [
                 'label' => 'Link',
                 'instructions' => 'Link text + URL for the card CTA.',
             ]);
 
         return $fields->build();
-    }
-
-    /**
-     * Retrieve the heading.
-     *
-     * @return string
-     */
-    public function heading()
-    {
-        return get_field('heading') ?: $this->example['heading'];
-    }
-
-    /**
-     * Retrieve the body text.
-     *
-     * @return string
-     */
-    public function body()
-    {
-        return get_field('body') ?: $this->example['body'];
     }
 
     /**

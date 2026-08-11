@@ -139,7 +139,7 @@ function menu_items_to_array(string $location): array
 <lunar-nav items="{{ json_encode($items) }}">
 ```
 
-`menu_items_to_footer_columns()` builds on top of this rather than re-walking the menu: it calls `menu_items_to_array()` first, then buckets the already-shaped top-level items into `columns` (ones with children) vs `legal` links (ones without), for `<lunar-site-footer>`'s `{ columns, legal }` shape.
+`menu_items_to_footer_columns()` builds on top of this rather than re-walking the menu: it calls `menu_items_to_array()` first, then maps each top-level item straight into a `{ title, links }` column for `<lunar-site-footer>`'s `columns` prop. `<lunar-site-footer>`'s `legal` prop is sourced separately, from a "Legal Links" repeater on the Theme Options page (`app/Options/ThemeOptions.php`) via `legal_links_from_options()`, rather than inferred from the same menu — not every project using this theme will want legal links to be "whichever footer menu items happen to have no children," so the two are independent inputs, matching the component's own independent `columns`/`legal` properties.
 
 See [site/web/app/themes/sage/resources/views/sections/header.blade.php](site/web/app/themes/sage/resources/views/sections/header.blade.php) and [.../sections/footer.blade.php](site/web/app/themes/sage/resources/views/sections/footer.blade.php) for the full canonical usage.
 

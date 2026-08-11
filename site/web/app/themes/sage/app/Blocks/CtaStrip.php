@@ -151,8 +151,6 @@ class CtaStrip extends Block
      * @var array
      */
     public $example = [
-        'title' => 'Need a bike to get started?',
-        'body' => 'Borrow one of our FREE electric, hybrid or folding bikes for up to a month',
         'link' => [
             'title' => 'Find out more',
             'url' => 'https://betterbybike.info/schemes-and-initiatives/loan-a-bike-scheme/',
@@ -161,13 +159,21 @@ class CtaStrip extends Block
     ];
 
     /**
+     * The block template.
+     *
+     * @var array
+     */
+    public $template = [
+        'core/heading' => ['placeholder' => 'Heading', 'level' => 3],
+        'core/paragraph' => ['placeholder' => 'Body text…'],
+    ];
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
         return [
-            'title' => $this->title(),
-            'body' => $this->body(),
             'link' => $this->link(),
         ];
     }
@@ -180,40 +186,12 @@ class CtaStrip extends Block
         $fields = Builder::make('cta_strip');
 
         $fields
-            ->addText('title', [
-                'label' => 'Title',
-            ])
-            ->addTextarea('body', [
-                'label' => 'Body text',
-                'rows' => 2,
-                'new_lines' => 'br',
-            ])
             ->addLink('link', [
                 'label' => 'Link',
                 'instructions' => 'Link text + URL for the CTA.',
             ]);
 
         return $fields->build();
-    }
-
-    /**
-     * Retrieve the title.
-     *
-     * @return string
-     */
-    public function title()
-    {
-        return get_field('title') ?: $this->example['title'];
-    }
-
-    /**
-     * Retrieve the body text.
-     *
-     * @return string
-     */
-    public function body()
-    {
-        return get_field('body') ?: $this->example['body'];
     }
 
     /**

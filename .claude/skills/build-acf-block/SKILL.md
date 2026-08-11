@@ -91,6 +91,21 @@ In the generated class:
 - `$example` on the class supplies the block-editor preview/empty-state data used by
   every accessor's fallback.
 
+**ACF fields vs. `InnerBlocks` for freeform copy:** a block's editable content can come
+from either ACF fields (`addText`/`addTextarea`, `get_field()`-backed, as above) or
+native `InnerBlocks` (empty `fields()`, a `$template` property, `<InnerBlocks
+template="{{ $block->template }}" />` in Blade — see `app/Blocks/TextHero.php`). Prefer
+`InnerBlocks` for a block's heading/body copy: it gives real, document-outline-correct
+HTML elements (`core/heading` with a CMS-editable H1–H6 level, `core/paragraph`) for
+free, whereas ACF text/textarea fields require you to hand-build that semantics
+yourself (see `app/Blocks/FeatureCard.php`/`CtaStrip.php`, which use `InnerBlocks` for
+this reason). A block can mix both: keep an ACF field for anything `InnerBlocks` has no
+native equivalent for (e.g. a CTA button's `link` field, which stays ACF in both of
+those blocks since there's no core block for a styled `wa-button`). Known trade-off:
+`InnerBlocks` content isn't covered by `$example`/get_field() fallbacks, so a block's
+editor "preview" thumbnail shows the raw `$template` placeholders rather than curated
+example copy — accepted as-is for now.
+
 ## 4. Build the Blade view
 
 Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
