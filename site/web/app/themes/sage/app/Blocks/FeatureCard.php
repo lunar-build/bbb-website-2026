@@ -1,0 +1,238 @@
+<?php
+
+namespace App\Blocks;
+
+use Log1x\AcfComposer\Block;
+use Log1x\AcfComposer\Builder;
+
+class FeatureCard extends Block
+{
+    /**
+     * The block name.
+     *
+     * @var string
+     */
+    public $name = 'Feature Card';
+
+    /**
+     * The block slug.
+     *
+     * @var string
+     */
+    public $slug = 'feature-card';
+
+    /**
+     * The block description.
+     *
+     * @var string
+     */
+    public $description = 'A bordered card with a heading, body text, and a single CTA link.';
+
+    /**
+     * The block category.
+     *
+     * @var string
+     */
+    public $category = 'text';
+
+    /**
+     * The block icon.
+     *
+     * @var string|array
+     */
+    public $icon = 'id-alt';
+
+    /**
+     * The block keywords.
+     *
+     * @var array
+     */
+    public $keywords = [
+        'card',
+        'feature',
+        'cta',
+        'link',
+    ];
+
+    /**
+     * The block post type allow list.
+     *
+     * @var array
+     */
+    public $post_types = ['post', 'page'];
+
+    /**
+     * The parent block type allow list.
+     *
+     * @var array
+     */
+    public $parent = [];
+
+    /**
+     * The ancestor block type allow list.
+     *
+     * @var array
+     */
+    public $ancestor = [];
+
+    /**
+     * The default block mode.
+     *
+     * @var string
+     */
+    public $mode = 'preview';
+
+    /**
+     * The default block alignment.
+     *
+     * @var string
+     */
+    public $align = '';
+
+    /**
+     * The default block text alignment.
+     *
+     * @var string
+     */
+    public $align_text = '';
+
+    /**
+     * The default block content alignment.
+     *
+     * @var string
+     */
+    public $align_content = '';
+
+    /**
+     * The default block spacing.
+     *
+     * @var array
+     */
+    public $spacing = [
+        'padding' => null,
+        'margin' => null,
+    ];
+
+    /**
+     * The supported block features.
+     *
+     * @var array
+     */
+    public $supports = [
+        'align' => true,
+        'align_text' => false,
+        'align_content' => false,
+        'full_height' => false,
+        'anchor' => false,
+        'mode' => true,
+        'multiple' => true,
+        'jsx' => true,
+        'color' => [
+            'background' => false,
+            'text' => false,
+            'gradients' => false,
+        ],
+        'spacing' => [
+            'padding' => false,
+            'margin' => false,
+        ],
+    ];
+
+    /**
+     * The block styles.
+     *
+     * @var array
+     */
+    public $styles = ['light', 'dark'];
+
+    /**
+     * The block preview example data.
+     *
+     * @var array
+     */
+    public $example = [
+        'heading' => 'Volunteer with us',
+        'body' => 'Join our team of bike mechanics and help keep the scheme running.',
+        'link' => [
+            'title' => 'Get involved',
+            'url' => 'https://betterbybike.info/get-involved/',
+            'target' => '',
+        ],
+    ];
+
+    /**
+     * Data to be passed to the block before rendering.
+     */
+    public function with(): array
+    {
+        return [
+            'heading' => $this->heading(),
+            'body' => $this->body(),
+            'link' => $this->link(),
+        ];
+    }
+
+    /**
+     * The block field group.
+     */
+    public function fields(): array
+    {
+        $fields = Builder::make('feature_card');
+
+        $fields
+            ->addText('heading', [
+                'label' => 'Heading',
+            ])
+            ->addTextarea('body', [
+                'label' => 'Body text',
+                'rows' => 3,
+                'new_lines' => 'br',
+            ])
+            ->addLink('link', [
+                'label' => 'Link',
+                'instructions' => 'Link text + URL for the card CTA.',
+            ]);
+
+        return $fields->build();
+    }
+
+    /**
+     * Retrieve the heading.
+     *
+     * @return string
+     */
+    public function heading()
+    {
+        return get_field('heading') ?: $this->example['heading'];
+    }
+
+    /**
+     * Retrieve the body text.
+     *
+     * @return string
+     */
+    public function body()
+    {
+        return get_field('body') ?: $this->example['body'];
+    }
+
+    /**
+     * Retrieve the link.
+     *
+     * @return array
+     */
+    public function link()
+    {
+        return get_field('link') ?: $this->example['link'];
+    }
+
+    /**
+     * Assets enqueued with 'enqueue_block_assets' when rendering the block.
+     *
+     * @link https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/#editor-content-scripts-and-styles
+     */
+    public function assets(array $block): void
+    {
+        //
+    }
+}
