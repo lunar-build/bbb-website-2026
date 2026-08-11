@@ -142,3 +142,63 @@ function menu_items_to_array(string $location): array
 `menu_items_to_footer_columns()` builds on top of this rather than re-walking the menu: it calls `menu_items_to_array()` first, then buckets the already-shaped top-level items into `columns` (ones with children) vs `legal` links (ones without), for `<lunar-site-footer>`'s `{ columns, legal }` shape.
 
 See [site/web/app/themes/sage/resources/views/sections/header.blade.php](site/web/app/themes/sage/resources/views/sections/header.blade.php) and [.../sections/footer.blade.php](site/web/app/themes/sage/resources/views/sections/footer.blade.php) for the full canonical usage.
+
+### Is there one generic converter, or one per block?
+
+**One small pure function per component prop *shape*, not one per block, and not one generic converter.** Lit's auto-JSON-parse only guarantees the *wire format* works (valid JSON in an attribute) — it says nothing about whether the *keys* inside that JSON match what the component expects. ACF/WP data almost never uses the same key names a Lunar component declares in its `static properties`, so there's no way to write a single converter that handles every case; the conversion is always "shape A → shape B," and shape B is fixed by whichever component you're feeding.
+
+**Worked example — a block combining a repeater, a WYSIWYG field, a CTA link, and a table:** say a block needs all four field types, feeding a hypothetical `<lunar-feature-grid>` that declares:
+
+```js
+static properties = {
+  items: { type: Array },   // [{ title, description, cta: { label, href } }]
+  intro: { type: String },  // raw HTML string
+  table: { type: Object },  // { headers: string[], rows: string[][] }
+};
+```
+
+- **Repeater → `items`:** an ACF repeater returns rows like `{ card_title, card_body, card_link }` — different key names, and `card_link` is ACF's link-field shape (`{ title, url, target }`), not the component's `{ label, href }`. One helper, named after the shape it produces:
+
+  ```php
+  // app/helpers.php
+  function repeater_to_feature_grid_items(array $rows): array
+  {
+      return array_map(fn ($row) => [
+          'title' => $row['card_title'],
+          'description' => $row['card_body'],
+          'cta' => [
+              'label' => $row['card_link']['title'] ?? '',
+              'href' => $row['card_link']['url'] ?? '',
+          ],
+      ], $rows);
+  }
+  ```
+
+- **WYSIWYG → `intro`:** often needs *no* helper at all — `get_field('intro')` already returns an HTML string, and if the component just wants a plain `String`, pass it straight through. Not every field needs a conversion function; only ones where the shape actually mismatches.
+
+- **CTA link → a single `{ label, href }` prop:** if it's a single ACF link field feeding a single prop (not a whole array), that's usually just a 3-4 line inline transform in the block's `with()` method — it doesn't earn its own named helper unless it's reused by more than one block. Compare `CtaStrip::link()`, which needs *no* transform at all because `wa-button`'s `href`/label are passed as separate Blade attributes rather than one structured prop.
+
+- **Table → `table`:** a third, separate helper, `table_rows_to_grid(array $rows): array`, walking ACF's table/repeater rows into `{ headers, rows }`.
+
+```php
+// app/Blocks/FeatureGrid.php
+public function with(): array
+{
+    return [
+        'items' => repeater_to_feature_grid_items($this->items()),
+        'intro' => $this->intro(), // WYSIWYG, no reshaping needed
+        'table' => table_rows_to_grid($this->tableRows()),
+    ];
+}
+```
+
+```blade
+{{-- resources/views/blocks/feature-grid.blade.php --}}
+<lunar-feature-grid
+  items="{{ json_encode($items) }}"
+  intro="{{ $intro }}"
+  table="{{ json_encode($table) }}"
+>
+```
+
+**Why this doesn't need one helper per block:** the helpers are named after the *shape they produce* (`repeater_to_feature_grid_items`, `table_rows_to_grid`), not after the block. If a second, unrelated block later also needs to feed a `<lunar-feature-grid>`, it reuses `repeater_to_feature_grid_items()` as-is — same pattern as `menu_items_to_footer_columns()` reusing `menu_items_to_array()` above. The source ACF field type (repeater vs. group vs. post meta) doesn't matter to the helper, only that its output matches the component's declared shape exactly.
