@@ -70,6 +70,19 @@ Repo ships a [Claude Code](https://claude.com/claude-code) skill at [.claude/ski
 
 See `site/web/app/themes/sage/app/Blocks/FeatureCard.php` + `.../resources/views/blocks/feature-card.blade.php` for a worked example built via this workflow (Web Awesome `<wa-card>`/`<wa-button>`, no Lunar component needed for this one).
 
+# [Web Awesome](https://webawesome.com/)
+
+`@awesome.me/webawesome` (from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package — no paid Pro tier dependency.
+
+- Styles are registered globally via `import '@awesome.me/webawesome/dist/styles/webawesome.css';` in `resources/js/app.js`. Not imported in `resources/js/editor.js`, so components aren't available inside the block editor yet.
+- **Components must be imported individually, per-component**, e.g. `import '@awesome.me/webawesome/dist/components/button/button.js';`. Currently imported: `button`, `card`. Add a new import line the first time a new `<wa-*>` tag is used.
+
+### ⚠️ Don't import `@awesome.me/webawesome/dist/webawesome.js`
+
+That entry point is a CDN-style autoloader, not a bundle — it lazy-fetches each component's JS at runtime by detecting its own `<script src="webawesome.js">` tag on the page to compute a base path. Bundled through Vite, no such script tag exists, so base-path detection silently fails and `<wa-*>` tags never register as custom elements — **no console error, no failed network request**, they just render as inert, unstyled markup (buttons that look like plain text and aren't clickable, links with `href` set but no working anchor underneath). This bit us once already: see [site/web/app/themes/sage/app/Blocks/CtaStrip.php](site/web/app/themes/sage/app/Blocks/CtaStrip.php)'s button silently failing to be clickable on the front end until the import was switched to per-component. Cherry-picking imports (Web Awesome's own npm/bundler install guidance) avoids this entirely.
+
+Full component docs/props/slots/events: https://webawesome.com/docs/components/. To check what's actually available locally (versions can drift from the docs), list `site/web/app/themes/sage/node_modules/@awesome.me/webawesome/dist/components/`.
+
 # [Lunar UI Components](https://github.com/lunar-build/ui-components)
 
 `@lunar.build/lunar-ui-components` is a small Lit-based web component library (`<lunar-nav>`, `<lunar-site-header>`, `<lunar-site-footer>`), registered globally via `import '@lunar.build/lunar-ui-components/main.js';` in `resources/js/app.js`, the same pattern used for Web Awesome. Component styles are bundled per-component (Lit Shadow DOM) — nothing extra to import for that.

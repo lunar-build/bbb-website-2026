@@ -79,13 +79,9 @@ When adding a new block: create the `App\Blocks\*` class, define fields with `Bu
 
 [Web Awesome](https://webawesome.com/) (`@awesome.me/webawesome`, from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package, which ships the full **core** component set — there is no paid Pro tier dependency wired in.
 
-- The whole library is registered globally by importing its bundled CSS and JS in the front-end entry point, `resources/js/app.js`:
-  ```js
-  import '@awesome.me/webawesome/dist/styles/webawesome.css';
-  import '@awesome.me/webawesome/dist/webawesome.js';
-  ```
-  This self-registers every `<wa-*>` custom element and its styles for the public-facing site. It is **not** imported in `resources/js/editor.js`, so components aren't currently available inside the block editor.
-- Because components are just custom elements, use them directly in Blade views (e.g. `<wa-button variant="brand">Submit</wa-button>`) with no additional PHP/JS wiring needed — no components are in use in `resources/views/` yet, so there's no existing in-repo usage pattern to follow.
+- Styles are registered globally by importing the bundled CSS in the front-end entry point, `resources/js/app.js`: `import '@awesome.me/webawesome/dist/styles/webawesome.css';`. This is **not** imported in `resources/js/editor.js`, so components aren't currently available inside the block editor.
+- **Components must be imported individually, per-component** — `import '@awesome.me/webawesome/dist/components/button/button.js';` — not via `@awesome.me/webawesome/dist/webawesome.js`. That entry point is a CDN-style autoloader: it lazy-fetches each component's JS by detecting its own `<script src="webawesome.js">` tag on the page to compute a base path. Bundled through Vite there's no such script tag, so base-path detection silently fails, `discover()` never fetches component defs, and every `<wa-*>` tag stays an inert, undefined custom element — no console error, no network 404, just unstyled/non-interactive markup. Cherry-pick imports (per Web Awesome's own npm/bundler install docs — see `node_modules/@awesome.me/webawesome/dist/skills/webawesome/references/installation.md`) avoid this entirely. Add a new `import '.../components/<name>/<name>.js';` line whenever a new `<wa-*>` tag is used for the first time; currently imported: `button`, `card`.
+- Because components are just custom elements, use them directly in Blade views (e.g. `<wa-button variant="brand">Submit</wa-button>`) with no additional PHP wiring needed. See `resources/views/blocks/cta-strip.blade.php` for the canonical usage pattern (`<wa-card>` + `<wa-button>`).
 - Full component docs/props/slots/events: https://webawesome.com/docs/components/. To check what's available locally (versions can drift from the docs), list `node_modules/@awesome.me/webawesome/dist/components/`.
 
 ## Lunar UI Components
