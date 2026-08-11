@@ -97,15 +97,21 @@ Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
 
 ```blade
 @unless ($block->preview)
-  <div {{ $attributes->class(['c-block-name']) }}>
+  <section {{ $attributes->class(['c-block-name']) }}>
 @endunless
 
   {{-- block content --}}
 
 @unless ($block->preview)
-  </div>
+  </section>
 @endunless
 ```
+
+**Root element is always `<section>`, never `<div>`.** Every block is a distinct
+region of page content, so `<section>` is the correct semantic wrapper — this is a
+fixed convention, not a per-block choice. If a block's content already has its own
+inner `<section>` (e.g. an "inner" wrapper), rename that inner one to `<div>` rather
+than nesting two `<section>`s (see `video-hero.blade.php`'s `.c-video-hero__inner`).
 
 `$attributes->class([...])` merges Gutenberg's wrapper classes with your own BEM root
 class. Use `$attributes` bare (no `->class()`) if you don't need an extra class.

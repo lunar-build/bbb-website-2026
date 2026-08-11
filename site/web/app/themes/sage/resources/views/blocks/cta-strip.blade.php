@@ -1,5 +1,5 @@
 @unless ($block->preview)
-  <div {{ $attributes->class(['c-cta-strip']) }}>
+  <section {{ $attributes->class(['c-cta-strip']) }}>
 @endunless
 
 <wa-card class="c-cta-strip__card" appearance="outlined" with-footer>
@@ -21,5 +21,5 @@
 </wa-card>
 
 @unless ($block->preview)
-  </div>
+  </section>
 @endunless

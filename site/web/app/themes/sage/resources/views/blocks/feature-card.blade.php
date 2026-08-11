@@ -1,5 +1,5 @@
 @unless ($block->preview)
-  <div {{ $attributes->class(['c-feature-card']) }}>
+  <section {{ $attributes->class(['c-feature-card']) }}>
 @endunless
 
 <wa-card class="c-feature-card__card" appearance="outlined" with-footer>
@@ -21,5 +21,5 @@
 </wa-card>
 
 @unless ($block->preview)
-  </div>
+  </section>
 @endunless

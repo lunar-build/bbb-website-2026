@@ -66,7 +66,7 @@ Theme translations (from `/site/web/app/themes/sage`): `npm run translate` (pot 
 - Each block's Blade view lives at `resources/views/blocks/<kebab-block-name>.blade.php`.
 - Standalone field groups (not tied to a block) go in `app/Fields/`.
 
-When adding a new block: create the `App\Blocks\*` class, define fields with `Builder`, add the matching Blade view under `resources/views/blocks/`, and reference `app/Blocks/TextHero.php` / `resources/views/blocks/text-hero.blade.php` as the canonical example.
+When adding a new block: create the `App\Blocks\*` class, define fields with `Builder`, add the matching Blade view under `resources/views/blocks/`, and reference `app/Blocks/TextHero.php` / `resources/views/blocks/text-hero.blade.php` as the canonical example. The block's root element is always `<section {{ $attributes->class([...]) }}>` (wrapped in `@unless ($block->preview)`), never `<div>` — a block is a distinct region of page content. See the `build-acf-block` skill (`.claude/skills/build-acf-block/SKILL.md`) for the full workflow.
 
 **Shaping WP/ACF data for structured component props:** whenever a block's Blade view hands data to a component that expects a structured `Array`/`Object` prop (Lunar's `items`/`columns`/`legal`, or similar on any future component library), WordPress's native data shape (menu items, ACF repeater rows, `WP_Query` results) will not match the component's expected shape 1:1 — a small conversion step is required every time, not just for Lunar. Convention:
 

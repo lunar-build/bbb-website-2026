@@ -1,8 +1,8 @@
 @unless ($block->preview)
-  <div {{ $attributes->class(['c-video-hero']) }}>
+  <section {{ $attributes->class(['c-video-hero']) }}>
 @endunless
 
-<section class="c-video-hero__inner">
+<div class="c-video-hero__inner">
   <div class="c-video-hero__media">
     @if ($video['url'] ?? null)
       <video
@@ -48,8 +48,8 @@
       </wa-button>
     </div>
   </div>
-</section>
+</div>
 
 @unless ($block->preview)
-  </div>
+  </section>
 @endunless
