@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(ddev exec *)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(ddev describe *)"
     ]
   }
 }
