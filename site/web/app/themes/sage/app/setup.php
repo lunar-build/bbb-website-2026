@@ -164,5 +164,79 @@ add_action('widgets_init', function () {
 });
 
 // enqueue web awesome
-add_action('wp_enqueue_scripts', function () {
+add_action('wp_enqueue_scripts', function () {});
+
+/**
+ * Relabel the built-in "Posts" post type as "News".
+ *
+ * @return void
+ */
+add_action('init', function () {
+    global $wp_post_types;
+
+    $labels = [
+        'name' => __('News', 'sage'),
+        'singular_name' => __('News', 'sage'),
+        'menu_name' => __('News', 'sage'),
+        'all_items' => __('All News', 'sage'),
+        'add_new_item' => __('Add New News', 'sage'),
+        'edit_item' => __('Edit News', 'sage'),
+        'new_item' => __('New News', 'sage'),
+        'view_item' => __('View News', 'sage'),
+        'search_items' => __('Search News', 'sage'),
+        'not_found' => __('No News found', 'sage'),
+        'not_found_in_trash' => __('No News found in Trash', 'sage'),
+    ];
+
+    foreach ($labels as $key => $value) {
+        $wp_post_types['post']->labels->{$key} = $value;
+    }
+
+    $wp_post_types['post']->label = $labels['name'];
+}, 100);
+
+/**
+ * Register custom post types.
+ *
+ * @return void
+ */
+add_action('init', function () {
+    register_post_type('case-study', [
+        'labels' => [
+            'name' => __('Case Studies', 'sage'),
+            'singular_name' => __('Case Study', 'sage'),
+        ],
+        'public' => true,
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-analytics',
+        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'has_archive' => true,
+        'rewrite' => ['slug' => 'case-studies'],
+    ]);
+
+    register_post_type('testimonial', [
+        'labels' => [
+            'name' => __('Testimonials', 'sage'),
+            'singular_name' => __('Testimonial', 'sage'),
+        ],
+        'public' => true,
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-testimonial',
+        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'has_archive' => true,
+        'rewrite' => ['slug' => 'testimonials'],
+    ]);
+
+    register_post_type('cycle-route', [
+        'labels' => [
+            'name' => __('Cycle Routes', 'sage'),
+            'singular_name' => __('Cycle Route', 'sage'),
+        ],
+        'public' => true,
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-location-alt',
+        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'has_archive' => true,
+        'rewrite' => ['slug' => 'cycle-routes'],
+    ]);
 });
