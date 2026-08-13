@@ -47,7 +47,7 @@ For every piece of UI in the new block, pick one:
   `@awesome.me/webawesome/dist/styles/webawesome.css`). **But each component's JS must be
   imported individually** — add `import '@awesome.me/webawesome/dist/components/<name>/<name>.js';`
   to `resources/js/app.js` the first time a new `<wa-*>` tag is used (currently imported:
-  `button`, `card`). Do **not** import `@awesome.me/webawesome/dist/webawesome.js` instead
+  `button`, `card`, `accordion`, `accordion-item`). Do **not** import `@awesome.me/webawesome/dist/webawesome.js` instead
   — that's a CDN-style autoloader that lazy-fetches components by detecting its own
   `<script src="webawesome.js">` tag to compute a base path; bundled through Vite there's
   no such tag, so it silently fails to find any component and every `<wa-*>` tag stays an
