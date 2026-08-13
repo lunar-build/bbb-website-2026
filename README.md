@@ -31,22 +31,56 @@ ddev exec "composer --working-dir web/app/themes/sage install"
 ddev exec "npm --prefix web/app/themes/sage run build"
 ```
 
-### Troubleshooting: site `composer install` prompts for a GitHub token / ACF Pro fails to download
+### ACF Pro & Gravity Forms — private Composer packages
 
-`composer.json` pulls ACF Pro from a private repo (`lunar-build/advanced-custom-fields-pro`). If `composer install` fails with a 404 downloading `wpengine/advanced-custom-fields`, or you're never prompted for a token and it just fails silently:
+Both plugins are premium/paid, so they aren't on Packagist or [WP Packages](https://wp-packages.org/) (the free-plugin mirror this project otherwise uses for `roots/wordpress` etc). Instead each has a **private mirror repo** in the `lunar-build` GitHub org that Composer pulls from directly:
 
-1. Delete `site/composer.lock`
-2. Re-run `ddev exec "composer install"` — this forces Composer to re-resolve and it should prompt for a GitHub token
-3. Generate a token at https://github.com/settings/tokens (needs access to the `lunar-build` org / the private repo) and paste it in when prompted
+| Plugin | Composer package | Source repo |
+|---|---|---|
+| ACF Pro | `wpengine/advanced-custom-fields` | `git@github.com:lunar-build/advanced-custom-fields-pro.git` |
+| Gravity Forms | `gravityforms/gravityforms` | `git@github.com:lunar-build/gravityforms.git` |
 
-Composer caches this token in `auth.json` (gitignored) so you shouldn't be prompted again after the first successful install.
+Both are declared as `"type": "vcs"` entries in `site/composer.json`'s `repositories` array, alongside the `wp-packages` entry. To add another premium plugin later, follow the same pattern: get (or create) a `lunar-build/<plugin-slug>` mirror repo, add a matching `vcs` entry, `require` the package.
+
+Install/update them the same way as any other Composer dependency:
+
+```bash
+ddev exec "composer install"                          # first install (uses composer.lock)
+ddev composer update wpengine/advanced-custom-fields   # bump ACF Pro only
+ddev composer update gravityforms/gravityforms         # bump Gravity Forms only
+```
+
+Both land in `web/app/plugins/` (gitignored — Composer-managed, don't hand-edit or commit).
+
+#### Auth: GitHub token required
+
+Since these are private repos, Composer needs a GitHub token with access to the `lunar-build` org to clone them. Set this up **once per machine**, not per-project — official steps: https://knowledge.lunar.build/#/ddev?id=persist-github-repositories-token-for-composer
+
+1. Generate a **repo-scoped** token at https://github.com/settings/tokens
+   - Use a **classic** token with the `repo` scope. Fine-grained tokens work too, but need every repo (`advanced-custom-fields-pro`, `gravityforms`, and any future ones) explicitly added to the token's repository access list — classic + `repo` scope is simpler and doesn't need updating each time a new private repo is added
+   - If `lunar-build` enforces SSO, click "Enable SSO" / "Configure SSO" next to the token on that page and authorize it for the org — otherwise you'll get a `403 Write access to repository not granted` error even with a valid, correctly-scoped token
+2. Drop it into DDEV's global Composer auth config so it applies across all DDEV projects on this machine:
+   ```bash
+   mkdir -p ~/.ddev/homeadditions/.composer
+   cat > ~/.ddev/homeadditions/.composer/auth.json <<'EOF'
+   {
+     "github-oauth": {
+       "github.com": "YOUR_TOKEN_HERE"
+     }
+   }
+   EOF
+   ddev restart
+   ```
+3. `ddev exec "composer install"` (or `ddev composer update ...`) should now clone both repos without prompting
+
+If `composer install` fails with a 404 downloading either package, or silently fails without ever prompting for a token, delete `site/composer.lock` and re-run — this forces Composer to re-resolve and surface the actual auth error.
 
 ### First run / after installing WordPress
 
 Once WP install screen has run (site loads, DB set up):
 
 1. Grab `ACF_PRO_KEY` from 1Password and set it in `site/.env`
-2. Activate ACF Pro plugin in WP admin (Plugins)
+2. Activate ACF Pro and Gravity Forms plugins in WP admin (Plugins)
 3. Confirm active theme is **Sage** (`web/app/themes/sage`) — WP admin > Appearance > Themes
 
 # [ACF Composer](https://github.com/log1x/acf-composer)
