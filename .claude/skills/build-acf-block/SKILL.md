@@ -17,6 +17,22 @@ builds, or publishes anything in the sibling `ui-components` repo (source of
 skill's job stops at printing a spec/prompt (see step 1d and "Requesting a new Lunar
 component" below) for the developer to take to that repo manually.
 
+## 0. Ask for a Figma reference (optional)
+
+Before starting, ask the developer: *"Do you have a Figma link for this block (a link
+to a specific layer/frame/group, copied via Figma's 'Copy link to selection')?"*
+
+If yes, and the Figma MCP server is connected in this Claude Code session, use it to
+pull the layer's structure/screenshot into context before scaffolding — this gives
+real spacing, copy, and component boundaries to work from instead of guessing. If the
+Figma MCP server isn't connected, tell the developer how to add it
+(`claude mcp add --transport http figma-dev-mode-mcp-server http://127.0.0.1:3845/mcp`,
+with Figma desktop's Dev Mode MCP server enabled) and continue without it if they'd
+rather not set it up now — this step is optional, never blocking.
+
+If no link is offered, skip straight to step 1 and work from the developer's
+description.
+
 ## 1. Decide what UI each part of the block needs
 
 For every piece of UI in the new block, pick one:
