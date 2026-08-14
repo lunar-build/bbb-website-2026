@@ -114,6 +114,12 @@ or set it to `'edit'`/`'auto'`.
 public $mode = 'preview';
 ```
 
+**`$styles` should always be `[]`, not the scaffold's default `['light', 'dark']`.**
+`wp acorn acf:block`'s stub pre-fills this with `public $styles = ['light', 'dark'];`,
+which adds a "Styles" picker to the block's Inspector panel (`is-style-light` /
+`is-style-dark` classes) — this project doesn't use block style variations, so clear it
+out to `[]` right after scaffolding, on every block.
+
 **If a block appears permanently stuck in edit mode** despite this being set correctly,
 it's very likely a stale ACF Composer cache serving an old field-group/mode snapshot
 from before the block's fields last changed (`config/acf.php`'s `generators.manifest`
