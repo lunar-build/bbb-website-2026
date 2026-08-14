@@ -144,7 +144,7 @@ class Form extends Block
      *
      * @var array
      */
-    public $styles = ['light', 'dark'];
+    public $styles = [];
 
     /**
      * The block preview example data.
