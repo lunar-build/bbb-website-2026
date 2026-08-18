@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "@awesome.me/webawesome": "^3.10.0",
-    "@lunar.build/lunar-ui-components": "^0.0.4"
+    "@lunar.build/lunar-ui-components": "^0.0.5"
   }
 }
