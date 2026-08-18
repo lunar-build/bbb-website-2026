@@ -1,11 +1,12 @@
-<header class="banner">
-  <a class="brand" href="{{ home_url('/') }}">
-    {!! $siteName !!}
-  </a>
+@php
+  $items = menu_items_to_array('primary_navigation');
+@endphp
 
-  @if (has_nav_menu('primary_navigation'))
-    <nav class="nav-primary" aria-label="{{ wp_get_nav_menu_name('primary_navigation') }}">
-      {!! wp_nav_menu(['theme_location' => 'primary_navigation', 'menu_class' => 'nav', 'echo' => false]) !!}
-    </nav>
-  @endif
-</header>
+<lunar-site-header sticky>
+  <lunar-nav
+    label="{{ wp_get_nav_menu_name('primary_navigation') ?: 'Primary' }}"
+    items="{{ json_encode($items) }}"
+  >
+    <a slot="brand" href="{{ home_url('/') }}">{!! $siteName !!}</a>
+  </lunar-nav>
+</lunar-site-header>

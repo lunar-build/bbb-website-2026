@@ -1,0 +1,77 @@
+.c-video-hero {
+  &__inner {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    padding: 2rem 1rem;
+
+    @media (min-width: 64rem) {
+      grid-template-columns: 5fr 11fr;
+      padding: 3rem 2rem;
+    }
+  }
+
+  &__media {
+    order: 1;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0.75rem;
+
+    @media (min-width: 64rem) {
+      order: 2;
+      aspect-ratio: auto;
+      height: 100%;
+    }
+  }
+
+  &__video {
+    // lunar-video's shadow-DOM wrapper is an auto-height block; an `auto` grid
+    // track sizes to its content (the video's intrinsic aspect ratio) instead
+    // of the host's own box, so it must be pinned to 1fr to fill height/width
+    // instead of overflowing past the host's bounds.
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #e5e5e5;
+    color: #737373;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  &__content {
+    order: 2;
+
+    @media (min-width: 64rem) {
+      order: 1;
+    }
+  }
+
+  &__heading {
+    margin: 0 0 1rem;
+  }
+
+  &__intro {
+    margin: 0 0 2rem;
+  }
+
+  &__cta-text {
+    margin: 0 0 0.75rem;
+  }
+
+  &__cta-label {
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}

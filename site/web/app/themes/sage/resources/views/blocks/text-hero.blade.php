@@ -1,5 +1,5 @@
 @unless ($block->preview)
-  <div {{ $attributes }}>
+  <section {{ $attributes }}>
 @endunless
 
 {{-- @if ($heading)
@@ -14,5 +14,5 @@
 </div>
 
 @unless ($block->preview)
-  </div>
+  </section>
 @endunless

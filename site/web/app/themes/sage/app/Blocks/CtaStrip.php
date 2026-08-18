@@ -5,21 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class TextHero extends Block
+class CtaStrip extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'Text Hero';
+    public $name = 'CTA Strip';
+
+    /**
+     * The block slug.
+     *
+     * @var string
+     */
+    public $slug = 'cta-strip';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A text-based hero that sits at the top of pages within the website.';
+    public $description = 'A reusable bordered call-to-action banner with a title, body text, and link.';
 
     /**
      * The block category.
@@ -33,7 +40,7 @@ class TextHero extends Block
      *
      * @var string|array
      */
-    public $icon = 'editor-textcolor';
+    public $icon = 'megaphone';
 
     /**
      * The block keywords.
@@ -41,10 +48,10 @@ class TextHero extends Block
      * @var array
      */
     public $keywords = [
-        'text',
-        'hero',
-        'heading',
-        'tagline',
+        'cta',
+        'banner',
+        'call to action',
+        'link',
     ];
 
     /**
@@ -113,7 +120,7 @@ class TextHero extends Block
      */
     public $supports = [
         'align' => true,
-        'align_text' => true,
+        'align_text' => false,
         'align_content' => false,
         'full_height' => false,
         'anchor' => false,
@@ -139,13 +146,26 @@ class TextHero extends Block
     public $styles = ['light', 'dark'];
 
     /**
+     * The block preview example data.
+     *
+     * @var array
+     */
+    public $example = [
+        'link' => [
+            'title' => 'Find out more',
+            'url' => 'https://betterbybike.info/schemes-and-initiatives/loan-a-bike-scheme/',
+            'target' => '',
+        ],
+    ];
+
+    /**
      * The block template.
      *
      * @var array
      */
     public $template = [
-        'core/heading' => ['placeholder' => 'Hello World', 'level' => 1],
-        'core/paragraph' => ['placeholder' => 'Welcome to the Text Hero block.', 'fontSize' => 'lg'],
+        'core/heading' => ['placeholder' => 'Heading', 'level' => 3],
+        'core/paragraph' => ['placeholder' => 'Body text…'],
     ];
 
     /**
@@ -153,7 +173,9 @@ class TextHero extends Block
      */
     public function with(): array
     {
-        return [];
+        return [
+            'link' => $this->link(),
+        ];
     }
 
     /**
@@ -161,8 +183,25 @@ class TextHero extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('text_hero');
+        $fields = Builder::make('cta_strip');
+
+        $fields
+            ->addLink('link', [
+                'label' => 'Link',
+                'instructions' => 'Link text + URL for the CTA.',
+            ]);
+
         return $fields->build();
+    }
+
+    /**
+     * Retrieve the link.
+     *
+     * @return array
+     */
+    public function link()
+    {
+        return get_field('link') ?: $this->example['link'];
     }
 
     /**

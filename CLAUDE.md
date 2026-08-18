@@ -60,26 +60,9 @@ Theme translations (from `/site/web/app/themes/sage`): `npm run translate` (pot 
 - `resources/{css,js}/app.*` and `editor.*` — separate front-end and block-editor entry points, built by Vite (`vite.config.js`). Path aliases: `@scripts`, `@styles`, `@fonts`, `@images` map to `resources/js`, `resources/css`, `resources/fonts`, `resources/images`.
 - `config/acf.php` — ACF configuration.
 
-**ACF Composer** (`log1x/acf-composer`) provides an Artisan-like CLI for defining ACF field groups and Gutenberg blocks in PHP instead of the ACF UI:
+**ACF Composer** (`log1x/acf-composer`) provides an Artisan-like CLI for defining ACF field groups and Gutenberg blocks in PHP instead of the ACF UI. Blocks live in `app/Blocks/*.php` with a matching Blade view at `resources/views/blocks/<kebab-block-name>.blade.php` (auto-discovered, no manual registration). Standalone field groups go in `app/Fields/`; global options pages go in `app/Options/*.php` extending `Log1x\AcfComposer\Options` (see `app/Options/ThemeOptions.php`, read via `get_field('field_name', 'option')`). **For the full block-building workflow** — scaffolding, `fields()`/`with()`, ACF fields vs. `InnerBlocks`, the `<section>` root convention, `$mode`/cache gotchas, Web Awesome/Lunar UI usage, and the WP/ACF-data-shaping convention — see the `build-acf-block` skill (`.claude/skills/build-acf-block/SKILL.md`); that skill is the source of truth for block work, not this file.
 
-- Blocks live in `app/Blocks/*.php` (e.g. `app/Blocks/TextHero.php`), each extending `Log1x\AcfComposer\Block`. Public properties configure block metadata (name, category, icon, supports, alignment, styles, `example` preview data, `template` for default inner blocks). `fields()` builds the ACF field group via `Builder::make(...)`. `with()` returns data passed into the block's Blade view. Helper methods (e.g. `heading()`, `tagline()`) wrap `get_field()` with fallbacks to `$this->example`.
-- Each block's Blade view lives at `resources/views/blocks/<kebab-block-name>.blade.php`.
-- Standalone field groups (not tied to a block) go in `app/Fields/`.
-
-When adding a new block: create the `App\Blocks\*` class, define fields with `Builder`, add the matching Blade view under `resources/views/blocks/`, and reference `app/Blocks/TextHero.php` / `resources/views/blocks/text-hero.blade.php` as the canonical example.
-
-## Web Awesome
-
-[Web Awesome](https://webawesome.com/) (`@awesome.me/webawesome`, from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package, which ships the full **core** component set — there is no paid Pro tier dependency wired in.
-
-- The whole library is registered globally by importing its bundled CSS and JS in the front-end entry point, `resources/js/app.js`:
-  ```js
-  import '@awesome.me/webawesome/dist/styles/webawesome.css';
-  import '@awesome.me/webawesome/dist/webawesome.js';
-  ```
-  This self-registers every `<wa-*>` custom element and its styles for the public-facing site. It is **not** imported in `resources/js/editor.js`, so components aren't currently available inside the block editor.
-- Because components are just custom elements, use them directly in Blade views (e.g. `<wa-button variant="brand">Submit</wa-button>`) with no additional PHP/JS wiring needed — no components are in use in `resources/views/` yet, so there's no existing in-repo usage pattern to follow.
-- Full component docs/props/slots/events: https://webawesome.com/docs/components/. To check what's available locally (versions can drift from the docs), list `node_modules/@awesome.me/webawesome/dist/components/`.
+**Web Awesome** (`@awesome.me/webawesome`) and **Lunar UI** (`@lunar.build/lunar-ui-components`, `node_modules/@lunar.build/lunar-ui-components`, currently `<lunar-nav>`, `<lunar-site-header>`, `<lunar-site-footer>`) are both framework-agnostic web component libraries, both registered globally in `resources/js/app.js` (not `editor.js`, so unavailable in the block editor). Full usage details, import gotchas, and the data-shaping convention for passing structured props into either are in the `build-acf-block` skill, not duplicated here.
 
 ## Notes
 

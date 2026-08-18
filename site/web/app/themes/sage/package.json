@@ -19,10 +19,12 @@
     "@roots/vite-plugin": "^2.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "laravel-vite-plugin": "^3.0.0",
+    "sass": "^1.102.0",
     "tailwindcss": "^4.0.0",
     "vite": "^8.0.0"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "^3.10.0"
+    "@awesome.me/webawesome": "^3.10.0",
+    "@lunar.build/lunar-ui-components": "^0.0.5"
   }
 }

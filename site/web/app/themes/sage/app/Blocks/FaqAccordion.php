@@ -5,21 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class TextHero extends Block
+class FaqAccordion extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'Text Hero';
+    public $name = 'FAQ Accordion';
+
+    /**
+     * The block slug.
+     *
+     * @var string
+     */
+    public $slug = 'faq-accordion';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A text-based hero that sits at the top of pages within the website.';
+    public $description = 'A list of expandable question and answer items.';
 
     /**
      * The block category.
@@ -33,7 +40,7 @@ class TextHero extends Block
      *
      * @var string|array
      */
-    public $icon = 'editor-textcolor';
+    public $icon = 'editor-help';
 
     /**
      * The block keywords.
@@ -41,10 +48,10 @@ class TextHero extends Block
      * @var array
      */
     public $keywords = [
-        'text',
-        'hero',
-        'heading',
-        'tagline',
+        'faq',
+        'accordion',
+        'questions',
+        'answers',
     ];
 
     /**
@@ -113,7 +120,7 @@ class TextHero extends Block
      */
     public $supports = [
         'align' => true,
-        'align_text' => true,
+        'align_text' => false,
         'align_content' => false,
         'full_height' => false,
         'anchor' => false,
@@ -139,13 +146,26 @@ class TextHero extends Block
     public $styles = ['light', 'dark'];
 
     /**
-     * The block template.
+     * The block preview example data.
      *
      * @var array
      */
-    public $template = [
-        'core/heading' => ['placeholder' => 'Hello World', 'level' => 1],
-        'core/paragraph' => ['placeholder' => 'Welcome to the Text Hero block.', 'fontSize' => 'lg'],
+    public $example = [
+        'heading' => 'Frequently asked questions',
+        'items' => [
+            [
+                'question' => 'How do I borrow a bike?',
+                'answer' => 'Sign up online, choose a scheme near you, and pick up your bike from one of our local hubs.',
+            ],
+            [
+                'question' => 'How long can I keep the bike for?',
+                'answer' => 'Loan periods vary by scheme, but most run for up to a month at a time.',
+            ],
+            [
+                'question' => 'What if something goes wrong with the bike?',
+                'answer' => 'Get in touch with your local scheme coordinator and we\'ll arrange a repair or replacement.',
+            ],
+        ],
     ];
 
     /**
@@ -153,7 +173,10 @@ class TextHero extends Block
      */
     public function with(): array
     {
-        return [];
+        return [
+            'heading' => $this->heading(),
+            'items' => $this->items(),
+        ];
     }
 
     /**
@@ -161,8 +184,51 @@ class TextHero extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('text_hero');
+        $fields = Builder::make('faq_accordion');
+
+        $fields
+            ->addText('heading', [
+                'label' => 'Heading',
+            ])
+            ->addRepeater('items', [
+                'label' => 'Questions',
+                'button_label' => 'Add question',
+                'min' => 1,
+                'layout' => 'block',
+            ])
+                ->addText('question', [
+                    'label' => 'Question',
+                    'required' => 1,
+                ])
+                ->addTextarea('answer', [
+                    'label' => 'Answer',
+                    'rows' => 3,
+                    'new_lines' => 'br',
+                    'required' => 1,
+                ])
+            ->endRepeater();
+
         return $fields->build();
+    }
+
+    /**
+     * Retrieve the heading.
+     *
+     * @return string
+     */
+    public function heading()
+    {
+        return get_field('heading') ?: $this->example['heading'];
+    }
+
+    /**
+     * Retrieve the FAQ items.
+     *
+     * @return array
+     */
+    public function items()
+    {
+        return get_field('items') ?: $this->example['items'];
     }
 
     /**
