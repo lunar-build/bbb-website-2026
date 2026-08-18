@@ -12,7 +12,7 @@
         <p class="c-form__placeholder">
           {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
         </p>
-      @elseif (function_exists('gravity_form'))
+      @else
         @php gravity_form($formId, false, false, false, null, false, 0, true); @endphp
       @endif
     </div>

@@ -204,6 +204,13 @@ class Form extends Block
     protected function formChoices()
     {
         if (! class_exists('GFAPI')) {
+            // Don't crash WP-CLI: it bootstraps this same block-registration hook,
+            // so a hard throw here would block `wp plugin activate` itself — the
+            // one command that fixes this.
+            if (defined('WP_CLI') && WP_CLI) {
+                return [];
+            }
+
             throw new \Exception('Gravity Forms is not installed or activated. The Form block will not work without it.');
         }
 
