@@ -5,20 +5,13 @@
 <div class="c-video-hero__inner">
   <div class="c-video-hero__media">
     @if ($video['url'] ?? null)
-      <video
-        autoplay
-        muted
-        playsinline
-        loop
+      <lunar-video
+        variant="background"
         class="c-video-hero__video"
-        aria-label="{{ $videoAlt }}"
-        aria-hidden="true"
-        tabindex="-1"
+        src="{{ $video['url'] }}"
         @if ($poster['url'] ?? null) poster="{{ $poster['url'] }}" @endif
-      >
-        <source src="{{ $video['url'] }}" type="video/mp4">
-        <p>{{ __("Your browser doesn't support HTML5 video.", 'sage') }}</p>
-      </video>
+        label="{{ $videoAlt }}"
+      ></lunar-video>
     @elseif ($poster['url'] ?? null)
       <img class="c-video-hero__video" src="{{ $poster['url'] }}" alt="{{ $videoAlt }}">
     @elseif ($block->preview)

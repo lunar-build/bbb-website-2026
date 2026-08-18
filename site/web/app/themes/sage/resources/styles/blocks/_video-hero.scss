@@ -26,11 +26,17 @@
   }
 
   &__video {
+    // lunar-video's shadow-DOM wrapper is an auto-height block; an `auto` grid
+    // track sizes to its content (the video's intrinsic aspect ratio) instead
+    // of the host's own box, so it must be pinned to 1fr to fill height/width
+    // instead of overflowing past the host's bounds.
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
   }
 
   &__placeholder {
