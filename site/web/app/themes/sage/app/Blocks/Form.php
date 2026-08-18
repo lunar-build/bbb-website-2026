@@ -185,7 +185,7 @@ class Form extends Block
 
         $fields
             ->addSelect('form_id', [
-                'label' => 'Gravity Forms form',
+                'label' => 'Choose a Gravity Form',
                 'instructions' => 'Select which Gravity Forms form to display.',
                 'choices' => $this->formChoices(),
                 'ui' => 1,
@@ -204,6 +204,12 @@ class Form extends Block
     protected function formChoices()
     {
         if (! class_exists('GFAPI')) {
+              error_log('Gravity Forms is not installed or activated. The Form block will not work without it.');
+
+            add_action('admin_notices', fn () => printf(
+                '<div class="notice notice-error"><p>%s</p></div>',
+                esc_html__('Gravity Forms is not installed or activated. The Form block will not work without it.', 'sage')
+            ));
             return [];
         }
 
