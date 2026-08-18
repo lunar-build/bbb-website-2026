@@ -162,7 +162,7 @@ class Form extends Block
      */
     public $template = [
         ['core/heading' => ['placeholder' => 'Get in touch', 'level' => 2]],
-        ['core/paragraph' => ['placeholder' => 'Subtitle…', 'fontSize' => 'lg']],
+        ['core/heading' => ['placeholder' => 'Subtitle…', 'level' => 3]],
         ['core/paragraph' => ['placeholder' => 'A short paragraph of intro copy above the form.']],
     ];
 
