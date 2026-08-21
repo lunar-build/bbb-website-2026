@@ -1,5 +1,5 @@
 {
-  "__preprocessed__": "This file is used to build the theme.json file in the `public/build/assets` directory. The built artifact includes Tailwind's colors, fonts, and font sizes.",
+  "__preprocessed__": "This file is used to build the theme.json file in the `public/build/assets` directory. Colors and font sizes below are hand-authored brand tokens — not generated from Tailwind.",
   "$schema": "https://schemas.wp.org/trunk/theme.json",
   "version": 3,
   "settings": {
@@ -16,7 +16,22 @@
       "defaultDuotone": false,
       "defaultGradients": false,
       "defaultPalette": false,
-      "duotone": []
+      "duotone": [],
+      "palette": [
+        { "slug": "light-blue-tint", "color": "#E9F0F3", "name": "Light blue tint" },
+        { "slug": "brand-yellow", "color": "#FFBF47", "name": "Brand yellow" },
+        { "slug": "white", "color": "#FFFFFF", "name": "White" },
+        { "slug": "blue", "color": "#1878A5", "name": "Blue" },
+        { "slug": "blue-dark", "color": "#136084", "name": "Blue dark" },
+        { "slug": "navy", "color": "#003852", "name": "Navy" },
+        { "slug": "grey-lightest", "color": "#F6F6F6", "name": "Grey lightest" },
+        { "slug": "orange", "color": "#F69502", "name": "Orange" },
+        { "slug": "green-light", "color": "#C7DC82", "name": "Green light" },
+        { "slug": "grey", "color": "#757575", "name": "Grey" },
+        { "slug": "rust", "color": "#B95B13", "name": "Rust" },
+        { "slug": "grey-dark", "color": "#363636", "name": "Grey dark" },
+        { "slug": "black", "color": "#000000", "name": "Black" }
+      ]
     },
     "custom": {
       "spacing": {},
@@ -31,7 +46,24 @@
     },
     "typography": {
       "defaultFontSizes": false,
-      "customFontSize": false
+      "customFontSize": false,
+      "fontFamilies": [
+        {
+          "slug": "nata-sans",
+          "name": "Nata Sans",
+          "fontFamily": "\"Nata Sans\", system-ui, sans-serif"
+        }
+      ],
+      "fontSizes": [
+        { "slug": "heading-1", "size": "60px", "name": "Heading 1" },
+        { "slug": "heading-2", "size": "50px", "name": "Heading 2" },
+        { "slug": "heading-3", "size": "40px", "name": "Heading 3" },
+        { "slug": "heading-4", "size": "30px", "name": "Heading 4" },
+        { "slug": "heading-5", "size": "26px", "name": "Heading 5" },
+        { "slug": "standfirst", "size": "20px", "name": "Standfirst" },
+        { "slug": "body", "size": "14px", "name": "Body" },
+        { "slug": "input-label", "size": "18px", "name": "Input label" }
+      ]
     }
   }
 }

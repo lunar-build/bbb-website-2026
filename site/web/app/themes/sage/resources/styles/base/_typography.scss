@@ -1,0 +1,68 @@
+body {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 400;
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 24px;
+  color: var(--wp--preset--color--grey-dark);
+}
+
+h1,
+.u-heading-1 {
+  font-size: var(--wp--preset--font-size--heading-1);
+  line-height: 64px;
+  font-weight: 700;
+}
+
+h2,
+.u-heading-2 {
+  font-size: var(--wp--preset--font-size--heading-2);
+  line-height: 54px;
+  font-weight: 700;
+}
+
+h3,
+.u-heading-3 {
+  font-size: var(--wp--preset--font-size--heading-3);
+  line-height: 44px;
+  font-weight: 700;
+}
+
+h4,
+.u-heading-4 {
+  font-size: var(--wp--preset--font-size--heading-4);
+  line-height: 34px;
+  font-weight: 700;
+}
+
+// No distinct H6 spec supplied by design — reuses H5 size until one is provided.
+h5,
+h6,
+.u-heading-5 {
+  font-size: var(--wp--preset--font-size--heading-5);
+  line-height: 36px;
+  font-weight: 700;
+}
+
+.u-standfirst {
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 30px;
+  font-weight: 400;
+}
+
+.u-input-label {
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 26px;
+  font-weight: 500;
+}
+
+.u-callout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: var(--wp--preset--color--light-blue-tint);
+  color: var(--wp--preset--color--navy);
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 24px;
+}
