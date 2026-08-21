@@ -3,7 +3,7 @@ body {
   font-weight: 400;
   font-size: var(--wp--preset--font-size--body);
   line-height: 24px;
-  color: var(--wp--preset--color--grey-dark);
+  color: var(--wp--preset--color--charcoal);
 }
 
 h1,
@@ -61,8 +61,8 @@ h6,
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   border-radius: 999px;
-  background: var(--wp--preset--color--light-blue-tint);
-  color: var(--wp--preset--color--navy);
+  background: var(--wp--preset--color--blue-light);
+  color: var(--wp--preset--color--blue-dark);
   font-size: var(--wp--preset--font-size--body);
   line-height: 24px;
 }

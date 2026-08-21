@@ -3,34 +3,27 @@
 // soft -fill-normal/-on-normal tokens (a light tint); "accent" is the one that
 // uses -fill-loud/-on-loud, which is what our brand-token override in
 // base/_wa-theme.scss targets for a solid, bold CTA look.
-// Hover/focus are pseudo-states on that one solid look, not separate appearances:
-// static = solid fill, hover = outline-only, focus = solid fill + ring. The arrow
-// nudges right on both hover and focus to read as an affordance.
+// The fill color never changes across states: static = solid fill, hover = same
+// solid fill but the arrow extends (see below), focus = same solid fill plus an
+// inset ring sitting inside the pill (outline-offset negative keeps it within the
+// solid area rather than floating outside it).
 
-wa-button[variant='brand']::part(button) {
-  &:hover {
-    background-color: transparent;
-    border-color: var(--wp--preset--color--brand-yellow);
-    color: var(--wp--preset--color--navy);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--navy);
-    outline-offset: 2px;
-  }
+wa-button::part(label) {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-weight: 700;
+  font-size: var(--wp--preset--font-size--button-label);
+  line-height: 30px;
+  letter-spacing: 0.02em;
 }
 
-wa-button[variant='neutral']::part(button) {
-  &:hover {
-    background-color: transparent;
-    border-color: var(--wp--preset--color--black);
-    color: var(--wp--preset--color--black);
-  }
+wa-button[variant='brand']::part(button):focus-visible {
+  outline: 2px solid var(--wp--preset--color--blue-dark);
+  outline-offset: -6px;
+}
 
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--black);
-    outline-offset: 2px;
-  }
+wa-button[variant='neutral']::part(button):focus-visible {
+  outline: 2px solid var(--wp--preset--color--white);
+  outline-offset: -6px;
 }
 
 wa-button .c-icon--arrow-right {
@@ -38,20 +31,23 @@ wa-button .c-icon--arrow-right {
   margin-inline-start: 0.5em;
 
   svg {
-    height: 1em;
-    width: auto;
+    width: 22px;
+    height: 14px;
+    flex: none;
     overflow: visible;
   }
 
-  // Single continuous path (tail anchored at x=4) so it always reads as one
+  // Single continuous path (tail anchored at x=1) so it always reads as one
   // shape. Its `d` transitions to a version with the same command structure
   // but a longer shaft + head shifted further right, so the shaft grows and
-  // the arrowhead moves outward together, not just the icon sliding.
+  // the arrowhead moves outward together, not just the icon sliding. Growth
+  // extends past the 22px viewBox on purpose (overflow: visible above).
+  // Arrowhead is sized to roughly match the button label's cap-height.
   .c-icon__arrow {
     transition: d 0.15s ease;
   }
 }
 
 wa-button:is(:hover, :focus-within) .c-icon--arrow-right .c-icon__arrow {
-  d: path('M4 12H38M38 12L30 4M38 12L30 20');
+  d: path('M1 7H28M28 7L22 1M28 7L22 13');
 }

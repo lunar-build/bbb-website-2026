@@ -18,18 +18,26 @@
       "defaultPalette": false,
       "duotone": [],
       "palette": [
-        { "slug": "light-blue-tint", "color": "#E9F0F3", "name": "Light blue tint" },
-        { "slug": "brand-yellow", "color": "#FFBF47", "name": "Brand yellow" },
+        { "slug": "blue-light", "color": "#E9F0F3", "name": "Blue-light" },
+        { "slug": "yellow", "color": "#FFBF47", "name": "Yellow" },
         { "slug": "white", "color": "#FFFFFF", "name": "White" },
         { "slug": "blue", "color": "#1878A5", "name": "Blue" },
-        { "slug": "blue-dark", "color": "#136084", "name": "Blue dark" },
-        { "slug": "navy", "color": "#003852", "name": "Navy" },
-        { "slug": "grey-lightest", "color": "#F6F6F6", "name": "Grey lightest" },
+        { "slug": "blue-medium", "color": "#136084", "name": "Blue medium" },
+        { "slug": "blue-dark", "color": "#003852", "name": "Blue dark" },
+        {
+          "slug": "lightest-grey",
+          "color": "#F6F6F6",
+          "name": "Lightest grey"
+        },
         { "slug": "orange", "color": "#F69502", "name": "Orange" },
-        { "slug": "green-light", "color": "#C7DC82", "name": "Green light" },
-        { "slug": "grey", "color": "#757575", "name": "Grey" },
-        { "slug": "rust", "color": "#B95B13", "name": "Rust" },
-        { "slug": "grey-dark", "color": "#363636", "name": "Grey dark" },
+        { "slug": "leaf", "color": "#C7DC82", "name": "Leaf" },
+        {
+          "slug": "place-holder-grey",
+          "color": "#757575",
+          "name": "Place holder grey"
+        },
+        { "slug": "dark-orange", "color": "#B95B13", "name": "Dark orange" },
+        { "slug": "charcoal", "color": "#363636", "name": "Charcoal" },
         { "slug": "black", "color": "#000000", "name": "Black" }
       ]
     },
@@ -52,6 +60,11 @@
           "slug": "nata-sans",
           "name": "Nata Sans",
           "fontFamily": "\"Nata Sans\", system-ui, sans-serif"
+        },
+        {
+          "slug": "anonymous-pro",
+          "name": "Anonymous Pro",
+          "fontFamily": "\"Anonymous Pro\", ui-monospace, monospace"
         }
       ],
       "fontSizes": [
@@ -62,7 +75,8 @@
         { "slug": "heading-5", "size": "26px", "name": "Heading 5" },
         { "slug": "standfirst", "size": "20px", "name": "Standfirst" },
         { "slug": "body", "size": "14px", "name": "Body" },
-        { "slug": "input-label", "size": "18px", "name": "Input label" }
+        { "slug": "input-label", "size": "18px", "name": "Input label" },
+        { "slug": "button-label", "size": "20px", "name": "Button label" }
       ]
     }
   }
