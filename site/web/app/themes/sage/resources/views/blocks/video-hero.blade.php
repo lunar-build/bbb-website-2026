@@ -33,11 +33,14 @@
 
       <wa-button
         variant="brand"
-        appearance="filled"
+        appearance="accent"
+        pill
+        with-end
         href="{{ $ctaButton['url'] }}"
         @if (($ctaButton['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
       >
         {{ $ctaButton['title'] }}
+        <x-icon name="arrow-right" slot="end" />
       </wa-button>
     </div>
   </div>

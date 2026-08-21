@@ -1,8 +1,11 @@
-// Site buttons only ever use variant="brand"|"neutral" appearance="filled" pill,
-// with a c-icon--arrow-right in the `end` slot. Hover/focus are pseudo-states on
-// that one filled look, not separate appearances: static = solid fill,
-// hover = outline-only, focus = solid fill + ring. The arrow nudges right on
-// both hover and focus to read as an affordance.
+// Site buttons only ever use variant="brand"|"neutral" appearance="accent" pill,
+// with a c-icon--arrow-right in the `end` slot. WA's "filled" appearance uses the
+// soft -fill-normal/-on-normal tokens (a light tint); "accent" is the one that
+// uses -fill-loud/-on-loud, which is what our brand-token override in
+// base/_wa-theme.scss targets for a solid, bold CTA look.
+// Hover/focus are pseudo-states on that one solid look, not separate appearances:
+// static = solid fill, hover = outline-only, focus = solid fill + ring. The arrow
+// nudges right on both hover and focus to read as an affordance.
 
 wa-button[variant='brand']::part(button) {
   &:hover {
@@ -32,14 +35,23 @@ wa-button[variant='neutral']::part(button) {
 
 wa-button .c-icon--arrow-right {
   display: inline-flex;
-  transition: transform 0.15s ease;
+  margin-inline-start: 0.5em;
 
   svg {
-    width: 1em;
     height: 1em;
+    width: auto;
+    overflow: visible;
+  }
+
+  // Single continuous path (tail anchored at x=4) so it always reads as one
+  // shape. Its `d` transitions to a version with the same command structure
+  // but a longer shaft + head shifted further right, so the shaft grows and
+  // the arrowhead moves outward together, not just the icon sliding.
+  .c-icon__arrow {
+    transition: d 0.15s ease;
   }
 }
 
-wa-button:is(:hover, :focus-within) .c-icon--arrow-right {
-  transform: translateX(0.25em);
+wa-button:is(:hover, :focus-within) .c-icon--arrow-right .c-icon__arrow {
+  d: path('M4 12H38M38 12L30 4M38 12L30 20');
 }
