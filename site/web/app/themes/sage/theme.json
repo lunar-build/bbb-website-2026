@@ -4,7 +4,8 @@
   "version": 3,
   "settings": {
     "layout": {
-      "contentSize": "48rem"
+      "contentSize": "80rem",
+      "wideSize": "80rem"
     },
     "background": {
       "backgroundImage": true
