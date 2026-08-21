@@ -1,0 +1,45 @@
+// Site buttons only ever use variant="brand"|"neutral" appearance="filled" pill,
+// with a c-icon--arrow-right in the `end` slot. Hover/focus are pseudo-states on
+// that one filled look, not separate appearances: static = solid fill,
+// hover = outline-only, focus = solid fill + ring. The arrow nudges right on
+// both hover and focus to read as an affordance.
+
+wa-button[variant='brand']::part(button) {
+  &:hover {
+    background-color: transparent;
+    border-color: var(--wp--preset--color--brand-yellow);
+    color: var(--wp--preset--color--navy);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--navy);
+    outline-offset: 2px;
+  }
+}
+
+wa-button[variant='neutral']::part(button) {
+  &:hover {
+    background-color: transparent;
+    border-color: var(--wp--preset--color--black);
+    color: var(--wp--preset--color--black);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--black);
+    outline-offset: 2px;
+  }
+}
+
+wa-button .c-icon--arrow-right {
+  display: inline-flex;
+  transition: transform 0.15s ease;
+
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+}
+
+wa-button:is(:hover, :focus-within) .c-icon--arrow-right {
+  transform: translateX(0.25em);
+}

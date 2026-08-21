@@ -1,0 +1,17 @@
+// Overrides Web Awesome's semantic color tokens with brand tokens, so
+// <wa-button variant="brand|neutral" appearance="filled"> renders in brand
+// colors without fighting WA's generated 05-95 OKLCH color-scale system.
+// Hover/focus pseudo-states are handled separately in base/_button.scss.
+// See: node_modules/@awesome.me/webawesome/dist/styles/themes/default.css
+
+:root {
+  --wa-color-brand-fill-loud: var(--wp--preset--color--brand-yellow);
+  --wa-color-brand-border-loud: var(--wp--preset--color--brand-yellow);
+  --wa-color-brand-on-loud: var(--wp--preset--color--navy);
+
+  --wa-color-neutral-fill-loud: var(--wp--preset--color--black);
+  --wa-color-neutral-border-loud: var(--wp--preset--color--black);
+  --wa-color-neutral-on-loud: var(--wp--preset--color--white);
+
+  --wa-color-focus: var(--wp--preset--color--blue);
+}
