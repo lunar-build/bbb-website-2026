@@ -36,6 +36,30 @@ class ThemeOptions extends Field
         $fields = Builder::make('theme_options');
 
         $fields
+            ->addTab('social', [
+                'label' => 'Social',
+            ])
+                ->addUrl('facebook_url', [
+                    'label' => 'Facebook',
+                ])
+                ->addUrl('instagram_url', [
+                    'label' => 'Instagram',
+                ])
+                ->addUrl('x_url', [
+                    'label' => 'X (Twitter)',
+                ])
+                ->addUrl('linkedin_url', [
+                    'label' => 'LinkedIn',
+                ])
+                ->addUrl('youtube_url', [
+                    'label' => 'YouTube',
+                ])
+                ->addUrl('tiktok_url', [
+                    'label' => 'TikTok',
+                ])
+            ->addTab('footer', [
+                'label' => 'Footer',
+            ])
             ->addRepeater('legal_links', [
                 'label' => 'Legal Links',
                 'instructions' => 'Links shown in the footer legal row (e.g. Privacy Policy, Terms).',
@@ -49,7 +73,8 @@ class ThemeOptions extends Field
                     'label' => 'URL',
                     'required' => true,
                 ])
-            ->endRepeater();
+            ->endRepeater()
+            ;
 
         return $fields->build();
     }

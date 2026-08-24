@@ -72,3 +72,23 @@ function legal_links_from_options(): array
         'href' => $row['href'],
     ], $rows);
 }
+
+/**
+ * Convert the Theme Options "Social" tab's fixed per-platform URL fields
+ * into a `{ platform, url }[]` list, skipping any platform left blank.
+ * `platform` is the field's own slug (e.g. 'facebook', 'x') rather than a
+ * free-text label, so it can be matched to an icon deterministically —
+ * see app/Options/ThemeOptions.php for why these are individual fields
+ * rather than a repeater.
+ */
+function social_links_from_options(): array
+{
+    $platforms = ['facebook', 'instagram', 'x', 'linkedin', 'youtube', 'tiktok'];
+
+    $links = array_map(fn($platform) => [
+        'platform' => $platform,
+        'url' => get_field("{$platform}_url", 'option'),
+    ], $platforms);
+
+    return array_values(array_filter($links, fn($link) => ! empty($link['url'])));
+}
