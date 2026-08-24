@@ -5,28 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class FeatureCard extends Block
+class Form extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'Feature Card';
+    public $name = 'Form';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'feature-card';
+    public $slug = 'form';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A bordered card with a heading, body text, and a single CTA link.';
+    public $description = 'An intro heading/text with a Gravity Forms form.';
 
     /**
      * The block category.
@@ -40,7 +40,7 @@ class FeatureCard extends Block
      *
      * @var string|array
      */
-    public $icon = 'id-alt';
+    public $icon = 'feedback';
 
     /**
      * The block keywords.
@@ -48,10 +48,11 @@ class FeatureCard extends Block
      * @var array
      */
     public $keywords = [
-        'card',
-        'feature',
-        'cta',
-        'link',
+        'form',
+        'gravity forms',
+        'gravityforms',
+        'enquiry',
+        'contact',
     ];
 
     /**
@@ -151,11 +152,7 @@ class FeatureCard extends Block
      * @var array
      */
     public $example = [
-        'link' => [
-            'title' => 'Get involved',
-            'url' => 'https://betterbybike.info/get-involved/',
-            'target' => '',
-        ],
+        'form_id' => 1,
     ];
 
     /**
@@ -164,8 +161,9 @@ class FeatureCard extends Block
      * @var array
      */
     public $template = [
-        'core/heading' => ['placeholder' => 'Heading', 'level' => 3],
-        'core/paragraph' => ['placeholder' => 'Body text…'],
+        ['core/heading' => ['placeholder' => 'Get in touch', 'level' => 2]],
+        ['core/heading' => ['placeholder' => 'Subtitle…', 'level' => 3]],
+        ['core/paragraph' => ['placeholder' => 'A short paragraph of intro copy above the form.']],
     ];
 
     /**
@@ -174,7 +172,7 @@ class FeatureCard extends Block
     public function with(): array
     {
         return [
-            'link' => $this->link(),
+            'formId' => $this->formId(),
         ];
     }
 
@@ -183,25 +181,50 @@ class FeatureCard extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('feature_card');
+        $fields = Builder::make('form');
 
         $fields
-            ->addLink('link', [
-                'label' => 'Link',
-                'instructions' => 'Link text + URL for the card CTA.',
+            ->addSelect('form_id', [
+                'label' => 'Choose a Gravity Form',
+                'instructions' => 'Select which Gravity Forms form to display.',
+                'choices' => $this->formChoices(),
+                'ui' => 1,
+                'allow_null' => 1,
+                'required' => 1,
             ]);
 
         return $fields->build();
     }
 
     /**
-     * Retrieve the link.
+     * Retrieve the available Gravity Forms forms as select choices.
      *
      * @return array
      */
-    public function link()
+    protected function formChoices()
     {
-        return get_field('link') ?: $this->example['link'];
+        if (! class_exists('GFAPI')) {
+            // Don't crash WP-CLI: it bootstraps this same block-registration hook,
+            // so a hard throw here would block `wp plugin activate` itself — the
+            // one command that fixes this.
+            if (defined('WP_CLI') && WP_CLI) {
+                return [];
+            }
+
+            throw new \Exception('Gravity Forms is not installed or activated. The Form block will not work without it.');
+        }
+
+        return collect(\GFAPI::get_forms())->pluck('title', 'id')->all();
+    }
+
+    /**
+     * Retrieve the selected Gravity Forms form ID.
+     *
+     * @return int
+     */
+    public function formId()
+    {
+        return get_field('form_id') ?: $this->example['form_id'];
     }
 
     /**

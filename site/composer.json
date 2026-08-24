@@ -39,11 +39,16 @@
     {
       "type": "vcs",
       "url": "git@github.com:lunar-build/advanced-custom-fields-pro.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@github.com:lunar-build/gravityforms.git"
     }
   ],
   "require": {
     "php": ">=8.3",
     "composer/installers": "^2.0",
+    "gravityforms/gravityforms": "^2.0",
     "oscarotero/env": "^2.0",
     "roots/bedrock-autoloader": "^1.0",
     "roots/bedrock-disallow-indexing": "^2.0",

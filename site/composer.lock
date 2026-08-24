@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64681cb8f47d8a47c5b8b20ce0f44160",
+    "content-hash": "f9be7d86434a54d3757ccd0c566b17ea",
     "packages": [
         {
             "name": "composer/installers",
@@ -213,6 +213,46 @@
                 }
             ],
             "time": "2025-12-27T19:43:20+00:00"
+        },
+        {
+            "name": "gravityforms/gravityforms",
+            "version": "2.10.5",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:lunar-build/gravityforms.git",
+                "reference": "ffeebca842c8a803d3e778589adb154cad3b82cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lunar-build/gravityforms/zipball/ffeebca842c8a803d3e778589adb154cad3b82cd",
+                "reference": "ffeebca842c8a803d3e778589adb154cad3b82cd",
+                "shasum": ""
+            },
+            "require-dev": {
+                "tutv95/wp-package-parser": "^1.0"
+            },
+            "type": "wordpress-plugin",
+            "authors": [
+                {
+                    "name": "Rocketgenius Inc.",
+                    "email": "contact@gravityforms.com"
+                },
+                {
+                    "name": "Ethan Clevenger",
+                    "email": "ethan@sternerstuff.dev"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/lunar-build/gravityforms/tree/2.10.5",
+                "issues": "https://github.com/lunar-build/gravityforms/issues"
+            },
+            "funding": [
+                {
+                    "type": "github",
+                    "url": "https://github.com/sterner-stuff"
+                }
+            ],
+            "time": "2026-07-01T00:54:58+00:00"
         },
         {
             "name": "oscarotero/env",
