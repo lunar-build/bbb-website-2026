@@ -104,6 +104,47 @@ Repo ships a [Claude Code](https://claude.com/claude-code) skill at [.claude/ski
 
 See `site/web/app/themes/sage/app/Blocks/FeatureCard.php` + `.../resources/views/blocks/feature-card.blade.php` for a worked example built via this workflow (Web Awesome `<wa-card>`/`<wa-button>`, no Lunar component needed for this one).
 
+# Pattern library
+
+Every block registered under `site/web/app/themes/sage/app/Blocks/` automatically
+appears on a living style guide page at **`/pattern-library`** — each block shown with
+its description and a rendered example, so a client can see what's available before
+dropping a block into a page.
+
+- **Logged-in only.** Anonymous visitors get a real 404, so it's safe to leave
+  published without exposing placeholder content publicly.
+- **No registration step.** The page is powered by
+  [`App\View\Composers\PatternLibrary`](site/web/app/themes/sage/app/View/Composers/PatternLibrary.php),
+  which discovers every block via ACF Composer's own registry
+  (`app('AcfComposer')->composers()`) and re-renders each one standalone using its
+  fixture data — the same mechanism already used for the block editor's empty-state
+  preview. A new block just needs to follow the normal block-building conventions (see
+  the `build-acf-block` skill's §6 "Pattern library"): a real `$description`, full
+  `$example`/`example()` coverage for every ACF field (including media, via the
+  bundled placeholder assets), and an `$exampleContent` string if it uses
+  `InnerBlocks`. Get those right and the block appears correctly with nothing else to
+  wire up.
+- **Placeholder assets** live at
+  `site/web/app/themes/sage/resources/images/placeholder/pattern-placeholder.svg` and
+  `.../resources/videos/placeholder/pattern-placeholder.mp4` — both generated locally
+  (no stock footage/images, no external dependency), committed to the repo, and
+  trivial to swap: replace the file in place and rebuild.
+
+### Setting this up on a fresh clone / new project
+
+The page itself is a normal WordPress Page (its template assignment lives in the
+database, not in version control), so after a fresh install you need to create it
+once:
+
+1. WP admin → Pages → Add New.
+2. Title it "Pattern Library" (the slug becomes the URL — set it to `pattern-library`
+   if it doesn't default to that).
+3. In the sidebar, set **Template** to "Pattern Library".
+4. Publish. Visit `/pattern-library` while logged in.
+
+No other setup is needed — every existing and future block appears automatically once
+the page exists.
+
 # [Web Awesome](https://webawesome.com/)
 
 `@awesome.me/webawesome` (from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package — no paid Pro tier dependency.

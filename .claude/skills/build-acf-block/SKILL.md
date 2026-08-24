@@ -172,9 +172,19 @@ In the generated class:
   - Text/textarea fields: `return get_field('x') ?: $this->example['x'];`
   - Link fields: fallback is a hand-built array matching ACF's link shape —
     `['title' => ..., 'url' => ..., 'target' => '']`.
-  - Image/file/relationship fields: no fallback, just `return get_field('x');`.
+  - Image/file/relationship fields: fallback to a bundled placeholder asset, e.g.
+    `return get_field('x') ?: $this->example['x'];` where `$example['x']` is
+    `['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')]`
+    (or `resources/videos/placeholder/pattern-placeholder.mp4` for video — see
+    `app/Blocks/VideoHero.php`). Every field needs a real fallback, not just text
+    fields — this is what makes the block render fully populated on `/pattern-library`
+    (see §6) with zero extra work.
 - `$example` on the class supplies the block-editor preview/empty-state data used by
-  every accessor's fallback.
+  every accessor's fallback. If a fallback value needs to be computed (e.g. calling
+  `Vite::asset()`, which isn't a constant expression so can't live in the property
+  default), override the `example(): array` method instead — ACF Composer merges its
+  return value into `$example` automatically before the block is registered (see
+  `VideoHero::example()`).
 
 **ACF fields vs. `InnerBlocks` for freeform copy:** a block's editable content can come
 from either ACF fields (`addText`/`addTextarea`, `get_field()`-backed, as above) or
@@ -186,10 +196,14 @@ free, whereas ACF text/textarea fields require you to hand-build that semantics
 yourself (see `app/Blocks/FeatureCard.php`/`CtaStrip.php`, which use `InnerBlocks` for
 this reason). A block can mix both: keep an ACF field for anything `InnerBlocks` has no
 native equivalent for (e.g. a CTA button's `link` field, which stays ACF in both of
-those blocks since there's no core block for a styled `wa-button`). Known trade-off:
-`InnerBlocks` content isn't covered by `$example`/get_field() fallbacks, so a block's
-editor "preview" thumbnail shows the raw `$template` placeholders rather than curated
-example copy — accepted as-is for now.
+those blocks since there's no core block for a styled `wa-button`). `InnerBlocks`
+content isn't real ACF field data, so it isn't covered by `$example`/`get_field()`
+fallbacks — instead, give the block a `$exampleContent` string property containing
+hand-written HTML matching its `$template` (e.g. `'<h3>...</h3><p>...</p>'` for a
+heading + paragraph template — see `app/Blocks/TextHero.php`/`CtaStrip.php`/
+`FeatureCard.php`). This is what the pattern library (§6) substitutes into the
+`<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
+block's library entry just shows an empty content area.
 
 ## 4. Build the Blade view
 
@@ -259,6 +273,27 @@ names, so there's no way to write a single converter that handles every case):
   iframe via the `block_editor_settings_all` filter in `app/setup.php`, since a normal
   enqueue doesn't reach that iframe).
 - Check the front end via the DDEV site URL and confirm real field data renders.
+- Visit `/pattern-library` while logged in and confirm the new block appears fully
+  populated (no blank media, no visible `{{ }}`/`<InnerBlocks>` leftovers) — see §6.
+
+## 6. Pattern library
+
+Every registered block auto-appears at `/pattern-library` (a logged-in-only page
+template, `resources/views/template-pattern-library.blade.php`) with its
+`$description` and a full render using its fixture data —
+`App\View\Composers\PatternLibrary` discovers every block via
+`app('AcfComposer')->composers()` and re-renders each one standalone, so there is
+**no registration step** for a new block. The only thing that makes a block show up
+correctly is completing steps 3–4 above properly: a real `$description`, full
+`$example`/`example()` coverage for every ACF field (including media, via the
+placeholder assets), and `$exampleContent` if it uses `InnerBlocks`. Skip any of
+those and the block still appears, just with a gap (blank description, blank image,
+or empty content area) — there's nothing else to wire up.
+
+Placeholder assets live at `resources/images/placeholder/pattern-placeholder.svg` and
+`resources/videos/placeholder/pattern-placeholder.mp4`, committed to the repo (not
+fetched externally) so they work offline and are trivial to swap — replace the file
+in place and rebuild, no code changes needed.
 
 ---
 

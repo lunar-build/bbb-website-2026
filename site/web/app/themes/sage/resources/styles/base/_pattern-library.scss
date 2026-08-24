@@ -1,0 +1,100 @@
+// Styles for the auto-generated block pattern library
+// (resources/views/template-pattern-library.blade.php). New blocks need no
+// styling here — this only frames each entry and the nav, the block itself
+// renders with its normal front-end styles.
+//
+// .c-pattern-library gets its own grid-template-columns (nav + content) one
+// level inside .o-container, rather than on the .o-container element itself
+// — .o-container's `> *` rule places direct children on its own named grid
+// lines (content-start/content-end), and stacking a second
+// grid-template-columns on that same element would replace those lines,
+// breaking the placement rule silently.
+
+.c-pattern-library {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 3rem;
+  align-items: start;
+}
+
+.c-pattern-library__nav {
+  position: sticky;
+  top: 2rem;
+  margin-block-start: 3rem;
+  padding: 1.5rem;
+  background: var(--wp--preset--color--lightest-grey);
+  border-radius: 8px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li + li {
+    margin-block-start: 0.5rem;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: inherit;
+    text-decoration: none;
+
+    span {
+      transition: transform 0.15s ease;
+    }
+
+    &:hover span {
+      transform: translateX(4px);
+    }
+  }
+
+  .dashicons,
+  svg {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    flex: none;
+  }
+}
+
+.c-pattern-library__nav-title {
+  font-weight: 700;
+  margin-block-end: 0.75rem;
+}
+
+.c-pattern-library__intro {
+  padding-block: 3rem 2rem;
+}
+
+.c-pattern-library__entry {
+  border-top: 2px solid var(--wp--preset--color--charcoal);
+  padding-block: 3rem;
+}
+
+.c-pattern-library__meta {
+  margin-block-end: 1rem;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--wp--preset--font-size--heading-4);
+    line-height: 34px;
+    font-weight: 700;
+
+    .dashicons,
+    svg {
+      width: 26px;
+      height: 26px;
+      font-size: 26px;
+      flex: none;
+    }
+  }
+
+  p {
+    color: var(--wp--preset--color--place-holder-grey);
+  }
+}
