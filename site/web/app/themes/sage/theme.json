@@ -80,5 +80,11 @@
         { "slug": "button-label", "size": "20px", "name": "Button label" }
       ]
     }
+  },
+  "styles": {
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--nata-sans)",
+      "fontSize": "var(--wp--preset--font-size--body)"
+    }
   }
 }
