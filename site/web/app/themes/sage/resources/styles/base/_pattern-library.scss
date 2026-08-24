@@ -63,10 +63,20 @@
 .c-pattern-library__nav-title {
   font-weight: 700;
   margin-block-end: 0.75rem;
+
+  &:not(:first-child) {
+    margin-block-start: 1.5rem;
+  }
 }
 
 .c-pattern-library__intro {
   padding-block: 3rem 2rem;
+}
+
+#style-buttons .c-pattern-library__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .c-pattern-library__entry {

@@ -57,4 +57,33 @@ class PatternLibrary extends Composer
 
         return $html;
     }
+
+    /**
+     * Every Blade `@props` component under resources/views/components/, for
+     * the dev-only "Components" section of the pattern library (see
+     * `resources/views/partials/pattern-library-styles.blade.php` for the
+     * hand-maintained counterpart covering non-component style primitives
+     * like buttons/type scale, which have no file to discover).
+     *
+     * A component appears here automatically — a matching example partial
+     * at resources/views/components/examples/{name}.blade.php is what fills
+     * in its rendered preview; without one it still lists, just with a
+     * "no example yet" note, so the gap stays visible.
+     */
+    public function components(): array
+    {
+        $path = get_theme_file_path('resources/views/components');
+
+        return collect(glob("{$path}/*.blade.php"))
+            ->map(fn ($file) => basename($file, '.blade.php'))
+            ->map(fn ($name) => [
+                'name' => $name,
+                'html' => view()->exists("components.examples.{$name}")
+                    ? view("components.examples.{$name}")->render()
+                    : null,
+            ])
+            ->sortBy('name')
+            ->values()
+            ->all();
+    }
 }

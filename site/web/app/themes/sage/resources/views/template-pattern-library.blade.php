@@ -18,7 +18,7 @@
     named grid lines (see resources/styles/base/_container.scss). --}}
     <div class="o-container">
       <div class="c-pattern-library">
-        <nav class="c-pattern-library__nav" aria-label="{{ __('Blocks', 'sage') }}">
+        <nav class="c-pattern-library__nav" aria-label="{{ __('Pattern library navigation', 'sage') }}">
           <p class="c-pattern-library__nav-title">{{ __('Blocks', 'sage') }}</p>
           <ul>
             @foreach ($blocks as $block)
@@ -30,6 +30,18 @@
               </li>
             @endforeach
           </ul>
+
+          @if (WP_DEBUG)
+            <p class="c-pattern-library__nav-title">{{ __('Components (dev only)', 'sage') }}</p>
+            <ul>
+              @foreach ($components as $component)
+                <li><a href="#component-{{ $component['name'] }}"><span>{{ $component['name'] }}</span></a></li>
+              @endforeach
+              <li><a href="#style-buttons"><span>{{ __('Buttons', 'sage') }}</span></a></li>
+              <li><a href="#style-type-scale"><span>{{ __('Type scale', 'sage') }}</span></a></li>
+              <li><a href="#style-callout"><span>{{ __('Callout', 'sage') }}</span></a></li>
+            </ul>
+          @endif
         </nav>
 
         <div class="c-pattern-library__content">
@@ -55,6 +67,31 @@
               </div>
             </section>
           @endforeach
+
+          @if (WP_DEBUG)
+            <div class="c-pattern-library__intro">
+              <h1>{{ __('Components', 'sage') }}</h1>
+              <p>{{ __('Dev-only — base design-system pieces as they\'re built. Not shown to clients (gated on WP_DEBUG).', 'sage') }}</p>
+            </div>
+
+            @foreach ($components as $component)
+              <section id="component-{{ $component['name'] }}" class="c-pattern-library__entry">
+                <div class="c-pattern-library__meta">
+                  <h2>&lt;x-{{ $component['name'] }}&gt;</h2>
+                </div>
+
+                <div class="c-pattern-library__preview">
+                  @if ($component['html'])
+                    {!! $component['html'] !!}
+                  @else
+                    <p>{{ __('No example yet — add one at resources/views/components/examples/', 'sage') }}{{ $component['name'] }}.blade.php</p>
+                  @endif
+                </div>
+              </section>
+            @endforeach
+
+            @include('partials.pattern-library-styles')
+          @endif
         </div>
       </div>
     </div>

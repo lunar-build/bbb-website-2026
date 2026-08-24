@@ -145,6 +145,44 @@ once:
 No other setup is needed — every existing and future block appears automatically once
 the page exists.
 
+### Dev-only "Components" section
+
+`/pattern-library` also has a second section for base design-system pieces — Blade
+`@props` components (`<x-input>`, `<x-alert>`, `<x-icon>`, etc.) plus non-component
+style primitives (buttons, the type scale, the callout style). This section only
+renders when `WP_DEBUG` is true (on by default locally via
+`site/config/environments/development.php`, off everywhere else via WP core's own
+fallback) — it's for development, never shown to a client regardless of login state
+or environment.
+
+**Workflow when adding a new component** (`site/web/app/themes/sage/resources/views/components/*.blade.php`):
+
+1. Build the component as normal — it's auto-discovered by
+   [`PatternLibrary::components()`](site/web/app/themes/sage/app/View/Composers/PatternLibrary.php)
+   just by existing in that folder, no registration step.
+2. Add an example file at `resources/views/components/examples/{component-name}.blade.php`
+   containing literal sample usage, e.g. for a new `<x-card>`:
+
+   ```blade
+   {{-- resources/views/components/examples/card.blade.php --}}
+   <x-card title="Example card">Example body copy.</x-card>
+   ```
+
+   Stack more than one line in the same file to show multiple variants (see
+   `resources/views/components/examples/input.blade.php` for both the text and
+   textarea variants of `<x-input>`).
+3. That's it — visit `/pattern-library` locally and the component shows up under
+   "Components (dev only)" with your example rendered.
+
+Skip step 2 and the component still lists (so the gap stays visible rather than
+silently missing), just with a "no example yet" note instead of a rendered preview.
+
+Buttons/type-scale/callout aren't separate files, so they can't be auto-discovered
+the same way — those are hand-maintained in
+[`resources/views/partials/pattern-library-styles.blade.php`](site/web/app/themes/sage/resources/views/partials/pattern-library-styles.blade.php).
+Only touch that file if you're introducing a genuinely new style primitive (not a
+component, not a block) — rare.
+
 # [Web Awesome](https://webawesome.com/)
 
 `@awesome.me/webawesome` (from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package — no paid Pro tier dependency.
