@@ -10,7 +10,7 @@
 
 <div {{ $attributes->class(['c-choice']) }}>
   <input
-    type="radio"
+    type="checkbox"
     @if ($id) id="{{ $id }}" @endif
     @if ($name) name="{{ $name }}" @endif
     @if ($value !== null) value="{{ $value }}" @endif

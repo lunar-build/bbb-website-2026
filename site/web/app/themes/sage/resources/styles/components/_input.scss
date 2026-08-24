@@ -1,8 +1,9 @@
-// Text input / textarea field, matching the `<x-input>` Blade component
-// (resources/views/components/input.blade.php). Text inputs are a pill
-// (border-radius: 999px) with a trailing icon; the textarea variant uses a
-// softer 20px radius and top-aligned content, no icon — see the Figma
-// "Inputs / Text" component.
+// Layout/label/icon extras for the `<x-input>` Blade component
+// (resources/views/components/input.blade.php). The actual field styling
+// (pill shape, border, focus ring) is a global element rule in
+// base/_forms.scss, so it also applies to third-party-rendered fields
+// (Gravity Forms etc.) — this file only adds what's specific to our own
+// component: the label above the field and the optional trailing icon.
 
 .c-input {
   display: flex;
@@ -24,45 +25,19 @@
 }
 
 .c-input__field {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
   width: 100%;
-  padding: 10px 20px;
-  background: var(--wp--preset--color--white);
-  border: 2px solid var(--wp--preset--color--charcoal);
-  border-radius: 999px;
-
-  &:focus-within {
-    outline: 2px solid var(--wp--preset--color--blue);
-    outline-offset: -4px;
-  }
-
-  input,
-  textarea {
-    flex: 1;
-    min-width: 0;
-    width: 100%;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-family: var(--wp--preset--font-family--nata-sans);
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 18px;
-    color: var(--wp--preset--color--charcoal);
-
-    &::placeholder {
-      color: var(--wp--preset--color--place-holder-grey);
-    }
-  }
 }
 
 .c-input__icon {
   display: flex;
-  flex: none;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
   color: var(--wp--preset--color--charcoal);
+  pointer-events: none;
 
   svg {
     display: block;
@@ -71,12 +46,12 @@
   }
 }
 
-.c-input--textarea .c-input__field {
-  align-items: flex-start;
-  border-radius: 20px;
+// Reserve space so the field's own text never sits under the icon.
+.c-input--has-icon input {
+  padding-right: 48px;
+}
 
-  textarea {
-    resize: vertical;
-    min-height: 72px;
-  }
+.c-input--textarea .c-input__icon {
+  top: 20px;
+  transform: none;
 }

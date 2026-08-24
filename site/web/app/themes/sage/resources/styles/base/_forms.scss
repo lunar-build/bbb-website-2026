@@ -1,0 +1,128 @@
+// Base styling for every native form control site-wide — plain element
+// selectors, not component classes, so this also styles markup our Blade
+// components never touch (Gravity Forms' own rendered fields, any other
+// plugin/embed). Component-specific extras that only our own `<x-input>`/
+// `<x-radio>`/`<x-checkbox>` need (icon overlay, label typography, layout
+// wrapper) live in components/_input.scss and components/_choice.scss on
+// top of this — this file only covers the control itself.
+//
+// `!important` is back, confirmed necessary (not pre-emptive) by testing
+// against a real Gravity Forms field: GF's Orbital theme wraps every form
+// in `.gform-theme--framework` and targets
+// `.gform-theme--framework input[type]:where(...)` — a class-level
+// selector, genuinely higher specificity than our bare `input[type=...]`,
+// so it wins regardless of load order. `:where()` keeps GF's OWN nested
+// conditions at zero specificity (their deliberate override-friendly
+// design), but the `.gform-theme--framework` part outside it still counts.
+// Matching or escalating specificity per-plugin isn't sustainable long
+// term, so `!important` here instead.
+
+input[type='text'],
+input[type='email'],
+input[type='tel'],
+input[type='url'],
+input[type='number'],
+input[type='search'],
+input[type='password'],
+textarea {
+  width: 100% !important;
+  padding: 10px 20px !important;
+  background: var(--wp--preset--color--white) !important;
+  border: 2px solid var(--wp--preset--color--charcoal) !important;
+  border-radius: 999px !important;
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
+  color: var(--wp--preset--color--charcoal) !important;
+
+  &::placeholder {
+    color: var(--wp--preset--color--place-holder-grey) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--blue) !important;
+    outline-offset: -4px !important;
+  }
+}
+
+textarea {
+  border-radius: 20px !important;
+  resize: vertical !important;
+  min-height: 72px !important;
+}
+
+input[type='radio'],
+input[type='checkbox'] {
+  appearance: none !important;
+  display: inline-grid !important;
+  place-content: center !important;
+  flex: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  color: var(--wp--preset--color--charcoal) !important;
+  border: 2px solid var(--wp--preset--color--charcoal) !important;
+  background: var(--wp--preset--color--white) !important;
+  --checked-icon-scale: 0;
+
+  &:checked {
+    --checked-icon-scale: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--blue) !important;
+    outline-offset: 2px !important;
+  }
+
+  // `::before`, not `::after` — Gravity Forms renders its own checked-state
+  // dot/check via `::before` on the same input. Using `::after` meant ours
+  // was a second, independent pseudo-element stacking on top rather than
+  // actually overriding GF's, so `!important` had nothing of theirs to
+  // beat. Targeting `::before` puts us on the exact same pseudo-element GF
+  // does, so each property below overrides theirs directly.
+  //
+  // Fixed px, not a percentage — `<input>` is a replaced element, so a
+  // percentage `width` on its ::before has no reliable containing block and
+  // resolves to 0 in every browser tested.
+  //
+  // `color` set explicitly here too, not just on the input above — GF sets
+  // `color` directly on its own `::before` rule, and an explicit
+  // declaration on the pseudo-element itself always beats an inherited
+  // value regardless of `!important` on the ancestor, so `currentColor`
+  // below was resolving to GF's blue until this was added.
+  &::before {
+    content: '' !important;
+    scale: var(--checked-icon-scale) !important;
+    color: var(--wp--preset--color--charcoal) !important;
+    background-color: currentColor !important;
+    transition: scale 0.1s ease !important;
+  }
+}
+
+input[type='radio'] {
+  border-radius: 50% !important;
+
+  &::before {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+  }
+}
+
+input[type='checkbox'] {
+  border-radius: 2px !important;
+
+  // GF's own checked-state tick is a pre-coloured background-image (not a
+  // plain fill like radio's dot), which layers on top of background-color
+  // and doesn't match our box's sizing — background-image: none clears
+  // theirs so only our mask-based background-color renders.
+  &::before {
+    width: 10px !important;
+    height: 7px !important;
+    background-image: none !important;
+    mask-image: url('../../svg/check.svg') !important;
+    mask-size: contain !important;
+    mask-repeat: no-repeat !important;
+  }
+}

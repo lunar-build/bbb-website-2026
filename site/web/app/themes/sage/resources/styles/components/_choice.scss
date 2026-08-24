@@ -1,58 +1,18 @@
-// "Choice" controls (radio, checkbox — checkbox to follow the same pattern
-// when built) — a native input styled via `appearance: none` rather than a
-// swapped background image. The Figma "Input | Radio" component exports its
-// two states as flattened SVGs, but that's just how Figma exports any vector
-// shape, not a signal to treat it as icon content: a radio's checked/
-// unchecked state is two plain circles with no detail an SVG preserves that
-// CSS can't, and it's a real interactive form control — styling the native
-// element keeps keyboard/form/accessibility semantics for free instead of
-// re-implementing them by hand for a fake image-based control.
+// Layout/label extras for the `<x-radio>` and `<x-checkbox>` Blade
+// components (resources/views/components/{radio,checkbox}.blade.php). The
+// actual control styling (circle/square, border, checked-state fill) is a
+// global element rule on input[type=radio]/input[type=checkbox] in
+// base/_forms.scss, so it also applies to third-party-rendered fields
+// (Gravity Forms etc.) — this file only adds the row layout + label shared
+// by both, since they're visually identical apart from the input itself.
 
-.c-radio {
+.c-choice {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.c-radio__input {
-  appearance: none;
-  display: inline-grid;
-  place-content: center;
-  flex: none;
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  color: var(--wp--preset--color--charcoal);
-  border: 2px solid var(--wp--preset--color--charcoal);
-  border-radius: 50%;
-  background: var(--wp--preset--color--white);
-  --checked-icon-scale: 0;
-
-  &:checked {
-    --checked-icon-scale: 1;
-  }
-
-  // `<input>` is a replaced element — its ::after has no reliable containing
-  // block, so a percentage `width` here resolves to 0 in every browser tested.
-  // Fixed px + `scale` (rather than sizing the box itself) keeps the
-  // currentColor/scale approach but sidesteps that.
-  &::after {
-    content: '';
-    width: 10px;
-    height: 10px;
-    scale: var(--checked-icon-scale);
-    background-color: currentColor;
-    border-radius: 50%;
-    transition: scale 0.1s ease;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--blue);
-    outline-offset: 2px;
-  }
-}
-
-.c-radio__label {
+.c-choice__label {
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 500;
   font-size: var(--wp--preset--font-size--input-label);

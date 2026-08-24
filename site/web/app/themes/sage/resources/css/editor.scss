@@ -1,10 +1,11 @@
 // Pulls in the full front-end stylesheet so block previews in the editor
 // iframe (mode: preview) match the front end. See app/setup.php's
 // block_editor_settings_all filter, which injects this file's compiled
-// output directly into the editor iframe. Web Awesome's base component
-// styles (--wa-color-* tokens etc, which base/_wa-theme.scss and
-// base/_button.scss override) are only ever imported as a side-effect of
-// resources/js/app.js on the front end, so they're pulled in explicitly
-// here too — app.scss itself doesn't import them.
-@use '../../node_modules/@awesome.me/webawesome/dist/styles/webawesome.css';
+// output directly into the editor iframe. Web Awesome's theme tokens
+// (--wa-color-* etc, which base/_wa-theme.scss and components/_button.scss
+// override) are only ever imported as a side-effect of resources/js/app.js
+// on the front end, so they're pulled in explicitly here too — app.scss
+// itself doesn't import them. Just the theme tokens, not the full
+// webawesome.css — see app.js for why.
+@use '../../node_modules/@awesome.me/webawesome/dist/styles/themes/default.css';
 @use '../styles/app';

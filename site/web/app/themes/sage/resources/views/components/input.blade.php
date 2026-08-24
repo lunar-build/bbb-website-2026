@@ -11,7 +11,7 @@
 
 @php($id = $id ?? $name)
 
-<div {{ $attributes->class(['c-input', 'c-input--textarea' => $textarea]) }}>
+<div {{ $attributes->class(['c-input', 'c-input--textarea' => $textarea, 'c-input--has-icon' => $icon && ! $textarea]) }}>
   @if ($label)
     <label @if ($id) for="{{ $id }}" @endif class="c-input__label">
       {{ $label }}
