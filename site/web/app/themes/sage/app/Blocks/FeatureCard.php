@@ -26,7 +26,7 @@ class FeatureCard extends Block
      *
      * @var string
      */
-    public $description = 'A bordered card with a heading, body text, and a single CTA link.';
+    public $description = 'A flexible image card for events, news listings, partner logos, and stat/route summaries.';
 
     /**
      * The block category.
@@ -164,8 +164,8 @@ class FeatureCard extends Block
      * @var array
      */
     public $template = [
-        'core/heading' => ['placeholder' => 'Heading', 'level' => 3],
-        'core/paragraph' => ['placeholder' => 'Body text…'],
+        'core/heading' => ['placeholder' => 'Title', 'level' => 3],
+        'core/paragraph' => ['placeholder' => 'Body text (optional — delete for cards without body copy)…'],
     ];
 
     /**
@@ -174,7 +174,11 @@ class FeatureCard extends Block
     public function with(): array
     {
         return [
+            'image' => $this->image(),
+            'date' => $this->date(),
+            'stats' => $this->stats(),
             'link' => $this->link(),
+            'ctaStyle' => $this->ctaStyle(),
         ];
     }
 
@@ -186,12 +190,112 @@ class FeatureCard extends Block
         $fields = Builder::make('feature_card');
 
         $fields
-            ->addLink('link', [
-                'label' => 'Link',
-                'instructions' => 'Link text + URL for the card CTA.',
-            ]);
+            ->addTab('Media')
+                ->addImage('image', [
+                    'label' => 'Image',
+                    'instructions' => 'Large image shown at the top of the card.',
+                    'return_format' => 'array',
+                    'preview_size' => 'medium',
+                    'required' => 1,
+                ])
+            ->addTab('Content')
+                ->addDatePicker('date', [
+                    'label' => 'Date',
+                    'instructions' => 'Optional. Leave blank to hide (e.g. for partner/route cards).',
+                    'display_format' => 'jS F Y',
+                    'return_format' => 'jS F Y',
+                ])
+            ->addTab('Stats')
+                ->addRepeater('stats', [
+                    'label' => 'Stats',
+                    'instructions' => 'Optional label/value rows (e.g. Difficulty, Time needed, Distance). Leave empty to omit.',
+                    'button_label' => 'Add stat',
+                    'min' => 0,
+                    'layout' => 'block',
+                ])
+                    ->addText('label', [
+                        'label' => 'Label',
+                        'required' => 1,
+                    ])
+                    ->addText('value', [
+                        'label' => 'Value',
+                        'required' => 1,
+                    ])
+                    ->addTrueFalse('show_as_pill', [
+                        'label' => 'Show as pill',
+                        'instructions' => 'Renders the value as a coloured wa-badge instead of plain text.',
+                        'ui' => 1,
+                        'default_value' => 0,
+                    ])
+                    ->addSelect('pill_variant', [
+                        'label' => 'Pill colour',
+                        'instructions' => 'Maps to a wa-badge variant.',
+                        'choices' => [
+                            'success' => 'Success (green) — e.g. Easy',
+                            'warning' => 'Warning (amber) — e.g. Moderate',
+                            'danger' => 'Danger (red)',
+                            'neutral' => 'Neutral (grey)',
+                            'brand' => 'Brand',
+                        ],
+                        'default_value' => 'success',
+                        'conditional_logic' => [
+                            [
+                                [
+                                    'field' => 'show_as_pill',
+                                    'operator' => '==',
+                                    'value' => '1',
+                                ],
+                            ],
+                        ],
+                    ])
+                ->endRepeater()
+            ->addTab('Call to Action')
+                ->addLink('link', [
+                    'label' => 'Link',
+                    'instructions' => 'URL the card links to. Leave empty for no link at all.',
+                ])
+                ->addSelect('cta_style', [
+                    'label' => 'CTA style',
+                    'instructions' => 'How the link is presented. Ignored if the Link field above is empty.',
+                    'choices' => [
+                        'button' => 'Full button (visible label)',
+                        'icon' => 'Icon only (arrow, no label)',
+                        'none' => 'No visible CTA — card is still fully clickable via Link',
+                    ],
+                    'default_value' => 'button',
+                ]);
 
         return $fields->build();
+    }
+
+    /**
+     * Retrieve the image.
+     *
+     * @return array|null
+     */
+    public function image()
+    {
+        return get_field('image');
+    }
+
+    /**
+     * Retrieve the date.
+     *
+     * @return string|null
+     */
+    public function date()
+    {
+        return get_field('date') ?: null;
+    }
+
+    /**
+     * Retrieve the stats.
+     *
+     * @return array
+     */
+    public function stats()
+    {
+        return get_field('stats') ?: [];
     }
 
     /**
@@ -202,6 +306,16 @@ class FeatureCard extends Block
     public function link()
     {
         return get_field('link') ?: $this->example['link'];
+    }
+
+    /**
+     * Retrieve the CTA style.
+     *
+     * @return string
+     */
+    public function ctaStyle()
+    {
+        return get_field('cta_style') ?: 'button';
     }
 
     /**

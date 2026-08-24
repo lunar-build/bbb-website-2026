@@ -1,0 +1,114 @@
+.c-feature-card {
+  &__card {
+    display: block;
+    position: relative; // containing block for the stretched-link overlay
+
+    &::part(media) {
+      display: block;
+    }
+
+    &::part(body) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  &__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    background: #e5e5e5;
+    color: #737373;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  &__stretched-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__date {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--wa-color-neutral-60, #737373);
+  }
+
+  &__content {
+    :where(h1, h2, h3, h4, h5, h6) {
+      margin: 0 0 0.25rem;
+    }
+
+    p {
+      margin: 0 0 0.5rem;
+    }
+  }
+
+  &__stats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  &__stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__stat-label {
+    font-weight: 600;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 2; // sits above the stretched-link overlay
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.625rem 1.25rem;
+    border-radius: 999px;
+    background: var(--wa-color-neutral-fill-loud, #1a1a1a);
+    color: var(--wa-color-neutral-on-loud, #fff);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__cta-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--wa-color-neutral-fill-quiet, #f0f0f0);
+  }
+}
