@@ -61,23 +61,27 @@ input[type='checkbox'] {
   width: 18px !important;
   height: 18px !important;
   margin: 0 !important;
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--blue) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+input[type='radio'] {
   color: var(--wp--preset--color--charcoal) !important;
   border: 2px solid var(--wp--preset--color--charcoal) !important;
   background: var(--wp--preset--color--white) !important;
+  border-radius: 50% !important;
   --checked-icon-scale: 0;
 
   &:checked {
     --checked-icon-scale: 1;
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--blue) !important;
-    outline-offset: 2px !important;
-  }
-
   // `::before`, not `::after` — Gravity Forms renders its own checked-state
-  // dot/check via `::before` on the same input. Using `::after` meant ours
-  // was a second, independent pseudo-element stacking on top rather than
+  // dot via `::before` on the same input. Using `::after` meant ours was a
+  // second, independent pseudo-element stacking on top rather than
   // actually overriding GF's, so `!important` had nothing of theirs to
   // beat. Targeting `::before` puts us on the exact same pseudo-element GF
   // does, so each property below overrides theirs directly.
@@ -86,43 +90,39 @@ input[type='checkbox'] {
   // percentage `width` on its ::before has no reliable containing block and
   // resolves to 0 in every browser tested.
   //
-  // `color` set explicitly here too, not just on the input above — GF sets
-  // `color` directly on its own `::before` rule, and an explicit
-  // declaration on the pseudo-element itself always beats an inherited
-  // value regardless of `!important` on the ancestor, so `currentColor`
-  // below was resolving to GF's blue until this was added.
+  // `color` set explicitly here too, not just above — GF sets `color`
+  // directly on its own `::before` rule, and an explicit declaration on
+  // the pseudo-element itself always beats an inherited value regardless
+  // of `!important` on the ancestor, so `currentColor` below was resolving
+  // to GF's blue until this was added.
   &::before {
     content: '' !important;
+    width: 10px !important;
+    height: 10px !important;
     scale: var(--checked-icon-scale) !important;
     color: var(--wp--preset--color--charcoal) !important;
     background-color: currentColor !important;
+    border-radius: 50% !important;
     transition: scale 0.1s ease !important;
   }
 }
 
-input[type='radio'] {
-  border-radius: 50% !important;
-
-  &::before {
-    width: 10px !important;
-    height: 10px !important;
-    border-radius: 50% !important;
-  }
-}
-
+// Checkbox swaps its whole box (border + fill + tick) between two exported
+// images rather than drawing the box in CSS and toggling a tick glyph —
+// GF's own checkbox ::before turned out to layer its own background-image
+// on top of any mask/background-color approach we used regardless of
+// !important (background-image isn't overridden by overriding
+// background-color), so owning the entire box as a single background-image
+// per state sidesteps that rather than fighting it property-by-property.
 input[type='checkbox'] {
-  border-radius: 2px !important;
+  border: none !important;
+  background-color: transparent !important;
+  background-image: url('../../svg/checkbox-unchecked.svg') !important;
+  background-size: 18px 18px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
 
-  // GF's own checked-state tick is a pre-coloured background-image (not a
-  // plain fill like radio's dot), which layers on top of background-color
-  // and doesn't match our box's sizing — background-image: none clears
-  // theirs so only our mask-based background-color renders.
-  &::before {
-    width: 10px !important;
-    height: 7px !important;
-    background-image: none !important;
-    mask-image: url('../../svg/check.svg') !important;
-    mask-size: contain !important;
-    mask-repeat: no-repeat !important;
+  &:checked {
+    background-image: url('../../svg/checkbox-checked.svg') !important;
   }
 }
