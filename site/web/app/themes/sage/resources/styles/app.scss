@@ -3,8 +3,9 @@
 @use 'base/fonts';
 @use 'base/typography';
 @use 'base/wa-theme';
-@use 'base/button';
-@use 'base/input';
+@use 'components/button';
+@use 'components/input';
+@use 'components/choice';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'blocks/video-hero';
