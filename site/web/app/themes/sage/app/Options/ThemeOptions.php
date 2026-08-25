@@ -36,6 +36,19 @@ class ThemeOptions extends Field
         $fields = Builder::make('theme_options');
 
         $fields
+            ->addTab('header', [
+                'label' => 'Header',
+            ])
+                ->addImage('logo_charcoal', [
+                    'label' => 'Logo (charcoal)',
+                    'instructions' => 'Used on light backgrounds (e.g. the white top bar). Falls back to the theme default if left empty.',
+                    'return_format' => 'array',
+                ])
+                ->addImage('logo_white', [
+                    'label' => 'Logo (white)',
+                    'instructions' => 'Used on dark backgrounds (e.g. the blue nav dropdown/mobile menu). Falls back to the theme default if left empty.',
+                    'return_format' => 'array',
+                ])
             ->addTab('social', [
                 'label' => 'Social',
             ])
