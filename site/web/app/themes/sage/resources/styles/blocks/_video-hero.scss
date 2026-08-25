@@ -1,3 +1,5 @@
+@use '../abstracts/breakpoints' as bp;
+
 .c-video-hero {
   &__inner {
     display: grid;
@@ -5,7 +7,7 @@
     align-items: center;
     padding: 2rem 1rem;
 
-    @media (min-width: 64rem) {
+    @include bp.respond($min: bp.$lg) {
       grid-template-columns: 5fr 11fr;
       padding: 3rem 2rem;
     }
@@ -18,7 +20,7 @@
     overflow: hidden;
     border-radius: 0.75rem;
 
-    @media (min-width: 64rem) {
+    @include bp.respond($min: bp.$lg) {
       order: 2;
       aspect-ratio: auto;
       height: 100%;
@@ -53,7 +55,7 @@
   &__content {
     order: 2;
 
-    @media (min-width: 64rem) {
+    @include bp.respond($min: bp.$lg) {
       order: 1;
     }
   }
