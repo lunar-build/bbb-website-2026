@@ -3,12 +3,19 @@
 @endphp
 
 @if (file_exists($path))
-  {{-- Decorative by default — every current usage sits next to visible text
-       or inside an element that already carries its own accessible name
-       (aria-label on a social link, sr-only text on a toggle, etc), so the
-       icon itself must stay out of the accessibility tree rather than
-       risk being announced twice or with no name at all. Pass
-       aria-hidden="false" explicitly for the rare icon that IS the whole
-       accessible content and has its own <title> inside the SVG. --}}
-  <span {{ $attributes->merge(['aria-hidden' => 'true'])->class(['c-icon', 'c-icon--'.$name]) }}>{!! file_get_contents($path) !!}</span>
+  @php
+    $svg = file_get_contents($path);
+
+    // Namespace internal ids (clipPath, gradients, etc) so reusing the same
+    // icon more than once on a page doesn't collide — duplicate ids make
+    // url(#id) references resolve unreliably in some browsers (seen as the
+    // footer logo's clip-path randomly failing to paint after a scroll
+    // repaint, since it shares ids with the header's copy of the same svg).
+    $uid = 'icon-'.uniqid();
+    $svg = preg_replace_callback('/\bid="([^"]+)"/', fn ($m) => 'id="'.$uid.'-'.$m[1].'"', $svg);
+    $svg = preg_replace_callback('/url\(#([^)]+)\)/', fn ($m) => 'url(#'.$uid.'-'.$m[1].')', $svg);
+    $svg = preg_replace_callback('/(xlink:href|href)="#([^"]+)"/', fn ($m) => $m[1].'="#'.$uid.'-'.$m[2].'"', $svg);
+  @endphp
+  {{-- Decorative by default; pass aria-hidden="false" to override. --}}
+  <span {{ $attributes->merge(['aria-hidden' => 'true'])->class(['c-icon', 'c-icon--'.$name]) }}>{!! $svg !!}</span>
 @endif
