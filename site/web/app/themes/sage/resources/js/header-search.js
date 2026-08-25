@@ -9,7 +9,15 @@ document.querySelectorAll('.c-header-search-toggle').forEach((toggle) => {
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Close search' : 'Search');
     panel.hidden = !open;
-    if (open) panel.querySelector('input')?.focus();
+
+    if (open) {
+      panel.querySelector('input')?.focus();
+      // Only one full-screen mobile overlay makes sense open at a time.
+      const menuToggle = document.querySelector('.c-header-menu-toggle');
+      if (menuToggle?.getAttribute('aria-expanded') === 'true') {
+        menuToggle.click();
+      }
+    }
   };
 
   toggle.addEventListener('click', () => {

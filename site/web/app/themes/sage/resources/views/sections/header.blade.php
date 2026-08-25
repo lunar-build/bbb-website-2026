@@ -40,6 +40,7 @@
                     <wa-button variant="brand" appearance="accent" pill class="c-header-cta" href="{{ $cta['url'] }}"
                         @if (($cta['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
                         {{ $cta['title'] }}
+                      <x-icon name="arrow-right" slot="end" />
                     </wa-button>
                 @endif
             </div>
@@ -65,10 +66,13 @@
                     <x-icon name="close" class="c-header-search-toggle__icon-close" />
                 </button>
 
-                {{-- Menu toggle is inert for now — wired up in Phase 3 alongside
-                     the bespoke mobile menu-level-1/menu-level-2 overlay. --}}
-                <button type="button" class="c-header-menu-toggle" disabled aria-label="Menu">
-                    <x-icon name="menu" />
+                {{-- Opens the mobile nav overlay (#primary-menu, below). Icon
+                     swaps menu<->close and aria-expanded is updated in
+                     primary-nav.js. --}}
+                <button type="button" class="c-header-menu-toggle" aria-expanded="false" aria-controls="primary-menu"
+                    aria-label="Menu">
+                    <x-icon name="menu" class="c-header-menu-toggle__icon-menu" />
+                    <x-icon name="close" class="c-header-menu-toggle__icon-close" />
                 </button>
             </div>
         </div>
@@ -83,9 +87,26 @@
         </div>
     </div>
 
-    <div class="o-container">
+    {{-- Desktop nav (mobile hides this via components/_primary-nav.scss; the
+         bespoke overlay below takes over there instead). no-collapse keeps
+         lunar-nav from ever showing its own hamburger/collapsing — it was
+         producing a second, redundant toggle alongside .c-header-menu-toggle
+         once the mobile overlay existed. --}}
+    <div class="o-container c-primary-nav-desktop">
         <lunar-nav label="{{ wp_get_nav_menu_name('primary_navigation') ?: 'Primary' }}"
-            items="{{ json_encode($items) }}">
+            items="{{ json_encode($items) }}" no-collapse>
         </lunar-nav>
     </div>
 </lunar-site-header>
+
+{{-- Deliberately OUTSIDE <lunar-site-header>: that component's shadow
+     <header> always carries a `transform` (part of its sticky auto-hide),
+     and any transformed ancestor becomes the containing block for a
+     position:fixed descendant — sharing it meant this overlay slid away
+     together with the header on scroll, and lost the stacking-order fight
+     for z-index against the header's own (non-positioned, so effectively
+     z-index:auto) content, hiding the close icon behind it. As a proper
+     sibling, position:fixed here is contained by the real viewport, and
+     z-index compares correctly against lunar-site-header's own
+     (--lunar-site-header-z-index, 100). --}}
+@include('sections.primary-nav', ['items' => $items, 'cta' => $cta, 'socialLinks' => $socialLinks])

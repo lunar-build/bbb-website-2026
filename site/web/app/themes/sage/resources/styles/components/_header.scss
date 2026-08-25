@@ -43,6 +43,7 @@
 
     @include bp.respond($min: bp.$sm) {
       display: flex;
+      gap: 1.5rem;
     }
   }
 
@@ -80,16 +81,15 @@
   &::part(button) {
     border: 2px solid var(--wp--preset--color--charcoal);
   }
-
-  .c-icon--arrow-right svg {
-    width: 15.586px;
-    height: 12px;
-  }
 }
 
 // CtaSmall spec: smaller pill/label than the desktop CTA — override the
 // shared wa-button parts rather than the base/_button.scss rule, which is
-// shaped for the desktop button only.
+// shaped for the desktop button only. Scoped to the --small modifier, not
+// a mobile-width media query — the header top-bar's compact CTA is the
+// only instance that should ever get the small arrow; the mobile nav
+// panel's CTA reuses plain .c-header-cta and needs the normal-size arrow
+// (base/_button.scss default) even though it's mobile-only too.
 .c-header-cta--small {
   &::part(button) {
     height: 40px;
@@ -101,6 +101,11 @@
   &::part(label) {
     font-size: 14px;
     line-height: 18px;
+  }
+
+  .c-icon--arrow-right svg {
+    width: 15.586px;
+    height: 12px;
   }
 }
 
@@ -136,6 +141,37 @@
     .c-header-search-toggle__icon-close {
       display: inline-flex;
     }
+  }
+}
+
+.c-header-menu-toggle {
+  &__icon-close {
+    display: none;
+  }
+
+  &[aria-expanded='true'] {
+    .c-header-menu-toggle__icon-menu {
+      display: none;
+    }
+
+    .c-header-menu-toggle__icon-close {
+      display: inline-flex;
+    }
+  }
+}
+
+// The bespoke mobile overlay (#primary-menu, sections/primary-nav.blade.php)
+// replaces lunar-nav's own collapsed/toggle behaviour on mobile — lunar-nav
+// stays for desktop only (no-collapse keeps it from ever rendering its own
+// hamburger, which was producing a second toggle alongside
+// .c-header-menu-toggle once the overlay existed).
+.c-primary-nav-desktop {
+  display: none;
+
+  @include bp.respond($min: bp.$sm) {
+    // .o-container is display:grid (base/_container.scss) — restore that,
+    // not display:block, or its named-line child placement breaks.
+    display: grid;
   }
 }
 
