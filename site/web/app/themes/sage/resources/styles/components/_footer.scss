@@ -27,6 +27,18 @@
   }
 }
 
+.c-footer-top__row--1 {
+  @include bp.respond($min: bp.$sm) {
+    align-items: center;
+  }
+}
+
+.c-footer-top__row--2 {
+  @include bp.respond($min: bp.$sm) {
+    margin-top: 2.5rem;
+  }
+}
+
 .c-footer-top__logo {
   display: inline-flex;
   flex: none;
@@ -48,7 +60,6 @@
   gap: 0.5rem;
 
   @include bp.respond($min: bp.$sm) {
-    order: 3;
     align-items: flex-end;
   }
 }
@@ -92,7 +103,6 @@
   gap: 1rem 1.5rem;
 
   @include bp.respond($min: bp.$sm) {
-    order: 2;
     width: auto;
     grid-template-columns: repeat(3, auto);
     grid-template-areas: 'col1 col2 col3';

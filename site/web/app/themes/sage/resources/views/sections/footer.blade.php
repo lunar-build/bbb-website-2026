@@ -12,7 +12,7 @@
 <footer class="c-footer">
     <div class="c-footer-top">
         <div class="o-container">
-          <div class="c-footer-top__row">
+          <div class="c-footer-top__row c-footer-top__row--1">
             <a class="c-footer-top__logo" href="{{ home_url('/') }}" aria-label="{{ get_bloginfo('name') }}">
                 @if ($logoWhite)
                     <img src="{{ $logoWhite['url'] }}" alt="" class="c-logo c-logo--footer">
@@ -37,7 +37,9 @@
                     <span>#ibikeitilikeit</span>
                 </div>
             </div>
+          </div>
 
+          <div class="c-footer-top__row c-footer-top__row--2">
             <nav class="c-footer-links" aria-label="Footer">
                 @foreach ($columns as $column)
                     <div class="c-footer-links__group">
