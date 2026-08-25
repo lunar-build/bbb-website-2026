@@ -1,10 +1,162 @@
+// Matches the 40rem breakpoint lunar-nav's own shadow-DOM styles use for its
+// mobile/desktop actions split, so row 1 and row 2 switch layout together.
+$header-breakpoint: 40rem;
+
+.c-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 1rem;
+}
+
+.c-header-top__logo {
+  // Without this, .c-header-top's flex row shrinks the logo below its set
+  // size on mobile (crowded by the CTA/search/menu group) — flex-shrink
+  // defaults to 1, and a fixed width on a descendant only sets the flex
+  // basis, not a floor, so the SVG was compressing to ~34px and distorting
+  // instead of holding its 89x24 box.
+  flex: none;
+}
+
 .c-logo {
   display: inline-flex;
 
   svg,
   img {
     display: block;
-    width: 175px;
-    height: 47px;
+    // Figma: Layout=Mobile is 89x24, Layout=Desktop is 175x47.
+    width: 89px;
+    height: 24px;
+
+    @media (min-width: $header-breakpoint) {
+      width: 175px;
+      height: 47px;
+    }
+  }
+}
+
+.c-header-actions {
+  display: flex;
+  align-items: center;
+
+  &--desktop {
+    display: none;
+
+    @media (min-width: $header-breakpoint) {
+      display: flex;
+    }
+  }
+
+  &--mobile {
+    display: flex;
+
+    @media (min-width: $header-breakpoint) {
+      display: none;
+    }
+  }
+
+  &__social {
+    display: inline-flex;
+    color: var(--wp--preset--color--charcoal);
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// CtaLarge spec: same yellow fill as the brand button elsewhere in the site,
+// but charcoal border/text here rather than the default blue-dark — overrides
+// scoped to this instance only so the shared brand variant is unaffected.
+//
+// The border is a real ::part(button) override, not a --wa-color-*-border-loud
+// custom property — WA's appearance="accent" never reads that token for its
+// border (only appearance="outlined" does), so accent buttons render with
+// border-color: transparent regardless of the token's value. Confirmed by
+// inspecting the shadow DOM's own adopted stylesheet rules directly.
+.c-header-cta {
+  --wa-color-brand-on-loud: var(--wp--preset--color--charcoal);
+
+  &::part(button) {
+    border: 2px solid var(--wp--preset--color--charcoal);
+  }
+
+  .c-icon--arrow-right svg {
+    width: 15.586px;
+    height: 12px;
+  }
+}
+
+// CtaSmall spec: smaller pill/label than the desktop CTA — override the
+// shared wa-button parts rather than the base/_button.scss rule, which is
+// shaped for the desktop button only.
+.c-header-cta--small {
+  &::part(button) {
+    height: 40px;
+    padding-block: 10px;
+    padding-inline: 16px;
+    gap: 10px;
+  }
+
+  &::part(label) {
+    font-size: 14px;
+    line-height: 18px;
+  }
+}
+
+.c-header-search-toggle,
+.c-header-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--wp--preset--color--charcoal);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+}
+
+.c-header-search-toggle {
+  &__icon-close {
+    display: none;
+  }
+
+  &[aria-expanded='true'] {
+    .c-header-search-toggle__icon-search {
+      display: none;
+    }
+
+    .c-header-search-toggle__icon-close {
+      display: inline-flex;
+    }
+  }
+}
+
+// Mobile-only placeholder search band (Figma "Mobile | Search" state) — the
+// desktop search state is deferred to Phase 4, pending the search component
+// being built separately in lunar-ui-components. The field itself is a
+// plain <x-input type="search" icon="search" icon-button-label="Search">,
+// so its border/pill shape/icon-button all come from components/_input.scss
+// — this only covers the full-bleed grey band it sits inside.
+.c-header-search {
+  display: none;
+  background: var(--wp--preset--color--lightest-grey);
+  padding: 1rem 0;
+
+  &:not([hidden]) {
+    display: block;
+  }
+
+  @media (min-width: $header-breakpoint) {
+    display: none !important;
   }
 }

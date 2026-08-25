@@ -49,6 +49,10 @@ class ThemeOptions extends Field
                     'instructions' => 'Used on dark backgrounds (e.g. the blue nav dropdown/mobile menu). Falls back to the theme default if left empty.',
                     'return_format' => 'array',
                 ])
+                ->addLink('cta', [
+                    'label' => 'CTA button',
+                    'instructions' => 'Shown in the header top row (e.g. "Plan a cycling route"). Leave empty to hide the button.',
+                ])
             ->addTab('social', [
                 'label' => 'Social',
             ])

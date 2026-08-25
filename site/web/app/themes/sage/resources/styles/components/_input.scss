@@ -30,6 +30,25 @@
   width: 100%;
 }
 
+// The icon is a sibling of <input>, absolutely positioned on top of it —
+// outlines only paint above an element's own descendants, not its
+// siblings, so the input's native :focus-visible ring (base/_forms.scss)
+// was rendering *behind* the icon wherever they overlapped. Moving the
+// ring to .c-input__field instead — the icon's actual ancestor — puts it
+// back on top, since outline is specified to paint above all descendant
+// content.
+.c-input--has-icon:not(.c-input--textarea) {
+  .c-input__field input:focus-visible {
+    outline: none !important;
+  }
+
+  .c-input__field:has(input:focus-visible) {
+    outline: 2px solid var(--wp--preset--color--blue);
+    outline-offset: -4px;
+    border-radius: 999px;
+  }
+}
+
 .c-input__icon {
   display: flex;
   position: absolute;
@@ -49,6 +68,35 @@
 // Reserve space so the field's own text never sits under the icon.
 .c-input--has-icon input {
   padding-right: 48px;
+}
+
+// Decorative "submit" look (yellow cap, e.g. a search field) — not a real
+// button, see $iconAccent in input.blade.php. Flush against the pill's own
+// inner right edge, filling its full height, so the pill's existing 2px
+// charcoal border (base/_forms.scss) reads as one continuous border with a
+// yellow cap, matching Figma, rather than a separately-bordered shape.
+.c-input__icon--accent {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: auto;
+  transform: none;
+  border-radius: 0 999px 999px 0;
+  background: var(--wp--preset--color--yellow);
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.c-input--has-icon:has(.c-input__icon--accent) input {
+  padding-right: 55px;
 }
 
 .c-input--textarea .c-input__icon {
