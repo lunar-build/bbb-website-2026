@@ -67,7 +67,11 @@
 .c-footer-social__icons {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2.5rem;
+
+  @include bp.respond($min: bp.$sm) {
+    gap: 1.5rem;
+  }
 }
 
 .c-footer-social__icon {
@@ -75,8 +79,14 @@
   color: var(--wp--preset--color--white);
 
   svg {
-    width: 20px;
-    height: 20px;
+    // Figma: 32px icons on mobile, 20px on desktop.
+    width: 32px;
+    height: 32px;
+
+    @include bp.respond($min: bp.$sm) {
+      width: 20px;
+      height: 20px;
+    }
   }
 }
 
