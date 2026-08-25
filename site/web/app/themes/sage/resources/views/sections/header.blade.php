@@ -78,7 +78,7 @@
         <div class="o-container">
             <form role="search" aria-label="Site" method="get" action="{{ home_url('/') }}" class="c-header-search__form">
                 <x-input type="search" name="s" placeholder="Search for a keyword" icon="search"
-                    icon-accent aria-label="Search for a keyword" />
+                    icon-button-label="Search" aria-label="Search for a keyword" />
             </form>
         </div>
     </div>

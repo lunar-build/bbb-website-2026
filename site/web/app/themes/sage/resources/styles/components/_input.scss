@@ -70,11 +70,14 @@
   padding-right: 48px;
 }
 
-// Decorative "submit" look (yellow cap, e.g. a search field) — not a real
-// button, see $iconAccent in input.blade.php. Flush against the pill's own
-// inner right edge, filling its full height, so the pill's existing 2px
-// charcoal border (base/_forms.scss) reads as one continuous border with a
-// yellow cap, matching Figma, rather than a separately-bordered shape.
+// Real <button> with the yellow-cap "submit" look (e.g. a search field's
+// icon-button, see $iconButtonLabel in input.blade.php). Flush against the
+// pill's own inner right edge, filling its full height, so the pill's
+// existing 2px charcoal border (base/_forms.scss) reads as one continuous
+// border with a yellow cap, matching Figma, rather than a separately
+// bordered shape. Resets the base .c-input__icon's pointer-events:none
+// (that rule is for the decorative, non-button icon case) since this one
+// must be clickable.
 .c-input__icon--accent {
   position: absolute;
   top: 2px;
@@ -86,12 +89,24 @@
   width: 43px;
   height: auto;
   transform: none;
+  padding: 0;
+  border: none;
   border-radius: 0 999px 999px 0;
   background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  cursor: pointer;
+  pointer-events: auto;
 
   svg {
     width: 16px;
     height: 16px;
+  }
+
+  // Separate from the field-level ring above (which covers <input> being
+  // focused) — this covers the button itself being reached directly via Tab.
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--blue);
+    outline-offset: -2px;
   }
 }
 

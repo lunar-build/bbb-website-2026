@@ -4,7 +4,7 @@
   'id' => null,
   'placeholder' => null,
   'icon' => null,
-  'iconAccent' => false,
+  'iconButtonLabel' => null,
   'required' => false,
   'textarea' => false,
   'rows' => 4,
@@ -15,10 +15,10 @@
 @php($id = $id ?? $name)
 
 {{--
-  $iconAccent gives the trailing icon the yellow-cap "submit" look (e.g. a
-  search field) — still decorative, not a real button: native form submit
-  (Enter key) covers activation, which also avoids a focusable element
-  sitting inside the input's own focus-ring area.
+  $iconButtonLabel turns the trailing icon into a real, focusable
+  <button type="submit"> with the yellow-cap "submit" look (e.g. a search
+  field) instead of a decorative icon — pass it whenever the icon is
+  something the user can actually click, not just a visual hint.
 
   $ariaLabel covers fields rendered without a visible $label (icon +
   placeholder only, e.g. a compact search field) — a placeholder alone
@@ -56,8 +56,12 @@
         @if ($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
       >
 
-      @if ($icon)
-        <x-icon name="{{ $icon }}" class="c-input__icon @if ($iconAccent) c-input__icon--accent @endif" />
+      @if ($icon && $iconButtonLabel)
+        <button type="submit" class="c-input__icon c-input__icon--accent" aria-label="{{ $iconButtonLabel }}">
+          <x-icon name="{{ $icon }}" />
+        </button>
+      @elseif ($icon)
+        <x-icon name="{{ $icon }}" class="c-input__icon" />
       @endif
     @endif
   </div>
