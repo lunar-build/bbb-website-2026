@@ -1,6 +1,4 @@
-// Mobile-only search band toggle (placeholder ahead of the real search
-// component landing in lunar-ui-components — see the header rebuild plan's
-// Phase 4). Plain show/hide, no query handling beyond the form's own submit.
+// Mobile search band toggle — placeholder ahead of the real search component (Phase 4).
 document.querySelectorAll('.c-header-search-toggle').forEach((toggle) => {
   const panel = document.getElementById(toggle.getAttribute('aria-controls'));
   if (!panel) return;

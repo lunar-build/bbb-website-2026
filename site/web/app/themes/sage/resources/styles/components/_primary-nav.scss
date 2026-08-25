@@ -1,37 +1,17 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
 
-// Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
-// sibling of <lunar-site-header> in header.blade.php, deliberately NOT
-// nested inside it — that component's shadow <header> always carries a
-// `transform` (part of its sticky auto-hide, present even when not
-// currently hidden), which would make it the containing block for a
-// nested position:fixed descendant: the overlay would size against the
-// header's own ~84px box instead of the viewport, slide away with the
-// header's hide-on-scroll transform, and lose the stacking fight for
-// z-index against the header's own (non-positioned) content. As a proper
-// sibling, position:fixed here is contained by the real viewport, and
-// z-index compares correctly against lunar-site-header's own
-// (--lunar-site-header-z-index, 100) — the header still paints on top for
-// its own real height.
-//
-// --header-height is set on <html> by primary-nav.js each time the menu
-// opens (measuring lunar-site-header's actual rendered height) — a fixed
-// top padding here would only coincidentally match the header's real
-// height, and whichever bit of content fell in the gap either way would
-// end up hidden behind the header (higher z-index) or floating in an
-// empty gap above it.
+// Sibling of <lunar-site-header>, not nested — that component's shadow
+// <header> always carries a transform (sticky auto-hide), which would
+// make it the containing block for position:fixed here instead of the
+// viewport. --header-height is set on <html> by primary-nav.js.
 .c-primary-nav {
   position: fixed;
   inset: 0;
-  z-index: 90; // below lunar-site-header's own (--lunar-site-header-z-index, 100)
+  z-index: 90; // below lunar-site-header's (--lunar-site-header-z-index, 100)
   overflow-y: auto;
   overflow-x: hidden;
-  // Reserves the scrollbar's own width permanently, rather than only when
-  // a given panel's content is tall enough to need it — without this,
-  // switching between a short L1/L2 panel (no scrollbar) and a long one
-  // (scrollbar present) shifted the visible content sideways by the
-  // scrollbar's width each time.
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable; // avoids a horizontal shift between short/long panels
   overscroll-behavior: contain;
   background: var(--wp--preset--color--blue);
   padding: calc(var(--header-height, 84px) + 5rem) 1rem 3rem;
@@ -46,10 +26,8 @@
   }
 }
 
-// [hidden] must win over the display below — an author rule with equal or
-// higher specificity always beats the UA stylesheet's [hidden]{display:none}
-// regardless of source order, so an unconditional `display: flex` here
-// would otherwise render every panel at once, stacked.
+// [hidden] needs the specificity bump or an unconditional `display: flex`
+// below would render every panel at once.
 .c-primary-nav__panel[hidden] {
   display: none;
 }
@@ -64,7 +42,6 @@
 .c-primary-nav__list {
   display: flex;
   flex-direction: column;
-  list-style: none;
   margin: 0;
   padding: 0;
 }
@@ -79,13 +56,7 @@
   justify-content: space-between;
   gap: 1rem;
   width: 100%;
-  // padding-inline set explicitly the same for both — leaf items are <a>
-  // (no inline padding by default) but drill items are <button>, which
-  // carries its own non-zero UA-stylesheet inline padding that was never
-  // reset, so buttons sat with extra left/right padding links didn't have.
-  // A small amount (rather than 0) also keeps the inset focus ring off
-  // the text itself.
-  padding: 0.875rem 0.25rem;
+  padding: 0.875rem 0.25rem; // inline padding reset for <button> items, not just <a>
   border: none;
   background: none;
   color: var(--wp--preset--color--white);
@@ -96,9 +67,17 @@
   text-decoration: none;
   cursor: pointer;
 
+  // Underline on the text only, not the whole flex row — text-decoration
+  // on a display:flex element has no inline content of its own to draw
+  // under, and underlining the icon's gap too would look wrong anyway.
+  &:hover > span,
+  &:focus-visible > span {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
   &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--white);
-    outline-offset: -2px;
+    outline: none;
   }
 }
 
@@ -114,8 +93,7 @@
   }
 }
 
-// L2 group heading (inert, not a link) + its L3 links — the mega-menu
-// content model: L2 is a plain label, L3 items are the real leaf links.
+// L2 heading is inert, L3 items are the real links
 .c-primary-nav__group {
   display: flex;
   flex-direction: column;
@@ -158,12 +136,7 @@
   align-items: center;
   gap: 0.625rem;
   align-self: flex-start;
-  // .c-primary-nav__panel is a flex column at height:100% — without this,
-  // default flex-shrink:1 lets a long panel's content squeeze this below
-  // its set height once the column runs out of space (same class of bug
-  // as the header logo shrinking earlier — a fixed size on a flex item is
-  // only a floor if shrink is disabled).
-  flex-shrink: 0;
+  flex-shrink: 0; // panel is a flex column, don't let long content squeeze this
   height: 40px;
   padding-inline: 1rem;
   border: 2px solid var(--wp--preset--color--white);
@@ -175,29 +148,25 @@
   font-size: 14px;
   cursor: pointer;
 
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--white);
-    outline-offset: 2px;
-  }
+  @include focus.ring;
 }
 
 .c-primary-nav__back-icon svg {
   display: block;
   width: 16px;
   height: 12px;
-  transform: scaleX(-1); // arrow-right.svg mirrored, avoids a separate asset
+  transform: scaleX(-1); // arrow-right.svg mirrored
 }
 
 .c-primary-nav__cta {
   align-self: center;
-  flex-shrink: 0; // same reasoning as .c-primary-nav__back above
+  flex-shrink: 0;
 }
 
 .c-primary-nav__socials {
   display: flex;
   gap: 4rem;
   justify-content: center;
-  list-style: none;
   margin: 0;
   padding: 0;
   margin-top: auto;
@@ -218,4 +187,237 @@
     width: 16px;
     height: 16px;
   }
+
+  @include focus.ring;
+}
+
+// Desktop bar + dropdown mega-menu (Figma "Desktop" / "Desktop | Dropdown")
+.c-primary-nav-desktop {
+  display: none;
+  position: relative; // containing block for .c-primary-nav-desktop__dropdown
+
+  @include bp.respond($min: bp.$sm) {
+    display: block;
+  }
+}
+
+// Full-bleed bg, content stays gutter-constrained via .o-container inside
+.c-primary-nav-desktop__bar {
+  background: var(--wp--preset--color--lightest-grey);
+}
+
+.c-primary-nav-desktop__list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding-block: 1rem;
+}
+
+.c-primary-nav-desktop__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--wp--preset--color--charcoal);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+
+  // Bold dropped vs Figma — it changes text width, shifting the whole
+  // justify-content:space-between row. Underline instead, shared by
+  // hover/focus/open state, scoped to the text span (see .c-primary-nav__link
+  // above for why not the whole flex row).
+  &:hover > span,
+  &:focus-visible > span,
+  &[aria-expanded='true'] > span {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.c-primary-nav-desktop__chevron {
+  flex: none;
+  color: inherit;
+
+  svg {
+    display: block;
+    width: 9px;
+    height: 5px;
+    transition: transform 0.15s ease;
+  }
+}
+
+.c-primary-nav-desktop__link[aria-expanded='true'] .c-primary-nav-desktop__chevron svg {
+  transform: rotate(180deg);
+}
+
+.c-primary-nav-desktop__dropdown {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  z-index: 10;
+  background: var(--wp--preset--color--blue);
+  padding-block: 2rem;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.c-primary-nav-desktop__columns {
+  display: flex;
+  gap: 3rem;
+}
+
+.c-primary-nav-desktop__column {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  flex: none;
+  width: 220px;
+}
+
+.c-primary-nav-desktop__heading {
+  margin: 0;
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.c-primary-nav-desktop__sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  margin: 0;
+  padding-inline-start: 16px; // creates the divider-line look with the border below
+  border-inline-start: 1px solid var(--wp--preset--color--white);
+}
+
+.c-primary-nav-desktop__sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+
+  &:hover > span,
+  &:focus-visible > span {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  .c-primary-nav-desktop__chevron svg {
+    transform: rotate(-90deg);
+  }
+}
+
+.c-primary-nav-desktop__search-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  margin-inline-start: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--wp--preset--color--charcoal);
+  cursor: pointer;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @include focus.ring;
+}
+
+.c-primary-nav-desktop__list[hidden],
+.c-primary-nav-desktop__search[hidden] {
+  display: none;
+}
+
+// Replaces the L1 list within the same bar (Figma "Desktop | Search")
+.c-primary-nav-desktop__search {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1rem;
+}
+
+// Field + submit button are adjacent real elements, squared off at the
+// seam (button's left border is the only dividing line) — not an overlay,
+// so each keeps its own independent focus ring.
+.c-primary-nav-desktop__search-field {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+
+  input {
+    // base/_forms.scss sets width:100% !important, which claimed the
+    // whole row now that the button is a real flex sibling.
+    width: auto !important;
+    flex: 1 1 auto;
+    font-size: 16px; // Figma: 16px vs the shared 14px default
+    border-radius: 999px 0 0 999px !important;
+    border-right: none !important;
+  }
+}
+
+.c-primary-nav-desktop__search-submit {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 1rem;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-left: none; // no seam line — flows straight from the input
+  border-radius: 0 999px 999px 0;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @include focus.ring;
+}
+
+.c-primary-nav-desktop__search-close {
+  flex: none;
+  height: 45px;
+  padding-inline: 1rem;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-radius: 999px;
+  background: var(--wp--preset--color--white);
+  color: var(--wp--preset--color--charcoal);
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+
+  @include focus.ring;
 }

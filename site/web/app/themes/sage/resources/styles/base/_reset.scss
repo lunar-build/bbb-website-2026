@@ -57,14 +57,24 @@ h6 {
   overflow-wrap: break-word;
 }
 
-ul[role='list'],
-ol[role='list'] {
+// role="list" keeps list semantics for VoiceOver/Safari when list-style
+// is removed. Scoped to [role='list'] so real content lists keep their
+// indent. :where() keeps this at zero specificity so components can
+// always override it.
+:where(ul[role='list'], ol[role='list']) {
   list-style: none;
+  padding-inline-start: 0;
 }
 
 a:not([class]) {
   text-decoration-skip-ink: auto;
   color: currentColor;
+}
+
+// Neutralises the browser's a:visited colour everywhere; :where() keeps
+// it overridable by any component.
+:where(a, a:visited) {
+  color: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {

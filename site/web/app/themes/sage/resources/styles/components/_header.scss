@@ -1,4 +1,5 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
 
 .c-header-top {
   display: flex;
@@ -9,12 +10,9 @@
 }
 
 .c-header-top__logo {
-  // Without this, .c-header-top's flex row shrinks the logo below its set
-  // size on mobile (crowded by the CTA/search/menu group) — flex-shrink
-  // defaults to 1, and a fixed width on a descendant only sets the flex
-  // basis, not a floor, so the SVG was compressing to ~34px and distorting
-  // instead of holding its 89x24 box.
-  flex: none;
+  flex: none; // prevents the flex row shrinking the logo below its set size
+
+  @include focus.ring;
 }
 
 .c-logo {
@@ -23,7 +21,7 @@
   svg,
   img {
     display: block;
-    // Figma: Layout=Mobile is 89x24, Layout=Desktop is 175x47.
+    // Figma: mobile 89x24, desktop 175x47
     width: 89px;
     height: 24px;
 
@@ -63,33 +61,12 @@
       width: 20px;
       height: 20px;
     }
+
+    @include focus.ring;
   }
 }
 
-// CtaLarge spec: same yellow fill as the brand button elsewhere in the site,
-// but charcoal border/text here rather than the default blue-dark — overrides
-// scoped to this instance only so the shared brand variant is unaffected.
-//
-// The border is a real ::part(button) override, not a --wa-color-*-border-loud
-// custom property — WA's appearance="accent" never reads that token for its
-// border (only appearance="outlined" does), so accent buttons render with
-// border-color: transparent regardless of the token's value. Confirmed by
-// inspecting the shadow DOM's own adopted stylesheet rules directly.
-.c-header-cta {
-  --wa-color-brand-on-loud: var(--wp--preset--color--charcoal);
-
-  &::part(button) {
-    border: 2px solid var(--wp--preset--color--charcoal);
-  }
-}
-
-// CtaSmall spec: smaller pill/label than the desktop CTA — override the
-// shared wa-button parts rather than the base/_button.scss rule, which is
-// shaped for the desktop button only. Scoped to the --small modifier, not
-// a mobile-width media query — the header top-bar's compact CTA is the
-// only instance that should ever get the small arrow; the mobile nav
-// panel's CTA reuses plain .c-header-cta and needs the normal-size arrow
-// (base/_button.scss default) even though it's mobile-only too.
+// Figma CtaSmall — smaller pill than the desktop CTA
 .c-header-cta--small {
   &::part(button) {
     height: 40px;
@@ -125,6 +102,8 @@
     cursor: default;
     opacity: 0.4;
   }
+
+  @include focus.ring;
 }
 
 .c-header-search-toggle {
@@ -159,32 +138,7 @@
   }
 }
 
-// The bespoke mobile overlay (#primary-menu, sections/primary-nav.blade.php)
-// replaces lunar-nav's own collapsed/toggle behaviour on mobile — lunar-nav
-// stays for desktop only (no-collapse keeps it from ever rendering its own
-// hamburger, which was producing a second toggle alongside
-// .c-header-menu-toggle once the overlay existed).
-.c-primary-nav-desktop {
-  display: none;
-
-  @include bp.respond($min: bp.$sm) {
-    // .o-container is display:grid (base/_container.scss) — restore that,
-    // not display:block, or its named-line child placement breaks.
-    display: grid;
-  }
-}
-
-// Mobile-only placeholder search band (Figma "Mobile | Search" state) — the
-// desktop search state is deferred to Phase 4, pending the search component
-// being built separately in lunar-ui-components. The field itself is a
-// plain <x-input type="search" icon="search" icon-button-label="Search">,
-// so its border/pill shape/icon-button all come from components/_input.scss
-// — this only covers the full-bleed grey band it sits inside.
-// position: absolute (not static/flow) so opening the band overlays page
-// content instead of pushing it down — lunar-site-header's shadow <header>
-// always carries a transform (part of its sticky auto-hide), which makes it
-// the containing block for this, so inset-inline: 0/top: 100% lines up with
-// the header bar's own edges without needing a positioned wrapper.
+// Figma "Mobile | Search" — full-bleed band, .c-input owns the field styling
 .c-header-search {
   display: none;
   position: absolute;

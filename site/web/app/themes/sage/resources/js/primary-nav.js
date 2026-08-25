@@ -1,6 +1,5 @@
-// Mobile nav overlay (#primary-menu, sections/primary-nav.blade.php):
-// open/close via .c-header-menu-toggle, plus panel drill-in/back between
-// the root L1 list and each L1 item's own level-2 panel.
+// Mobile nav overlay: open/close via .c-header-menu-toggle, plus panel
+// drill-in/back between the root L1 list and each L1 item's level-2 panel.
 const toggle = document.querySelector('.c-header-menu-toggle');
 const menu = document.getElementById('primary-menu');
 const siteHeader = document.querySelector('lunar-site-header');
@@ -8,25 +7,15 @@ const siteHeader = document.querySelector('lunar-site-header');
 if (toggle && menu) {
   const panels = menu.querySelectorAll('.c-primary-nav__panel');
 
-  // The overlay's own top padding is a fixed value, not "however tall the
-  // header happens to be" — without this, its content starts under that
-  // fixed padding while the header (higher z-index, painted on top for
-  // its own real height) can cover more or less than that, hiding
-  // whichever bit of content falls in the gap. Measuring on each open
-  // keeps it correct if the header's height ever changes.
+  // Overlay top padding depends on the header's real rendered height, not a
+  // fixed guess — measured fresh on each open.
   const syncHeaderHeight = () => {
     if (!siteHeader) return;
     document.documentElement.style.setProperty('--header-height', `${siteHeader.getBoundingClientRect().height}px`);
   };
 
-  // Moving focus onto the newly-shown panel isn't just nice-to-have: the
-  // element that was focused when its panel got hidden doesn't stay
-  // focused — the browser drops focus to <body> (on the next tick, not
-  // synchronously). Since <body> isn't tracked by the Tab trap below,
-  // leaving it there would let Tab escape the overlay entirely after any
-  // drill-in/back. Focusing the panel's first focusable element (its Back
-  // button for a level-2 panel) keeps the trap intact and gives keyboard
-  // users a sensible landing point.
+  // Also moves focus into the new panel — a focused element loses focus to
+  // <body> once its panel is hidden, which would let Tab escape the trap.
   const showPanel = (name) => {
     panels.forEach((panel) => {
       panel.hidden = panel.dataset.panel !== name;
@@ -39,18 +28,13 @@ if (toggle && menu) {
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
     menu.hidden = !open;
 
-    // Locks the page (not just the overlay) from scrolling while open —
-    // without this, scrolling inside the overlay past its own content (or
-    // via a trackpad/wheel event that doesn't hit its overflow) reaches
-    // the page underneath, which triggers lunar-site-header's own
-    // scroll-hide-on-scroll-down behaviour and makes the header vanish
-    // behind the overlay's lower z-index.
+    // Without this, scrolling past the overlay's content reaches the page
+    // underneath and triggers the header's own scroll-hide behaviour.
     document.documentElement.style.overflow = open ? 'hidden' : '';
 
     if (open) {
       syncHeaderHeight();
       showPanel('root');
-      // Only one full-screen mobile overlay makes sense open at a time.
       document.getElementById('mobile-search')?.setAttribute('hidden', '');
       document.querySelector('.c-header-search-toggle')?.setAttribute('aria-expanded', 'false');
     }
@@ -74,21 +58,13 @@ if (toggle && menu) {
       return;
     }
 
-    // A leaf link (real navigation) — close the overlay rather than
-    // leaving it open. Matters for same-page anchors too, not just
-    // placeholder `#` hrefs, since those don't trigger a page load that
-    // would otherwise leave it open with nothing to see.
     if (event.target.closest('.c-primary-nav__link:not([data-open-panel])')) {
-      setOpen(false);
+      setOpen(false); // real navigation — close rather than leave it open
     }
   });
 
-  // Focus trap: the toggle button is the close control, but it lives in
-  // .c-header-top, not inside #primary-menu itself — so it's treated as
-  // the start/end of the trapped sequence explicitly rather than relying
-  // on it being a DOM descendant of the menu. Recomputed on every Tab
-  // press (not cached) since which panel is visible changes on drill-in/
-  // back, changing what's focusable.
+  // Toggle sits outside #primary-menu, so it's included explicitly as the
+  // trap's start/end. Recomputed each keypress since the visible panel changes.
   const getTrapElements = () => {
     const panel = menu.querySelector('.c-primary-nav__panel:not([hidden])');
     const panelFocusables = panel ? [...panel.querySelectorAll('a[href], button:not([disabled])')] : [];
@@ -118,4 +94,109 @@ if (toggle && menu) {
       first.focus();
     }
   });
+}
+
+// Desktop dropdown mega-menu. Hover-to-open (short close delay so moving
+// diagonally into the dropdown doesn't close it early), plus click and
+// keyboard support.
+const desktopNav = document.querySelector('.c-primary-nav-desktop');
+
+if (desktopNav) {
+  const triggers = [...desktopNav.querySelectorAll('.c-primary-nav-desktop__link[aria-controls]')];
+  let closeTimer = null;
+
+  const closeAll = (except) => {
+    triggers.forEach((trigger) => {
+      if (trigger === except) return;
+      trigger.setAttribute('aria-expanded', 'false');
+      const dropdown = document.getElementById(trigger.getAttribute('aria-controls'));
+      if (dropdown) dropdown.hidden = true;
+    });
+  };
+
+  const openDropdown = (trigger) => {
+    clearTimeout(closeTimer);
+    closeAll(trigger);
+    trigger.setAttribute('aria-expanded', 'true');
+    document.getElementById(trigger.getAttribute('aria-controls')).hidden = false;
+  };
+
+  const scheduleClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => closeAll(), 150);
+  };
+
+  triggers.forEach((trigger) => {
+    const dropdown = document.getElementById(trigger.getAttribute('aria-controls'));
+    const item = trigger.closest('.c-primary-nav-desktop__item');
+
+    trigger.addEventListener('click', () => {
+      const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+      isOpen ? closeAll() : openDropdown(trigger);
+    });
+
+    // Tab alone must NOT open the dropdown — only hover or an explicit
+    // Enter/Space (native <button> activation, handled by the click
+    // listener above) should. Focusing a trigger still closes any OTHER
+    // trigger's dropdown though (leaving this one's own alone, in case
+    // focus is arriving back on the trigger that owns it), so tabbing
+    // past a previously Enter-opened dropdown closes it behind you.
+    trigger.addEventListener('focus', () => closeAll(trigger));
+
+    item?.addEventListener('mouseenter', () => openDropdown(trigger));
+    item?.addEventListener('mouseleave', scheduleClose);
+    dropdown?.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+    dropdown?.addEventListener('mouseleave', scheduleClose);
+  });
+
+  // Leaf L1 items have no dropdown but still sit in tab order between
+  // triggers — focusing one should close whatever was open.
+  const leaves = [...desktopNav.querySelectorAll('.c-primary-nav-desktop__list > .c-primary-nav-desktop__item > a.c-primary-nav-desktop__link')];
+  leaves.forEach((leaf) => {
+    leaf.addEventListener('focus', () => closeAll());
+  });
+
+  desktopNav.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const openTrigger = triggers.find((trigger) => trigger.getAttribute('aria-expanded') === 'true');
+    if (!openTrigger) return;
+    closeAll();
+    openTrigger.focus();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!desktopNav.contains(event.target)) closeAll();
+  });
+
+  desktopNav.addEventListener('focusout', (event) => {
+    if (event.relatedTarget && !desktopNav.contains(event.relatedTarget)) closeAll();
+  });
+
+  // Desktop search (Figma "Desktop | Search") replaces the L1 list within
+  // the same bar rather than opening a separate overlay.
+  const searchToggle = desktopNav.querySelector('.c-primary-nav-desktop__search-toggle');
+  const searchForm = document.getElementById('desktop-search');
+  const list = desktopNav.querySelector('.c-primary-nav-desktop__list');
+
+  if (searchToggle && searchForm && list) {
+    const setSearchOpen = (open) => {
+      closeAll();
+      searchToggle.setAttribute('aria-expanded', String(open));
+      list.hidden = open;
+      searchForm.hidden = !open;
+      if (open) searchForm.querySelector('input').focus();
+    };
+
+    searchToggle.addEventListener('click', () => setSearchOpen(true));
+    searchForm.querySelector('[data-search-close]').addEventListener('click', () => {
+      setSearchOpen(false);
+      searchToggle.focus();
+    });
+
+    searchForm.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      setSearchOpen(false);
+      searchToggle.focus();
+    });
+  }
 }

@@ -1,0 +1,28 @@
+// Shared :focus-visible ring — @include per element, not applied globally.
+// Charcoal by default, white inside dark-surface contexts (below) via the
+// --focus-color variable, or pass a colour directly to override either.
+//
+// Usage:
+//   @use '../base/focus' as focus;
+//   .thing {
+//     @include focus.ring; // uses --focus-color
+//     @include focus.ring($color: red); // explicit override
+//   }
+
+:root {
+  --focus-color: var(--wp--preset--color--charcoal);
+}
+
+// Dark-surface contexts override the variable; anything inside that
+// still calls ring() with the default picks up white automatically.
+.c-primary-nav,
+.c-primary-nav-desktop__dropdown {
+  --focus-color: var(--wp--preset--color--white);
+}
+
+@mixin ring($color: var(--focus-color)) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: 2px;
+  }
+}
