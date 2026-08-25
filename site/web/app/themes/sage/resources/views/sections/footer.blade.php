@@ -61,11 +61,7 @@
         <div class="o-container">
             <p class="c-footer-bottom__copyright">{{ $copyright }}</p>
             @if ($officialSite)
-                <p class="c-footer-bottom__tagline">
-                    <a href="{{ $officialSite['url'] }}" target="{{ $officialSite['target'] ?: '_self' }}" rel="noopener noreferrer">
-                        {{ $officialSite['title'] }}
-                    </a>
-                </p>
+                <p class="c-footer-bottom__tagline">{{ $officialSite }}</p>
             @elseif ($tagline)
                 <p class="c-footer-bottom__tagline">{{ $tagline }}</p>
             @endif
