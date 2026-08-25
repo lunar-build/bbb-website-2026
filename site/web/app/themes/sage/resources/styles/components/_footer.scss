@@ -34,9 +34,7 @@
 }
 
 .c-footer-top__row--2 {
-  @include bp.respond($min: bp.$sm) {
-    margin-top: 2.5rem;
-  }
+  margin-top: 2.5rem;
 }
 
 .c-footer-top__logo {
@@ -107,9 +105,11 @@
   display: grid;
   width: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  // Odd link group out (col3) spans full width on its own row rather than
+  // sharing a column with col1 — matches the mobile Figma layout.
   grid-template-areas:
     'col1 col2'
-    'col3 col2';
+    'col3 col3';
   gap: 1rem 1.5rem;
 
   @include bp.respond($min: bp.$sm) {
