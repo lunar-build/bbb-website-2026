@@ -20,6 +20,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+// Sticky footer: #app stretches to fill the viewport so .footer always
+// sits at the bottom, even when page content is short.
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1 0 auto;
+}
+
 img,
 picture,
 svg,
