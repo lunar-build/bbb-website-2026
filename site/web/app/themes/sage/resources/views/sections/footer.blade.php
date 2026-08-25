@@ -5,6 +5,7 @@
     // visible links as children — see menu_items_to_footer_columns(). This
     // reuses the same header/footer nav location the header links from.
     $columns = menu_items_to_footer_columns('footer_navigation');
+    $officialSite = get_field('official_site', 'option');
     $tagline = get_bloginfo('description');
     $copyright = sprintf('© %s %s', date('Y'), get_bloginfo('name'));
 @endphp
@@ -59,7 +60,13 @@
     <div class="c-footer-bottom">
         <div class="o-container">
             <p class="c-footer-bottom__copyright">{{ $copyright }}</p>
-            @if ($tagline)
+            @if ($officialSite)
+                <p class="c-footer-bottom__tagline">
+                    <a href="{{ $officialSite['url'] }}" target="{{ $officialSite['target'] ?: '_self' }}" rel="noopener noreferrer">
+                        {{ $officialSite['title'] }}
+                    </a>
+                </p>
+            @elseif ($tagline)
                 <p class="c-footer-bottom__tagline">{{ $tagline }}</p>
             @endif
         </div>
