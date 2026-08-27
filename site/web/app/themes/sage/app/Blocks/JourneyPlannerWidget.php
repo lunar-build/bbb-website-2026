@@ -215,20 +215,21 @@ class JourneyPlannerWidget extends Block
                         ],
                     ],
                 ])
-            ->addTab('Find nearby feature')
+            ->addTab('Find nearby feature', [
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'variant',
+                            'operator' => '==',
+                            'value' => 'find_nearby',
+                        ],
+                    ],
+                ],
+            ])
                 ->addRepeater('nearby_options', [
                     'label' => 'Options',
                     'instructions' => 'Radio choices shown under the location field.',
                     'button_label' => 'Add option',
-                    'conditional_logic' => [
-                        [
-                            [
-                                'field' => 'variant',
-                                'operator' => '==',
-                                'value' => 'find_nearby',
-                            ],
-                        ],
-                    ],
                 ])
                     ->addText('label', [
                         'label' => 'Label',
