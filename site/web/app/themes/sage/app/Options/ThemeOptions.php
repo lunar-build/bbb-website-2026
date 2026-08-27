@@ -46,7 +46,7 @@ class ThemeOptions extends Field
                 ])
                 ->addImage('logo_white', [
                     'label' => 'Logo (white)',
-                    'instructions' => 'Used on dark backgrounds (e.g. the blue nav dropdown/mobile menu). Falls back to the theme default if left empty.',
+                    'instructions' => 'Used on dark backgrounds (e.g. the blue footer). Falls back to the theme default if left empty.',
                     'return_format' => 'array',
                 ])
                 ->addLink('cta', [

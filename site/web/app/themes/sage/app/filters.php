@@ -39,3 +39,29 @@ add_filter('render_block', function ($block_content, $block) {
         $block_content,
     );
 }, 10, 2);
+
+/**
+ * Warn editors on the Primary Navigation menu screen that an item with
+ * children never renders as a link itself — on mobile it becomes an inert
+ * heading (primary-nav.blade.php), on desktop a submenu toggle button
+ * (lunar-nav) — only items with no children are actual links.
+ */
+add_action('admin_notices', function () {
+    $screen = get_current_screen();
+
+    if (! $screen || $screen->id !== 'nav-menus') {
+        return;
+    }
+
+    global $nav_menu_selected_id;
+
+    $primaryMenuId = get_nav_menu_locations()['primary_navigation'] ?? 0;
+
+    if (! $primaryMenuId || $nav_menu_selected_id !== $primaryMenuId) {
+        return;
+    }
+
+    echo '<div class="notice notice-warning"><p>'
+        . __('Primary Navigation note: an item with sub-items does not link anywhere itself (it becomes an inert heading on mobile, a submenu toggle on desktop) — only items with no children are actual links.', 'sage')
+        . '</p></div>';
+});

@@ -180,10 +180,19 @@
 // plain <x-input type="search" icon="search" icon-button-label="Search">,
 // so its border/pill shape/icon-button all come from components/_input.scss
 // — this only covers the full-bleed grey band it sits inside.
+// position: absolute (not static/flow) so opening the band overlays page
+// content instead of pushing it down — lunar-site-header's shadow <header>
+// always carries a transform (part of its sticky auto-hide), which makes it
+// the containing block for this, so inset-inline: 0/top: 100% lines up with
+// the header bar's own edges without needing a positioned wrapper.
 .c-header-search {
   display: none;
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
   background: var(--wp--preset--color--lightest-grey);
   padding: 1rem 0;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 
   &:not([hidden]) {
     display: block;
