@@ -69,15 +69,47 @@
         }
       ],
       "fontSizes": [
-        { "slug": "heading-1", "size": "60px", "name": "Heading 1" },
-        { "slug": "heading-2", "size": "50px", "name": "Heading 2" },
-        { "slug": "heading-3", "size": "40px", "name": "Heading 3" },
-        { "slug": "heading-4", "size": "30px", "name": "Heading 4" },
-        { "slug": "heading-5", "size": "26px", "name": "Heading 5" },
-        { "slug": "standfirst", "size": "20px", "name": "Standfirst" },
-        { "slug": "body", "size": "14px", "name": "Body" },
-        { "slug": "input-label", "size": "18px", "name": "Input label" },
-        { "slug": "button-label", "size": "20px", "name": "Button label" }
+        {
+          "slug": "heading-1",
+          "size": "clamp(2.25rem, 1.628rem + 2.652vw, 3.75rem)",
+          "name": "Heading 1"
+        },
+        {
+          "slug": "heading-2",
+          "size": "clamp(2rem, 1.534rem + 1.989vw, 3.125rem)",
+          "name": "Heading 2"
+        },
+        {
+          "slug": "heading-3",
+          "size": "clamp(1.75rem, 1.439rem + 1.326vw, 2.5rem)",
+          "name": "Heading 3"
+        },
+        {
+          "slug": "heading-4",
+          "size": "clamp(1.5rem, 1.345rem + 0.663vw, 1.875rem)",
+          "name": "Heading 4"
+        },
+        {
+          "slug": "heading-5",
+          "size": "clamp(1.375rem, 1.271rem + 0.442vw, 1.625rem)",
+          "name": "Heading 5"
+        },
+        {
+          "slug": "standfirst",
+          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "name": "Standfirst"
+        },
+        { "slug": "body", "size": "16px", "name": "Body" },
+        {
+          "slug": "input-label",
+          "size": "clamp(1rem, 0.948rem + 0.221vw, 1.125rem)",
+          "name": "Input label"
+        },
+        {
+          "slug": "button-label",
+          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "name": "Button label"
+        }
       ]
     }
   },
