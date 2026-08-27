@@ -53,6 +53,10 @@ class ThemeOptions extends Field
                     'label' => 'CTA button',
                     'instructions' => 'Shown in the header top row (e.g. "Plan a cycling route"). Leave empty to hide the button.',
                 ])
+                ->addLink('cta_mobile', [
+                    'label' => 'CTA button (mobile)',
+                    'instructions' => 'Shorter link/text for mobile, where the desktop CTA text may not fit. Leave empty to reuse the desktop CTA button above on mobile too.',
+                ])
             ->addTab('social', [
                 'label' => 'Social',
             ])
@@ -91,7 +95,7 @@ class ThemeOptions extends Field
                     'required' => true,
                 ])
             ->endRepeater()
-            ;
+        ;
 
         return $fields->build();
     }

@@ -2,6 +2,7 @@
     $items = menu_items_to_array('primary_navigation');
     $logoCharcoal = get_field('logo_charcoal', 'option');
     $cta = get_field('cta', 'option');
+    $ctaMobile = get_field('cta_mobile', 'option') ?: $cta;
     $socialLinks = social_links_from_options();
 @endphp
 
@@ -46,11 +47,11 @@
             </div>
 
             <div class="c-header-actions c-header-actions--mobile">
-                @if (! empty($cta['url']))
+                @if (! empty($ctaMobile['url']))
                     <wa-button variant="brand" appearance="accent" pill with-end class="c-header-cta c-header-cta--small"
-                        href="{{ $cta['url'] }}"
-                        @if (($cta['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-                        Plan route
+                        href="{{ $ctaMobile['url'] }}"
+                        @if (($ctaMobile['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+                        {{ $ctaMobile['title'] }}
                         <x-icon name="arrow-right" slot="end" />
                     </wa-button>
                 @endif
@@ -109,4 +110,4 @@
      sibling, position:fixed here is contained by the real viewport, and
      z-index compares correctly against lunar-site-header's own
      (--lunar-site-header-z-index, 100). --}}
-@include('sections.primary-nav', ['items' => $items, 'cta' => $cta, 'socialLinks' => $socialLinks])
+@include('sections.primary-nav', ['items' => $items, 'cta' => $ctaMobile, 'socialLinks' => $socialLinks])
