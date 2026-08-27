@@ -99,6 +99,13 @@ class ThemeOptions extends Field
                     'required' => true,
                 ])
             ->endRepeater()
+            ->addTab('integrations', [
+                'label' => 'Integrations',
+            ])
+                ->addText('google_maps_api_key', [
+                    'label' => 'Google Maps API key',
+                    'instructions' => 'Places API key, used by the Journey Planner Widget block for address autocomplete.',
+                ])
         ;
 
         return $fields->build();
