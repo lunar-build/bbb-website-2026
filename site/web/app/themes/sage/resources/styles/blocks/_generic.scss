@@ -1,0 +1,11 @@
+// Fallback containment for third-party/core blocks wrapped by the
+// render_block filter in app/filters.php (blocks we don't own a Blade
+// template for, so can't set their own padding/section rhythm directly).
+
+.c-block {
+  padding-block: 2rem;
+
+  @media (min-width: 64rem) {
+    padding-block: 3rem;
+  }
+}
