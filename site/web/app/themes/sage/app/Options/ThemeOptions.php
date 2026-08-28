@@ -81,6 +81,10 @@ class ThemeOptions extends Field
             ->addTab('footer', [
                 'label' => 'Footer',
             ])
+                ->addText('official_site', [
+                    'label' => 'Official cycling website',
+                    'instructions' => 'Shown in the footer bottom bar, e.g. "Official cycling website for Bristol, Bath & NE Somerset, North Somerset and South Gloucestershire". Leave empty to fall back to the site tagline.',
+                ])
             ->addRepeater('legal_links', [
                 'label' => 'Legal Links',
                 'instructions' => 'Links shown in the footer legal row (e.g. Privacy Policy, Terms).',

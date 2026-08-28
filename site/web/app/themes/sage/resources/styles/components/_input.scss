@@ -1,9 +1,8 @@
-// Layout/label/icon extras for the `<x-input>` Blade component
-// (resources/views/components/input.blade.php). The actual field styling
-// (pill shape, border, focus ring) is a global element rule in
-// base/_forms.scss, so it also applies to third-party-rendered fields
-// (Gravity Forms etc.) — this file only adds what's specific to our own
-// component: the label above the field and the optional trailing icon.
+@use '../base/focus' as focus;
+
+// Field styling (border, pill, focus ring) is a global element rule in
+// base/_forms.scss, so it also applies to third-party fields (GF etc) —
+// this only covers what's specific to <x-input>: label + trailing icon.
 
 .c-input {
   display: flex;
@@ -25,28 +24,9 @@
 }
 
 .c-input__field {
-  position: relative;
   display: flex;
+  align-items: stretch;
   width: 100%;
-}
-
-// The icon is a sibling of <input>, absolutely positioned on top of it —
-// outlines only paint above an element's own descendants, not its
-// siblings, so the input's native :focus-visible ring (base/_forms.scss)
-// was rendering *behind* the icon wherever they overlapped. Moving the
-// ring to .c-input__field instead — the icon's actual ancestor — puts it
-// back on top, since outline is specified to paint above all descendant
-// content.
-.c-input--has-icon:not(.c-input--textarea) {
-  .c-input__field input:focus-visible {
-    outline: none !important;
-  }
-
-  .c-input__field:has(input:focus-visible) {
-    outline: 2px solid var(--wp--preset--color--blue);
-    outline-offset: -4px;
-    border-radius: 999px;
-  }
 }
 
 .c-input__icon {
@@ -65,56 +45,63 @@
   }
 }
 
-// Reserve space so the field's own text never sits under the icon.
-.c-input--has-icon input {
-  padding-right: 48px;
+.c-input--has-icon .c-input__field {
+  position: relative; // containing block for the decorative .c-input__icon above
 }
 
-// Real <button> with the yellow-cap "submit" look (e.g. a search field's
-// icon-button, see $iconButtonLabel in input.blade.php). Flush against the
-// pill's own inner right edge, filling its full height, so the pill's
-// existing 2px charcoal border (base/_forms.scss) reads as one continuous
-// border with a yellow cap, matching Figma, rather than a separately
-// bordered shape. Resets the base .c-input__icon's pointer-events:none
-// (that rule is for the decorative, non-button icon case) since this one
-// must be clickable.
+.c-input--has-icon input {
+  padding-right: 48px; // reserve space so text never sits under the icon
+}
+
+.c-input--textarea .c-input__icon {
+  top: 20px;
+  transform: none;
+}
+
+// Icon-button variant is a real adjacent element, not an overlay — squared
+// off where it meets the input so the two read as one control while each
+// keeps its own independent focus ring (see $iconButtonLabel in
+// input.blade.php). The input's own right border is dropped so the
+// button's left border is the only seam line.
+.c-input--has-icon:has(.c-input__icon--accent) {
+  .c-input__field {
+    position: static;
+  }
+
+  input {
+    // base/_forms.scss sets width:100% !important, which — now that the
+    // button is a real flex sibling rather than an absolute overlay —
+    // claimed the whole row and pushed the button out of the unit.
+    width: auto !important;
+    flex: 1 1 auto;
+    padding-right: 20px;
+    border-radius: 999px 0 0 999px !important;
+    border-right: none !important;
+  }
+}
+
 .c-input__icon--accent {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  bottom: 2px;
-  display: flex;
+  // Overrides .c-input__icon's absolute positioning — this element carries
+  // both classes, and unlike the decorative icon this one is a real flex
+  // sibling, not an overlay.
+  position: static;
+  transform: none;
+  flex: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 43px;
-  height: auto;
-  transform: none;
-  padding: 0;
-  border: none;
+  padding-inline: 14px;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-left: none; // no seam line — flows straight from the input
   border-radius: 0 999px 999px 0;
   background: var(--wp--preset--color--yellow);
   color: var(--wp--preset--color--charcoal);
   cursor: pointer;
-  pointer-events: auto;
 
   svg {
     width: 16px;
     height: 16px;
   }
 
-  // Separate from the field-level ring above (which covers <input> being
-  // focused) — this covers the button itself being reached directly via Tab.
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--blue);
-    outline-offset: -2px;
-  }
-}
-
-.c-input--has-icon:has(.c-input__icon--accent) input {
-  padding-right: 55px;
-}
-
-.c-input--textarea .c-input__icon {
-  top: 20px;
-  transform: none;
+  @include focus.ring;
 }

@@ -20,6 +20,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+// Sticky footer: #app stretches to fill the viewport so .footer always
+// sits at the bottom, even when page content is short.
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1 0 auto;
+}
+
 img,
 picture,
 svg,
@@ -45,14 +57,24 @@ h6 {
   overflow-wrap: break-word;
 }
 
-ul[role='list'],
-ol[role='list'] {
+// role="list" keeps list semantics for VoiceOver/Safari when list-style
+// is removed. Scoped to [role='list'] so real content lists keep their
+// indent. :where() keeps this at zero specificity so components can
+// always override it.
+:where(ul[role='list'], ol[role='list']) {
   list-style: none;
+  padding-inline-start: 0;
 }
 
 a:not([class]) {
   text-decoration-skip-ink: auto;
   color: currentColor;
+}
+
+// Neutralises the browser's a:visited colour everywhere; :where() keeps
+// it overridable by any component.
+:where(a, a:visited) {
+  color: inherit;
 }
 
 @media (prefers-reduced-motion: reduce) {

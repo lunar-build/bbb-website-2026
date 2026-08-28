@@ -14,17 +14,9 @@
 
 @php($id = $id ?? $name)
 
-{{--
-  $iconButtonLabel turns the trailing icon into a real, focusable
-  <button type="submit"> with the yellow-cap "submit" look (e.g. a search
-  field) instead of a decorative icon — pass it whenever the icon is
-  something the user can actually click, not just a visual hint.
-
-  $ariaLabel covers fields rendered without a visible $label (icon +
-  placeholder only, e.g. a compact search field) — a placeholder alone
-  isn't a substitute for an accessible name (WCAG 4.1.2 / 3.3.2), so one of
-  $label or $ariaLabel must be supplied.
---}}
+{{-- iconButtonLabel: pass to make the trailing icon a real clickable
+     <button> instead of decorative. ariaLabel: required when there's no
+     visible $label (placeholder alone isn't an accessible name). --}}
 
 <div {{ $attributes->class(['c-input', 'c-input--textarea' => $textarea, 'c-input--has-icon' => $icon && ! $textarea]) }}>
   @if ($label)

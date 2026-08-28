@@ -1,6 +1,4 @@
-// Shared breakpoints + a respond() mixin, so @media values stay consistent
-// site-wide instead of ad-hoc rem numbers repeated per component. Handles
-// min, max, or a min+max range.
+// Shared breakpoints + a respond() mixin for min/max/range @media queries.
 //
 // The 5 standard breakpoints:
 //   sm  640px  — large phones, small tablets in portrait
