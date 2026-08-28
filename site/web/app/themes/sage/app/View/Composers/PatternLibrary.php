@@ -28,8 +28,8 @@ class PatternLibrary extends Composer
     {
         return collect(app('AcfComposer')->composers())
             ->flatten()
-            ->filter(fn ($composer) => $composer instanceof Block)
-            ->map(fn (Block $block) => [
+            ->filter(fn($composer) => $composer instanceof Block)
+            ->map(fn(Block $block) => [
                 'name' => $block->getName(),
                 'slug' => $block->slug,
                 'description' => $block->getDescription(),
@@ -44,8 +44,43 @@ class PatternLibrary extends Composer
     /**
      * Render a block's Blade view standalone using its fixture data, with
      * no live post/ACF context required.
+     *
+     * Blocks with more than one visually distinct fixture (e.g. CtaBanner's
+     * layout variants) can expose an optional `$examples` property — an
+     * array of `['Label' => $exampleOverrides]` — to render each variant
+     * stacked in the library instead of just the default `$example`. This
+     * is opt-in: blocks without `$examples` render exactly as before.
      */
     protected function render(Block $block): string
+    {
+        if (empty($block->examples)) {
+            return $this->renderVariant($block);
+        }
+
+        $baseExample = $block->example;
+
+        $html = collect($block->examples)
+            ->map(function ($overrides, $label) use ($block, $baseExample) {
+                $block->example = array_merge($baseExample, $overrides);
+                $variantHtml = $this->renderVariant($block);
+                $block->example = $baseExample;
+
+                return sprintf(
+                    '<div class="c-pattern-library__variant"><p class="c-pattern-library__variant-label">%s</p>%s</div>',
+                    esc_html($label),
+                    $variantHtml,
+                );
+            })
+            ->implode('');
+
+        return $html;
+    }
+
+    /**
+     * Render a single pass of a block's Blade view using its current
+     * `$example`/`$exampleContent` fixture data.
+     */
+    protected function renderVariant(Block $block): string
     {
         $content = $block->exampleContent ?? '';
 
@@ -75,8 +110,8 @@ class PatternLibrary extends Composer
         $path = get_theme_file_path('resources/views/components');
 
         return collect(glob("{$path}/*.blade.php"))
-            ->map(fn ($file) => basename($file, '.blade.php'))
-            ->map(fn ($name) => [
+            ->map(fn($file) => basename($file, '.blade.php'))
+            ->map(fn($name) => [
                 'name' => $name,
                 'html' => view()->exists("components.examples.{$name}")
                     ? view("components.examples.{$name}")->render()

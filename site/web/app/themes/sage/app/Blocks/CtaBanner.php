@@ -181,6 +181,19 @@ class CtaBanner extends Block
     ];
 
     /**
+     * Layout variants to render stacked on the pattern-library page (see
+     * App\View\Composers\PatternLibrary::render()) — each entry is merged
+     * onto $example above, so only needs to override what differs.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Centred' => [],
+        'Left' => ['layout' => 'left'],
+        'Slimline' => ['layout' => 'slimline'],
+    ];
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
