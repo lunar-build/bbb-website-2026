@@ -1,0 +1,47 @@
+// Figma: yellow card (#FFBF47), 20px radius, stacked From/To or
+// location+radios, dark CTA pill. Input/radio control styling itself comes
+// from _input.scss/_choice.scss — this only covers the card shell.
+
+.c-journey-planner-widget {
+  max-width: 641px;
+}
+
+.c-journey-planner-widget__card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 40px;
+  background: var(--wp--preset--color--yellow);
+  border-radius: 20px;
+}
+
+.c-journey-planner-widget__heading {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 40px;
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-journey-planner-widget__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.c-journey-planner-widget__options {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 60px;
+  row-gap: 12px;
+}
+
+// Figma's CTA is a solid charcoal pill — neither wa-button token preset
+// matches (brand = yellow, neutral = black), so override the neutral
+// tokens locally rather than adding a third global variant for one button.
+.c-journey-planner-widget__cta {
+  align-self: center;
+  --wa-color-neutral-fill-loud: var(--wp--preset--color--charcoal);
+  --wa-color-neutral-border-loud: var(--wp--preset--color--charcoal);
+}

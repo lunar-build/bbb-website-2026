@@ -113,11 +113,11 @@ It creates exactly two files:
 class under `app/Blocks/*.php` extending `Block` — don't add anything to
 `ThemeServiceProvider` or `setup.php`.
 
-**`$mode` is always `'preview'`, with `supports.mode` (and `supports.jsx`) both `true`.**
+**`$mode` is always `'auto'`, with `supports.mode` (and `supports.jsx`) both `true`.**
 Every block in this theme uses this combination so editors get a rendered preview by
 default and only see the ACF fields (in the block's Inspector sidebar, not an inline
 edit form) once they click into the block — not the reverse. Don't leave `$mode` unset
-or set it to `'edit'`/`'auto'`.
+or set it to `'edit'`/`'preview'`.
 
 ```php
 /**
@@ -125,7 +125,7 @@ or set it to `'edit'`/`'auto'`.
  *
  * @var string
  */
-public $mode = 'preview';
+public $mode = 'auto';
 ```
 
 **`$styles` should always be `[]`, not the scaffold's default `['light', 'dark']`.**
