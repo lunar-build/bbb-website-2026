@@ -1,0 +1,50 @@
+@use '../base/focus' as focus;
+
+// Figma "Single tag" component (node 53:1110): default is an outline-only
+// pill; hover fills solid with no icon; focus fills solid, gains a 2px
+// charcoal border, and shows the arrow icon. The focus ring itself uses
+// the shared focus.ring mixin rather than reproducing Figma's literal
+// box-shadow, per the site-wide focus-visible convention.
+
+.c-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 10px;
+  border: 1px solid var(--wp--preset--color--yellow);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--wp--preset--color--charcoal);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 26px;
+  text-decoration: none;
+  white-space: nowrap;
+
+  @include focus.ring;
+}
+
+.c-pill__icon {
+  display: none;
+
+  svg {
+    width: 16px;
+    height: 10px;
+    flex: none;
+  }
+}
+
+a.c-pill:hover {
+  border-color: var(--wp--preset--color--yellow);
+  background: var(--wp--preset--color--yellow);
+}
+
+a.c-pill:focus-visible {
+  border: 2px solid var(--wp--preset--color--charcoal);
+  background: var(--wp--preset--color--yellow);
+
+  .c-pill__icon {
+    display: inline-flex;
+  }
+}

@@ -76,4 +76,21 @@
     text-transform: uppercase;
     letter-spacing: 0.02em;
   }
+
+  // Overlaps the hero's bottom-right corner on desktop, per Figma — a
+  // negative top margin pulls it up over the media/content boundary and
+  // margin-inline-start:auto pushes it to the right without needing to
+  // share a grid row/track with .c-video-hero__inner. Stacks normally
+  // below the content on narrower widths, where there's no room to overlap.
+  &__widget {
+    margin-block-start: 2rem;
+
+    @include bp.respond($min: bp.$lg) {
+      max-width: 26rem;
+      margin-block-start: -5rem;
+      margin-inline-start: auto;
+      position: relative;
+      z-index: 1;
+    }
+  }
 }

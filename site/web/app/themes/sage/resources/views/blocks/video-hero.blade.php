@@ -46,6 +46,15 @@
     </div>
   </div>
 </div>
+
+{{-- Widget slot — overlaps the hero's bottom-right corner per Figma. Empty
+     by default in the editor until a Journey Planner Widget (or another
+     block added to $allowedBlocks) is inserted; not shown at all on the
+     pattern-library page since nested-block fixture content isn't wired up
+     there (see App\View\Composers\PatternLibrary). --}}
+<div class="c-video-hero__widget">
+  <InnerBlocks allowedBlocks="{{ json_encode($block->allowedBlocks) }}" template="{{ $block->template }}" />
+</div>
 </div>
 
 @unless ($block->preview)

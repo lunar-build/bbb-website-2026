@@ -20,7 +20,7 @@ class VideoHero extends Block
      *
      * @var string
      */
-    public $description = 'A video masthead hero with heading, intro text, and a primary call-to-action.';
+    public $description = 'The main/homepage hero: video masthead with heading, intro text, a primary call-to-action, and a widget slot (e.g. the Journey Planner Widget) overlapping its bottom-right corner.';
 
     /**
      * The block category.
@@ -138,6 +138,30 @@ class VideoHero extends Block
      * @var array
      */
     public $styles = [];
+
+    /**
+     * The widget slot's InnerBlocks template — pre-populates a Journey
+     * Planner Widget when the hero is first inserted. Set the widget's own
+     * "Wrap in container" (`contained`) field off when using it here, since
+     * this hero already provides `.o-container`.
+     *
+     * @var array
+     */
+    public $template = [
+        'acf/journey-planner-widget' => [],
+    ];
+
+    /**
+     * Blocks allowed in the widget slot — scoped to the Journey Planner
+     * Widget for now (the slot is styled/positioned as a widget card, not a
+     * general content area). Add another block name here if a second
+     * widget-shaped block is ever built for this slot.
+     *
+     * @var array
+     */
+    public $allowedBlocks = [
+        'acf/journey-planner-widget',
+    ];
 
     /**
      * The block preview example data.
