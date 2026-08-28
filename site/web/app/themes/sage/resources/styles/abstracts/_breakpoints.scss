@@ -1,0 +1,43 @@
+// Shared breakpoints + a respond() mixin, so @media values stay consistent
+// site-wide instead of ad-hoc rem numbers repeated per component. Handles
+// min, max, or a min+max range.
+//
+// The 5 standard breakpoints:
+//   sm  640px  — large phones, small tablets in portrait
+//   md  768px  — tablets, large phones in landscape
+//   lg  1024px — laptops, small desktops
+//   xl  1280px — standard desktop monitors
+//   xxl 1536px — wide and ultrawide monitors
+//
+// Usage:
+//   @use '../abstracts/breakpoints' as bp;
+//
+//   .thing {
+//     @include bp.respond($min: bp.$sm) { ... }   // min-width only
+//     @include bp.respond($max: bp.$sm) { ... }   // max-width only
+//     @include bp.respond($min: bp.$sm, $max: bp.$lg) { ... } // range
+//   }
+
+$sm: 40rem; // 640px
+$md: 48rem; // 768px
+$lg: 64rem; // 1024px
+$xl: 80rem; // 1280px
+$xxl: 96rem; // 1536px
+
+@mixin respond($min: null, $max: null) {
+  @if $min and $max {
+    @media (min-width: $min) and (max-width: $max) {
+      @content;
+    }
+  } @else if $min {
+    @media (min-width: $min) {
+      @content;
+    }
+  } @else if $max {
+    @media (max-width: $max) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}

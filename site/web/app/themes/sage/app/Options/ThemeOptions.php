@@ -36,6 +36,51 @@ class ThemeOptions extends Field
         $fields = Builder::make('theme_options');
 
         $fields
+            ->addTab('header', [
+                'label' => 'Header',
+            ])
+                ->addImage('logo_charcoal', [
+                    'label' => 'Logo (charcoal)',
+                    'instructions' => 'Used on light backgrounds (e.g. the white top bar). Falls back to the theme default if left empty.',
+                    'return_format' => 'array',
+                ])
+                ->addImage('logo_white', [
+                    'label' => 'Logo (white)',
+                    'instructions' => 'Used on dark backgrounds (e.g. the blue footer). Falls back to the theme default if left empty.',
+                    'return_format' => 'array',
+                ])
+                ->addLink('cta', [
+                    'label' => 'CTA button',
+                    'instructions' => 'Shown in the header top row (e.g. "Plan a cycling route"). Leave empty to hide the button.',
+                ])
+                ->addLink('cta_mobile', [
+                    'label' => 'CTA button (mobile)',
+                    'instructions' => 'Shorter link/text for mobile, where the desktop CTA text may not fit. Leave empty to reuse the desktop CTA button above on mobile too.',
+                ])
+            ->addTab('social', [
+                'label' => 'Social',
+            ])
+                ->addUrl('facebook_url', [
+                    'label' => 'Facebook',
+                ])
+                ->addUrl('instagram_url', [
+                    'label' => 'Instagram',
+                ])
+                ->addUrl('x_url', [
+                    'label' => 'X (Twitter)',
+                ])
+                ->addUrl('linkedin_url', [
+                    'label' => 'LinkedIn',
+                ])
+                ->addUrl('youtube_url', [
+                    'label' => 'YouTube',
+                ])
+                ->addUrl('tiktok_url', [
+                    'label' => 'TikTok',
+                ])
+            ->addTab('footer', [
+                'label' => 'Footer',
+            ])
             ->addRepeater('legal_links', [
                 'label' => 'Legal Links',
                 'instructions' => 'Links shown in the footer legal row (e.g. Privacy Policy, Terms).',
@@ -49,7 +94,8 @@ class ThemeOptions extends Field
                     'label' => 'URL',
                     'required' => true,
                 ])
-            ->endRepeater();
+            ->endRepeater()
+        ;
 
         return $fields->build();
     }

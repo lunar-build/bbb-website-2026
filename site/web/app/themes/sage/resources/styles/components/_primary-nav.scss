@@ -1,0 +1,221 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
+// sibling of <lunar-site-header> in header.blade.php, deliberately NOT
+// nested inside it — that component's shadow <header> always carries a
+// `transform` (part of its sticky auto-hide, present even when not
+// currently hidden), which would make it the containing block for a
+// nested position:fixed descendant: the overlay would size against the
+// header's own ~84px box instead of the viewport, slide away with the
+// header's hide-on-scroll transform, and lose the stacking fight for
+// z-index against the header's own (non-positioned) content. As a proper
+// sibling, position:fixed here is contained by the real viewport, and
+// z-index compares correctly against lunar-site-header's own
+// (--lunar-site-header-z-index, 100) — the header still paints on top for
+// its own real height.
+//
+// --header-height is set on <html> by primary-nav.js each time the menu
+// opens (measuring lunar-site-header's actual rendered height) — a fixed
+// top padding here would only coincidentally match the header's real
+// height, and whichever bit of content fell in the gap either way would
+// end up hidden behind the header (higher z-index) or floating in an
+// empty gap above it.
+.c-primary-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 90; // below lunar-site-header's own (--lunar-site-header-z-index, 100)
+  overflow-y: auto;
+  overflow-x: hidden;
+  // Reserves the scrollbar's own width permanently, rather than only when
+  // a given panel's content is tall enough to need it — without this,
+  // switching between a short L1/L2 panel (no scrollbar) and a long one
+  // (scrollbar present) shifted the visible content sideways by the
+  // scrollbar's width each time.
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  background: var(--wp--preset--color--blue);
+  padding: calc(var(--header-height, 84px) + 5rem) 1rem 3rem;
+  display: none;
+
+  &:not([hidden]) {
+    display: block;
+  }
+
+  @include bp.respond($min: bp.$sm) {
+    display: none !important;
+  }
+}
+
+// [hidden] must win over the display below — an author rule with equal or
+// higher specificity always beats the UA stylesheet's [hidden]{display:none}
+// regardless of source order, so an unconditional `display: flex` here
+// would otherwise render every panel at once, stacked.
+.c-primary-nav__panel[hidden] {
+  display: none;
+}
+
+.c-primary-nav__panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 2rem;
+}
+
+.c-primary-nav__list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.c-primary-nav__item + .c-primary-nav__item {
+  border-block-start: 1px solid rgb(255 255 255 / 30%);
+}
+
+.c-primary-nav__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  // padding-inline set explicitly the same for both — leaf items are <a>
+  // (no inline padding by default) but drill items are <button>, which
+  // carries its own non-zero UA-stylesheet inline padding that was never
+  // reset, so buttons sat with extra left/right padding links didn't have.
+  // A small amount (rather than 0) also keeps the inset focus ring off
+  // the text itself.
+  padding: 0.875rem 0.25rem;
+  border: none;
+  background: none;
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  font-size: 16px;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--white);
+    outline-offset: -2px;
+  }
+}
+
+.c-primary-nav__chevron {
+  flex: none;
+  color: inherit;
+
+  svg {
+    display: block;
+    width: 11px;
+    height: 7px;
+    transform: rotate(-90deg);
+  }
+}
+
+// L2 group heading (inert, not a link) + its L3 links — the mega-menu
+// content model: L2 is a plain label, L3 items are the real leaf links.
+.c-primary-nav__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.c-primary-nav__heading {
+  margin: 0;
+  padding-block-end: 0.75rem;
+  border-block-end: 1px solid rgb(255 255 255 / 30%);
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.c-primary-nav__list--sub {
+  gap: 0.75rem;
+}
+
+.c-primary-nav__link--sub {
+  padding-block: 0;
+  font-weight: 500;
+  font-size: 14px;
+
+  .c-primary-nav__chevron svg {
+    width: 9px;
+    height: 6px;
+  }
+}
+
+.c-primary-nav__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.c-primary-nav__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  align-self: flex-start;
+  // .c-primary-nav__panel is a flex column at height:100% — without this,
+  // default flex-shrink:1 lets a long panel's content squeeze this below
+  // its set height once the column runs out of space (same class of bug
+  // as the header logo shrinking earlier — a fixed size on a flex item is
+  // only a floor if shrink is disabled).
+  flex-shrink: 0;
+  height: 40px;
+  padding-inline: 1rem;
+  border: 2px solid var(--wp--preset--color--white);
+  border-radius: 999px;
+  background: none;
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--wp--preset--color--white);
+    outline-offset: 2px;
+  }
+}
+
+.c-primary-nav__back-icon svg {
+  display: block;
+  width: 16px;
+  height: 12px;
+  transform: scaleX(-1); // arrow-right.svg mirrored, avoids a separate asset
+}
+
+.c-primary-nav__cta {
+  align-self: center;
+  flex-shrink: 0; // same reasoning as .c-primary-nav__back above
+}
+
+.c-primary-nav__socials {
+  display: flex;
+  gap: 4rem;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-top: auto;
+  padding-bottom: 2rem;
+}
+
+.c-primary-nav__social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--wp--preset--color--blue-medium);
+  color: var(--wp--preset--color--white);
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
