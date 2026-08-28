@@ -1,0 +1,53 @@
+// Figma: font-size 20px, line-height 30px, letter-spacing 0.4px, color
+// blue-dark (#003852). Current page (last item) is underlined and not a
+// link — WA renders a plain <button> for items with no href, so it's also
+// stripped of pointer/focus affordances below.
+//
+// Colour is a custom property, not a hardcoded value, so it can be
+// overridden per-context (e.g. a dark hero block) without touching this
+// file — set --c-breadcrumbs-color on the <x-breadcrumbs> tag itself
+// (via its `style` attribute) or on any ancestor:
+//   <x-breadcrumbs :items="..." style="--c-breadcrumbs-color: var(--wp--preset--color--white)" />
+
+.c-breadcrumbs {
+  --c-breadcrumbs-color: var(--wp--preset--color--blue-dark);
+}
+
+wa-breadcrumb-item {
+  color: var(--c-breadcrumbs-color);
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.4px;
+}
+
+wa-breadcrumb-item::part(label) {
+  text-decoration: none;
+  transition: text-decoration-color var(--wa-transition-normal, 0.15s) ease;
+}
+
+wa-breadcrumb-item:not(:last-of-type)::part(label):is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
+wa-breadcrumb-item::part(separator) {
+  margin-inline: 0.5em;
+}
+
+wa-breadcrumb-item .c-icon--arrow-right {
+  display: inline-flex;
+  color: var(--c-breadcrumbs-color);
+
+  svg {
+    width: 14px;
+    height: 9px;
+    flex: none;
+  }
+}
+
+wa-breadcrumb-item:last-of-type::part(label) {
+  text-decoration: underline;
+  cursor: default;
+  pointer-events: none;
+}
