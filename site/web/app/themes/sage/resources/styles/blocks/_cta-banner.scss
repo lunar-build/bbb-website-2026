@@ -1,28 +1,177 @@
 @use '../abstracts/breakpoints' as bp;
 
-.c-cta-strip {
-  &__card {
+// Section always bleeds full-width (the coloured background), with a
+// position:relative + overflow:hidden clip so the Centred layout's
+// edge-bleeding illustrations never cause horizontal scroll — .o-container
+// inside stays gutter-constrained per base/_container.scss's convention.
+.c-cta-banner {
+  position: relative;
+  overflow: hidden;
+  padding-block: 3rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 4rem;
+  }
+}
+
+.c-cta-banner__grid {
+  // Left layout turns this into a real 2-column grid — see below. Centred/
+  // Slimline just need the content block, no grid required.
+}
+
+.c-cta-banner__content {
+  position: relative; // stack above the Centred layout's illustrations
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 40rem;
+}
+
+.c-cta-banner__heading,
+.c-cta-banner__body {
+  margin: 0;
+}
+
+.c-cta-banner__cta {
+  align-self: flex-start;
+}
+
+// Centred layout's decorative illustrations — absolutely positioned
+// against the section itself (not .o-container), and capped narrow via
+// clamp() so they stay clear of the centred text column at in-between
+// (lg–xl) viewport widths. Vertically centred on the section. Sit BEHIND
+// the text (z-index below .c-cta-banner__content's), hidden on phones,
+// visible (clipped, behind the text) from tablet (`md`) up rather than
+// only appearing at `lg` like before.
+.c-cta-banner__image {
+  display: none;
+  position: absolute;
+  top: 50%;
+  z-index: 0;
+  --c-cta-banner-image-width: clamp(9rem, 16vw, 15rem);
+  width: var(--c-cta-banner-image-width);
+  pointer-events: none;
+
+  @include bp.respond($min: bp.$md) {
     display: block;
+  }
+}
 
-    &::part(body) {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+// Two states, not one:
+// - md–xl: positioned relative to the section's centre (not its full-bleed
+//   raw edge, which let the gap to the fixed-width text keep growing on
+//   wide screens) but still close enough to sit BEHIND the text — there
+//   isn't room to clear it at these widths, so overlap is intentional.
+// - xl and up: enough room to sit beside the text without overlapping it.
+//   Anchored a fixed distance from centre (half the text's 34rem max-width
+//   + a gap) rather than the section edge, so they hold that gap instead
+//   of collapsing toward centre (too-close) or drifting to the edges
+//   (too-far) as the viewport keeps growing.
+.c-cta-banner__image--left {
+  left: max(2rem, calc(50% - 22rem));
+  transform: translateY(-50%);
 
-      @include bp.respond($min: bp.$sm) {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 2rem;
-      }
+  @include bp.respond($min: bp.$xl) {
+    left: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
+  }
+}
+
+.c-cta-banner__image--right {
+  right: max(2rem, calc(50% - 22rem));
+  // Both Centred illustrations face outward (away from the text) — the
+  // source art faces left, so the right-hand rider needs mirroring.
+  transform: translateY(-50%) scaleX(-1);
+
+  @include bp.respond($min: bp.$xl) {
+    right: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
+  }
+}
+
+// Centred — Figma "Layout=Centred": blue bg, white centred text/CTA, two
+// optional illustrations flanking the content.
+.c-cta-banner--centred {
+  background: var(--wp--preset--color--blue);
+  color: var(--wp--preset--color--white);
+  text-align: center;
+
+  .c-cta-banner__content {
+    align-items: center;
+    max-width: 34rem;
+    margin-inline: auto;
+  }
+
+  .c-cta-banner__heading,
+  .c-cta-banner__body {
+    color: var(--wp--preset--color--white);
+  }
+
+  .c-cta-banner__cta {
+    align-self: center;
+  }
+}
+
+// Left — Figma "Layout=Left": light bg, dark left-aligned text/CTA, one
+// optional illustration — as a real grid column (contained, not bleeding),
+// per feedback that the single-image variation should sit inside the
+// block rather than overlap/overflow it.
+.c-cta-banner--left {
+  background: var(--wp--preset--color--blue-light);
+  color: var(--wp--preset--color--blue-dark);
+
+  .c-cta-banner__grid {
+    @include bp.respond($min: bp.$lg) {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      align-items: center;
+      gap: 3rem;
     }
   }
 
-  &__title {
-    display: block;
+  .c-cta-banner__content {
+    max-width: none;
   }
 
-  &__text {
-    margin: 0.25rem 0 0;
+  .c-cta-banner__heading,
+  .c-cta-banner__body {
+    color: var(--wp--preset--color--blue-dark);
+  }
+}
+
+.c-cta-banner__image--column {
+  display: none;
+  width: 100%;
+  max-width: 22rem;
+  margin-inline: auto;
+  // Source art faces left; mirror so the rider faces outward (right).
+  transform: scaleX(-1);
+
+  @include bp.respond($min: bp.$lg) {
+    display: block;
+    justify-self: end;
+  }
+}
+
+// Slimline — Figma "Layout=Slimline": dark bg, no heading/illustration,
+// body + CTA share a single compact row.
+.c-cta-banner--slimline {
+  background: var(--wp--preset--color--blue-dark);
+  color: var(--wp--preset--color--white);
+
+  .c-cta-banner__content {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: none;
+
+    @include bp.respond($min: bp.$md) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .c-cta-banner__body {
+    color: var(--wp--preset--color--white);
+    max-width: 40rem;
   }
 }

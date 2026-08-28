@@ -108,3 +108,16 @@
     color: var(--wp--preset--color--place-holder-grey);
   }
 }
+
+// Stacked layout variants for blocks with more than one visually distinct
+// fixture (see App\Blocks\CtaBanner's $examples / PatternLibrary::render()).
+.c-pattern-library__variant + .c-pattern-library__variant {
+  margin-block-start: 1.5rem;
+}
+
+.c-pattern-library__variant-label {
+  margin: 0 0 0.5rem;
+  font-size: var(--wp--preset--font-size--input-label);
+  font-weight: 700;
+  color: var(--wp--preset--color--place-holder-grey);
+}
