@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Vite;
  * @return array
  */
 add_filter('block_editor_settings_all', function ($settings) {
-    $style = Vite::asset('resources/css/editor.css');
+    $style = Vite::asset('resources/css/editor.scss');
 
     $settings['styles'][] = [
         'css' => "@import url('{$style}')",
@@ -165,6 +165,18 @@ add_action('widgets_init', function () {
 
 // enqueue web awesome
 add_action('wp_enqueue_scripts', function () {});
+
+/**
+ * Enqueue dashicons on the front end for the pattern library page, which
+ * displays each block's icon (most blocks use a core dashicon slug).
+ *
+ * @return void
+ */
+add_action('wp_enqueue_scripts', function () {
+    if (is_page_template('template-pattern-library.blade.php')) {
+        wp_enqueue_style('dashicons');
+    }
+});
 
 /**
  * Relabel the built-in "Posts" post type as "News".

@@ -2,6 +2,7 @@
   <section {{ $attributes->class(['c-video-hero']) }}>
 @endunless
 
+<div class="o-container">
 <div class="c-video-hero__inner">
   <div class="c-video-hero__media">
     @if ($video['url'] ?? null)
@@ -33,14 +34,18 @@
 
       <wa-button
         variant="brand"
-        appearance="filled"
+        appearance="accent"
+        pill
+        with-end
         href="{{ $ctaButton['url'] }}"
         @if (($ctaButton['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
       >
         {{ $ctaButton['title'] }}
+        <x-icon name="arrow-right" slot="end" />
       </wa-button>
     </div>
   </div>
+</div>
 </div>
 
 @unless ($block->preview)

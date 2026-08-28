@@ -149,6 +149,14 @@ class TextHero extends Block
     ];
 
     /**
+     * Fixture markup standing in for this block's InnerBlocks content on
+     * the pattern library page (see App\View\Composers\PatternLibrary).
+     *
+     * @var string
+     */
+    public $exampleContent = '<h1>Get people cycling in Bristol</h1><p>Example intro text for the hero — replace with real page content.</p>';
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array

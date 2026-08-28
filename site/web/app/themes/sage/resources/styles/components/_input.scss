@@ -1,0 +1,57 @@
+// Layout/label/icon extras for the `<x-input>` Blade component
+// (resources/views/components/input.blade.php). The actual field styling
+// (pill shape, border, focus ring) is a global element rule in
+// base/_forms.scss, so it also applies to third-party-rendered fields
+// (Gravity Forms etc.) — this file only adds what's specific to our own
+// component: the label above the field and the optional trailing icon.
+
+.c-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.c-input__label {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 500;
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 26px;
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-input__required {
+  color: var(--wp--preset--color--dark-orange);
+}
+
+.c-input__field {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.c-input__icon {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  color: var(--wp--preset--color--charcoal);
+  pointer-events: none;
+
+  svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Reserve space so the field's own text never sits under the icon.
+.c-input--has-icon input {
+  padding-right: 48px;
+}
+
+.c-input--textarea .c-input__icon {
+  top: 20px;
+  transform: none;
+}

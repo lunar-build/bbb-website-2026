@@ -1,10 +1,11 @@
 {
-  "__preprocessed__": "This file is used to build the theme.json file in the `public/build/assets` directory. The built artifact includes Tailwind's colors, fonts, and font sizes.",
+  "__preprocessed__": "This file is used to build the theme.json file in the `public/build/assets` directory. Colors and font sizes below are hand-authored brand tokens — not generated from Tailwind.",
   "$schema": "https://schemas.wp.org/trunk/theme.json",
   "version": 3,
   "settings": {
     "layout": {
-      "contentSize": "48rem"
+      "contentSize": "80rem",
+      "wideSize": "80rem"
     },
     "background": {
       "backgroundImage": true
@@ -16,7 +17,30 @@
       "defaultDuotone": false,
       "defaultGradients": false,
       "defaultPalette": false,
-      "duotone": []
+      "duotone": [],
+      "palette": [
+        { "slug": "blue-light", "color": "#E9F0F3", "name": "Blue-light" },
+        { "slug": "yellow", "color": "#FFBF47", "name": "Yellow" },
+        { "slug": "white", "color": "#FFFFFF", "name": "White" },
+        { "slug": "blue", "color": "#1878A5", "name": "Blue" },
+        { "slug": "blue-medium", "color": "#136084", "name": "Blue medium" },
+        { "slug": "blue-dark", "color": "#003852", "name": "Blue dark" },
+        {
+          "slug": "lightest-grey",
+          "color": "#F6F6F6",
+          "name": "Lightest grey"
+        },
+        { "slug": "orange", "color": "#F69502", "name": "Orange" },
+        { "slug": "leaf", "color": "#C7DC82", "name": "Leaf" },
+        {
+          "slug": "place-holder-grey",
+          "color": "#737373",
+          "name": "Place holder grey"
+        },
+        { "slug": "dark-orange", "color": "#B95B13", "name": "Dark orange" },
+        { "slug": "charcoal", "color": "#363636", "name": "Charcoal" },
+        { "slug": "black", "color": "#000000", "name": "Black" }
+      ]
     },
     "custom": {
       "spacing": {},
@@ -31,7 +55,68 @@
     },
     "typography": {
       "defaultFontSizes": false,
-      "customFontSize": false
+      "customFontSize": false,
+      "fontFamilies": [
+        {
+          "slug": "nata-sans",
+          "name": "Nata Sans",
+          "fontFamily": "\"Nata Sans\", system-ui, sans-serif"
+        },
+        {
+          "slug": "anonymous-pro",
+          "name": "Anonymous Pro",
+          "fontFamily": "\"Anonymous Pro\", ui-monospace, monospace"
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "heading-1",
+          "size": "clamp(2.25rem, 1.628rem + 2.652vw, 3.75rem)",
+          "name": "Heading 1"
+        },
+        {
+          "slug": "heading-2",
+          "size": "clamp(2rem, 1.534rem + 1.989vw, 3.125rem)",
+          "name": "Heading 2"
+        },
+        {
+          "slug": "heading-3",
+          "size": "clamp(1.75rem, 1.439rem + 1.326vw, 2.5rem)",
+          "name": "Heading 3"
+        },
+        {
+          "slug": "heading-4",
+          "size": "clamp(1.5rem, 1.345rem + 0.663vw, 1.875rem)",
+          "name": "Heading 4"
+        },
+        {
+          "slug": "heading-5",
+          "size": "clamp(1.375rem, 1.271rem + 0.442vw, 1.625rem)",
+          "name": "Heading 5"
+        },
+        {
+          "slug": "standfirst",
+          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "name": "Standfirst"
+        },
+        { "slug": "body", "size": "16px", "name": "Body" },
+        {
+          "slug": "input-label",
+          "size": "clamp(1rem, 0.948rem + 0.221vw, 1.125rem)",
+          "name": "Input label"
+        },
+        {
+          "slug": "button-label",
+          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "name": "Button label"
+        }
+      ]
+    }
+  },
+  "styles": {
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--nata-sans)",
+      "fontSize": "var(--wp--preset--font-size--body)"
     }
   }
 }
