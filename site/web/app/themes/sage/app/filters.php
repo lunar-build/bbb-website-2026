@@ -35,7 +35,7 @@ add_filter('render_block', function ($block_content, $block) {
     }
 
     return sprintf(
-        '<section class="c-block o-container">%s</section>',
+        '<section class="c-block"><div class="o-container">%s</div></section>',
         $block_content,
     );
 }, 10, 2);
