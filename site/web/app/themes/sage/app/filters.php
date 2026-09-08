@@ -46,12 +46,13 @@ add_filter('render_block', function ($block_content, $block) {
  * voice control software can't target on a bare pseudo-styled input. Gravity
  * Forms renders each choice's `<label>` with `id="label_…"` / `for="choice_…"`,
  * distinct from the field's own group label (which has no `for`), so this only
- * touches the individual choice labels.
+ * touches the individual choice labels. Note: GF renders this attribute with
+ * single quotes (`for='choice_…'`), not double.
  */
 add_filter('gform_field_content', function ($content, $field) {
     if (! in_array($field->type, ['checkbox', 'radio'], true)) {
         return $content;
     }
 
-    return preg_replace('/<label\s+for="choice_/', '<label role="link" tabindex="0" for="choice_', $content);
+    return preg_replace('/<label\s+for=([\'"])choice_/', '<label role="link" tabindex="0" for=$1choice_', $content);
 }, 10, 2);
