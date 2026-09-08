@@ -186,13 +186,26 @@ class PostHero extends Block
     }
 
     /**
+     * Whether we're rendering inside a real blog post — not just any
+     * truthy post ID, since this block also renders standalone on the
+     * pattern-library page, which is itself a real (but wrong) `page`
+     * post in the loop.
+     *
+     * @return bool
+     */
+    protected function inPostContext()
+    {
+        return get_post_type() === 'post';
+    }
+
+    /**
      * Retrieve the post's published date.
      *
      * @return string
      */
     public function date()
     {
-        return get_the_ID() ? get_the_date() : $this->example['date'];
+        return $this->inPostContext() ? get_the_date() : $this->example['date'];
     }
 
     /**
@@ -202,7 +215,7 @@ class PostHero extends Block
      */
     public function title()
     {
-        return get_the_ID() ? get_the_title() : $this->example['title'];
+        return $this->inPostContext() ? get_the_title() : $this->example['title'];
     }
 
     /**
@@ -212,7 +225,7 @@ class PostHero extends Block
      */
     public function permalink()
     {
-        return get_the_ID() ? get_permalink() : $this->example['permalink'];
+        return $this->inPostContext() ? get_permalink() : $this->example['permalink'];
     }
 
     /**
@@ -223,7 +236,7 @@ class PostHero extends Block
      */
     public function categories()
     {
-        if (! get_the_ID()) {
+        if (! $this->inPostContext()) {
             return $this->example['categories'];
         }
 
@@ -233,7 +246,7 @@ class PostHero extends Block
             return [];
         }
 
-        return array_map(fn ($category) => [
+        return array_map(fn($category) => [
             'label' => $category->name,
             'url' => get_category_link($category),
         ], $categories);

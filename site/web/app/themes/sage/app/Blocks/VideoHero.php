@@ -20,7 +20,7 @@ class VideoHero extends Block
      *
      * @var string
      */
-    public $description = 'The main/homepage hero: video masthead with heading, intro text, a primary call-to-action, and a widget slot (e.g. the Journey Planner Widget) overlapping its bottom-right corner.';
+    public $description = 'The main/homepage hero: full-width video masthead, heading + intro text below it, and a widget slot (e.g. the Journey Planner Widget) overlapping the boundary between them.';
 
     /**
      * The block category.
@@ -172,10 +172,6 @@ class VideoHero extends Block
         'heading' => 'Cycling in the West of England',
         'intro' => "If you haven't ridden a bike in years, or have never cycled at all – we can help you find all the resources you need to ride a bike for commuting, health, fitness and fun.",
         'video_alt' => 'Video montage of cyclists in the South West.',
-        'cta_label' => 'Try our cycle planner',
-        'cta_subtext' => 'Find a route that suits you!',
-        'cta_button_text' => 'Plan a route',
-        'cta_button_url' => 'https://cycleplanner.betterbybike.info',
     ];
 
     /**
@@ -202,9 +198,6 @@ class VideoHero extends Block
             'videoAlt' => $this->videoAlt(),
             'heading' => $this->heading(),
             'intro' => $this->intro(),
-            'ctaLabel' => $this->ctaLabel(),
-            'ctaSubtext' => $this->ctaSubtext(),
-            'ctaButton' => $this->ctaButton(),
         ];
     }
 
@@ -242,18 +235,6 @@ class VideoHero extends Block
                     'label' => 'Intro text',
                     'rows' => 3,
                     'new_lines' => 'br',
-                ])
-            ->addTab('Call to Action')
-                ->addText('cta_label', [
-                    'label' => 'CTA label',
-                    'instructions' => 'Small bold label above the button, e.g. "Try our cycle planner".',
-                ])
-                ->addText('cta_subtext', [
-                    'label' => 'CTA subtext',
-                ])
-                ->addLink('cta_button', [
-                    'label' => 'CTA button',
-                    'instructions' => 'Button text + URL (+ optional "open in new tab").',
                 ]);
 
         return $fields->build();
@@ -307,40 +288,6 @@ class VideoHero extends Block
     public function intro()
     {
         return get_field('intro') ?: $this->example['intro'];
-    }
-
-    /**
-     * Retrieve the CTA label.
-     *
-     * @return string
-     */
-    public function ctaLabel()
-    {
-        return get_field('cta_label') ?: $this->example['cta_label'];
-    }
-
-    /**
-     * Retrieve the CTA subtext.
-     *
-     * @return string
-     */
-    public function ctaSubtext()
-    {
-        return get_field('cta_subtext') ?: $this->example['cta_subtext'];
-    }
-
-    /**
-     * Retrieve the CTA button link.
-     *
-     * @return array
-     */
-    public function ctaButton()
-    {
-        return get_field('cta_button') ?: [
-            'title' => $this->example['cta_button_text'],
-            'url' => $this->example['cta_button_url'],
-            'target' => '_blank',
-        ];
     }
 
     /**

@@ -12,9 +12,12 @@
 @use 'components/primary-nav';
 @use 'components/footer';
 @use 'components/breadcrumbs';
+@use 'components/pill';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'blocks/generic';
 @use 'blocks/video-hero';
 @use 'blocks/cta-banner';
 @use 'blocks/journey-planner-widget';
+@use 'blocks/post-hero';
+@use 'blocks/image-hero';

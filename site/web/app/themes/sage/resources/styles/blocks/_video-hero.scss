@@ -1,96 +1,90 @@
 @use '../abstracts/breakpoints' as bp;
 
+// Figma "Homepage" hero: full-width video/image band on top, a grey lower
+// section with heading + intro below it, and a widget card (the Journey
+// Planner Widget, via the InnerBlocks slot below) overlapping the boundary
+// between the two.
 .c-video-hero {
-  &__inner {
-    display: grid;
-    gap: 2rem;
-    align-items: center;
-    padding: 2rem 1rem;
+  position: relative;
+}
 
-    @include bp.respond($min: bp.$lg) {
-      grid-template-columns: 5fr 11fr;
-      padding: 3rem 2rem;
-    }
+.c-video-hero__media {
+  position: relative;
+  aspect-ratio: 1440 / 574;
+  overflow: hidden;
+
+  @include bp.respond($max: bp.$md) {
+    aspect-ratio: 4 / 3;
   }
+}
 
-  &__media {
-    order: 1;
+.c-video-hero__video {
+  // lunar-video's shadow-DOM wrapper is an auto-height block; an `auto`
+  // sized ancestor sizes to its content (the video's intrinsic aspect
+  // ratio) instead of the host's own box, so it must be pinned to fill
+  // width/height instead of overflowing past the host's bounds.
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.c-video-hero__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #e5e5e5;
+  color: #737373;
+  text-align: center;
+  padding: 1rem;
+}
+
+.c-video-hero__lower {
+  position: relative;
+  background: var(--wp--preset--color--lightest-grey);
+  padding-block: 2.5rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 3.5rem;
+  }
+}
+
+.c-video-hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 34rem;
+}
+
+.c-video-hero__heading {
+  margin: 0;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-video-hero__intro {
+  margin: 0;
+  color: var(--wp--preset--color--blue-dark);
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 30px;
+}
+
+// Overlaps the media/lower boundary on desktop, per Figma — a negative top
+// margin pulls it up over the boundary, and justify-self:end (it's a grid
+// item of its own .o-container, gutter/max-width constrained same as the
+// content above) pushes it to the container's right edge rather than the
+// section's raw (full-bleed) one. Stacks in normal flow below the content
+// on narrower widths, where there's no room to overlap.
+.c-video-hero__widget {
+  margin-block-start: 1.5rem;
+
+  @include bp.respond($min: bp.$lg) {
+    max-width: 26rem;
+    margin-block-start: -3rem;
+    justify-self: end;
     position: relative;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 0.75rem;
-
-    @include bp.respond($min: bp.$lg) {
-      order: 2;
-      aspect-ratio: auto;
-      height: 100%;
-    }
-  }
-
-  &__video {
-    // lunar-video's shadow-DOM wrapper is an auto-height block; an `auto` grid
-    // track sizes to its content (the video's intrinsic aspect ratio) instead
-    // of the host's own box, so it must be pinned to 1fr to fill height/width
-    // instead of overflowing past the host's bounds.
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    grid-template-columns: minmax(0, 1fr);
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  &__placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    background: #e5e5e5;
-    color: #737373;
-    text-align: center;
-    padding: 1rem;
-  }
-
-  &__content {
-    order: 2;
-
-    @include bp.respond($min: bp.$lg) {
-      order: 1;
-    }
-  }
-
-  &__heading {
-    margin: 0 0 1rem;
-  }
-
-  &__intro {
-    margin: 0 0 2rem;
-  }
-
-  &__cta-text {
-    margin: 0 0 0.75rem;
-  }
-
-  &__cta-label {
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  // Overlaps the hero's bottom-right corner on desktop, per Figma — a
-  // negative top margin pulls it up over the media/content boundary and
-  // margin-inline-start:auto pushes it to the right without needing to
-  // share a grid row/track with .c-video-hero__inner. Stacks normally
-  // below the content on narrower widths, where there's no room to overlap.
-  &__widget {
-    margin-block-start: 2rem;
-
-    @include bp.respond($min: bp.$lg) {
-      max-width: 26rem;
-      margin-block-start: -5rem;
-      margin-inline-start: auto;
-      position: relative;
-      z-index: 1;
-    }
+    z-index: 1;
   }
 }
