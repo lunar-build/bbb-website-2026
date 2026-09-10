@@ -30,11 +30,24 @@
   align-items: flex-start;
 }
 
+// A <fieldset> for a11y/semantic grouping (KyeBuff's review comment) —
+// reset its UA-stylesheet border/padding so it stays visually identical to
+// the plain <div> it replaced.
 .c-journey-planner-widget__options {
   display: flex;
   flex-wrap: wrap;
   column-gap: 60px;
   row-gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.c-journey-planner-widget__options legend {
+  width: 100%;
+  padding: 0;
+  margin-bottom: 4px;
 }
 
 // Figma's CTA is a solid charcoal pill — neither wa-button token preset
