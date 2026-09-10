@@ -10,9 +10,11 @@
   'rows' => 4,
   'type' => 'text',
   'ariaLabel' => null,
+  'error' => null,
 ])
 
 @php($id = $id ?? $name)
+@php($errorId = $error ? $id.'-error' : null)
 
 {{--
   $iconButtonLabel turns the trailing icon into a real, focusable
@@ -24,9 +26,14 @@
   placeholder only, e.g. a compact search field) — a placeholder alone
   isn't a substitute for an accessible name (WCAG 4.1.2 / 3.3.2), so one of
   $label or $ariaLabel must be supplied.
+
+  $error renders a validation message below the field and wires
+  aria-invalid + aria-describedby onto the input/textarea (WCAG 3.3.1/4.1.2)
+  — pass the message string when this field failed validation, leave null
+  otherwise.
 --}}
 
-<div {{ $attributes->class(['c-input', 'c-input--textarea' => $textarea, 'c-input--has-icon' => $icon && ! $textarea]) }}>
+<div {{ $attributes->class(['c-input', 'c-input--textarea' => $textarea, 'c-input--has-icon' => $icon && ! $textarea, 'c-input--error' => $error]) }}>
   @if ($label)
     <label @if ($id) for="{{ $id }}" @endif class="c-input__label">
       {{ $label }}
@@ -45,6 +52,7 @@
         @if ($placeholder) placeholder="{{ $placeholder }}" @endif
         @if ($required) required @endif
         @if ($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
+        @if ($error) aria-invalid="true" aria-describedby="{{ $errorId }}" @endif
       ></textarea>
     @else
       <input
@@ -54,6 +62,7 @@
         @if ($placeholder) placeholder="{{ $placeholder }}" @endif
         @if ($required) required @endif
         @if ($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
+        @if ($error) aria-invalid="true" aria-describedby="{{ $errorId }}" @endif
       >
 
       @if ($icon && $iconButtonLabel)
@@ -65,4 +74,8 @@
       @endif
     @endif
   </div>
+
+  @if ($error)
+    <p id="{{ $errorId }}" class="c-input__error" role="alert">{{ $error }}</p>
+  @endif
 </div>

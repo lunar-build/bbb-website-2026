@@ -12,10 +12,11 @@
      — here just given a circular blue-medium badge via CSS rather than a
      separate baked asset, per Figma's mobile-menu social treatment. --}}
 @if (! empty($socialLinks))
-  <ul class="c-primary-nav__socials">
+  <ul class="c-primary-nav__socials" aria-label="{{ __('Social links for', 'sage') }} {{ get_bloginfo('name') }}">
     @foreach ($socialLinks as $link)
       <li>
-        <a href="{{ $link['url'] }}" class="c-primary-nav__social" aria-label="{{ ucfirst($link['platform']) }}"
+        <a href="{{ $link['url'] }}" class="c-primary-nav__social"
+          aria-label="{{ __('Visit', 'sage') }} {{ get_bloginfo('name') }} {{ __('on', 'sage') }} {{ ucfirst($link['platform']) }}"
           target="_blank" rel="noopener noreferrer">
           <x-icon name="{{ $link['platform'] }}" />
         </a>

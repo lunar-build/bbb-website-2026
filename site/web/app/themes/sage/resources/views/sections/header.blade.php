@@ -31,7 +31,8 @@
 
             <div class="c-header-actions c-header-actions--desktop">
                 @foreach ($socialLinks as $link)
-                    <a href="{{ $link['url'] }}" class="c-header-actions__social" aria-label="{{ ucfirst($link['platform']) }}"
+                    <a href="{{ $link['url'] }}" class="c-header-actions__social"
+                        aria-label="{{ __('Visit', 'sage') }} {{ get_bloginfo('name') }} {{ __('on', 'sage') }} {{ ucfirst($link['platform']) }}"
                         target="_blank" rel="noopener noreferrer">
                         <x-icon name="{{ $link['platform'] }}" />
                     </a>
@@ -81,7 +82,7 @@
 
     <div id="mobile-search" class="c-header-search" hidden>
         <div class="o-container">
-            <form role="search" aria-label="Site" method="get" action="{{ home_url('/') }}" class="c-header-search__form">
+            <form role="search" aria-label="{{ __('Search this site', 'sage') }}" method="get" action="{{ home_url('/') }}" class="c-header-search__form">
                 <x-input type="search" name="s" placeholder="Search for a keyword" icon="search"
                     icon-button-label="Search" aria-label="Search for a keyword" />
             </form>

@@ -6,7 +6,7 @@
      accordion). Panel switching/back/escape handled by primary-nav.js. --}}
 <div id="primary-menu" class="c-primary-nav" hidden>
   <div class="c-primary-nav__panel" data-panel="root">
-    <ul class="c-primary-nav__list">
+    <ul class="c-primary-nav__list" aria-label="{{ wp_get_nav_menu_name('primary_navigation') ?: __('Primary', 'sage') }}">
       @foreach ($items as $i => $item)
         <li class="c-primary-nav__item">
           @if (! empty($item['children']))
@@ -33,12 +33,13 @@
         </button>
 
         <div class="c-primary-nav__groups">
-          @foreach ($item['children'] as $group)
+          @foreach ($item['children'] as $g => $group)
+            @php($groupHeadingId = 'primary-nav-group-'.$i.'-'.$g)
             <div class="c-primary-nav__group">
-              <p class="c-primary-nav__heading">{{ $group['label'] }}</p>
+              <p class="c-primary-nav__heading" id="{{ $groupHeadingId }}">{{ $group['label'] }}</p>
 
               @if (! empty($group['children']))
-                <ul class="c-primary-nav__list c-primary-nav__list--sub">
+                <ul class="c-primary-nav__list c-primary-nav__list--sub" aria-labelledby="{{ $groupHeadingId }}">
                   @foreach ($group['children'] as $link)
                     <li>
                       <a href="{{ $link['href'] }}" class="c-primary-nav__link c-primary-nav__link--sub">
