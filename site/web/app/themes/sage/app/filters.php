@@ -35,7 +35,7 @@ add_filter('render_block', function ($block_content, $block) {
     }
 
     return sprintf(
-        '<section class="c-block o-container">%s</section>',
+        '<section class="c-block"><div class="o-container">%s</div></section>',
         $block_content,
     );
 }, 10, 2);
@@ -65,3 +65,20 @@ add_action('admin_notices', function () {
         . __('Primary Navigation note: an item with sub-items does not link anywhere itself (it becomes an inert heading on mobile, a submenu toggle on desktop) — only items with no children are actual links.', 'sage')
         . '</p></div>';
 });
+
+/**
+ * base/_forms.scss hides the native `input[type=checkbox]`/`input[type=radio]`
+ * box (`appearance: none`) and draws a custom glyph via `::before`, which some
+ * voice control software can't target on a bare pseudo-styled input. Gravity
+ * Forms renders each choice's `<label>` with `id="label_…"` / `for="choice_…"`,
+ * distinct from the field's own group label (which has no `for`), so this only
+ * touches the individual choice labels. Note: GF renders this attribute with
+ * single quotes (`for='choice_…'`), not double.
+ */
+add_filter('gform_field_content', function ($content, $field) {
+    if (! in_array($field->type, ['checkbox', 'radio'], true)) {
+        return $content;
+    }
+
+    return preg_replace('/<label\s+for=([\'"])choice_/', '<label role="link" tabindex="0" for=$1choice_', $content);
+}, 10, 2);
