@@ -10,7 +10,7 @@
 
 {{-- Same icons as the desktop top-bar, given a circular badge via CSS --}}
 @if (!empty($socialLinks))
-    <ul class="c-primary-nav__socials" aria-label="{{ __('Social links for', 'sage') }} {{ get_bloginfo('name') }}">
+    <ul class="c-primary-nav__socials" role="list" aria-label="{{ __('Social links for', 'sage') }} {{ get_bloginfo('name') }}">
         @foreach ($socialLinks as $link)
             <li>
                 <a href="{{ $link['url'] }}" class="c-primary-nav__social"

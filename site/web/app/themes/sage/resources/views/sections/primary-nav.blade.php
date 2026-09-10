@@ -2,7 +2,7 @@
      L2 headings are inert, L3 items are the real links. --}}
 <div id="primary-menu" class="c-primary-nav" hidden>
     <div class="c-primary-nav__panel" data-panel="root">
-        <ul class="c-primary-nav__list"
+        <ul class="c-primary-nav__list" role="list"
             aria-label="{{ wp_get_nav_menu_name('primary_navigation') ?: __('Primary', 'sage') }}">
             @foreach ($items as $i => $item)
                 <li class="c-primary-nav__item">
@@ -37,7 +37,7 @@
                             <p class="c-primary-nav__heading" id="{{ $groupHeadingId }}">{{ $group['label'] }}</p>
 
                             @if (!empty($group['children']))
-                                <ul class="c-primary-nav__list c-primary-nav__list--sub"
+                                <ul class="c-primary-nav__list c-primary-nav__list--sub" role="list"
                                     aria-labelledby="{{ $groupHeadingId }}">
                                     @foreach ($group['children'] as $link)
                                         <li>
@@ -124,7 +124,7 @@
                 </li>
             </ul>
 
-            <form id="desktop-search" role="search" aria-label="Site" method="get" action="{{ home_url('/') }}"
+            <form id="desktop-search" role="search" aria-label="{{ __('Search this site', 'sage') }}" method="get" action="{{ home_url('/') }}"
                 class="c-primary-nav-desktop__search" hidden>
                 <div class="c-primary-nav-desktop__search-field">
                     <input type="search" name="s" class="c-primary-nav-desktop__search-input"

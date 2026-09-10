@@ -100,9 +100,10 @@ if (toggle && menu) {
   });
 }
 
-// Desktop dropdown mega-menu. Hover-to-open (short close delay so moving
-// diagonally into the dropdown doesn't close it early), plus click and
-// keyboard support.
+// Desktop dropdown mega-menu. Click/tap and keyboard (Enter/Space, native
+// <button> activation) only — no hover-to-open and no focus-driven
+// open/close, since either caused dropdowns to flicker open/closed while
+// just tabbing or moving the mouse through the bar.
 const desktopNav = document.querySelector('.c-primary-nav-desktop');
 
 if (desktopNav) {
@@ -111,7 +112,6 @@ if (desktopNav) {
       '.c-primary-nav-desktop__link[aria-controls]',
     ),
   ];
-  let closeTimer = null;
 
   const closeAll = (except) => {
     triggers.forEach((trigger) => {
@@ -125,52 +125,17 @@ if (desktopNav) {
   };
 
   const openDropdown = (trigger) => {
-    clearTimeout(closeTimer);
     closeAll(trigger);
     trigger.setAttribute('aria-expanded', 'true');
     document.getElementById(trigger.getAttribute('aria-controls')).hidden =
       false;
   };
 
-  const scheduleClose = () => {
-    clearTimeout(closeTimer);
-    closeTimer = setTimeout(() => closeAll(), 150);
-  };
-
   triggers.forEach((trigger) => {
-    const dropdown = document.getElementById(
-      trigger.getAttribute('aria-controls'),
-    );
-    const item = trigger.closest('.c-primary-nav-desktop__item');
-
     trigger.addEventListener('click', () => {
       const isOpen = trigger.getAttribute('aria-expanded') === 'true';
       isOpen ? closeAll() : openDropdown(trigger);
     });
-
-    // Tab alone must NOT open the dropdown — only hover or an explicit
-    // Enter/Space (native <button> activation, handled by the click
-    // listener above) should. Focusing a trigger still closes any OTHER
-    // trigger's dropdown though (leaving this one's own alone, in case
-    // focus is arriving back on the trigger that owns it), so tabbing
-    // past a previously Enter-opened dropdown closes it behind you.
-    trigger.addEventListener('focus', () => closeAll(trigger));
-
-    item?.addEventListener('mouseenter', () => openDropdown(trigger));
-    item?.addEventListener('mouseleave', scheduleClose);
-    dropdown?.addEventListener('mouseenter', () => clearTimeout(closeTimer));
-    dropdown?.addEventListener('mouseleave', scheduleClose);
-  });
-
-  // Leaf L1 items have no dropdown but still sit in tab order between
-  // triggers — focusing one should close whatever was open.
-  const leaves = [
-    ...desktopNav.querySelectorAll(
-      '.c-primary-nav-desktop__list > .c-primary-nav-desktop__item > a.c-primary-nav-desktop__link',
-    ),
-  ];
-  leaves.forEach((leaf) => {
-    leaf.addEventListener('focus', () => closeAll());
   });
 
   desktopNav.addEventListener('keydown', (event) => {
