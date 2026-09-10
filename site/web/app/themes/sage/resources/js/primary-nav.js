@@ -2,25 +2,26 @@
 // drill-in/back between the root L1 list and each L1 item's level-2 panel.
 const toggle = document.querySelector('.c-header-menu-toggle');
 const menu = document.getElementById('primary-menu');
-const siteHeader = document.querySelector('lunar-site-header');
 
 if (toggle && menu) {
   const panels = menu.querySelectorAll('.c-primary-nav__panel');
 
-  // Overlay top padding depends on the header's real rendered height, not a
-  // fixed guess — measured fresh on each open.
-  const syncHeaderHeight = () => {
-    if (!siteHeader) return;
-    document.documentElement.style.setProperty('--header-height', `${siteHeader.getBoundingClientRect().height}px`);
-  };
-
-  // Also moves focus into the new panel — a focused element loses focus to
-  // <body> once its panel is hidden, which would let Tab escape the trap.
+  // Moving focus onto the newly-shown panel isn't just nice-to-have: the
+  // element that was focused when its panel got hidden doesn't stay
+  // focused — the browser drops focus to <body> (on the next tick, not
+  // synchronously). Since <body> isn't tracked by the Tab trap below,
+  // leaving it there would let Tab escape the overlay entirely after any
+  // drill-in/back. Focusing the panel's first focusable element (its Back
+  // button for a level-2 panel) keeps the trap intact and gives keyboard
+  // users a sensible landing point.
   const showPanel = (name) => {
     panels.forEach((panel) => {
       panel.hidden = panel.dataset.panel !== name;
     });
-    menu.querySelector('.c-primary-nav__panel:not([hidden])')?.querySelector('a[href], button:not([disabled])')?.focus();
+    menu
+      .querySelector('.c-primary-nav__panel:not([hidden])')
+      ?.querySelector('a[href], button:not([disabled])')
+      ?.focus();
   };
 
   const setOpen = (open) => {
@@ -33,10 +34,11 @@ if (toggle && menu) {
     document.documentElement.style.overflow = open ? 'hidden' : '';
 
     if (open) {
-      syncHeaderHeight();
       showPanel('root');
       document.getElementById('mobile-search')?.setAttribute('hidden', '');
-      document.querySelector('.c-header-search-toggle')?.setAttribute('aria-expanded', 'false');
+      document
+        .querySelector('.c-header-search-toggle')
+        ?.setAttribute('aria-expanded', 'false');
     }
   };
 
@@ -67,7 +69,9 @@ if (toggle && menu) {
   // trap's start/end. Recomputed each keypress since the visible panel changes.
   const getTrapElements = () => {
     const panel = menu.querySelector('.c-primary-nav__panel:not([hidden])');
-    const panelFocusables = panel ? [...panel.querySelectorAll('a[href], button:not([disabled])')] : [];
+    const panelFocusables = panel
+      ? [...panel.querySelectorAll('a[href], button:not([disabled])')]
+      : [];
     return [toggle, ...panelFocusables];
   };
 
@@ -102,14 +106,20 @@ if (toggle && menu) {
 const desktopNav = document.querySelector('.c-primary-nav-desktop');
 
 if (desktopNav) {
-  const triggers = [...desktopNav.querySelectorAll('.c-primary-nav-desktop__link[aria-controls]')];
+  const triggers = [
+    ...desktopNav.querySelectorAll(
+      '.c-primary-nav-desktop__link[aria-controls]',
+    ),
+  ];
   let closeTimer = null;
 
   const closeAll = (except) => {
     triggers.forEach((trigger) => {
       if (trigger === except) return;
       trigger.setAttribute('aria-expanded', 'false');
-      const dropdown = document.getElementById(trigger.getAttribute('aria-controls'));
+      const dropdown = document.getElementById(
+        trigger.getAttribute('aria-controls'),
+      );
       if (dropdown) dropdown.hidden = true;
     });
   };
@@ -118,7 +128,8 @@ if (desktopNav) {
     clearTimeout(closeTimer);
     closeAll(trigger);
     trigger.setAttribute('aria-expanded', 'true');
-    document.getElementById(trigger.getAttribute('aria-controls')).hidden = false;
+    document.getElementById(trigger.getAttribute('aria-controls')).hidden =
+      false;
   };
 
   const scheduleClose = () => {
@@ -127,7 +138,9 @@ if (desktopNav) {
   };
 
   triggers.forEach((trigger) => {
-    const dropdown = document.getElementById(trigger.getAttribute('aria-controls'));
+    const dropdown = document.getElementById(
+      trigger.getAttribute('aria-controls'),
+    );
     const item = trigger.closest('.c-primary-nav-desktop__item');
 
     trigger.addEventListener('click', () => {
@@ -151,14 +164,20 @@ if (desktopNav) {
 
   // Leaf L1 items have no dropdown but still sit in tab order between
   // triggers — focusing one should close whatever was open.
-  const leaves = [...desktopNav.querySelectorAll('.c-primary-nav-desktop__list > .c-primary-nav-desktop__item > a.c-primary-nav-desktop__link')];
+  const leaves = [
+    ...desktopNav.querySelectorAll(
+      '.c-primary-nav-desktop__list > .c-primary-nav-desktop__item > a.c-primary-nav-desktop__link',
+    ),
+  ];
   leaves.forEach((leaf) => {
     leaf.addEventListener('focus', () => closeAll());
   });
 
   desktopNav.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    const openTrigger = triggers.find((trigger) => trigger.getAttribute('aria-expanded') === 'true');
+    const openTrigger = triggers.find(
+      (trigger) => trigger.getAttribute('aria-expanded') === 'true',
+    );
     if (!openTrigger) return;
     closeAll();
     openTrigger.focus();
@@ -169,12 +188,15 @@ if (desktopNav) {
   });
 
   desktopNav.addEventListener('focusout', (event) => {
-    if (event.relatedTarget && !desktopNav.contains(event.relatedTarget)) closeAll();
+    if (event.relatedTarget && !desktopNav.contains(event.relatedTarget))
+      closeAll();
   });
 
   // Desktop search (Figma "Desktop | Search") replaces the L1 list within
   // the same bar rather than opening a separate overlay.
-  const searchToggle = desktopNav.querySelector('.c-primary-nav-desktop__search-toggle');
+  const searchToggle = desktopNav.querySelector(
+    '.c-primary-nav-desktop__search-toggle',
+  );
   const searchForm = document.getElementById('desktop-search');
   const list = desktopNav.querySelector('.c-primary-nav-desktop__list');
 
@@ -188,10 +210,12 @@ if (desktopNav) {
     };
 
     searchToggle.addEventListener('click', () => setSearchOpen(true));
-    searchForm.querySelector('[data-search-close]').addEventListener('click', () => {
-      setSearchOpen(false);
-      searchToggle.focus();
-    });
+    searchForm
+      .querySelector('[data-search-close]')
+      .addEventListener('click', () => {
+        setSearchOpen(false);
+        searchToggle.focus();
+      });
 
     searchForm.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;

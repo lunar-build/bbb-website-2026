@@ -18,7 +18,7 @@
   >
 
   @if ($label)
-    <label @if ($id) for="{{ $id }}" @endif class="c-choice__label">
+    <label @if ($id) for="{{ $id }}" @endif role="link" tabindex="0" class="c-choice__label">
       {{ $label }}
     </label>
   @endif

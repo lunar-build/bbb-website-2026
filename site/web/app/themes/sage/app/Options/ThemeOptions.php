@@ -36,19 +36,22 @@ class ThemeOptions extends Field
         $fields = Builder::make('theme_options');
 
         $fields
-            ->addTab('header', [
-                'label' => 'Header',
+            ->addTab('general', [
+                'label' => 'General',
             ])
                 ->addImage('logo_charcoal', [
                     'label' => 'Logo (charcoal)',
-                    'instructions' => 'Used on light backgrounds (e.g. the white top bar). Falls back to the theme default if left empty.',
+                    'instructions' => 'Used on light backgrounds anywhere in the site (e.g. the header top bar). Falls back to the theme default if left empty.',
                     'return_format' => 'array',
                 ])
                 ->addImage('logo_white', [
                     'label' => 'Logo (white)',
-                    'instructions' => 'Used on dark backgrounds (e.g. the blue footer). Falls back to the theme default if left empty.',
+                    'instructions' => 'Used on dark backgrounds anywhere in the site (e.g. the blue footer). Falls back to the theme default if left empty.',
                     'return_format' => 'array',
                 ])
+            ->addTab('header', [
+                'label' => 'Header',
+            ])
                 ->addLink('cta', [
                     'label' => 'CTA button',
                     'instructions' => 'Shown in the header top row (e.g. "Plan a cycling route"). Leave empty to hide the button.',

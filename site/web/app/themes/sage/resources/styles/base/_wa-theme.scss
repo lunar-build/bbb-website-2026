@@ -1,5 +1,5 @@
 // Overrides Web Awesome's semantic color tokens with brand tokens, so
-// <wa-button variant="brand|neutral" appearance="filled"> renders in brand
+// <wa-button variant="brand|neutral" appearance="accent"> renders in brand
 // colors without fighting WA's generated 05-95 OKLCH color-scale system.
 // Hover/focus pseudo-states are handled separately in base/_button.scss.
 // See: node_modules/@awesome.me/webawesome/dist/styles/themes/default.css
