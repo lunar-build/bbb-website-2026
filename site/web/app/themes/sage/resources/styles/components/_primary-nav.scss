@@ -14,12 +14,14 @@
 // (--lunar-site-header-z-index, 100) — the header still paints on top for
 // its own real height.
 //
-// --header-height is set on <html> by primary-nav.js each time the menu
-// opens (measuring lunar-site-header's actual rendered height) — a fixed
-// top padding here would only coincidentally match the header's real
-// height, and whichever bit of content fell in the gap either way would
-// end up hidden behind the header (higher z-index) or floating in an
-// empty gap above it.
+// This overlay only ever shows below bp.$sm (see the display rule below),
+// so there's exactly one header height to account for: Figma's Mobile
+// header row is a fixed 84px regardless of content (logo/CTA/search/menu
+// toggle all share that row height) — hardcoded rather than measured via
+// JS, since it doesn't vary within the breakpoint range this overlay is
+// visible in. The extra 2.25rem (36px) below it is Figma's own gap before
+// the menu content starts (node 4:1257: content top sits at 13.73% of the
+// 874px frame, ~120px — 84px header + 36px gap).
 .c-primary-nav {
   position: fixed;
   inset: 0;
@@ -34,7 +36,7 @@
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
   background: var(--wp--preset--color--blue);
-  padding: calc(var(--header-height, 84px) + 5rem) 1rem 3rem;
+  padding: calc(84px + 2.25rem) 1rem 3rem;
   display: none;
 
   &:not([hidden]) {

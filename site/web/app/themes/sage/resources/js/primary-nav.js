@@ -3,21 +3,9 @@
 // the root L1 list and each L1 item's own level-2 panel.
 const toggle = document.querySelector('.c-header-menu-toggle');
 const menu = document.getElementById('primary-menu');
-const siteHeader = document.querySelector('lunar-site-header');
 
 if (toggle && menu) {
   const panels = menu.querySelectorAll('.c-primary-nav__panel');
-
-  // The overlay's own top padding is a fixed value, not "however tall the
-  // header happens to be" — without this, its content starts under that
-  // fixed padding while the header (higher z-index, painted on top for
-  // its own real height) can cover more or less than that, hiding
-  // whichever bit of content falls in the gap. Measuring on each open
-  // keeps it correct if the header's height ever changes.
-  const syncHeaderHeight = () => {
-    if (!siteHeader) return;
-    document.documentElement.style.setProperty('--header-height', `${siteHeader.getBoundingClientRect().height}px`);
-  };
 
   // Moving focus onto the newly-shown panel isn't just nice-to-have: the
   // element that was focused when its panel got hidden doesn't stay
@@ -48,7 +36,6 @@ if (toggle && menu) {
     document.documentElement.style.overflow = open ? 'hidden' : '';
 
     if (open) {
-      syncHeaderHeight();
       showPanel('root');
       // Only one full-screen mobile overlay makes sense open at a time.
       document.getElementById('mobile-search')?.setAttribute('hidden', '');
