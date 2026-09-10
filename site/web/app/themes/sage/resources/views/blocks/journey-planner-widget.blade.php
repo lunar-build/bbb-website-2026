@@ -37,6 +37,7 @@
         icon="send"
         class="c-journey-planner-widget__field"
       />
+      <p id="from-error" class="c-input__error" hidden></p>
 
       <x-input
         label="To"
@@ -45,6 +46,7 @@
         icon="send"
         class="c-journey-planner-widget__field"
       />
+      <p id="to-error" class="c-input__error" hidden></p>
 
       <wa-button type="submit" variant="neutral" appearance="accent" pill with-end class="c-journey-planner-widget__cta">
         {{ $ctaLabel }}
