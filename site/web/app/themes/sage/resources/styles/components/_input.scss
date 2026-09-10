@@ -105,3 +105,16 @@
 
   @include focus.ring;
 }
+
+.c-input__error {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: var(--wp--preset--font-size--input-label);
+  color: var(--wp--preset--color--dark-orange);
+}
+
+.c-input--error {
+  input,
+  textarea {
+    border-color: var(--wp--preset--color--dark-orange);
+  }
+}
