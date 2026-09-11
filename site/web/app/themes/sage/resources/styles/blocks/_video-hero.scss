@@ -19,16 +19,53 @@
 }
 
 .c-video-hero__video {
-  // lunar-video's shadow-DOM wrapper is an auto-height block; an `auto`
-  // sized ancestor sizes to its content (the video's intrinsic aspect
-  // ratio) instead of the host's own box, so it must be pinned to fill
-  // width/height instead of overflowing past the host's bounds.
   display: block;
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+// Top-right play/pause toggle, per Figma — aligned with the content edge
+// of the `.o-container` grid used below (max-width 1280px, 1.5rem gutter)
+// rather than the raw full-bleed video edge, once there's room for it.
+.c-video-hero__toggle {
+  position: absolute;
+  top: 2rem;
+  right: 1.5rem;
+  z-index: 1;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+
+  @include bp.respond($min: bp.$lg) {
+    right: max(1.5rem, calc((100% - 1280px) / 2));
+  }
+}
+
+.c-video-hero__toggle-icon {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+
+  @include bp.respond($min: bp.$lg) {
+    width: 3.375rem;
+    height: 3.375rem;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 .c-video-hero__placeholder {

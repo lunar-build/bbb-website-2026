@@ -2,15 +2,36 @@
   <section {{ $attributes->class(['c-video-hero']) }}>
 @endunless
 
-<div class="c-video-hero__media">
+<div class="c-video-hero__media" data-video-hero>
   @if ($video['url'] ?? null)
-    <lunar-video
-      variant="background"
+    <video
       class="c-video-hero__video"
-      src="{{ $video['url'] }}"
+      data-video-hero-video
+      aria-hidden="true"
+      tabindex="-1"
+      muted
+      loop
+      playsinline
+      autoplay
       @if ($poster['url'] ?? null) poster="{{ $poster['url'] }}" @endif
-      label="{{ $videoAlt }}"
-    ></lunar-video>
+    >
+      <source src="{{ $video['url'] }}" type="video/mp4">
+    </video>
+
+    {{-- Required by WCAG 2.2.2 (Pause, Stop, Hide) whenever the video
+         autoplays — hidden by JS once loaded metadata shows the clip is
+         short enough (<=5s) that continuously moving content is
+         negligible, and the video itself is paused outright when the
+         visitor prefers reduced motion (see video-hero.js). --}}
+    <button
+      type="button"
+      class="c-video-hero__toggle"
+      data-video-hero-toggle
+      aria-label="{{ __('Pause background video', 'sage') }}"
+    >
+      <x-icon name="video-pause" class="c-video-hero__toggle-icon" data-video-hero-icon="pause" />
+      <x-icon name="video-play" class="c-video-hero__toggle-icon" data-video-hero-icon="play" hidden />
+    </button>
   @elseif ($poster['url'] ?? null)
     <img class="c-video-hero__video" src="{{ $poster['url'] }}" alt="{{ $videoAlt }}">
   @elseif ($block->preview)
