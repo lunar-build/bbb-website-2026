@@ -1,0 +1,35 @@
+@use '../base/focus' as focus;
+
+// Figma "Tag" component (node 136:3025) — reworked from the original
+// rounded/bordered pill: now plain text with a top+bottom rule only (no
+// radius, no side borders, no icon). Default is a yellow rule; hover
+// switches it to charcoal; focus keeps the charcoal rule and fills the
+// background yellow. The focus ring itself still uses the shared
+// focus.ring mixin rather than reproducing Figma's box-shadow, per the
+// site-wide focus-visible convention.
+
+.c-pill {
+  display: inline-flex;
+  align-items: center;
+  border-block: 3px solid var(--wp--preset--color--yellow);
+  padding-block-end: 3px;
+  background: transparent;
+  color: var(--wp--preset--color--charcoal);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 32px;
+  text-decoration: none;
+  white-space: nowrap;
+
+  @include focus.ring;
+}
+
+a.c-pill:hover {
+  border-color: var(--wp--preset--color--charcoal);
+}
+
+a.c-pill:focus-visible {
+  border-color: var(--wp--preset--color--charcoal);
+  background: var(--wp--preset--color--yellow);
+}
