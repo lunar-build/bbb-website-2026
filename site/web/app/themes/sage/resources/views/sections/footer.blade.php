@@ -4,6 +4,8 @@
     $copyright = sprintf('© %s %s', date('Y'), get_bloginfo('name'));
 @endphp
 
-<lunar-site-footer copyright="{{ $copyright }}" columns="{{ json_encode($columns) }}" legal="{{ json_encode($legal) }}">
-    <a slot="logo" href="{{ home_url('/') }}">{!! $siteName !!}</a>
-</lunar-site-footer>
+<div class="o-container">
+  <lunar-site-footer copyright="{{ $copyright }}" columns="{{ json_encode($columns) }}" legal="{{ json_encode($legal) }}">
+      <a slot="logo" href="{{ home_url('/') }}">{!! $siteName !!}</a>
+  </lunar-site-footer>
+</div>

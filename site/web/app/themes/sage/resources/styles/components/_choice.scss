@@ -1,0 +1,21 @@
+// Layout/label extras for the `<x-radio>` and `<x-checkbox>` Blade
+// components (resources/views/components/{radio,checkbox}.blade.php). The
+// actual control styling (circle/square, border, checked-state fill) is a
+// global element rule on input[type=radio]/input[type=checkbox] in
+// base/_forms.scss, so it also applies to third-party-rendered fields
+// (Gravity Forms etc.) — this file only adds the row layout + label shared
+// by both, since they're visually identical apart from the input itself.
+
+.c-choice {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.c-choice__label {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 500;
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 26px;
+  color: var(--wp--preset--color--black);
+}

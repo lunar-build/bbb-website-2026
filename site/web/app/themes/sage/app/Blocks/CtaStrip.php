@@ -169,6 +169,14 @@ class CtaStrip extends Block
     ];
 
     /**
+     * Fixture markup standing in for this block's InnerBlocks content on
+     * the pattern library page (see App\View\Composers\PatternLibrary).
+     *
+     * @var string
+     */
+    public $exampleContent = '<h3>Try our loan a bike scheme</h3><p>Example body copy for the strip — replace with real content.</p>';
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array

@@ -104,6 +104,85 @@ Repo ships a [Claude Code](https://claude.com/claude-code) skill at [.claude/ski
 
 See `site/web/app/themes/sage/app/Blocks/FeatureCard.php` + `.../resources/views/blocks/feature-card.blade.php` for a worked example built via this workflow (Web Awesome `<wa-card>`/`<wa-button>`, no Lunar component needed for this one).
 
+# Pattern library
+
+Every block registered under `site/web/app/themes/sage/app/Blocks/` automatically
+appears on a living style guide page at **`/pattern-library`** — each block shown with
+its description and a rendered example, so a client can see what's available before
+dropping a block into a page.
+
+- **Logged-in only.** Anonymous visitors get a real 404, so it's safe to leave
+  published without exposing placeholder content publicly.
+- **No registration step.** The page is powered by
+  [`App\View\Composers\PatternLibrary`](site/web/app/themes/sage/app/View/Composers/PatternLibrary.php),
+  which discovers every block via ACF Composer's own registry
+  (`app('AcfComposer')->composers()`) and re-renders each one standalone using its
+  fixture data — the same mechanism already used for the block editor's empty-state
+  preview. A new block just needs to follow the normal block-building conventions (see
+  the `build-acf-block` skill's §6 "Pattern library"): a real `$description`, full
+  `$example`/`example()` coverage for every ACF field (including media, via the
+  bundled placeholder assets), and an `$exampleContent` string if it uses
+  `InnerBlocks`. Get those right and the block appears correctly with nothing else to
+  wire up.
+- **Placeholder assets** live at
+  `site/web/app/themes/sage/resources/images/placeholder/pattern-placeholder.svg` and
+  `.../resources/videos/placeholder/pattern-placeholder.mp4` — both generated locally
+  (no stock footage/images, no external dependency), committed to the repo, and
+  trivial to swap: replace the file in place and rebuild.
+
+### Setting this up on a fresh clone / new project
+
+The page itself is a normal WordPress Page (its template assignment lives in the
+database, not in version control), so after a fresh install you need to create it
+once:
+
+1. WP admin → Pages → Add New.
+2. Title it "Pattern Library" (the slug becomes the URL — set it to `pattern-library`
+   if it doesn't default to that).
+3. In the sidebar, set **Template** to "Pattern Library".
+4. Publish. Visit `/pattern-library` while logged in.
+
+No other setup is needed — every existing and future block appears automatically once
+the page exists.
+
+### Dev-only "Components" section
+
+`/pattern-library` also has a second section for base design-system pieces — Blade
+`@props` components (`<x-input>`, `<x-alert>`, `<x-icon>`, etc.) plus non-component
+style primitives (buttons, the type scale, the callout style). This section only
+renders when `WP_DEBUG` is true (on by default locally via
+`site/config/environments/development.php`, off everywhere else via WP core's own
+fallback) — it's for development, never shown to a client regardless of login state
+or environment.
+
+**Workflow when adding a new component** (`site/web/app/themes/sage/resources/views/components/*.blade.php`):
+
+1. Build the component as normal — it's auto-discovered by
+   [`PatternLibrary::components()`](site/web/app/themes/sage/app/View/Composers/PatternLibrary.php)
+   just by existing in that folder, no registration step.
+2. Add an example file at `resources/views/components/examples/{component-name}.blade.php`
+   containing literal sample usage, e.g. for a new `<x-card>`:
+
+   ```blade
+   {{-- resources/views/components/examples/card.blade.php --}}
+   <x-card title="Example card">Example body copy.</x-card>
+   ```
+
+   Stack more than one line in the same file to show multiple variants (see
+   `resources/views/components/examples/input.blade.php` for both the text and
+   textarea variants of `<x-input>`).
+3. That's it — visit `/pattern-library` locally and the component shows up under
+   "Components (dev only)" with your example rendered.
+
+Skip step 2 and the component still lists (so the gap stays visible rather than
+silently missing), just with a "no example yet" note instead of a rendered preview.
+
+Buttons/type-scale/callout aren't separate files, so they can't be auto-discovered
+the same way — those are hand-maintained in
+[`resources/views/partials/pattern-library-styles.blade.php`](site/web/app/themes/sage/resources/views/partials/pattern-library-styles.blade.php).
+Only touch that file if you're introducing a genuinely new style primitive (not a
+component, not a block) — rare.
+
 # [Web Awesome](https://webawesome.com/)
 
 `@awesome.me/webawesome` (from the Font Awesome team) is a library of framework-agnostic, MIT-licensed web components (`<wa-button>`, `<wa-card>`, `<wa-dialog>`, `<wa-input>`, etc.). This project only depends on the free npm package — no paid Pro tier dependency.
