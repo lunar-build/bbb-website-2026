@@ -13,11 +13,12 @@ document.querySelectorAll('[data-video-hero]').forEach((wrapper) => {
 
   const pauseIcon = toggle.querySelector('[data-video-hero-icon="pause"]');
   const playIcon = toggle.querySelector('[data-video-hero-icon="play"]');
+  const label = toggle.dataset.videoHeroLabel || 'background video';
 
   const setPlayingState = (playing) => {
     pauseIcon.hidden = !playing;
     playIcon.hidden = playing;
-    toggle.setAttribute('aria-label', playing ? 'Pause background video' : 'Play background video');
+    toggle.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} ${label}`);
   };
 
   const applyReducedMotion = () => {

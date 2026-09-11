@@ -1,4 +1,5 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
 
 .c-video-hero {
   position: relative;
@@ -35,6 +36,8 @@
   background: none;
   line-height: 0;
   cursor: pointer;
+
+  @include focus.ring($color: white);
 
   @include bp.respond($min: bp.$lg) {
     right: max(1.5rem, calc((100% - 1280px) / 2));

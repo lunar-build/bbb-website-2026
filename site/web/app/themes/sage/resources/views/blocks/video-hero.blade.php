@@ -27,7 +27,8 @@
       type="button"
       class="c-video-hero__toggle"
       data-video-hero-toggle
-      aria-label="{{ __('Pause background video', 'sage') }}"
+      data-video-hero-label="{{ $videoAlt ?: __('background video', 'sage') }}"
+      aria-label="{{ sprintf(__('Pause %s', 'sage'), $videoAlt ?: __('background video', 'sage')) }}"
     >
       <x-icon name="video-pause" class="c-video-hero__toggle-icon" data-video-hero-icon="pause" />
       <x-icon name="video-play" class="c-video-hero__toggle-icon" data-video-hero-icon="play" hidden />
