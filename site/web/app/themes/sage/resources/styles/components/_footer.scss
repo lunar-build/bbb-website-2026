@@ -138,11 +138,11 @@
   }
 
   &__link {
+    @extend .u-footer-link;
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
     color: var(--wp--preset--color--white);
-    font-weight: 700;
     text-decoration: none;
 
     svg {

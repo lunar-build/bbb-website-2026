@@ -75,8 +75,7 @@
   }
 
   &::part(label) {
-    font-size: 14px;
-    line-height: 18px;
+    @extend .u-cta-small;
   }
 
   .c-icon--arrow-right svg {

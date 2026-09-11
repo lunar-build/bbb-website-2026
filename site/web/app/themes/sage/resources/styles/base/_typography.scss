@@ -16,14 +16,14 @@ h1,
 h2,
 .u-heading-2 {
   font-size: var(--wp--preset--font-size--heading-2);
-  line-height: 54px;
+  line-height: 60px;
   font-weight: 700;
 }
 
 h3,
 .u-heading-3 {
   font-size: var(--wp--preset--font-size--heading-3);
-  line-height: 44px;
+  line-height: 50px;
   font-weight: 700;
 }
 
@@ -53,6 +53,112 @@ h6,
   font-size: var(--wp--preset--font-size--input-label);
   line-height: 26px;
   font-weight: 500;
+}
+
+.u-body-large {
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 26px;
+  font-weight: 400;
+}
+
+.u-body-regular {
+  font-size: var(--wp--preset--font-size--body-regular);
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.u-cta-large {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--button-label);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-cta-small {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--cta-small);
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.u-input-placeholder {
+  font-size: var(--wp--preset--font-size--input-placeholder);
+  line-height: 18px;
+  font-weight: 500;
+}
+
+.u-card-date {
+  font-size: var(--wp--preset--font-size--card-date);
+  line-height: 24px;
+  font-weight: 700;
+}
+
+.u-card-title-small {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--card-title-small);
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.u-short-form-link {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--short-form-link);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-quote {
+  font-size: var(--wp--preset--font-size--quote);
+  line-height: 40px;
+  font-weight: 400;
+}
+
+.u-quote-citation {
+  font-size: var(--wp--preset--font-size--quote-citation);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-nav-link {
+  font-size: var(--wp--preset--font-size--nav-link);
+  line-height: normal;
+  font-weight: 500;
+}
+
+.u-nav-sublink {
+  font-size: var(--wp--preset--font-size--nav-sublink);
+  line-height: normal;
+  font-weight: 500;
+}
+
+.u-mobile-menu-link {
+  font-size: var(--wp--preset--font-size--mobile-menu-link);
+  line-height: normal;
+  font-weight: 700;
+}
+
+.u-mobile-menu-sublink {
+  font-size: var(--wp--preset--font-size--mobile-menu-sublink);
+  line-height: normal;
+  font-weight: 500;
+}
+
+.u-footer-link {
+  font-size: var(--wp--preset--font-size--footer-link);
+  line-height: 26px;
+  font-weight: 700;
+}
+
+.u-table-column-heading {
+  font-size: var(--wp--preset--font-size--table-column-heading);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-table-cell-heading {
+  font-size: var(--wp--preset--font-size--table-cell-heading);
+  line-height: 26px;
+  font-weight: 700;
 }
 
 .u-callout {
