@@ -11,6 +11,11 @@
 
 // TODO: Implement JS wiring for the "Find nearby feature" variant. Also hook up google Places Autocomplete as currently not finished.
 
+// TODO: check a Google Maps API key is set (Theme Options -> [tab with
+// google_maps_api_key]) before relying on any of this — without one,
+// JourneyPlannerWidget::assets() never enqueues the script and none of the
+// below runs at all.
+
 window.initJourneyPlannerPlaces = () => {
   document
     .querySelectorAll(
@@ -34,6 +39,11 @@ window.initJourneyPlannerPlaces = () => {
             'Google Places Autocomplete failed to initialise:',
             error,
           );
+          setFieldError(
+            form,
+            input,
+            'Location search is unavailable right now.',
+          );
           return;
         }
 
@@ -50,6 +60,7 @@ window.initJourneyPlannerPlaces = () => {
           input.dataset.lat = location.lat();
           input.dataset.lng = location.lng();
           input.dataset.name = place.formatted_address ?? input.value;
+          clearFieldError(form, input);
         });
       });
 
@@ -61,6 +72,11 @@ window.initJourneyPlannerPlaces = () => {
         );
 
         if (missing) {
+          setFieldError(
+            form,
+            missing,
+            'Select a location from the list of suggestions.',
+          );
           missing.focus();
           return;
         }
@@ -74,6 +90,27 @@ window.initJourneyPlannerPlaces = () => {
       });
     });
 };
+
+// Mirrors <x-input>'s $error prop (aria-invalid + aria-describedby pointing
+// at a visible message, see components/input.blade.php) but toggled at
+// runtime — the error only exists once init has failed or a user has tried
+// to submit without picking a suggestion, not at render time.
+function setFieldError(form, input, message) {
+  const errorEl = form.querySelector(`#${input.name}-error`);
+  if (!errorEl) return;
+
+  errorEl.textContent = message;
+  errorEl.hidden = false;
+  input.setAttribute('aria-invalid', 'true');
+  input.setAttribute('aria-describedby', errorEl.id);
+}
+
+function clearFieldError(form, input) {
+  const errorEl = form.querySelector(`#${input.name}-error`);
+  if (errorEl) errorEl.hidden = true;
+  input.removeAttribute('aria-invalid');
+  input.removeAttribute('aria-describedby');
+}
 
 function pointFrom(input) {
   return {

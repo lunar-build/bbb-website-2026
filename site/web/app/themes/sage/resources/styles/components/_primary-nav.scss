@@ -1,10 +1,28 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 
-// Sibling of <lunar-site-header>, not nested — that component's shadow
-// <header> always carries a transform (sticky auto-hide), which would
-// make it the containing block for position:fixed here instead of the
-// viewport. --header-height is set on <html> by primary-nav.js.
+// Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
+// sibling of <lunar-site-header> in header.blade.php, deliberately NOT
+// nested inside it — that component's shadow <header> always carries a
+// `transform` (part of its sticky auto-hide, present even when not
+// currently hidden), which would make it the containing block for a
+// nested position:fixed descendant: the overlay would size against the
+// header's own ~84px box instead of the viewport, slide away with the
+// header's hide-on-scroll transform, and lose the stacking fight for
+// z-index against the header's own (non-positioned) content. As a proper
+// sibling, position:fixed here is contained by the real viewport, and
+// z-index compares correctly against lunar-site-header's own
+// (--lunar-site-header-z-index, 100) — the header still paints on top for
+// its own real height.
+//
+// This overlay only ever shows below bp.$sm (see the display rule below),
+// so there's exactly one header height to account for: Figma's Mobile
+// header row is a fixed 84px regardless of content (logo/CTA/search/menu
+// toggle all share that row height) — hardcoded rather than measured via
+// JS, since it doesn't vary within the breakpoint range this overlay is
+// visible in. The extra 2.25rem (36px) below it is Figma's own gap before
+// the menu content starts (node 4:1257: content top sits at 13.73% of the
+// 874px frame, ~120px — 84px header + 36px gap).
 .c-primary-nav {
   position: fixed;
   inset: 0;
@@ -14,7 +32,7 @@
   scrollbar-gutter: stable; // avoids a horizontal shift between short/long panels
   overscroll-behavior: contain;
   background: var(--wp--preset--color--blue);
-  padding: calc(var(--header-height, 84px) + 5rem) 1rem 3rem;
+  padding: calc(84px + 4rem) 1rem 3rem;
   display: none;
 
   &:not([hidden]) {
@@ -42,6 +60,7 @@
 .c-primary-nav__list {
   display: flex;
   flex-direction: column;
+  list-style: none;
   margin: 0;
   padding: 0;
 }
@@ -167,6 +186,7 @@
   display: flex;
   gap: 4rem;
   justify-content: center;
+  list-style: none;
   margin: 0;
   padding: 0;
   margin-top: auto;
@@ -210,6 +230,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  list-style: none;
   margin: 0;
   padding-block: 1rem;
 }
@@ -256,7 +277,9 @@
   }
 }
 
-.c-primary-nav-desktop__link[aria-expanded='true'] .c-primary-nav-desktop__chevron svg {
+.c-primary-nav-desktop__link[aria-expanded='true']
+  .c-primary-nav-desktop__chevron
+  svg {
   transform: rotate(180deg);
 }
 
@@ -298,6 +321,7 @@
   display: flex;
   flex-direction: column;
   gap: 19px;
+  list-style: none;
   margin: 0;
   padding-inline-start: 16px; // creates the divider-line look with the border below
   border-inline-start: 1px solid var(--wp--preset--color--white);
