@@ -74,7 +74,7 @@ class VideoHero extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.

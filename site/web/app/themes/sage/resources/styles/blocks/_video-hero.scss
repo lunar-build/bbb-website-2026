@@ -1,9 +1,5 @@
 @use '../abstracts/breakpoints' as bp;
 
-// Figma "Homepage" hero: full-width video/image band on top, a grey lower
-// section with heading + intro below it, and a widget card (the Journey
-// Planner Widget, via the InnerBlocks slot below) overlapping the boundary
-// between the two.
 .c-video-hero {
   position: relative;
 }
@@ -27,9 +23,7 @@
   object-fit: cover;
 }
 
-// Top-right play/pause toggle, per Figma — aligned with the content edge
-// of the `.o-container` grid used below (max-width 1280px, 1.5rem gutter)
-// rather than the raw full-bleed video edge, once there's room for it.
+// Aligns with the .o-container content edge once there's room for it.
 .c-video-hero__toggle {
   position: absolute;
   top: 2rem;
@@ -89,11 +83,26 @@
   }
 }
 
+// Content + widget share one grid row so the widget's overlap (below) is a
+// fixed offset from their shared row-start, not dependent on content height.
+.c-video-hero__row {
+  @include bp.respond($min: bp.$xl) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 3rem;
+    align-items: start;
+  }
+}
+
 .c-video-hero__content {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   max-width: 34rem;
+
+  @include bp.respond($min: bp.$xl) {
+    max-width: none;
+  }
 }
 
 .c-video-hero__heading {
@@ -108,19 +117,14 @@
   line-height: 30px;
 }
 
-// Overlaps the media/lower boundary on desktop, per Figma — a negative top
-// margin pulls it up over the boundary, and justify-self:end (it's a grid
-// item of its own .o-container, gutter/max-width constrained same as the
-// content above) pushes it to the container's right edge rather than the
-// section's raw (full-bleed) one. Stacks in normal flow below the content
-// on narrower widths, where there's no room to overlap.
+// Stacked below $xl. At $xl+, overlaps the media above by 3rem — margin
+// must first clear .c-video-hero__lower's own 3.5rem padding-block-start,
+// hence -6.5rem.
 .c-video-hero__widget {
   margin-block-start: 1.5rem;
 
-  @include bp.respond($min: bp.$lg) {
-    max-width: 26rem;
-    margin-block-start: -3rem;
-    justify-self: end;
+  @include bp.respond($min: bp.$xl) {
+    margin-block-start: -6.5rem;
     position: relative;
     z-index: 1;
   }
