@@ -1,0 +1,43 @@
+@use '../base/focus' as focus;
+
+// Site buttons only ever use variant="brand"|"neutral" appearance="accent" pill,
+// with a c-icon--arrow-right in the `end` slot. WA's "filled" appearance uses the
+// soft -fill-normal/-on-normal tokens (a light tint); "accent" is the one that
+// uses -fill-loud/-on-loud, which is what our brand-token override in
+// base/_wa-theme.scss targets for a solid, bold CTA look.
+
+wa-button::part(label) {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-weight: 700;
+  font-size: var(--wp--preset--font-size--button-label);
+  line-height: 30px;
+  letter-spacing: 0.02em;
+}
+
+wa-button[variant='brand'][appearance='accent']::part(button) {
+  border: 2px solid var(--wp--preset--color--charcoal);
+}
+
+wa-button::part(button) {
+  @include focus.ring;
+}
+
+wa-button .c-icon--arrow-right {
+  display: inline-flex;
+  margin-inline-start: 0.5em;
+
+  svg {
+    width: 22px;
+    height: 14px;
+    flex: none;
+    overflow: visible;
+  }
+
+  .c-icon__arrow {
+    transition: d 0.15s ease;
+  }
+}
+
+wa-button:is(:hover, :focus-within) .c-icon--arrow-right .c-icon__arrow {
+  d: path('M1 7H28M28 7L22 1M28 7L22 13');
+}

@@ -2,6 +2,7 @@
   <section {{ $attributes->class(['c-feature-card']) }}>
 @endunless
 
+<div class="o-container">
 <wa-card
   class="c-feature-card__card"
   appearance="outlined"
@@ -69,6 +70,7 @@
     </div>
   @endif
 </wa-card>
+</div>
 
 @unless ($block->preview)
   </section>

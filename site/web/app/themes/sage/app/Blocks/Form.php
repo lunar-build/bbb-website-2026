@@ -5,28 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class CtaStrip extends Block
+class Form extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'CTA Strip';
+    public $name = 'Form';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'cta-strip';
+    public $slug = 'form';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A reusable bordered call-to-action banner with a title, body text, and link.';
+    public $description = 'An intro heading/text with a Gravity Forms form.';
 
     /**
      * The block category.
@@ -40,7 +40,7 @@ class CtaStrip extends Block
      *
      * @var string|array
      */
-    public $icon = 'megaphone';
+    public $icon = 'feedback';
 
     /**
      * The block keywords.
@@ -48,10 +48,11 @@ class CtaStrip extends Block
      * @var array
      */
     public $keywords = [
-        'cta',
-        'banner',
-        'call to action',
-        'link',
+        'form',
+        'gravity forms',
+        'gravityforms',
+        'enquiry',
+        'contact',
     ];
 
     /**
@@ -143,7 +144,7 @@ class CtaStrip extends Block
      *
      * @var array
      */
-    public $styles = ['light', 'dark'];
+    public $styles = [];
 
     /**
      * The block preview example data.
@@ -151,11 +152,7 @@ class CtaStrip extends Block
      * @var array
      */
     public $example = [
-        'link' => [
-            'title' => 'Find out more',
-            'url' => 'https://betterbybike.info/schemes-and-initiatives/loan-a-bike-scheme/',
-            'target' => '',
-        ],
+        'form_id' => 1,
     ];
 
     /**
@@ -164,8 +161,9 @@ class CtaStrip extends Block
      * @var array
      */
     public $template = [
-        'core/heading' => ['placeholder' => 'Heading', 'level' => 3],
-        'core/paragraph' => ['placeholder' => 'Body text…'],
+        ['core/heading' => ['placeholder' => 'Get in touch', 'level' => 2]],
+        ['core/heading' => ['placeholder' => 'Subtitle…', 'level' => 3]],
+        ['core/paragraph' => ['placeholder' => 'A short paragraph of intro copy above the form.']],
     ];
 
     /**
@@ -174,7 +172,7 @@ class CtaStrip extends Block
     public function with(): array
     {
         return [
-            'link' => $this->link(),
+            'formId' => $this->formId(),
         ];
     }
 
@@ -183,25 +181,50 @@ class CtaStrip extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('cta_strip');
+        $fields = Builder::make('form');
 
         $fields
-            ->addLink('link', [
-                'label' => 'Link',
-                'instructions' => 'Link text + URL for the CTA.',
+            ->addSelect('form_id', [
+                'label' => 'Choose a Gravity Form',
+                'instructions' => 'Select which Gravity Forms form to display.',
+                'choices' => $this->formChoices(),
+                'ui' => 1,
+                'allow_null' => 1,
+                'required' => 1,
             ]);
 
         return $fields->build();
     }
 
     /**
-     * Retrieve the link.
+     * Retrieve the available Gravity Forms forms as select choices.
      *
      * @return array
      */
-    public function link()
+    protected function formChoices()
     {
-        return get_field('link') ?: $this->example['link'];
+        if (! class_exists('GFAPI')) {
+            // Don't crash WP-CLI: it bootstraps this same block-registration hook,
+            // so a hard throw here would block `wp plugin activate` itself — the
+            // one command that fixes this.
+            if (defined('WP_CLI') && WP_CLI) {
+                return [];
+            }
+
+            throw new \Exception('Gravity Forms is not installed or activated. The Form block will not work without it.');
+        }
+
+        return collect(\GFAPI::get_forms())->pluck('title', 'id')->all();
+    }
+
+    /**
+     * Retrieve the selected Gravity Forms form ID.
+     *
+     * @return int
+     */
+    public function formId()
+    {
+        return get_field('form_id') ?: $this->example['form_id'];
     }
 
     /**

@@ -1,0 +1,46 @@
+// Site-wide content container. Wrap nav/block/footer content in `.o-container`
+// to constrain it to a max width and center it with a side gutter. Most direct
+// children stay contained by default; give a child `.o-container__full` to let
+// it bleed edge-to-edge (full-colour backgrounds, full-bleed images/video)
+// without breaking out of the DOM or needing a separate wrapper.
+//
+// Usage:
+//   <section class="c-my-block">
+//     <div class="o-container">
+//       <p>Contained by default…</p>
+//       <img class="o-container__full" src="…"> <!-- bleeds full width -->
+//     </div>
+//   </section>
+//
+// If an entire block's background should bleed (not just one child), simply
+// don't wrap the whole block in `.o-container` — put it on an inner content
+// wrapper instead, so the block's own <section> stays naturally full width.
+//
+// Never put the `.o-container` class directly on a Shadow-DOM custom element
+// (<lunar-*>, <wa-*>) — `display: grid` on a shadow host only grids that
+// component's OWN shadow-tree wrapper, not the light-DOM content slotted into
+// it, so it can't actually constrain the component's content and produces
+// broken/undefined sizing (confirmed: it collapsed <lunar-nav> to the gutter
+// track's width and tripped its container-query mobile layout). Always wrap
+// the custom element in a plain <div class="o-container"> instead, so the
+// whole component becomes one grid item — see sections/header.blade.php.
+
+$container-max-width: 1280px;
+$container-gutter: 1.5rem;
+
+.o-container {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(#{$container-gutter}, 1fr)
+    [content-start] min(100% - #{$container-gutter * 2}, #{$container-max-width})
+    [content-end] minmax(#{$container-gutter}, 1fr)
+    [full-end];
+
+  > * {
+    grid-column: content-start / content-end;
+  }
+
+  &__full {
+    grid-column: full-start / full-end;
+  }
+}

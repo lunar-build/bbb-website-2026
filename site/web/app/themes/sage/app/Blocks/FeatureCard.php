@@ -80,7 +80,7 @@ class FeatureCard extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.
@@ -143,7 +143,7 @@ class FeatureCard extends Block
      *
      * @var array
      */
-    public $styles = ['light', 'dark'];
+    public $styles = [];
 
     /**
      * The block preview example data.
@@ -167,6 +167,14 @@ class FeatureCard extends Block
         'core/heading' => ['placeholder' => 'Title', 'level' => 3],
         'core/paragraph' => ['placeholder' => 'Body text (optional — delete for cards without body copy)…'],
     ];
+
+    /**
+     * Fixture markup standing in for this block's InnerBlocks content on
+     * the pattern library page (see App\View\Composers\PatternLibrary).
+     *
+     * @var string
+     */
+    public $exampleContent = '<h3>Loan a bike</h3><p>Example body copy for the card — replace with real content.</p>';
 
     /**
      * Data to be passed to the block before rendering.

@@ -36,6 +36,58 @@ class ThemeOptions extends Field
         $fields = Builder::make('theme_options');
 
         $fields
+            ->addTab('general', [
+                'label' => 'General',
+            ])
+                ->addImage('logo_charcoal', [
+                    'label' => 'Logo (charcoal)',
+                    'instructions' => 'Used on light backgrounds anywhere in the site (e.g. the header top bar). Falls back to the theme default if left empty.',
+                    'return_format' => 'array',
+                ])
+                ->addImage('logo_white', [
+                    'label' => 'Logo (white)',
+                    'instructions' => 'Used on dark backgrounds anywhere in the site (e.g. the blue footer). Falls back to the theme default if left empty.',
+                    'return_format' => 'array',
+                ])
+            ->addTab('header', [
+                'label' => 'Header',
+            ])
+                ->addLink('cta', [
+                    'label' => 'CTA button',
+                    'instructions' => 'Shown in the header top row (e.g. "Plan a cycling route"). Leave empty to hide the button.',
+                ])
+                ->addLink('cta_mobile', [
+                    'label' => 'CTA button (mobile)',
+                    'instructions' => 'Shorter link/text for mobile, where the desktop CTA text may not fit. Leave empty to reuse the desktop CTA button above on mobile too.',
+                ])
+            ->addTab('social', [
+                'label' => 'Social',
+            ])
+                ->addUrl('facebook_url', [
+                    'label' => 'Facebook',
+                ])
+                ->addUrl('instagram_url', [
+                    'label' => 'Instagram',
+                ])
+                ->addUrl('x_url', [
+                    'label' => 'X (Twitter)',
+                ])
+                ->addUrl('linkedin_url', [
+                    'label' => 'LinkedIn',
+                ])
+                ->addUrl('youtube_url', [
+                    'label' => 'YouTube',
+                ])
+                ->addUrl('tiktok_url', [
+                    'label' => 'TikTok',
+                ])
+            ->addTab('footer', [
+                'label' => 'Footer',
+            ])
+                ->addText('official_site', [
+                    'label' => 'Official cycling website',
+                    'instructions' => 'Shown in the footer bottom bar, e.g. "Official cycling website for Bristol, Bath & NE Somerset, North Somerset and South Gloucestershire". Leave empty to fall back to the site tagline.',
+                ])
             ->addRepeater('legal_links', [
                 'label' => 'Legal Links',
                 'instructions' => 'Links shown in the footer legal row (e.g. Privacy Policy, Terms).',
@@ -49,7 +101,15 @@ class ThemeOptions extends Field
                     'label' => 'URL',
                     'required' => true,
                 ])
-            ->endRepeater();
+            ->endRepeater()
+            ->addTab('integrations', [
+                'label' => 'Integrations',
+            ])
+                ->addText('google_maps_api_key', [
+                    'label' => 'Google Maps API key',
+                    'instructions' => 'Places API key, used by the Journey Planner Widget block for address autocomplete.',
+                ])
+        ;
 
         return $fields->build();
     }

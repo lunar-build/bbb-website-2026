@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -136,7 +137,7 @@ class VideoHero extends Block
      *
      * @var array
      */
-    public $styles = ['light', 'dark'];
+    public $styles = [];
 
     /**
      * The block preview example data.
@@ -152,6 +153,19 @@ class VideoHero extends Block
         'cta_button_text' => 'Plan a route',
         'cta_button_url' => 'https://cycleplanner.betterbybike.info',
     ];
+
+    /**
+     * Merge computed placeholder asset URLs into the block preview example data.
+     *
+     * @return array
+     */
+    public function example(): array
+    {
+        return [
+            'video' => ['url' => Vite::asset('resources/videos/placeholder/pattern-placeholder.mp4')],
+            'poster' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')],
+        ];
+    }
 
     /**
      * Data to be passed to the block before rendering.
@@ -228,7 +242,7 @@ class VideoHero extends Block
      */
     public function video()
     {
-        return get_field('video');
+        return get_field('video') ?: ($this->example['video'] ?? null);
     }
 
     /**
@@ -238,7 +252,7 @@ class VideoHero extends Block
      */
     public function poster()
     {
-        return get_field('poster');
+        return get_field('poster') ?: ($this->example['poster'] ?? null);
     }
 
     /**

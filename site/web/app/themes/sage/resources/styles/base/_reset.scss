@@ -1,0 +1,89 @@
+// Modern CSS reset, adapted from Andy Bell's https://piccalil.li/blog/a-more-modern-css-reset/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  hanging-punctuation: first last;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+// Sticky footer: #app stretches to fill the viewport so .footer always
+// sits at the bottom, even when page content is short.
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1 0 auto;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+// role="list" keeps list semantics for VoiceOver/Safari when list-style
+// is removed. Scoped to [role='list'] so real content lists keep their
+// indent. :where() keeps this at zero specificity so components can
+// always override it.
+:where(ul[role='list'], ol[role='list']) {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+  color: currentColor;
+}
+
+// Neutralises the browser's a:visited colour everywhere; :where() keeps
+// it overridable by any component.
+:where(a, a:visited) {
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
