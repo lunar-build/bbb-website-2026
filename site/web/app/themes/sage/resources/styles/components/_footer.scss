@@ -1,0 +1,177 @@
+@use '../abstracts/breakpoints' as bp;
+
+.c-footer {
+  color: var(--wp--preset--color--white);
+}
+
+.c-footer-top {
+  padding-block: 2.5rem;
+  background: var(--wp--preset--color--blue-medium);
+
+  @include bp.respond($min: bp.$sm) {
+    padding-block: 2.75rem;
+  }
+}
+
+.c-footer-top__row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+
+  @include bp.respond($min: bp.$sm) {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+}
+
+.c-footer-top__row--1 {
+  @include bp.respond($min: bp.$sm) {
+    align-items: center;
+  }
+}
+
+.c-footer-top__row--2 {
+  margin-top: 2.5rem;
+}
+
+.c-footer-top__logo {
+  display: inline-flex;
+  flex: none;
+}
+
+// Figma: 175x47 at both mobile and desktop.
+.c-logo--footer svg,
+.c-logo--footer img {
+  display: block;
+  width: 175px;
+  height: 47px;
+}
+
+.c-footer-social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  gap: 0.5rem;
+
+  @include bp.respond($min: bp.$sm) {
+    align-items: flex-end;
+  }
+}
+
+.c-footer-social__icons {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+
+  @include bp.respond($min: bp.$sm) {
+    gap: 1.5rem;
+  }
+}
+
+.c-footer-social__icon {
+  display: inline-flex;
+  color: var(--wp--preset--color--white);
+
+  svg {
+    // Figma: 32px icons on mobile, 20px on desktop.
+    width: 32px;
+    height: 32px;
+
+    @include bp.respond($min: bp.$sm) {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.c-footer-social__hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+  font-size: var(--wp--preset--font-size--body);
+  font-weight: 700;
+
+  @include bp.respond($min: bp.$sm) {
+    justify-content: flex-end;
+  }
+}
+
+.c-footer-links {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  // Odd link group out (col3) spans full width on its own row rather than
+  // sharing a column with col1 — matches the mobile Figma layout.
+  grid-template-areas:
+    'col1 col2'
+    'col3 col3';
+  gap: 1rem 1.5rem;
+
+  @include bp.respond($min: bp.$sm) {
+    width: auto;
+    grid-template-columns: repeat(3, auto);
+    grid-template-areas: 'col1 col2 col3';
+    gap: 1rem 3rem;
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &:nth-child(1) {
+      grid-area: col1;
+    }
+
+    &:nth-child(2) {
+      grid-area: col2;
+    }
+
+    &:nth-child(3) {
+      grid-area: col3;
+    }
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--wp--preset--color--white);
+    font-weight: 700;
+    text-decoration: none;
+
+    svg {
+      flex: none;
+      width: 16px;
+      height: 10px;
+    }
+
+    @include bp.respond($min: bp.$sm) {
+      white-space: nowrap;
+    }
+  }
+}
+
+.c-footer-bottom {
+  padding-block: 1.75rem;
+  background: var(--wp--preset--color--blue-dark);
+  text-align: center;
+}
+
+.c-footer-bottom__copyright {
+  font-weight: 700;
+}
+
+.c-footer-bottom__tagline {
+  margin-top: 0.75rem;
+
+  @include bp.respond($min: bp.$sm) {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+}

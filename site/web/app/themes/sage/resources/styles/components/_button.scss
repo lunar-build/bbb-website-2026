@@ -1,12 +1,10 @@
+@use '../base/focus' as focus;
+
 // Site buttons only ever use variant="brand"|"neutral" appearance="accent" pill,
 // with a c-icon--arrow-right in the `end` slot. WA's "filled" appearance uses the
 // soft -fill-normal/-on-normal tokens (a light tint); "accent" is the one that
 // uses -fill-loud/-on-loud, which is what our brand-token override in
 // base/_wa-theme.scss targets for a solid, bold CTA look.
-// The fill color never changes across states: static = solid fill, hover = same
-// solid fill but the arrow extends (see below), focus = same solid fill plus an
-// inset ring sitting inside the pill (outline-offset negative keeps it within the
-// solid area rather than floating outside it).
 
 wa-button::part(label) {
   font-family: var(--wp--preset--font-family--anonymous-pro);
@@ -16,14 +14,12 @@ wa-button::part(label) {
   letter-spacing: 0.02em;
 }
 
-wa-button[variant='brand']::part(button):focus-visible {
-  outline: 2px solid var(--wp--preset--color--blue-dark);
-  outline-offset: -6px;
+wa-button[variant='brand'][appearance='accent']::part(button) {
+  border: 2px solid var(--wp--preset--color--charcoal);
 }
 
-wa-button[variant='neutral']::part(button):focus-visible {
-  outline: 2px solid var(--wp--preset--color--white);
-  outline-offset: -6px;
+wa-button::part(button) {
+  @include focus.ring;
 }
 
 wa-button .c-icon--arrow-right {
@@ -37,12 +33,6 @@ wa-button .c-icon--arrow-right {
     overflow: visible;
   }
 
-  // Single continuous path (tail anchored at x=1) so it always reads as one
-  // shape. Its `d` transitions to a version with the same command structure
-  // but a longer shaft + head shifted further right, so the shaft grows and
-  // the arrowhead moves outward together, not just the icon sliding. Growth
-  // extends past the 22px viewBox on purpose (overflow: visible above).
-  // Arrowhead is sized to roughly match the button label's cap-height.
   .c-icon__arrow {
     transition: d 0.15s ease;
   }

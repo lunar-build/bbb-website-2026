@@ -1,3 +1,5 @@
+@use '../base/focus' as focus;
+
 // Base styling for every native form control site-wide — plain element
 // selectors, not component classes, so this also styles markup our Blade
 // components never touch (Gravity Forms' own rendered fields, any other
@@ -40,10 +42,7 @@ textarea {
     color: var(--wp--preset--color--place-holder-grey) !important;
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--blue) !important;
-    outline-offset: -4px !important;
-  }
+  @include focus.ring;
 }
 
 textarea {
@@ -62,10 +61,7 @@ input[type='checkbox'] {
   height: 18px !important;
   margin: 0 !important;
 
-  &:focus-visible {
-    outline: 2px solid var(--wp--preset--color--blue) !important;
-    outline-offset: 2px !important;
-  }
+  @include focus.ring;
 }
 
 input[type='radio'] {

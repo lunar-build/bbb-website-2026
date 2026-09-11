@@ -1,0 +1,158 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+
+.c-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 1rem;
+}
+
+.c-header-top__logo {
+  flex: none; // prevents the flex row shrinking the logo below its set size
+
+  @include focus.ring;
+}
+
+.c-logo {
+  display: inline-flex;
+
+  svg,
+  img {
+    display: block;
+    // Figma: mobile 89x24, desktop 175x47
+    width: 89px;
+    height: 24px;
+
+    @include bp.respond($min: bp.$sm) {
+      width: 175px;
+      height: 47px;
+    }
+  }
+}
+
+.c-header-actions {
+  display: flex;
+  align-items: center;
+
+  &--desktop {
+    display: none;
+
+    @include bp.respond($min: bp.$sm) {
+      display: flex;
+      gap: 1.5rem;
+    }
+  }
+
+  &--mobile {
+    display: flex;
+
+    @include bp.respond($min: bp.$sm) {
+      display: none;
+    }
+  }
+
+  &__social {
+    display: inline-flex;
+    color: var(--wp--preset--color--charcoal);
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    @include focus.ring;
+  }
+}
+
+// Figma CtaSmall — smaller pill than the desktop CTA
+.c-header-cta--small {
+  &::part(button) {
+    height: 40px;
+    padding-block: 10px;
+    padding-inline: 16px;
+  }
+
+  &::part(label) {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .c-icon--arrow-right svg {
+    width: 15.586px;
+    height: 12px;
+  }
+}
+
+.c-header-search-toggle,
+.c-header-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--wp--preset--color--charcoal);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  @include focus.ring;
+}
+
+.c-header-search-toggle {
+  &__icon-close {
+    display: none;
+  }
+
+  &[aria-expanded='true'] {
+    .c-header-search-toggle__icon-search {
+      display: none;
+    }
+
+    .c-header-search-toggle__icon-close {
+      display: inline-flex;
+    }
+  }
+}
+
+.c-header-menu-toggle {
+  &__icon-close {
+    display: none;
+  }
+
+  &[aria-expanded='true'] {
+    .c-header-menu-toggle__icon-menu {
+      display: none;
+    }
+
+    .c-header-menu-toggle__icon-close {
+      display: inline-flex;
+    }
+  }
+}
+
+// Figma "Mobile | Search" — full-bleed band, .c-input owns the field styling
+.c-header-search {
+  display: none;
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  background: var(--wp--preset--color--lightest-grey);
+  padding: 1rem 0;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+
+  &:not([hidden]) {
+    display: block;
+  }
+
+  @include bp.respond($min: bp.$sm) {
+    display: none !important;
+  }
+}
