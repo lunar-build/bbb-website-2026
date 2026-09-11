@@ -12,10 +12,7 @@
 }
 
 .c-input__label {
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: var(--wp--preset--font-size--input-label);
-  line-height: 26px;
+  @extend .u-input-label;
   color: var(--wp--preset--color--charcoal);
 }
 

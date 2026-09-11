@@ -14,11 +14,8 @@
 }
 
 wa-breadcrumb-item {
+  @extend .u-cta-large;
   color: var(--c-breadcrumbs-color);
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 30px;
   letter-spacing: 0.4px;
 }
 

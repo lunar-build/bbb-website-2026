@@ -7,10 +7,7 @@
 // base/_wa-theme.scss targets for a solid, bold CTA look.
 
 wa-button::part(label) {
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: var(--wp--preset--font-size--button-label);
-  line-height: 30px;
+  @extend .u-cta-large;
   letter-spacing: 0.02em;
 }
 
