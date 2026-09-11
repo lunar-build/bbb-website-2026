@@ -30,7 +30,7 @@ document.querySelectorAll('[data-video-hero]').forEach((wrapper) => {
   // Unknown duration (metadata not loaded yet) defaults to "show the
   // control" — safer than briefly hiding a required pause affordance.
   video.addEventListener('loadedmetadata', () => {
-    toggle.hidden = video.duration <= 5;
+toggle.hidden = false;
   });
 
   toggle.addEventListener('click', () => {
