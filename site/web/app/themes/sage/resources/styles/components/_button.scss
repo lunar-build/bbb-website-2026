@@ -1,4 +1,5 @@
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Site buttons only ever use variant="brand"|"neutral" appearance="accent" pill,
 // with a c-icon--arrow-right in the `end` slot. WA's "filled" appearance uses the
@@ -7,10 +8,7 @@
 // base/_wa-theme.scss targets for a solid, bold CTA look.
 
 wa-button::part(label) {
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: var(--wp--preset--font-size--button-label);
-  line-height: 30px;
+  @extend .u-cta-large;
   letter-spacing: 0.02em;
 }
 

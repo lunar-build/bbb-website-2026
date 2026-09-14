@@ -109,6 +109,53 @@
           "slug": "button-label",
           "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
           "name": "Button label"
+        },
+        { "slug": "body-regular", "size": "14px", "name": "Body regular" },
+        { "slug": "cta-small", "size": "14px", "name": "CTA small" },
+        {
+          "slug": "input-placeholder",
+          "size": "14px",
+          "name": "Input placeholder"
+        },
+        { "slug": "card-date", "size": "18px", "name": "Card date" },
+        {
+          "slug": "card-title-small",
+          "size": "16px",
+          "name": "Card title small"
+        },
+        {
+          "slug": "short-form-link",
+          "size": "24px",
+          "name": "Short form link"
+        },
+        { "slug": "quote", "size": "30px", "name": "Quote" },
+        {
+          "slug": "quote-citation",
+          "size": "20px",
+          "name": "Quote citation"
+        },
+        { "slug": "nav-link", "size": "16px", "name": "Nav link" },
+        { "slug": "nav-sublink", "size": "14px", "name": "Nav sublink" },
+        {
+          "slug": "mobile-menu-link",
+          "size": "16px",
+          "name": "Mobile menu link"
+        },
+        {
+          "slug": "mobile-menu-sublink",
+          "size": "14px",
+          "name": "Mobile menu sublink"
+        },
+        { "slug": "footer-link", "size": "16px", "name": "Footer link" },
+        {
+          "slug": "table-column-heading",
+          "size": "20px",
+          "name": "Table column heading"
+        },
+        {
+          "slug": "table-cell-heading",
+          "size": "16px",
+          "name": "Table cell heading"
         }
       ]
     }

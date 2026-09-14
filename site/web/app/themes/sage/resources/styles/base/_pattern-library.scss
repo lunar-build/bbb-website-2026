@@ -1,3 +1,5 @@
+@use 'typography';
+
 // Styles for the auto-generated block pattern library
 // (resources/views/template-pattern-library.blade.php). New blocks need no
 // styling here — this only frames each entry and the nav, the block itself
@@ -88,12 +90,10 @@
   margin-block-end: 1rem;
 
   h2 {
+    @extend .u-heading-4;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: var(--wp--preset--font-size--heading-4);
-    line-height: 34px;
-    font-weight: 700;
 
     .dashicons,
     svg {
