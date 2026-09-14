@@ -1,3 +1,5 @@
+@use '../base/typography';
+
 // Layout/label extras for the `<x-radio>` and `<x-checkbox>` Blade
 // components (resources/views/components/{radio,checkbox}.blade.php). The
 // actual control styling (circle/square, border, checked-state fill) is a

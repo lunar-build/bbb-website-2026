@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
 // sibling of <lunar-site-header> in header.blade.php, deliberately NOT

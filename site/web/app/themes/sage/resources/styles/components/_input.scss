@@ -1,4 +1,5 @@
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Field styling (border, pill, focus ring) is a global element rule in
 // base/_forms.scss, so it also applies to third-party fields (GF etc) —

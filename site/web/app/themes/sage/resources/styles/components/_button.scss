@@ -1,4 +1,5 @@
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Site buttons only ever use variant="brand"|"neutral" appearance="accent" pill,
 // with a c-icon--arrow-right in the `end` slot. WA's "filled" appearance uses the
