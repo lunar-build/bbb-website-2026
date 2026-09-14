@@ -211,8 +211,8 @@ class CardRow extends Block
                 ],
             ],
             'area_links' => [
-                ['title' => 'Bristol Cycle Routes', 'url' => '#', 'target' => ''],
-                ['title' => 'Bath & NE Somerset Cycle Routes', 'url' => '#', 'target' => ''],
+                ['link' => ['title' => 'Bristol Cycle Routes', 'url' => '#', 'target' => '']],
+                ['link' => ['title' => 'Bath & NE Somerset Cycle Routes', 'url' => '#', 'target' => '']],
             ],
             'browse_all_link' => ['title' => 'Plan your own route', 'url' => '#', 'target' => ''],
         ],
