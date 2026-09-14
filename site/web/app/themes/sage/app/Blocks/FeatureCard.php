@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -26,14 +27,14 @@ class FeatureCard extends Block
      *
      * @var string
      */
-    public $description = 'A flexible image card for events, news listings, partner logos, and stat/route summaries.';
+    public $description = 'A flexible image card for events, news listings, and partner logos/links.';
 
     /**
      * The block category.
      *
      * @var string
      */
-    public $category = 'text';
+    public $category = 'cards';
 
     /**
      * The block icon.
@@ -152,6 +153,7 @@ class FeatureCard extends Block
      */
     public $example = [
         'card_style' => 'link',
+        'cta_style' => 'icon',
         'link' => [
             'title' => 'Get involved',
             'url' => 'https://betterbybike.info/get-involved/',
@@ -162,15 +164,30 @@ class FeatureCard extends Block
     /**
      * Style variants to render stacked on the pattern-library page (see
      * App\View\Composers\PatternLibrary::render()) — each entry is merged
-     * onto $example above, so only needs to override what differs.
+     * onto $example above, so only needs to override what differs. Matches
+     * the four "Image and content card" instances in Figma (node 9-3214):
+     * Link with picture, Bikeability, Event card, News card.
      *
      * @var array
      */
     public $examples = [
         'Link' => [],
-        'Event' => ['card_style' => 'event'],
-        'News' => ['card_style' => 'news'],
+        'Bikeability' => ['card_style' => 'bikeability', 'cta_style' => 'button'],
+        'Event' => ['card_style' => 'event', 'cta_style' => 'button', 'date' => '2nd July 2026'],
+        'News' => ['card_style' => 'news', 'cta_style' => 'button', 'date' => '12th June 2026'],
     ];
+
+    /**
+     * Fallback example data requiring a non-constant expression (Vite::asset).
+     *
+     * @return array
+     */
+    public function example(): array
+    {
+        return [
+            'image' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')],
+        ];
+    }
 
     /**
      * The block template.
@@ -199,7 +216,6 @@ class FeatureCard extends Block
             'cardStyle' => $this->cardStyle(),
             'image' => $this->image(),
             'date' => $this->date(),
-            'stats' => $this->stats(),
             'link' => $this->link(),
             'ctaStyle' => $this->ctaStyle(),
         ];
@@ -216,11 +232,12 @@ class FeatureCard extends Block
             ->addTab('Style')
                 ->addSelect('card_style', [
                     'label' => 'Card style',
-                    'instructions' => 'Visual treatment matching the Figma card variant this content represents.',
+                    'instructions' => 'Visual treatment matching the Figma "Image and content card" variant this content represents.',
                     'choices' => [
-                        'link' => 'Link (white background, e.g. links, Bikeability)',
-                        'event' => 'Event (white background, date shown)',
-                        'news' => 'News (grey background, smaller heading)',
+                        'link' => 'Link with picture (arrow-only CTA, no date)',
+                        'bikeability' => 'Bikeability (button CTA, no date — e.g. partner logos)',
+                        'event' => 'Event card (button CTA, date shown)',
+                        'news' => 'News card (button CTA, date shown, no body copy)',
                     ],
                     'default_value' => 'link',
                     'ui' => true,
@@ -236,54 +253,26 @@ class FeatureCard extends Block
             ->addTab('Content')
                 ->addDatePicker('date', [
                     'label' => 'Date',
-                    'instructions' => 'Optional. Leave blank to hide (e.g. for partner/route cards).',
+                    'instructions' => 'Shown above the heading on Event and News styles.',
                     'display_format' => 'jS F Y',
                     'return_format' => 'jS F Y',
-                ])
-            ->addTab('Stats')
-                ->addRepeater('stats', [
-                    'label' => 'Stats',
-                    'instructions' => 'Optional label/value rows (e.g. Difficulty, Time needed, Distance). Leave empty to omit.',
-                    'button_label' => 'Add stat',
-                    'min' => 0,
-                    'layout' => 'block',
-                ])
-                    ->addText('label', [
-                        'label' => 'Label',
-                        'required' => 1,
-                    ])
-                    ->addText('value', [
-                        'label' => 'Value',
-                        'required' => 1,
-                    ])
-                    ->addTrueFalse('show_as_pill', [
-                        'label' => 'Show as pill',
-                        'instructions' => 'Renders the value as a coloured wa-badge instead of plain text.',
-                        'ui' => 1,
-                        'default_value' => 0,
-                    ])
-                    ->addSelect('pill_variant', [
-                        'label' => 'Pill colour',
-                        'instructions' => 'Maps to a wa-badge variant.',
-                        'choices' => [
-                            'success' => 'Success (green) — e.g. Easy',
-                            'warning' => 'Warning (amber) — e.g. Moderate',
-                            'danger' => 'Danger (red)',
-                            'neutral' => 'Neutral (grey)',
-                            'brand' => 'Brand',
-                        ],
-                        'default_value' => 'success',
-                        'conditional_logic' => [
+                    'conditional_logic' => [
+                        [
                             [
-                                [
-                                    'field' => 'show_as_pill',
-                                    'operator' => '==',
-                                    'value' => '1',
-                                ],
+                                'field' => 'card_style',
+                                'operator' => '==',
+                                'value' => 'event',
                             ],
                         ],
-                    ])
-                ->endRepeater()
+                        [
+                            [
+                                'field' => 'card_style',
+                                'operator' => '==',
+                                'value' => 'news',
+                            ],
+                        ],
+                    ],
+                ])
             ->addTab('Call to Action')
                 ->addLink('link', [
                     'label' => 'Link',
@@ -291,9 +280,9 @@ class FeatureCard extends Block
                 ])
                 ->addSelect('cta_style', [
                     'label' => 'CTA style',
-                    'instructions' => 'How the link is presented. Ignored if the Link field above is empty.',
+                    'instructions' => 'How the link is presented. Ignored if the Link field above is empty. Figma pairs "Link with picture" with an arrow-only CTA, and Bikeability/Event/News with a button.',
                     'choices' => [
-                        'button' => 'Full button (visible label)',
+                        'button' => 'Button (filled pill, visible label)',
                         'icon' => 'Icon only (arrow, no label)',
                         'none' => 'No visible CTA — card is still fully clickable via Link',
                     ],
@@ -320,7 +309,7 @@ class FeatureCard extends Block
      */
     public function image()
     {
-        return get_field('image');
+        return get_field('image') ?: $this->example['image'];
     }
 
     /**
@@ -330,17 +319,7 @@ class FeatureCard extends Block
      */
     public function date()
     {
-        return get_field('date') ?: null;
-    }
-
-    /**
-     * Retrieve the stats.
-     *
-     * @return array
-     */
-    public function stats()
-    {
-        return get_field('stats') ?: [];
+        return get_field('date') ?: ($this->example['date'] ?? null);
     }
 
     /**
@@ -360,7 +339,7 @@ class FeatureCard extends Block
      */
     public function ctaStyle()
     {
-        return get_field('cta_style') ?: 'button';
+        return get_field('cta_style') ?: ($this->example['cta_style'] ?? 'button');
     }
 
     /**

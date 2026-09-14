@@ -26,7 +26,10 @@
 
           <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
           <span class="c-card-row__news-title">{{ $card['title'] }}</span>
-          <span class="c-card-row__news-cta">{{ $card['link']['title'] }}</span>
+          <span class="c-card-row__news-cta">
+            {{ $card['link']['title'] }}
+            <x-icon name="arrow-right" />
+          </span>
         </a>
       @endforeach
     @elseif ($type === 'route')

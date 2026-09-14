@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -33,7 +34,7 @@ class CycleRouteCard extends Block
      *
      * @var string
      */
-    public $category = 'text';
+    public $category = 'cards';
 
     /**
      * The block icon.
@@ -163,6 +164,18 @@ class CycleRouteCard extends Block
     ];
 
     /**
+     * Fallback example data requiring a non-constant expression (Vite::asset).
+     *
+     * @return array
+     */
+    public function example(): array
+    {
+        return [
+            'image' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')],
+        ];
+    }
+
+    /**
      * Difficulty variants to render stacked on the pattern-library page (see
      * App\View\Composers\PatternLibrary::render()) — each entry is merged
      * onto $example above, so only needs to override what differs.
@@ -263,7 +276,7 @@ class CycleRouteCard extends Block
      */
     public function image()
     {
-        return get_field('image');
+        return get_field('image') ?: $this->example['image'];
     }
 
     /**

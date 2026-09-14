@@ -1,31 +1,21 @@
-{{-- The card-style modifier lives on <wa-card> below, not this <section>
-     — the <section> is skipped when $block->preview is true (both the real
-     Gutenberg editor preview and the pattern-library page render with
-     preview=true), which would make every card-style rule invisible on
-     /pattern-library if it depended on this wrapper (see CtaBanner's own
-     note on the same $block->preview quirk). --}}
+{{-- The card-style modifier lives on the .c-feature-card__card div below,
+     not this <section> — the <section> is skipped when $block->preview is
+     true (both the real Gutenberg editor preview and the pattern-library
+     page render with preview=true), which would make every card-style rule
+     invisible on /pattern-library if it depended on this wrapper (see
+     CtaBanner's own note on the same $block->preview quirk). --}}
 @unless ($block->preview)
   <section {{ $attributes->class(['c-feature-card']) }}>
 @endunless
 
 <div class="o-container">
-<wa-card
-  class="c-feature-card__card c-feature-card--{{ $cardStyle }}"
-  appearance="outlined"
-  with-media
-  @if ((! empty($link['url']) && $ctaStyle !== 'none') || ! empty($stats) || $date) with-footer @endif
->
-  @if ($image)
-    <img slot="media" class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
-  @elseif ($block->preview)
-    <div slot="media" class="c-feature-card__placeholder">
-      {{ __('Add an image…', 'sage') }}
-    </div>
-  @endif
+<div class="c-feature-card__card c-feature-card--{{ $cardStyle }}">
+  <img class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
 
   {{-- Stretched-link overlay: makes the whole card clickable without nesting an
-       anchor around the visible CTA below (invalid HTML). Sits behind the CTA via
-       z-index/position stacking in SCSS; the CTA stays independently focusable. --}}
+       anchor around the visible CTA below (invalid HTML). The CTA below is
+       purely decorative (aria-hidden + tabindex="-1", pointer-events:none via
+       _button.scss) — this is the only real, focusable link in the card. --}}
   @if (! empty($link['url']))
     <a
       class="c-feature-card__stretched-link"
@@ -44,38 +34,33 @@
       <InnerBlocks template="{{ $block->template }}" />
     </div>
 
-    @if (! empty($stats))
-      <ul class="c-feature-card__stats">
-        @foreach ($stats as $stat)
-          <li class="c-feature-card__stat">
-            <span class="c-feature-card__stat-label">{{ $stat['label'] }}</span>
-            @if (! empty($stat['show_as_pill']))
-              <wa-badge class="c-feature-card__stat-value" variant="{{ $stat['pill_variant'] ?: 'neutral' }}" appearance="filled" pill>
-                {{ $stat['value'] }}
-              </wa-badge>
-            @else
-              <span class="c-feature-card__stat-value">{{ $stat['value'] }}</span>
-            @endif
-          </li>
-        @endforeach
-      </ul>
+    @if (! empty($link['url']) && $ctaStyle !== 'none')
+      <div class="c-feature-card__footer">
+        @if ($ctaStyle === 'icon')
+          <span class="c-feature-card__cta-icon" aria-hidden="true">
+            <x-icon name="arrow-right" />
+          </span>
+        @else
+          {{-- The actual Button component (see resources/styles/components/_button.scss),
+               marked decorative since the card itself — not this button — is the real link. --}}
+          <wa-button
+            class="c-feature-card__cta"
+            variant="neutral"
+            appearance="accent"
+            size="small"
+            pill
+            with-end
+            tabindex="-1"
+            aria-hidden="true"
+          >
+            {{ $link['title'] ?: __('Find out more', 'sage') }}
+            <x-icon name="arrow-right" slot="end" />
+          </wa-button>
+        @endif
+      </div>
     @endif
   </div>
-
-  @if (! empty($link['url']) && $ctaStyle !== 'none')
-    <div slot="footer" class="c-feature-card__footer">
-      @if ($ctaStyle === 'icon')
-        <span class="c-feature-card__cta-icon" aria-hidden="true">
-          <wa-icon name="arrow-right"></wa-icon>
-        </span>
-      @else
-        <span class="c-feature-card__cta" aria-hidden="true">
-          {{ $link['title'] ?: __('Find out more', 'sage') }}
-        </span>
-      @endif
-    </div>
-  @endif
-</wa-card>
+</div>
 </div>
 
 @unless ($block->preview)

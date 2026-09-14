@@ -33,7 +33,7 @@ class FilterResultCard extends Block
      *
      * @var string
      */
-    public $category = 'text';
+    public $category = 'cards';
 
     /**
      * The block icon.
@@ -284,13 +284,37 @@ class FilterResultCard extends Block
     }
 
     /**
-     * Retrieve the contact info rows.
+     * Retrieve the contact info rows, each augmented with an `href` so
+     * phone/email/address/website rows are directly actionable (tap to
+     * call, open the default mail client, open in Maps, or open the site)
+     * rather than just being static text.
      *
      * @return array
      */
     public function contactInfo()
     {
-        return get_field('contact_info') ?: $this->example['contact_info'];
+        $rows = get_field('contact_info') ?: $this->example['contact_info'];
+
+        return array_map(fn ($row) => $row + ['href' => $this->contactHref($row['icon'], $row['text'])], $rows);
+    }
+
+    /**
+     * Build the tap/click-through URL for a contact info row based on its
+     * icon type.
+     *
+     * @param  string  $icon
+     * @param  string  $text
+     * @return string|null
+     */
+    protected function contactHref($icon, $text)
+    {
+        return match ($icon) {
+            'phone' => 'tel:'.preg_replace('/[^0-9+]/', '', $text),
+            'envelope' => 'mailto:'.trim($text),
+            'location-dot' => 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($text),
+            'globe' => preg_match('#^https?://#i', $text) ? $text : 'https://'.$text,
+            default => null,
+        };
     }
 
     /**

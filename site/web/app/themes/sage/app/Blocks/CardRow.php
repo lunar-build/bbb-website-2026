@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -33,7 +34,7 @@ class CardRow extends Block
      *
      * @var string
      */
-    public $category = 'text';
+    public $category = 'cards';
 
     /**
      * The block icon.
@@ -498,7 +499,7 @@ class CardRow extends Block
      */
     public function newsCards()
     {
-        return get_field('news_cards') ?: ($this->example['news_cards'] ?? []);
+        return $this->normalizeCards(get_field('news_cards') ?: ($this->example['news_cards'] ?? []));
     }
 
     /**
@@ -508,7 +509,7 @@ class CardRow extends Block
      */
     public function routeCards()
     {
-        return get_field('route_cards') ?: ($this->example['route_cards'] ?? []);
+        return $this->normalizeCards(get_field('route_cards') ?: ($this->example['route_cards'] ?? []));
     }
 
     /**
@@ -518,7 +519,53 @@ class CardRow extends Block
      */
     public function linkCards()
     {
-        return get_field('link_cards') ?: ($this->example['link_cards'] ?? []);
+        return $this->normalizeCards(get_field('link_cards') ?: ($this->example['link_cards'] ?? []));
+    }
+
+    /**
+     * Fill in a placeholder image, and a safe `link` shape, for any row
+     * missing one — both the fixture data's dead external URL, and a real
+     * row with incomplete data: ACF's image field returns `false` (not an
+     * array) when unset, and a `link` sub-field can come back as a plain
+     * string on legacy/incomplete rows, so `$card['image']['url']` or
+     * `$card['link']['target']` would otherwise fatal on a real saved post.
+     *
+     * @param  array  $cards
+     * @return array
+     */
+    protected function normalizeCards(array $cards)
+    {
+        $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
+
+        return array_map(function ($card) use ($placeholder) {
+            $image = is_array($card['image'] ?? null) ? $card['image'] : [];
+
+            if (empty($image['url'])) {
+                $image = ['url' => $placeholder, 'alt' => $image['alt'] ?? ''];
+            }
+
+            $card['image'] = $image;
+            $card['link'] = $this->normalizeLink($card['link'] ?? null);
+
+            return $card;
+        }, $cards);
+    }
+
+    /**
+     * Coerce a `link` field value to its expected shape — ACF normally
+     * returns an array, but a legacy/incomplete row can store a plain
+     * string (or nothing at all), which would fatal on array access.
+     *
+     * @param  mixed  $link
+     * @return array
+     */
+    protected function normalizeLink($link)
+    {
+        if (is_array($link)) {
+            return $link + ['title' => '', 'url' => '#', 'target' => ''];
+        }
+
+        return ['title' => (string) $link, 'url' => '#', 'target' => ''];
     }
 
     /**
@@ -528,7 +575,9 @@ class CardRow extends Block
      */
     public function areaLinks()
     {
-        return get_field('area_links') ?: ($this->example['area_links'] ?? []);
+        $rows = get_field('area_links') ?: ($this->example['area_links'] ?? []);
+
+        return array_map(fn ($row) => ['link' => $this->normalizeLink($row['link'] ?? null)], $rows);
     }
 
     /**
@@ -538,7 +587,9 @@ class CardRow extends Block
      */
     public function browseAllLink()
     {
-        return get_field('browse_all_link') ?: ($this->type() !== 'link' ? ($this->example['browse_all_link'] ?? null) : null);
+        $link = get_field('browse_all_link') ?: ($this->type() !== 'link' ? ($this->example['browse_all_link'] ?? null) : null);
+
+        return $link ? $this->normalizeLink($link) : null;
     }
 
     /**

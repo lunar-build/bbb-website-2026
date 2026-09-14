@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -33,7 +34,7 @@ class ImageCard extends Block
      *
      * @var string
      */
-    public $category = 'text';
+    public $category = 'cards';
 
     /**
      * The block icon.
@@ -160,6 +161,18 @@ class ImageCard extends Block
             'target' => '',
         ],
     ];
+
+    /**
+     * Fallback example data requiring a non-constant expression (Vite::asset).
+     *
+     * @return array
+     */
+    public function example(): array
+    {
+        return [
+            'image' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''],
+        ];
+    }
 
     /**
      * Data to be passed to the block before rendering.

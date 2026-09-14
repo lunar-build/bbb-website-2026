@@ -1,45 +1,29 @@
+// Figma "Image and content card" (node 9-3214): white card, no border —
+// image (top corners rounded only) + a text block with a rule directly
+// under the heading. Four style variants share this shell: Link with
+// picture (arrow-only CTA), Bikeability, Event card and News card (button
+// CTA, the latter two adding a date above the heading).
 @use '../base/typography';
+@use '../components/button';
 
 .c-feature-card {
   &__card {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: relative; // containing block for the stretched-link overlay
-
-    &::part(base) {
-      background: var(--wp--preset--color--white);
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-      overflow: hidden; // clips the media's square corners to the card radius
-    }
-
-    &::part(media) {
-      display: block;
-    }
-
-    &::part(body) {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+    max-width: 443px;
+    border-radius: 12px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    overflow: hidden; // clips the image's square corners to the card radius
+    background: var(--wp--preset--color--white);
   }
 
   &__image {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 443 / 302;
     object-fit: cover;
-  }
-
-  &__placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 16 / 9;
-    background: #e5e5e5;
-    color: #737373;
-    text-align: center;
-    padding: 1rem;
+    border-radius: 12px 12px 0 0;
   }
 
   &__stretched-link {
@@ -51,65 +35,51 @@
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    flex: 1;
+    gap: 16px;
+    padding: 20px;
   }
 
   &__date {
+    @extend .u-card-date;
     margin: 0;
-    font-size: var(--wp--preset--font-size--card-date);
-    line-height: 24px;
-    font-weight: 700;
     color: var(--wp--preset--color--blue);
   }
 
   &__content {
     :where(h1, h2, h3, h4, h5, h6) {
-      margin: 0 0 0.25rem;
+      margin: 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--wp--preset--color--blue-medium);
       color: var(--wp--preset--color--blue);
     }
 
     p {
-      margin: 0 0 0.5rem;
+      @extend .u-body-regular;
+      margin: 0;
+      color: var(--wp--preset--color--blue-dark);
+
+      + p {
+        margin-top: 0.75rem;
+      }
     }
-  }
-
-  &__stats {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-  }
-
-  &__stat {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  &__stat-label {
-    font-weight: 600;
   }
 
   &__footer {
     display: flex;
     align-items: center;
-    position: relative;
-    z-index: 2; // sits above the stretched-link overlay
+    justify-content: flex-start;
+    margin-top: auto;
+    // No z-index here: the CTA below (a decorative <wa-button>, or the
+    // bare arrow icon) must NOT sit above __stretched-link — otherwise
+    // clicking it would be a dead zone on an otherwise whole-card link.
   }
 
+  // Styling/typography/colour come from the real Button component
+  // (_button.scss's `size="small"` rules) — this just positions it.
   &__cta {
-    @extend .u-cta-small;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 16px;
-    border: 2px solid var(--wp--preset--color--charcoal);
-    border-radius: 999px;
-    color: var(--wp--preset--color--charcoal);
+    align-self: flex-start;
+    flex: none;
   }
 
   &__cta-icon {
@@ -117,35 +87,39 @@
     align-items: center;
     justify-content: center;
     margin-left: auto;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 2px solid var(--wp--preset--color--charcoal);
-    border-radius: 50%;
-    color: var(--wp--preset--color--charcoal);
+    color: var(--wp--preset--color--blue);
+
+    svg {
+      width: 38px;
+      height: auto;
+    }
+  }
+
+  // The CTA can't rely on its own :hover/:focus-within — it's pointer-events:none
+  // (decorative <wa-button>) or a bare icon, since the card itself is the real
+  // link — so the arrow-morph animation is driven off the card being hovered
+  // instead. See components/_button.scss for the shared mixin/markup this matches.
+  &__card:is(:hover, :focus-within) &__cta,
+  &__card:is(:hover, :focus-within) &__cta-icon {
+    @include button.arrow-hover;
   }
 }
 
-// Event — Figma "Type=Event card": white background (base default), but
-// the heading sits below a blue __date and reads in blue-dark rather than
-// the default Link style's blue.
-.c-feature-card--event {
-  .c-feature-card__content :where(h1, h2, h3, h4, h5, h6) {
-    color: var(--wp--preset--color--blue-dark);
-  }
-}
-
-// News — Figma "Type=News card": grey card background, blue-dark heading
-// rendered at H5 size regardless of the InnerBlocks heading level chosen
-// (same "visual size independent of semantic level" approach as the
-// .u-heading-* utilities).
+// Event/News — Figma "Type=Event card"/"Type=News card": heading reads in
+// blue-dark (rather than the Link/Bikeability styles' blue) and sits below
+// a blue __date.
+.c-feature-card--event,
 .c-feature-card--news {
-  &.c-feature-card__card::part(base) {
-    background: var(--wp--preset--color--lightest-grey);
-  }
-
   .c-feature-card__content :where(h1, h2, h3, h4, h5, h6) {
     color: var(--wp--preset--color--blue-dark);
-    font-size: var(--wp--preset--font-size--heading-5);
-    line-height: 36px;
+  }
+}
+
+// News — Figma "Type=News card" (node 9-3294): the body content area (not
+// the image) sits on a lightest-grey fill, distinguishing it from the
+// white-bodied Link/Bikeability/Event styles.
+.c-feature-card--news {
+  .c-feature-card__body {
+    background: var(--wp--preset--color--lightest-grey);
   }
 }

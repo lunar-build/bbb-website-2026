@@ -1,6 +1,7 @@
 // Figma "Filter result card": no image, a business/service listing —
 // heading, contact info + services icon/text repeaters, description, CTA.
 @use '../base/typography';
+@use '../components/button';
 
 .c-filter-result-card {
   &__card {
@@ -56,6 +57,15 @@
     color: var(--wp--preset--color--blue-dark);
   }
 
+  &__contact-link {
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+
   &__service-text {
     @extend .u-filter-service-label;
     color: var(--wp--preset--color--charcoal);
@@ -86,5 +96,10 @@
     border-radius: 999px;
     color: var(--wp--preset--color--charcoal);
     text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      @include button.arrow-hover;
+    }
   }
 }

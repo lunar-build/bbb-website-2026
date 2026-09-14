@@ -13,7 +13,11 @@
         @foreach ($contactInfo as $row)
           <li class="c-filter-result-card__contact-item">
             <wa-icon name="{{ $row['icon'] }}" class="c-filter-result-card__icon"></wa-icon>
-            <span class="c-filter-result-card__contact-text">{{ $row['text'] }}</span>
+            @if ($row['href'])
+              <a class="c-filter-result-card__contact-text c-filter-result-card__contact-link" href="{{ $row['href'] }}" @if ($row['icon'] === 'location-dot' || $row['icon'] === 'globe') target="_blank" rel="noopener" @endif>{{ $row['text'] }}</a>
+            @else
+              <span class="c-filter-result-card__contact-text">{{ $row['text'] }}</span>
+            @endif
           </li>
         @endforeach
       </ul>

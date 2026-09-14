@@ -5,6 +5,7 @@
 // rather than duplicating that styling here.
 
 @use '../base/typography';
+@use '../components/button';
 
 .c-card-row {
   padding-block: 3rem;
@@ -58,6 +59,8 @@
 }
 
 .c-card-row__news-tag {
+  align-self: flex-start;
+  margin-inline-start: 18px;
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 500;
   font-size: var(--wp--preset--font-size--input-label);
@@ -79,10 +82,16 @@
   @extend .u-cta-small;
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   padding: 10px 16px;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   color: var(--wp--preset--color--charcoal);
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
 }
 
 // Link cards — Figma "Link card row": wider, centred text, grey background.
@@ -126,11 +135,17 @@
   @extend .u-cta-small;
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   padding: 10px 16px;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   color: var(--wp--preset--color--charcoal);
   text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
 }
 
 // Route type's extra "browse by area" quick-links panel.
@@ -152,6 +167,11 @@
   gap: 12px;
   color: var(--wp--preset--color--blue-dark);
   text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
 }
 
 .c-card-row__browse-all {
@@ -165,6 +185,11 @@
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
 }
 
 // News — "Latest news" reads as one continuous phrase in Figma (no two-tone

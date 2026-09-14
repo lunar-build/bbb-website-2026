@@ -1,5 +1,6 @@
 // Figma "Image card": image with a linked caption bar, no body copy.
 @use '../base/typography';
+@use '../components/button';
 
 .c-image-card {
   &__card {
@@ -10,6 +11,11 @@
     overflow: hidden;
     background: var(--wp--preset--color--white);
     text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      @include button.arrow-hover;
+    }
   }
 
   &__image {
