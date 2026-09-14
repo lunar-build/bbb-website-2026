@@ -1,0 +1,205 @@
+// Figma "News/Route/Link card row": a section heading + a row of cards,
+// with the individual card sub-style, extra content (area links), and
+// bottom CTA varying per `type`. Route's cards reuse .c-cycle-route-card__*
+// classes directly (see resources/styles/blocks/_cycle-route-card.scss)
+// rather than duplicating that styling here.
+
+.c-card-row {
+  padding-block: 3rem;
+}
+
+.c-card-row__heading {
+  text-align: center;
+  margin: 0 0 1rem;
+}
+
+.c-card-row__heading-highlight {
+  display: block;
+  color: var(--wp--preset--color--blue);
+}
+
+.c-card-row__intro {
+  max-width: 40rem;
+  margin: 0 auto 2rem;
+  text-align: center;
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-card-row__cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+// News cards — Figma "News card row": smaller/white/tag pill, no date.
+.c-card-row__news-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 305px;
+  padding-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  background: var(--wp--preset--color--white);
+  text-decoration: none;
+}
+
+.c-card-row__news-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 305 / 183;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+}
+
+.c-card-row__news-tag {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 500;
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 32px;
+  color: var(--wp--preset--color--charcoal);
+  border-top: 3px solid var(--wp--preset--color--yellow);
+  border-bottom: 3px solid var(--wp--preset--color--yellow);
+  padding-bottom: 3px;
+}
+
+.c-card-row__news-title {
+  @extend .u-news-row-card-title;
+  padding-inline: 18px;
+  color: var(--wp--preset--color--charcoal);
+  text-align: left;
+}
+
+.c-card-row__news-cta {
+  @extend .u-cta-small;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-radius: 999px;
+  color: var(--wp--preset--color--charcoal);
+}
+
+// Link cards — Figma "Link card row": wider, centred text, grey background.
+.c-card-row__link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 300px;
+  padding-bottom: 24px;
+  border-radius: 20px;
+  background: var(--wp--preset--color--lightest-grey);
+  text-align: center;
+}
+
+.c-card-row__link-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 300 / 180;
+  object-fit: cover;
+  border-radius: 20px 20px 0 0;
+}
+
+.c-card-row__link-title {
+  font-size: var(--wp--preset--font-size--heading-5);
+  line-height: 36px;
+  font-weight: 700;
+  color: var(--wp--preset--color--blue-medium);
+  padding-inline: 13px;
+}
+
+.c-card-row__link-body {
+  margin: 0;
+  padding-inline: 13px;
+  font-size: var(--wp--preset--font-size--body-regular);
+  line-height: 24px;
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-card-row__link-cta {
+  @extend .u-cta-small;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-radius: 999px;
+  color: var(--wp--preset--color--charcoal);
+  text-decoration: none;
+}
+
+// Route type's extra "browse by area" quick-links panel.
+.c-card-row__area-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem 3rem;
+  padding: 2rem;
+  border-radius: 20px;
+  background: var(--wp--preset--color--lightest-grey);
+  margin-bottom: 2rem;
+}
+
+.c-card-row__area-link {
+  @extend .u-short-form-link;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--wp--preset--color--blue-dark);
+  text-decoration: none;
+}
+
+.c-card-row__browse-all {
+  @extend .u-cta-large;
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 26px;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+// News — "Latest news" reads as one continuous phrase in Figma (no two-tone
+// split), so the highlight span just matches the rest of the heading.
+.c-card-row--news {
+  .c-card-row__heading-highlight {
+    display: inline;
+    color: inherit;
+  }
+
+  .c-card-row__heading {
+    color: var(--wp--preset--color--blue-dark);
+  }
+
+  .c-card-row__browse-all {
+    background: var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+  }
+}
+
+.c-card-row--route {
+  .c-card-row__heading {
+    color: var(--wp--preset--color--blue-dark);
+  }
+
+  .c-card-row__browse-all {
+    background: var(--wp--preset--color--charcoal);
+    color: var(--wp--preset--color--white);
+  }
+}
+
+.c-card-row--link {
+  .c-card-row__heading {
+    color: var(--wp--preset--color--blue-dark);
+  }
+
+  .c-card-row__heading-highlight {
+    color: var(--wp--preset--color--blue-medium);
+  }
+}

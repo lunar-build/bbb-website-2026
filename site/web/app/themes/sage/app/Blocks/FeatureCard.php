@@ -151,6 +151,7 @@ class FeatureCard extends Block
      * @var array
      */
     public $example = [
+        'card_style' => 'link',
         'link' => [
             'title' => 'Get involved',
             'url' => 'https://betterbybike.info/get-involved/',
@@ -159,12 +160,25 @@ class FeatureCard extends Block
     ];
 
     /**
+     * Style variants to render stacked on the pattern-library page (see
+     * App\View\Composers\PatternLibrary::render()) — each entry is merged
+     * onto $example above, so only needs to override what differs.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Link' => [],
+        'Event' => ['card_style' => 'event'],
+        'News' => ['card_style' => 'news'],
+    ];
+
+    /**
      * The block template.
      *
      * @var array
      */
     public $template = [
-        'core/heading' => ['placeholder' => 'Title', 'level' => 3],
+        'core/heading' => ['placeholder' => 'Title', 'level' => 4],
         'core/paragraph' => ['placeholder' => 'Body text (optional — delete for cards without body copy)…'],
     ];
 
@@ -182,6 +196,7 @@ class FeatureCard extends Block
     public function with(): array
     {
         return [
+            'cardStyle' => $this->cardStyle(),
             'image' => $this->image(),
             'date' => $this->date(),
             'stats' => $this->stats(),
@@ -198,6 +213,18 @@ class FeatureCard extends Block
         $fields = Builder::make('feature_card');
 
         $fields
+            ->addTab('Style')
+                ->addSelect('card_style', [
+                    'label' => 'Card style',
+                    'instructions' => 'Visual treatment matching the Figma card variant this content represents.',
+                    'choices' => [
+                        'link' => 'Link (white background, e.g. links, Bikeability)',
+                        'event' => 'Event (white background, date shown)',
+                        'news' => 'News (grey background, smaller heading)',
+                    ],
+                    'default_value' => 'link',
+                    'ui' => true,
+                ])
             ->addTab('Media')
                 ->addImage('image', [
                     'label' => 'Image',
@@ -274,6 +301,16 @@ class FeatureCard extends Block
                 ]);
 
         return $fields->build();
+    }
+
+    /**
+     * Retrieve the card style.
+     *
+     * @return string
+     */
+    public function cardStyle()
+    {
+        return get_field('card_style') ?: $this->example['card_style'];
     }
 
     /**

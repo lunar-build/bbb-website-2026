@@ -30,6 +30,7 @@
           "color": "#F6F6F6",
           "name": "Lightest grey"
         },
+        { "slug": "light-grey", "color": "#E9E9E9", "name": "Light grey" },
         { "slug": "orange", "color": "#F69502", "name": "Orange" },
         { "slug": "leaf", "color": "#C7DC82", "name": "Leaf" },
         {
@@ -109,6 +110,16 @@
           "slug": "button-label",
           "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
           "name": "Button label"
+        },
+        {
+          "slug": "filter-service-label",
+          "size": "12px",
+          "name": "Filter service label"
+        },
+        {
+          "slug": "news-row-card-title",
+          "size": "22px",
+          "name": "News row card title"
         }
       ]
     }

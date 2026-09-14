@@ -3,6 +3,14 @@
     display: block;
     position: relative; // containing block for the stretched-link overlay
 
+    &::part(base) {
+      background: var(--wp--preset--color--white);
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+      overflow: hidden; // clips the media's square corners to the card radius
+    }
+
     &::part(media) {
       display: block;
     }
@@ -46,13 +54,16 @@
 
   &__date {
     margin: 0;
-    font-size: 0.875rem;
-    color: var(--wa-color-neutral-60, #737373);
+    font-size: var(--wp--preset--font-size--card-date);
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--wp--preset--color--blue);
   }
 
   &__content {
     :where(h1, h2, h3, h4, h5, h6) {
       margin: 0 0 0.25rem;
+      color: var(--wp--preset--color--blue);
     }
 
     p {
@@ -88,17 +99,15 @@
   }
 
   &__cta {
+    @extend .u-cta-small;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    padding: 0.625rem 1.25rem;
+    gap: 10px;
+    padding: 10px 16px;
+    border: 2px solid var(--wp--preset--color--charcoal);
     border-radius: 999px;
-    background: var(--wa-color-neutral-fill-loud, #1a1a1a);
-    color: var(--wa-color-neutral-on-loud, #fff);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    color: var(--wp--preset--color--charcoal);
   }
 
   &__cta-icon {
@@ -108,7 +117,33 @@
     margin-left: auto;
     width: 2.25rem;
     height: 2.25rem;
+    border: 2px solid var(--wp--preset--color--charcoal);
     border-radius: 50%;
-    background: var(--wa-color-neutral-fill-quiet, #f0f0f0);
+    color: var(--wp--preset--color--charcoal);
+  }
+}
+
+// Event — Figma "Type=Event card": white background (base default), but
+// the heading sits below a blue __date and reads in blue-dark rather than
+// the default Link style's blue.
+.c-feature-card--event {
+  .c-feature-card__content :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--wp--preset--color--blue-dark);
+  }
+}
+
+// News — Figma "Type=News card": grey card background, blue-dark heading
+// rendered at H5 size regardless of the InnerBlocks heading level chosen
+// (same "visual size independent of semantic level" approach as the
+// .u-heading-* utilities).
+.c-feature-card--news {
+  &.c-feature-card__card::part(base) {
+    background: var(--wp--preset--color--lightest-grey);
+  }
+
+  .c-feature-card__content :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--wp--preset--color--blue-dark);
+    font-size: var(--wp--preset--font-size--heading-5);
+    line-height: 36px;
   }
 }

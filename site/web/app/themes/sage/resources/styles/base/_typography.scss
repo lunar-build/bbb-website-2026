@@ -55,6 +55,18 @@ h6,
   font-weight: 500;
 }
 
+.u-filter-service-label {
+  font-size: var(--wp--preset--font-size--filter-service-label);
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.u-news-row-card-title {
+  font-size: var(--wp--preset--font-size--news-row-card-title);
+  line-height: 36px;
+  font-weight: 700;
+}
+
 .u-callout {
   display: flex;
   align-items: center;
