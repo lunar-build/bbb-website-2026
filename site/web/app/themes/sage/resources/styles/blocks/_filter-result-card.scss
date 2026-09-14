@@ -1,5 +1,7 @@
 // Figma "Filter result card": no image, a business/service listing —
 // heading, contact info + services icon/text repeaters, description, CTA.
+@use '../base/typography';
+
 .c-filter-result-card {
   &__card {
     display: flex;

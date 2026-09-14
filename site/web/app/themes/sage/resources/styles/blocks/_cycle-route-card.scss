@@ -2,6 +2,8 @@
 // other card), a colored banner strip over the image carrying the route
 // name, a fixed time/distance/difficulty info list, and a CTA pill —
 // difficulty drives the banner + badge color via a BEM modifier.
+@use '../base/typography';
+
 .c-cycle-route-card {
   &__card {
     position: relative;

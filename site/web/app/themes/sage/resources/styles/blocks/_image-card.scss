@@ -1,4 +1,6 @@
 // Figma "Image card": image with a linked caption bar, no body copy.
+@use '../base/typography';
+
 .c-image-card {
   &__card {
     display: block;

@@ -4,6 +4,8 @@
 // classes directly (see resources/styles/blocks/_cycle-route-card.scss)
 // rather than duplicating that styling here.
 
+@use '../base/typography';
+
 .c-card-row {
   padding-block: 3rem;
 }
