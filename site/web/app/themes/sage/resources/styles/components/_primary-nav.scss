@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
 // sibling of <lunar-site-header> in header.blade.php, deliberately NOT
@@ -78,10 +79,8 @@
   padding: 0.875rem 0.25rem; // inline padding reset for <button> items, not just <a>
   border: none;
   background: none;
+  @extend .u-mobile-menu-link;
   color: var(--wp--preset--color--white);
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 700;
-  font-size: 16px;
   text-align: start;
   text-decoration: none;
   cursor: pointer;
@@ -120,13 +119,11 @@
 }
 
 .c-primary-nav__heading {
+  @extend .u-mobile-menu-link;
   margin: 0;
   padding-block-end: 0.75rem;
   border-block-end: 1px solid rgb(255 255 255 / 30%);
   color: var(--wp--preset--color--white);
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 700;
-  font-size: 16px;
 }
 
 .c-primary-nav__list--sub {
@@ -134,9 +131,8 @@
 }
 
 .c-primary-nav__link--sub {
+  @extend .u-mobile-menu-sublink;
   padding-block: 0;
-  font-weight: 500;
-  font-size: 14px;
 
   .c-primary-nav__chevron svg {
     width: 9px;
@@ -162,9 +158,7 @@
   border-radius: 999px;
   background: none;
   color: var(--wp--preset--color--white);
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 14px;
+  @extend .u-cta-small;
   cursor: pointer;
 
   @include focus.ring;
@@ -243,9 +237,7 @@
   background: none;
   padding: 0;
   color: var(--wp--preset--color--charcoal);
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: 16px;
+  @extend .u-nav-link;
   text-decoration: none;
   cursor: pointer;
 
@@ -310,11 +302,9 @@
 }
 
 .c-primary-nav-desktop__heading {
+  @extend .u-mobile-menu-link;
   margin: 0;
   color: var(--wp--preset--color--white);
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 700;
-  font-size: 16px;
 }
 
 .c-primary-nav-desktop__sublist {
@@ -333,9 +323,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   color: var(--wp--preset--color--white);
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: 14px;
+  @extend .u-nav-sublink;
   text-decoration: none;
 
   &:hover > span,
@@ -417,9 +405,7 @@
   border-radius: 0 999px 999px 0;
   background: var(--wp--preset--color--yellow);
   color: var(--wp--preset--color--charcoal);
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 20px;
+  @extend .u-cta-large;
   cursor: pointer;
 
   svg {
@@ -438,9 +424,7 @@
   border-radius: 999px;
   background: var(--wp--preset--color--white);
   color: var(--wp--preset--color--charcoal);
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 20px;
+  @extend .u-cta-large;
   cursor: pointer;
 
   @include focus.ring;

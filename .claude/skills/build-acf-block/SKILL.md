@@ -205,6 +205,36 @@ heading + paragraph template — see `app/Blocks/TextHero.php`/`CtaStrip.php`/
 `<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
 block's library entry just shows an empty content area.
 
+**Never hardcode `font-size`/`line-height`/`font-weight`.** Every text style used
+anywhere in the site's Figma design has a matching rule in
+`resources/styles/base/_typography.scss`, backed by `theme.json`
+`settings.typography.fontSizes` presets (`--wp--preset--font-size--*`). `InnerBlocks`
+headings/paragraphs (`core/heading`, `core/paragraph`) already inherit the base
+`h1`-`h6`/`body` rules for free - no extra classes needed. For any other text in a
+block (buttons, card titles, badges, captions, nav-style links, table headers, quotes,
+standfirst/intro paragraphs, form labels/placeholders), add the matching `.u-*` utility
+class instead of writing new font rules:
+
+| Utility class | Use for |
+|---|---|
+| `.u-standfirst` | Intro/lede paragraph under a heading |
+| `.u-body-large` / `.u-body-regular` | Body copy at 16px / 14px (base `body` already covers the default case) |
+| `.u-cta-large` / `.u-cta-small` | Button/CTA label text (Anonymous Pro) |
+| `.u-input-label` / `.u-input-placeholder` | Form field labels / placeholder text |
+| `.u-card-date` | Date text on event/news cards |
+| `.u-card-title-small` | Small card title (Anonymous Pro) |
+| `.u-short-form-link` | Short-form link list items (Anonymous Pro) |
+| `.u-quote` / `.u-quote-citation` | Pull-quote body / citation |
+| `.u-nav-link` / `.u-nav-sublink` | Top nav link / sublink |
+| `.u-mobile-menu-link` / `.u-mobile-menu-sublink` | Mobile menu link / sublink |
+| `.u-footer-link` | Footer link |
+| `.u-table-column-heading` / `.u-table-cell-heading` | Table header row / row-heading cell |
+
+If a block genuinely needs a text style with no match above, add a new `fontSizes`
+entry to `theme.json` plus a `.u-*` rule in `_typography.scss` following that file's
+existing pattern (font-size from the new preset var, explicit `line-height` in px,
+explicit `font-weight`) - don't hardcode the value inline in the block's own SCSS.
+
 ## 4. Build the Blade view
 
 Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
