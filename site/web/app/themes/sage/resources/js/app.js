@@ -7,8 +7,10 @@
 // their JS modules (see components.js) independent of this either way.
 import '@awesome.me/webawesome/dist/styles/themes/default.css';
 import './components.js';
+import './site-header.js';
 import './header-search.js';
 import './primary-nav.js';
+import './video-background.js';
 import './journey-planner-widget.js';
 import '../styles/app.scss';
 
