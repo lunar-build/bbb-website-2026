@@ -587,7 +587,7 @@ if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-cont
      */
     public function browseAllLink()
     {
-        $link = get_field('browse_all_link') ?: ($this->type() !== 'link' ? ($this->example['browse_all_link'] ?? null) : null);
+        $link = $this->type() !== 'link' ? (get_field('browse_all_link') ?: ($this->example['browse_all_link'] ?? null)) : null;
 
         return $link ? $this->normalizeLink($link) : null;
     }
