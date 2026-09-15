@@ -540,7 +540,7 @@ class CardRow extends Block
         return array_map(function ($card) use ($placeholder) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];
 
-            if (empty($image['url'])) {
+if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-content/uploads/placeholder.jpg') {
                 $image = ['url' => $placeholder, 'alt' => $image['alt'] ?? ''];
             }
 
