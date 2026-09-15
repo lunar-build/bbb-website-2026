@@ -565,7 +565,7 @@ if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-cont
             return $link + ['title' => '', 'url' => '#', 'target' => ''];
         }
 
-        return ['title' => (string) $link, 'url' => '#', 'target' => ''];
+        return ['title' => '', 'url' => (string) $link, 'target' => ''];
     }
 
     /**
