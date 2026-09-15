@@ -28,14 +28,14 @@ input[type='search'],
 input[type='password'],
 textarea {
   width: 100% !important;
-  padding: 10px 20px !important;
+  padding: 0.625rem 1.25rem !important;
   background: var(--wp--preset--color--white) !important;
   border: 2px solid var(--wp--preset--color--charcoal) !important;
   border-radius: 999px !important;
   font-family: var(--wp--preset--font-family--nata-sans) !important;
   font-weight: 500 !important;
-  font-size: 14px !important;
-  line-height: 18px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.125rem !important;
   color: var(--wp--preset--color--charcoal) !important;
 
   &::placeholder {
@@ -46,9 +46,9 @@ textarea {
 }
 
 textarea {
-  border-radius: 20px !important;
+  border-radius: 1.25rem !important;
   resize: vertical !important;
-  min-height: 72px !important;
+  min-height: 4.5rem !important;
 }
 
 input[type='radio'],
@@ -57,8 +57,8 @@ input[type='checkbox'] {
   display: inline-grid !important;
   place-content: center !important;
   flex: none !important;
-  width: 18px !important;
-  height: 18px !important;
+  width: 1.125rem !important;
+  height: 1.125rem !important;
   margin: 0 !important;
 
   @include focus.ring;
@@ -93,8 +93,8 @@ input[type='radio'] {
   // to GF's blue until this was added.
   &::before {
     content: '' !important;
-    width: 10px !important;
-    height: 10px !important;
+    width: 0.625rem !important;
+    height: 0.625rem !important;
     scale: var(--checked-icon-scale) !important;
     color: var(--wp--preset--color--charcoal) !important;
     background-color: currentColor !important;
@@ -114,7 +114,7 @@ input[type='checkbox'] {
   border: none !important;
   background-color: transparent !important;
   background-image: url('../../svg/checkbox-unchecked.svg') !important;
-  background-size: 18px 18px !important;
+  background-size: 1.125rem 1.125rem !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
 

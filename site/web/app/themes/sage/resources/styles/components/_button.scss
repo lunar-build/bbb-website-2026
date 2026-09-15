@@ -10,7 +10,7 @@ wa-button::part(label) {
   font-family: var(--wp--preset--font-family--anonymous-pro);
   font-weight: 700;
   font-size: var(--wp--preset--font-size--button-label);
-  line-height: 30px;
+  line-height: 1.875rem;
   letter-spacing: 0.02em;
 }
 
@@ -27,8 +27,8 @@ wa-button .c-icon--arrow-right {
   margin-inline-start: 0.5em;
 
   svg {
-    width: 22px;
-    height: 14px;
+    width: 1.375rem;
+    height: 0.875rem;
     flex: none;
     overflow: visible;
   }

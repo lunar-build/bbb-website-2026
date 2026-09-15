@@ -46,8 +46,8 @@
 .c-logo--footer svg,
 .c-logo--footer img {
   display: block;
-  width: 175px;
-  height: 47px;
+  width: 10.9375rem;
+  height: 2.9375rem;
 }
 
 .c-footer-social {
@@ -78,12 +78,12 @@
 
   svg {
     // Figma: 32px icons on mobile, 20px on desktop.
-    width: 32px;
-    height: 32px;
+    width: 2rem;
+    height: 2rem;
 
     @include bp.respond($min: bp.$sm) {
-      width: 20px;
-      height: 20px;
+      width: 1.25rem;
+      height: 1.25rem;
     }
   }
 }
@@ -147,8 +147,8 @@
 
     svg {
       flex: none;
-      width: 16px;
-      height: 10px;
+      width: 1rem;
+      height: 0.625rem;
     }
 
     @include bp.respond($min: bp.$sm) {
