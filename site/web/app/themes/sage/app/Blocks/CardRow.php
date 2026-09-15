@@ -489,7 +489,7 @@ class CardRow extends Block
      */
     public function intro()
     {
-        return get_field('intro') ?: ($this->type() === 'link' ? ($this->example['intro'] ?? null) : null);
+        return $this->type() === 'link' ? (get_field('intro') ?: ($this->example['intro'] ?? null)) : null;
     }
 
     /**
