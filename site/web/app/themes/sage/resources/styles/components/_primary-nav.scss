@@ -1,9 +1,10 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../components/header' as header;
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
-// sibling of <lunar-site-header> in header.blade.php, deliberately NOT
-// nested inside it — that component's shadow <header> always carries a
+// sibling of <header class="c-site-header"> in header.blade.php,
+// deliberately NOT nested inside it — that header always carries a
 // `transform` (part of its sticky auto-hide, present even when not
 // currently hidden), which would make it the containing block for a
 // nested position:fixed descendant: the overlay would size against the
@@ -11,9 +12,9 @@
 // header's hide-on-scroll transform, and lose the stacking fight for
 // z-index against the header's own (non-positioned) content. As a proper
 // sibling, position:fixed here is contained by the real viewport, and
-// z-index compares correctly against lunar-site-header's own
-// (--lunar-site-header-z-index, 100) — the header still paints on top for
-// its own real height.
+// z-index compares correctly against .c-site-header's own
+// ($site-header-z-index, 100) — the header still paints on top for its
+// own real height.
 //
 // This overlay only ever shows below bp.$sm (see the display rule below),
 // so there's exactly one header height to account for: Figma's Mobile
@@ -26,7 +27,7 @@
 .c-primary-nav {
   position: fixed;
   inset: 0;
-  z-index: 90; // below lunar-site-header's (--lunar-site-header-z-index, 100)
+  z-index: header.$site-header-z-index - 10; // below .c-site-header's own z-index
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-gutter: stable; // avoids a horizontal shift between short/long panels

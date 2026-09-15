@@ -1,0 +1,60 @@
+@use '../base/focus' as focus;
+
+// <x-video>: a plain wrapper around a native <video>. variant="background"
+// (the only variant in use today) is decorative/muted/looping and pairs
+// with a required pause/play toggle (WCAG 2.2.2) — see
+// resources/js/video-background.js for the toggle behaviour and
+// resources/views/components/video.blade.php for the markup.
+.c-video {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 0;
+}
+
+.c-video__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.c-video__control {
+  position: absolute;
+  inset-block-end: 0.75rem;
+  inset-inline-end: 0.75rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 45%);
+  color: white;
+  cursor: pointer;
+
+  @include focus.ring;
+}
+
+.c-video__control-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.c-video__control-icon--play {
+  display: none;
+}
+
+.c-video__control[aria-pressed='false'] {
+  .c-video__control-icon--pause {
+    display: none;
+  }
+
+  .c-video__control-icon--play {
+    display: block;
+  }
+}

@@ -6,9 +6,10 @@
     $socialLinks = social_links_from_options();
 @endphp
 
-{{-- lunar-site-header stays unconstrained; rows that need the site gutter
-     get their own inner .o-container instead of one wrapping everything. --}}
-<lunar-site-header sticky>
+{{-- .c-site-header stays unconstrained; rows that need the site gutter
+     get their own inner .o-container instead of one wrapping everything.
+     Sticky auto-hide-on-scroll behaviour lives in resources/js/site-header.js. --}}
+<header class="c-site-header">
     <div class="o-container">
         <div class="c-header-top">
             <a class="c-header-top__logo" href="{{ home_url('/') }}" aria-label="{{ get_bloginfo('name') }}">
@@ -72,16 +73,16 @@
         </div>
     </div>
 
-</lunar-site-header>
+</header>
 
-{{-- Deliberately OUTSIDE <lunar-site-header>: that component's shadow
-     <header> always carries a `transform` (part of its sticky auto-hide),
-     and any transformed ancestor becomes the containing block for a
-     position:fixed descendant — sharing it meant this overlay slid away
-     together with the header on scroll, and lost the stacking-order fight
-     for z-index against the header's own (non-positioned, so effectively
-     z-index:auto) content, hiding the close icon behind it. As a proper
-     sibling, position:fixed here is contained by the real viewport, and
-     z-index compares correctly against lunar-site-header's own
-     (--lunar-site-header-z-index, 100). --}}
+{{-- Deliberately OUTSIDE <header class="c-site-header">: site-header.js's
+     sticky auto-hide always carries a `transform` on the header itself
+     (part of the hide-on-scroll transition), and any transformed ancestor
+     becomes the containing block for a position:fixed descendant — sharing
+     it meant this overlay slid away together with the header on scroll,
+     and lost the stacking-order fight for z-index against the header's own
+     (non-positioned, so effectively z-index:auto) content, hiding the
+     close icon behind it. As a proper sibling, position:fixed here is
+     contained by the real viewport, and z-index compares correctly
+     against .c-site-header's own ($site-header-z-index, 100). --}}
 @include('sections.primary-nav', ['items' => $items, 'cta' => $ctaMobile, 'socialLinks' => $socialLinks])

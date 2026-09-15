@@ -2,20 +2,14 @@
 name: build-acf-block
 description: >
   Step-by-step workflow for creating a new ACF Composer block in the Sage theme
-  (site/web/app/themes/sage), including a decision tree for when to use Web Awesome
-  (<wa-*>) directly, an existing Lunar UI (<lunar-*>) component, or when a new Lunar
-  component needs to be built in the sibling ui-components repo first. Use when the
-  user says "create a block", "new block", "add a block", "build a block", or invokes
-  /build-acf-block.
+  (site/web/app/themes/sage), including guidance on when to use Web Awesome (<wa-*>)
+  directly versus plain HTML/Blade. Use when the user says "create a block", "new
+  block", "add a block", "build a block", or invokes /build-acf-block.
 ---
 
 # Building an ACF Composer block
 
-Scope: this skill only ever reads/writes inside `bbb-website-2026`. It never edits,
-builds, or publishes anything in the sibling `ui-components` repo (source of
-`@lunar.build/lunar-ui-components`). Where a new Lunar component is needed, this
-skill's job stops at printing a spec/prompt (see step 1d and "Requesting a new Lunar
-component" below) for the developer to take to that repo manually.
+Scope: this skill only ever reads/writes inside `bbb-website-2026`.
 
 ## 0. Ask for a Figma reference (optional)
 
@@ -55,39 +49,16 @@ For every piece of UI in the new block, pick one:
   inert, undefined custom element — no console error, no network 404, just dead markup
   (this bit `CtaStrip`'s button once already).
 
-  `resources/js/components.js` holds all `<wa-*>`/`<lunar-*>` registrations and is imported
-  by both `resources/js/app.js` (front end) and `resources/js/editor.js` (block editor), so
+  `resources/js/components.js` holds all `<wa-*>` registrations and is imported by both
+  `resources/js/app.js` (front end) and `resources/js/editor.js` (block editor), so
   components render as real custom elements in block preview mode too, not inert markup —
   add new component imports there, not directly in app.js/editor.js.
 
-- **(c) An existing Lunar component** — `<lunar-nav>`, `<lunar-site-header>`,
-  `<lunar-site-footer>` today. Check `node_modules/@lunar.build/lunar-ui-components/components/`
-  for the current list, and that component's `index.js` `static properties` block for its
-  exact prop shape before wiring data into it. Registered globally the same way as Web
-  Awesome, via `import '@lunar.build/lunar-ui-components/main.js';` in
-  `resources/js/components.js` (styles are bundled per-component via Lit shadow DOM,
-  nothing extra to import).
-
-  **Never apply a layout utility class (e.g. `.o-container`) directly to a Lunar/Web
-  Awesome custom element** — `display: grid`/`flex` set on a shadow-DOM host only lays out
-  that component's own shadow-tree wrapper, not the light-DOM content slotted into it, so
-  it silently fails to constrain anything (confirmed: it collapsed `<lunar-nav>` to the
-  gutter track's width and tripped its container-query mobile layout). Wrap the custom
-  element in a plain `<div class="o-container">` instead — see
-  `resources/views/sections/header.blade.php`.
-
-  Passing structured data in: Lit auto-`JSON.parse`s a matching HTML attribute for any
-  property declared `{ type: Array }` or `{ type: Object }` with no custom `converter` —
-  so Blade can just write `items="{{ json_encode($shaped) }}"` and the component parses
-  it itself, no JS bridge (Alpine etc.) needed. Confirm the property's declared as
-  `Array`/`Object` with no custom `converter` in the component's `index.js` before relying
-  on this. `app/helpers.php` already has `menu_items_to_array()` (WP menu → `<lunar-nav
-  items="...">`'s nested shape) and `menu_items_to_footer_columns()` (reuses it) as
-  reference conversions — see "Shaping WP/ACF data" below for the general pattern.
-- **(d) A new Lunar component is needed** — stop here. Don't scaffold the block yet.
-  Jump to "Requesting a new Lunar component" below, produce the prompt, and wait for the
-  developer to build + publish it in `ui-components` and bump the dependency in this
-  theme's `package.json` before continuing.
+  **Never apply a layout utility class (e.g. `.o-container`) directly to a Web Awesome
+  custom element** — `display: grid`/`flex` set on a shadow-DOM host only lays out that
+  component's own shadow-tree wrapper, not the light-DOM content slotted into it, so it
+  silently fails to constrain anything. Wrap the custom element in a plain
+  `<div class="o-container">` instead — see `resources/views/sections/header.blade.php`.
 
 ## 2. Scaffold the block
 
@@ -242,8 +213,7 @@ its own `grid-template-columns`.
 ### Shaping WP/ACF data for structured component props
 
 Whenever a block's Blade view hands data to a component expecting a structured
-`Array`/`Object` prop (Lunar's `items`/`columns`/`legal`, or similar on any future
-component library), WordPress's native data shape (menu items, ACF repeater rows,
+array/object prop, WordPress's native data shape (menu items, ACF repeater rows,
 `WP_Query` results) won't match the component's expected shape 1:1 — a small conversion
 step is needed every time. One small pure function per **shape**, not per block or one
 generic converter (ACF/WP key names almost never match a component's declared prop
@@ -294,53 +264,3 @@ Placeholder assets live at `resources/images/placeholder/pattern-placeholder.svg
 `resources/videos/placeholder/pattern-placeholder.mp4`, committed to the repo (not
 fetched externally) so they work offline and are trivial to swap — replace the file
 in place and rebuild, no code changes needed.
-
----
-
-## Requesting a new Lunar component
-
-When step 1d applies, print a prompt like the one below (filled in for the actual block)
-instead of writing any code in `ui-components`. The developer copies it into a separate
-Claude Code session opened in their local `ui-components` clone.
-
-The prompt must cover:
-- **Component name**: `lunar-<name>`, kebab-case, plus a one-line purpose.
-- **Props/attributes**, with types matching what the Blade view will pass in (e.g.
-  `heading: String`, `link: Object` for a `{title, url, target}` shape) — Lit auto-parses
-  JSON attributes for `Array`/`Object`-typed properties with no custom converter, so
-  props can stay simple.
-- **Composition**: which Web Awesome elements (`<wa-card>`, `<wa-button>`, etc.) it
-  should wrap internally, inside the Lit component's `render()`.
-- **Structural convention to follow**: one folder per component under
-  `components/<name>/`, containing `index.js` + `styles.css`; scoped theming via
-  `--lunar-<component>-<variant>-<property>` CSS custom properties; register in
-  `components/base.css`.
-- **Publishing reminder**: pushing to `main` on `ui-components` auto-bumps the npm
-  patch version and publishes via CI — that's a deliberate, separate step the developer
-  triggers themselves once the component is reviewed, not something to do automatically.
-- **Return step**: once published, bump `@lunar.build/lunar-ui-components` in this
-  theme's `package.json`, run `npm install`, then resume the block build from step 2.
-
-### Example generated prompt
-
-```
-Build a new Lunar UI component: <lunar-feature-card>
-
-Purpose: a bordered card with a heading, body text, and a single CTA button —
-used inside a Sage theme ACF block.
-
-Props:
-  heading: String
-  body: String
-  link: Object   // { title: String, url: String, target: String }
-
-Composition: wrap <wa-card appearance="outlined" with-footer> for the body and
-<wa-button slot="footer" variant="brand"> for the CTA, per this repo's convention
-of composing Web Awesome elements inside a Lit render().
-
-Follow the existing structural pattern: components/lunar-feature-card/{index.js,styles.css},
-scoped theming vars like --lunar-feature-card-bg, register in components/base.css.
-
-Once built and reviewed, push to main to publish (auto-bumps npm patch version) —
-that's your call, not something to do as part of scaffolding.
-```

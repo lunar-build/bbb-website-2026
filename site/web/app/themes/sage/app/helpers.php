@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Convert a WordPress nav menu theme location into the nested item-array
- * shape expected by lunar-ui-components' `<lunar-nav items="...">`:
+ * Convert a WordPress nav menu theme location into a nested item array:
  * [{ label, href, current, children }, ...], children nested recursively.
+ * Consumed by sections/header.blade.php and sections/primary-nav.blade.php.
  */
 function menu_items_to_array(string $location): array
 {
@@ -38,10 +38,9 @@ function menu_items_to_array(string $location): array
 }
 
 /**
- * Convert a WordPress nav menu theme location into the `columns` shape
- * expected by lunar-ui-components' `<lunar-site-footer columns="...">`:
- * one column per top-level item (item label as the column title, its
- * children as the column's links).
+ * Convert a WordPress nav menu theme location into a `columns` shape: one
+ * column per top-level item (item label as the column title, its children
+ * as the column's links). Consumed by sections/footer.blade.php.
  */
 function menu_items_to_footer_columns(string $location): array
 {
@@ -57,11 +56,10 @@ function menu_items_to_footer_columns(string $location): array
 }
 
 /**
- * Convert the Theme Options "Legal Links" repeater into the `legal` shape
- * expected by lunar-ui-components' `<lunar-site-footer legal="...">`.
- * Sourced independently from the footer nav menu (not derived from it),
- * since not every project using this theme will want legal links to be
- * whichever footer menu items happen to have no children.
+ * Convert the Theme Options "Legal Links" repeater into a `{ label, href }[]`
+ * list. Sourced independently from the footer nav menu (not derived from
+ * it), since not every project using this theme will want legal links to
+ * be whichever footer menu items happen to have no children.
  */
 function legal_links_from_options(): array
 {
