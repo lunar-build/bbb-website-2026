@@ -51,9 +51,7 @@
   }
 
   &__contact-text {
-    font-weight: 700;
-    font-size: var(--wp--preset--font-size--body-regular);
-    line-height: 24px;
+    @extend .u-contact-text;
     color: var(--wp--preset--color--blue-dark);
   }
 
@@ -79,9 +77,8 @@
   }
 
   &__description {
+    @extend .u-body-regular;
     margin: 0;
-    font-size: var(--wp--preset--font-size--body-regular);
-    line-height: 24px;
     color: var(--wp--preset--color--charcoal);
   }
 

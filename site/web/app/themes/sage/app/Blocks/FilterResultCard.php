@@ -293,7 +293,11 @@ class FilterResultCard extends Block
      */
     public function contactInfo()
     {
-        $rows = get_field('contact_info') ?: $this->example['contact_info'];
+        $rows = get_field('contact_info');
+
+        if (! $rows) {
+            $rows = $this->preview ? $this->example['contact_info'] : [];
+        }
 
         return array_map(fn ($row) => $row + ['href' => $this->contactHref($row['icon'], $row['text'])], $rows);
     }
@@ -324,7 +328,13 @@ class FilterResultCard extends Block
      */
     public function services()
     {
-        return get_field('services') ?: $this->example['services'];
+        $rows = get_field('services');
+
+        if (! $rows) {
+            $rows = $this->preview ? $this->example['services'] : [];
+        }
+
+        return $rows;
     }
 
     /**
@@ -334,7 +344,13 @@ class FilterResultCard extends Block
      */
     public function description()
     {
-        return get_field('description') ?: null;
+        $description = get_field('description');
+
+        if ($description) {
+            return $description;
+        }
+
+        return $this->preview ? $this->example['description'] : null;
     }
 
     /**

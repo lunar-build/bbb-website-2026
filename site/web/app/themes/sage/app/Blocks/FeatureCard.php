@@ -202,10 +202,19 @@ class FeatureCard extends Block
     /**
      * Fixture markup standing in for this block's InnerBlocks content on
      * the pattern library page (see App\View\Composers\PatternLibrary).
-     *
-     * @var string
+     * News cards have no body copy, so the paragraph is omitted whenever
+     * the current fixture's card_style is "news".
      */
-    public $exampleContent = '<h3>Loan a bike</h3><p>Example body copy for the card — replace with real content.</p>';
+    public function exampleContent(): string
+    {
+        $heading = '<h3>Loan a bike</h3>';
+
+        if (($this->example['card_style'] ?? null) === 'news') {
+            return $heading;
+        }
+
+        return $heading.'<p>Example body copy for the card — replace with real content.</p>';
+    }
 
     /**
      * Data to be passed to the block before rendering.
@@ -286,7 +295,6 @@ class FeatureCard extends Block
                         'icon' => 'Icon only (arrow, no label)',
                         'none' => 'No visible CTA — card is still fully clickable via Link',
                     ],
-                    'default_value' => 'button',
                 ]);
 
         return $fields->build();
@@ -329,7 +337,13 @@ class FeatureCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        $link = get_field('link');
+
+        if ($link) {
+            return $link;
+        }
+
+        return $this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
     }
 
     /**
@@ -339,7 +353,7 @@ class FeatureCard extends Block
      */
     public function ctaStyle()
     {
-        return get_field('cta_style') ?: ($this->example['cta_style'] ?? 'button');
+        return get_field('cta_style') ?: ($this->example['cta_style'] ?? ($this->cardStyle() === 'link' ? 'icon' : 'button'));
     }
 
     /**

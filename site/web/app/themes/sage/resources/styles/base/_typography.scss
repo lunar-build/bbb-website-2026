@@ -55,6 +55,12 @@ h6,
   font-weight: 500;
 }
 
+.u-news-tag {
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 32px;
+  font-weight: 500;
+}
+
 .u-filter-service-label {
   font-size: var(--wp--preset--font-size--filter-service-label);
   line-height: 24px;
@@ -71,6 +77,12 @@ h6,
   font-size: var(--wp--preset--font-size--body-regular);
   line-height: 24px;
   font-weight: 400;
+}
+
+.u-contact-text {
+  font-size: var(--wp--preset--font-size--body-regular);
+  line-height: 24px;
+  font-weight: 700;
 }
 
 .u-news-row-card-title {

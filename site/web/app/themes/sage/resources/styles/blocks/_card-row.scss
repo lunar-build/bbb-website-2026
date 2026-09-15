@@ -59,12 +59,9 @@
 }
 
 .c-card-row__news-tag {
+  @extend .u-news-tag;
   align-self: flex-start;
   margin-inline-start: 18px;
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: var(--wp--preset--font-size--input-label);
-  line-height: 32px;
   color: var(--wp--preset--color--charcoal);
   border-top: 3px solid var(--wp--preset--color--yellow);
   border-bottom: 3px solid var(--wp--preset--color--yellow);
@@ -116,18 +113,15 @@
 }
 
 .c-card-row__link-title {
-  font-size: var(--wp--preset--font-size--heading-5);
-  line-height: 36px;
-  font-weight: 700;
+  @extend .u-heading-5;
   color: var(--wp--preset--color--blue-medium);
   padding-inline: 13px;
 }
 
 .c-card-row__link-body {
+  @extend .u-body-regular;
   margin: 0;
   padding-inline: 13px;
-  font-size: var(--wp--preset--font-size--body-regular);
-  line-height: 24px;
   color: var(--wp--preset--color--charcoal);
 }
 
