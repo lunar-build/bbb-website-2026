@@ -43,8 +43,8 @@ add_filter('render_block', function ($block_content, $block) {
 /**
  * Warn editors on the Primary Navigation menu screen that an item with
  * children never renders as a link itself — on mobile it becomes an inert
- * heading (primary-nav.blade.php), on desktop a submenu toggle button
- * (lunar-nav) — only items with no children are actual links.
+ * heading (primary-nav.blade.php), on desktop a submenu toggle button —
+ * only items with no children are actual links.
  */
 add_action('admin_notices', function () {
     $screen = get_current_screen();
