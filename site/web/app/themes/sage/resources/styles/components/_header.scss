@@ -1,6 +1,38 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 
+$site-header-z-index: 100;
+$site-header-transition-duration: 0.25s;
+
+// Sticky, auto-hide-on-scroll behaviour (toggles .is-hidden) lives in
+// resources/js/site-header.js.
+.c-site-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: $site-header-z-index;
+  background: canvas;
+  transform: translateY(0);
+  visibility: visible;
+  transition:
+    transform $site-header-transition-duration ease,
+    visibility 0s linear 0s;
+
+  // translateY(-100%) only clears the header's own box — content that
+  // overflows it (e.g. a tall open submenu) can still paint on screen, so
+  // visibility is switched off too once the slide-out finishes.
+  &.is-hidden {
+    transform: translateY(-100%);
+    visibility: hidden;
+    transition:
+      transform $site-header-transition-duration ease,
+      visibility 0s linear $site-header-transition-duration;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 .c-header-top {
   display: flex;
   align-items: center;

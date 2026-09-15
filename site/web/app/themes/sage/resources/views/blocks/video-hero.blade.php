@@ -6,13 +6,13 @@
 <div class="c-video-hero__inner">
   <div class="c-video-hero__media">
     @if ($video['url'] ?? null)
-      <lunar-video
+      <x-video
         variant="background"
         class="c-video-hero__video"
-        src="{{ $video['url'] }}"
-        @if ($poster['url'] ?? null) poster="{{ $poster['url'] }}" @endif
-        label="{{ $videoAlt }}"
-      ></lunar-video>
+        :src="$video['url']"
+        :poster="$poster['url'] ?? null"
+        :label="$videoAlt"
+      />
     @elseif ($poster['url'] ?? null)
       <img class="c-video-hero__video" src="{{ $poster['url'] }}" alt="{{ $videoAlt }}">
     @elseif ($block->preview)
