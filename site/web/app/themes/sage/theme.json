@@ -99,7 +99,7 @@
           "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
           "name": "Standfirst"
         },
-        { "slug": "body", "size": "16px", "name": "Body" },
+        { "slug": "body", "size": "1rem", "name": "Body" },
         {
           "slug": "input-label",
           "size": "clamp(1rem, 0.948rem + 0.221vw, 1.125rem)",

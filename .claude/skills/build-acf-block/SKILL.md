@@ -232,12 +232,34 @@ class. Use `$attributes` bare (no `->class()`) if you don't need an extra class.
 
 **Wrap the block's content in `.o-container`** (`resources/styles/base/_container.scss`)
 as a `<div>` *inside* the `<section>`, not on the `<section>` itself — this keeps content
-capped at the shared 1280px width while letting the section's own background bleed full
-width if needed. Give any child that should bleed edge-to-edge (a full-bleed image inside
-otherwise-contained content) the `.o-container__full` class instead of wrapping it
-separately. See `cta-strip.blade.php`/`feature-card.blade.php` for the plain case and
-`video-hero.blade.php` for wrapping an existing bespoke-grid inner div without breaking
-its own `grid-template-columns`.
+capped at the shared 80rem (1280px) width while letting the section's own background
+bleed full width if needed. Give any child that should bleed edge-to-edge (a full-bleed
+image inside otherwise-contained content) the `.o-container__full` class instead of
+wrapping it separately. See `cta-strip.blade.php`/`feature-card.blade.php` for the plain
+case and `video-hero.blade.php` for wrapping an existing bespoke-grid inner div without
+breaking its own `grid-template-columns`.
+
+### Sizing: use rem, not px
+
+Every value written in a block's SCSS must be `rem`, not `px` — this theme targets WCAG
+1.4.4/1.4.10 zoom/reflow, which requires text and layout to scale with the user's
+browser zoom/font-size preference, and `px` doesn't. Convert with `px ÷ 16 = rem`
+(confirmed no `html`/`body` font-size override exists in `base/_reset.scss`, so root
+stays the browser default 16px).
+
+Convert to rem: `font-size`, `line-height`, `padding`/`margin`/`gap`,
+`width`/`height`/`max-width` for content/layout sizing (including icon, logo, and
+button/hit-area dimensions), and real visible `border-radius` values.
+
+Leave as px (the only exceptions): hairline/stroke `border`/`outline` widths (1–2px),
+`box-shadow` offset/blur, the `.u-sr-only` visually-hidden clip pattern
+(`base/_utilities.scss` — converting it would break the clip technique), and `999px`
+pill-radius sentinels (they just need to exceed half the element's height, not represent
+a real measurement).
+
+When copying a px value straight from a Figma spec, convert it before it lands in SCSS —
+don't paste `20px` and fix it later. See `resources/styles/components/_header.scss` and
+`_primary-nav.scss` for worked examples of icon/logo/spacing values converted this way.
 
 ### Shaping WP/ACF data for structured component props
 
