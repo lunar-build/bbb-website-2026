@@ -21,6 +21,21 @@
       {{ __('Neutral button', 'sage') }}
       <x-icon name="arrow-right" slot="end" />
     </wa-button>
+
+    <wa-button variant="brand" appearance="accent" size="small" pill with-end>
+      {{ __('Plan route', 'sage') }}
+      <x-icon name="arrow-right" slot="end" />
+    </wa-button>
+
+    <wa-button variant="neutral" appearance="accent" size="small" pill with-end>
+      {{ __('Plan route', 'sage') }}
+      <x-icon name="arrow-right" slot="end" />
+    </wa-button>
+
+    <wa-button variant="neutral" appearance="outlined" size="small" pill with-end>
+      {{ __('Plan route', 'sage') }}
+      <x-icon name="arrow-right" slot="end" />
+    </wa-button>
   </div>
 </section>
 

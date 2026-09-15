@@ -1,0 +1,102 @@
+// Figma "Filter result card": no image, a business/service listing —
+// heading, contact info + services icon/text repeaters, description, CTA.
+@use '../base/typography';
+@use '../components/button';
+
+.c-filter-result-card {
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 443px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    background: var(--wp--preset--color--white);
+  }
+
+  &__name {
+    margin: 0;
+    color: var(--wp--preset--color--blue);
+  }
+
+  &__rule {
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-top: 1px solid var(--wp--preset--color--light-grey);
+  }
+
+  &__contact-info,
+  &__services {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__services {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  &__contact-item,
+  &__service {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__contact-text {
+    @extend .u-contact-text;
+    color: var(--wp--preset--color--blue-dark);
+  }
+
+  &__contact-link {
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+
+  &__service-text {
+    @extend .u-filter-service-label;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  &__icon {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    color: var(--wp--preset--color--blue);
+  }
+
+  &__description {
+    @extend .u-body-regular;
+    margin: 0;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  &__cta {
+    @extend .u-cta-small;
+    display: inline-flex;
+    align-self: center;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border: 2px solid var(--wp--preset--color--charcoal);
+    border-radius: 999px;
+    color: var(--wp--preset--color--charcoal);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      @include button.arrow-hover;
+    }
+  }
+}

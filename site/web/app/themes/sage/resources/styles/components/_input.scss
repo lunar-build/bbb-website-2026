@@ -1,4 +1,5 @@
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Field styling (border, pill, focus ring) is a global element rule in
 // base/_forms.scss, so it also applies to third-party fields (GF etc) —
@@ -12,10 +13,7 @@
 }
 
 .c-input__label {
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: var(--wp--preset--font-size--input-label);
-  line-height: 26px;
+  @extend .u-input-label;
   color: var(--wp--preset--color--charcoal);
 }
 
