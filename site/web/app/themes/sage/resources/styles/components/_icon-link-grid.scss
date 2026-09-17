@@ -1,4 +1,5 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
 
 // Matches Figma "Icon link grid" (node 10:4389): a light-blue full-bleed
 // section containing a row of icon-led links, each icon/heading+arrow/
@@ -46,9 +47,16 @@
   padding-block: 1rem;
   color: inherit;
   text-decoration: none;
+
+  @include focus.ring;
 }
 
 .c-icon-link-grid__icon {
+  // KNOWN WCAG 1.4.11 (Non-text Contrast) FAILURE: --orange (#F69502, the
+  // exact Figma brand colour) is ~2.3:1 against white and ~1.9:1 against
+  // Blue light — both below the required 3:1 for meaningful icons. This is
+  // a design-system colour choice, not something to silently override here
+  // — flag to design/client rather than picking an off-brand replacement.
   display: inline-flex;
   color: var(--wp--preset--color--orange);
 

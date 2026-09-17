@@ -12,7 +12,7 @@
       <a
         class="c-icon-link-grid__item"
         href="{{ $item['link']['url'] }}"
-        @if (! empty($item['link']['target'])) target="{{ $item['link']['target'] }}" @endif
+        @if (($item['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
       >
         <x-icon name="{{ $item['icon'] }}" class="c-icon-link-grid__icon" />
 
