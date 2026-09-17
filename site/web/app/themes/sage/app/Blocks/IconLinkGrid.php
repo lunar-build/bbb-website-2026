@@ -152,10 +152,6 @@ class IconLinkGrid extends Block
      */
     public $example = [
         'background_color' => 'blue-light',
-        // Empty by default — the Figma reference for this block has no
-        // heading above the grid, so the fixture matches that (heading is
-        // optional, for callers who do want one).
-        'heading' => '',
         'items' => [
             [
                 'icon' => 'cycling-route',
@@ -193,7 +189,6 @@ class IconLinkGrid extends Block
     public function with(): array
     {
         return [
-            'heading' => $this->heading(),
             'items' => $this->items(),
             'backgroundColor' => $this->backgroundColor(),
         ];
@@ -207,11 +202,6 @@ class IconLinkGrid extends Block
         $fields = Builder::make('icon_link_grid');
 
         $fields
-            ->addText('heading', [
-                'label' => 'Heading',
-                'instructions' => 'Optional — the Figma reference has no heading above the grid.',
-                'required' => 0,
-            ])
             ->addSelect('background_color', [
                 'label' => 'Background colour',
                 'instructions' => 'Optional — matches the Figma reference\'s "Blue light" by default. Leave blank for no background.
@@ -249,17 +239,6 @@ class IconLinkGrid extends Block
             ->endRepeater();
 
         return $fields->build();
-    }
-
-    /**
-     * Retrieve the heading (empty string if not set — optional, per the
-     * Figma reference).
-     *
-     * @return string
-     */
-    public function heading()
-    {
-        return get_field('heading') ?: $this->example['heading'];
     }
 
     /**

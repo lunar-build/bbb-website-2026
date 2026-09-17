@@ -8,7 +8,7 @@
 >
 
 <div class="o-container">
-  <x-icon-link-grid :items="$items" :heading="$heading" />
+  <x-icon-link-grid :items="$items" />
 </div>
 
 </section>

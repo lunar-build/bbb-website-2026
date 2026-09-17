@@ -5,19 +5,12 @@
 // section containing a row of icon-led links, each icon/heading+arrow/
 // description — 1 column on phones, 2 from tablet (`md`), 3 from desktop
 // (`lg`), same responsive pattern as every other grid in this theme even
-// though the reference mock only shows the 3-up desktop state. The heading
-// slot (optional core/heading InnerBlocks content, or a hardcoded caller's
-// own markup) sits above the grid when present — not part of the Figma
-// reference itself, which has no heading.
+// though the reference mock only shows the 3-up desktop state.
 .c-icon-link-grid-block {
   // Background colour is optional and set inline per the block's
   // "Background colour" ACF field (resources/views/blocks/icon-link-grid.blade.php) —
   // defaults to Blue light per the Figma reference, but nothing here if unset.
   padding-block: 2.125rem; // 34px
-}
-
-.c-icon-link-grid__heading {
-  margin: 0 0 1.5rem;
 }
 
 .c-icon-link-grid__list {

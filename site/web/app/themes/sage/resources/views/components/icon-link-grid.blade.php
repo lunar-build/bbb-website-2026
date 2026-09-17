@@ -1,10 +1,6 @@
-@props(['items' => [], 'heading' => null])
+@props(['items' => []])
 
 <div {{ $attributes->class(['c-icon-link-grid']) }}>
-  @if ($heading)
-    <h2 class="c-icon-link-grid__heading">{{ $heading }}</h2>
-  @endif
-
   <div class="c-icon-link-grid__list">
     @foreach ($items as $item)
       <a
