@@ -1,31 +1,36 @@
 // Reusable pull-quote fragment (resources/views/components/quote.blade.php),
 // used standalone by the Quote block (resources/views/blocks/quote.blade.php)
-// and hardcodable into any other block's Blade view.
+// and hardcodable into any other block's Blade view. Matches Figma node
+// 53:989 (both Short/Long variants collapsed into one block — see
+// app/Blocks/Quote.php's $example doc comment).
 //
 // Large decorative quote mark via ::before rather than a bundled SVG icon —
-// resources/svg/ currently has no quote-mark asset.
+// resources/svg/ currently has no quote-mark asset. Purely decorative
+// (the actual quote meaning is carried by the real <blockquote> text), so
+// no WCAG 1.4.11 contrast requirement applies to its colour.
 
 .c-quote {
+  position: relative;
   max-width: 46rem;
 }
 
 .c-quote__body {
   position: relative;
   margin: 0;
-  padding-inline-start: 2.5rem;
+  padding-inline-start: 3rem;
   font-family: var(--wp--preset--font-family--nata-sans);
-  font-size: var(--wp--preset--font-size--heading-4);
+  font-size: var(--wp--preset--font-size--heading-4); // clamps up to 30px, matching the Figma reference
   line-height: 1.3;
-  font-weight: 700;
-  color: var(--wp--preset--color--blue-dark);
+  font-weight: 400;
+  color: var(--wp--preset--color--charcoal);
 
   &::before {
     content: '\201C';
     position: absolute;
-    top: -0.35em;
+    top: -1.6rem;
     left: 0;
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 3em;
+    font-size: 8rem; // ~128px, matching the Figma reference's 140px mark
     font-weight: 700;
     line-height: 1;
     color: var(--wp--preset--color--yellow);
@@ -43,24 +48,25 @@
 .c-quote__attribution {
   display: block;
   margin-top: 1.5rem;
-  padding-inline-start: 2.5rem;
+  padding-inline-start: 3rem;
   font-style: normal;
+  text-align: right;
 }
 
 .c-quote__attribution-name {
   display: block;
-  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 700;
-  font-size: var(--wp--preset--font-size--input-label);
-  line-height: 26px;
-  color: var(--wp--preset--color--charcoal);
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 1.5;
+  color: var(--wp--preset--color--blue);
 }
 
 .c-quote__attribution-role {
   display: block;
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 400;
-  font-size: var(--wp--preset--font-size--body);
-  line-height: 24px;
-  color: var(--wp--preset--color--place-holder-grey);
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 1.5;
+  color: var(--wp--preset--color--blue);
 }
