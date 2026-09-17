@@ -4,7 +4,7 @@
 
 <div class="o-container">
   <x-quote :size="$quoteSize" :attribution-name="$attributionName" :attribution-role="$attributionRole">
-    <InnerBlocks template="{{ $block->template }}" />
+    {!! $quote !!}
   </x-quote>
 </div>
 

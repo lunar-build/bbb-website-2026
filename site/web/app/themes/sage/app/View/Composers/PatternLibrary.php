@@ -50,14 +50,6 @@ class PatternLibrary extends Composer
      * array of `['Label' => $exampleOverrides]` — to render each variant
      * stacked in the library instead of just the default `$example`. This
      * is opt-in: blocks without `$examples` render exactly as before.
-     *
-     * A variant's overrides array may include a reserved `_content` key —
-     * swapped in as `$block->exampleContent` for that render only, then
-     * restored — for blocks whose main content is `InnerBlocks`-based
-     * (`$exampleContent`) rather than a plain `$example` field, e.g. Quote's
-     * Short/Long variants (different quote *text*, not just field values).
-     * Every other key in the overrides array merges into `$example` as
-     * before.
      */
     protected function render(Block $block): string
     {
@@ -66,23 +58,12 @@ class PatternLibrary extends Composer
         }
 
         $baseExample = $block->example;
-        $baseContent = $block->exampleContent ?? '';
 
         $html = collect($block->examples)
-            ->map(function ($overrides, $label) use ($block, $baseExample, $baseContent) {
-                $content = $overrides['_content'] ?? null;
-                unset($overrides['_content']);
-
+            ->map(function ($overrides, $label) use ($block, $baseExample) {
                 $block->example = array_merge($baseExample, $overrides);
-
-                if ($content !== null) {
-                    $block->exampleContent = $content;
-                }
-
                 $variantHtml = $this->renderVariant($block);
-
                 $block->example = $baseExample;
-                $block->exampleContent = $baseContent;
 
                 return sprintf(
                     '<div class="c-pattern-library__variant"><p class="c-pattern-library__variant-label">%s</p>%s</div>',

@@ -155,13 +155,13 @@ class Quote extends Block
      * that's purely a content-length difference, not a structural one —
      * attribution is simply optional and hides when blank. $examples
      * below shows both on the pattern library page for awareness (see
-     * build-acf-block skill §6 and PatternLibrary::render()'s `_content`
-     * handling for InnerBlocks-based variant content).
+     * build-acf-block skill §6).
      *
      * @var array
      */
     public $example = [
         'quote_size' => 'large',
+        'quote' => 'Investing in safer streets and better cycle routes isn\'t just good for the environment — it\'s good for our high streets, our health, and our children\'s future.',
         'attribution_name' => 'Priya Chandra',
         'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
     ];
@@ -172,39 +172,17 @@ class Quote extends Block
     public $examples = [
         'Short' => [
             'quote_size' => 'large',
+            'quote' => 'Find the right cycling group for you — there\'s plenty of choice!',
             'attribution_name' => 'Ben',
             'attribution_role' => 'Cyclists in Bristol',
-            '_content' => '<p>Find the right cycling group for you — there\'s plenty of choice!</p>',
         ],
         'Long' => [
             'quote_size' => 'standard',
+            'quote' => "We want to make it safer, easier and more pleasant for people to get around, whether they are walking, wheeling, cycling or using the bus and these schemes will help achieve that. They will improve everyday connections and, at Bear Flat, help buses run more reliably.\n\nIn Royal Victoria Park, we have listened to feedback and refined the plans, retaining vehicle access while delivering better facilities for people walking, wheeling and cycling through the park. The improvements will create safer crossings, better accessibility and a more welcoming environment for everyone.\n\nWe will do our best to reduce disruption to traffic while these are installed and want to thank people for their patience as these improvements are put in.",
             'attribution_name' => 'Councillor Lucy Hodge',
             'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
-            '_content' => '<p>We want to make it safer, easier and more pleasant for people to get around, whether they are walking, wheeling, cycling or using the bus and these schemes will help achieve that. They will improve everyday connections and, at Bear Flat, help buses run more reliably.</p>'
-                .'<p>In Royal Victoria Park, we have listened to feedback and refined the plans, retaining vehicle access while delivering better facilities for people walking, wheeling and cycling through the park. The improvements will create safer crossings, better accessibility and a more welcoming environment for everyone.</p>'
-                .'<p>We will do our best to reduce disruption to traffic while these are installed and want to thank people for their patience as these improvements are put in.</p>',
         ],
     ];
-
-    /**
-     * The block template.
-     *
-     * @var array
-     */
-    public $template = [
-        'core/paragraph' => ['placeholder' => 'Quote text…'],
-    ];
-
-    /**
-     * Default fixture markup standing in for this block's InnerBlocks
-     * content — used for the block editor's own empty-state preview, and
-     * as the pattern-library fallback for any block without $examples set.
-     * On the pattern library page specifically, $examples above (via its
-     * per-variant `_content` key) overrides this per variant instead.
-     *
-     * @var string
-     */
-    public $exampleContent = '<p>Investing in safer streets and better cycle routes isn\'t just good for the environment — it\'s good for our high streets, our health, and our children\'s future.</p>';
 
     /**
      * Data to be passed to the block before rendering.
@@ -213,6 +191,7 @@ class Quote extends Block
     {
         return [
             'quoteSize' => $this->quoteSize(),
+            'quote' => $this->quote(),
             'attributionName' => $this->attributionName(),
             'attributionRole' => $this->attributionRole(),
         ];
@@ -226,6 +205,12 @@ class Quote extends Block
         $fields = Builder::make('quote');
 
         $fields
+            ->addTextarea('quote', [
+                'label' => 'Quote',
+                'required' => 1,
+                'rows' => 4,
+                'new_lines' => 'wpautop', // wraps each line in <p> — matches .c-quote__body's p + p spacing for multi-paragraph "Long" quotes
+            ])
             ->addSelect('quote_size', [
                 'label' => 'Quote size',
                 'instructions' => 'Matches the Figma "Short"/"Long" variants — Large suits a punchy one-liner, Standard suits a longer, multi-paragraph quote.',
@@ -257,6 +242,19 @@ class Quote extends Block
     public function quoteSize()
     {
         return get_field('quote_size') ?: $this->example['quote_size'];
+    }
+
+    /**
+     * Retrieve the quote text. `get_field()` already applies the `quote`
+     * field's `new_lines => 'wpautop'` formatting to real saved data; the
+     * $example fallback is plain text, so it needs the same wpautop() pass
+     * manually to match (real <p> tags for multi-paragraph "Long" quotes).
+     *
+     * @return string
+     */
+    public function quote()
+    {
+        return get_field('quote') ?: wpautop($this->example['quote']);
     }
 
     /**
