@@ -1,29 +1,15 @@
-// Reusable pull-quote fragment (resources/views/components/quote.blade.php),
-// used standalone by the Quote block (resources/views/blocks/quote.blade.php)
-// and hardcodable into any other block's Blade view. Matches Figma node
-// 53:989 (both Short/Long variants collapsed into one block — see
-// app/Blocks/Quote.php's $example doc comment).
+// Figma node 53:989 — reusable pull-quote, also hardcodable into other blocks.
 //
-// Two-column grid — mark in its own column, body text in the next — rather
-// than the quote mark absolutely-positioned over the text (that overlapped
-// the first line(s) of quote text) or stacked in its own row above (gave
-// separation but didn't match the intended side-by-side layout). Attribution
-// spans both columns as its own row underneath.
+// Two-column grid (mark, then body) rather than absolutely-positioning the
+// mark (overlapped the text) or stacking it above (didn't match the design).
 //
-// Quote mark is <x-icon name="quote-mark">, a new addition to resources/svg/
-// (this theme's curated icon set — see build-acf-block skill) rather than a
-// text glyph — consistent rendering across platforms instead of depending
-// on a serif font's own quotation-mark glyph. Automatically aria-hidden via
-// <x-icon> (resources/views/components/icon.blade.php) and purely decorative
-// (the actual quote meaning is carried by the real <blockquote> text), so no
-// WCAG 1.4.11 contrast requirement applies to its colour.
+// Mark is <x-icon>, not a text glyph, for cross-platform rendering; purely
+// decorative (auto aria-hidden), so its colour is exempt from WCAG 1.4.11.
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
 
-// Section padding for the Quote block used standalone (not hardcoded into
-// another block's view) — same default rhythm as .c-block's generic
-// third-party-block containment (resources/styles/blocks/_generic.scss).
+// Standalone-only padding — same rhythm as .c-block's generic containment.
 .c-quote-block {
   padding-block: 2rem;
 
@@ -33,25 +19,15 @@
 }
 
 .c-quote {
-  // --c-quote-color / --c-quote-attribution-color: override from a calling
-  // block's own wrapper class (e.g. a future dark-background stat-banner
-  // block matching Figma node 7:1972) rather than editing this component —
-  // same "override the custom property from an ancestor" convention as
-  // base/_focus.scss's --focus-color.
+  // Overridable from a calling block's wrapper class (e.g. a future
+  // dark-background usage, node 7:1972) instead of editing this component.
   --c-quote-color: var(--wp--preset--color--charcoal);
   --c-quote-attribution-color: var(--wp--preset--color--blue);
 
   display: grid;
-  // Mobile: single column, mark/body/attribution stack in source order via
-  // normal auto-placement — the mark's large size would crowd the text in
-  // a fixed column on a narrow phone. From `md` up: mark gets its own
-  // column, body the next.
-  row-gap: 1rem;
+  row-gap: 1rem; // mobile: single column, stacked via source order
   align-items: start;
-  // Stays this width rather than stretching to fill .o-container's full
-  // content column — margin-inline:auto centres it within that wider column
-  // instead of hugging the left edge.
-  max-width: 46rem;
+  max-width: 46rem; // narrower than .o-container; centred via margin-inline
   margin-inline: auto;
 
   @include bp.respond($min: bp.$md) {
@@ -60,14 +36,9 @@
   }
 }
 
-// Mark stays left-aligned above centred text, rather than beside it — the
-// arrangement seen in the (not-yet-built) carousel card, Figma node 7:2013.
-// Per that design's own coordinates, the mark is NOT centred with the text
-// below it (mark ~19-25% from the card's left edge; the text block sits
-// centred around ~35%) — only the body/attribution are centred, the mark
-// keeps its natural left position. That block will still need its own
-// markup for the image/name-heading/CTA button around this — .c-quote only
-// owns the mark+body(+optional attribution) part of that design.
+// Figma node 7:2013 (carousel card, not yet built) — mark stays left-aligned
+// above centred text; per that design it is NOT centred with the text below
+// it, only body/attribution are.
 .c-quote--centered {
   --c-quote-color: var(--wp--preset--color--blue); // matches node 7:2013's blue quote text, not the default charcoal
 
@@ -88,10 +59,7 @@
     @include bp.respond($min: bp.$md) {
       grid-column: 1;
       grid-row: 2;
-      // Default layout's 1.75rem margin-top exists to clear the mark
-      // sitting beside it in the same row — not needed here, the mark's
-      // already on its own row above, spaced by .c-quote's row-gap.
-      margin-top: 0;
+      margin-top: 0; // default layout's margin-top clears the mark beside it; not needed here
     }
   }
 
@@ -105,10 +73,7 @@
   color: var(--wp--preset--color--yellow);
 
   svg {
-    // Fixed 49x49 box, same convention as Icon Link Grid's icons — the
-    // browser's default preserveAspectRatio scales this (non-square,
-    // 44x32) glyph to fit within it uncropped.
-    width: 3.0625rem; // 49px
+    width: 3.0625rem; // 49px, same fixed box convention as Icon Link Grid
     height: 3.0625rem; // 49px
   }
 
@@ -124,19 +89,10 @@
   @include bp.respond($min: bp.$md) {
     grid-column: 2;
     grid-row: 1;
-    // Mark stays at the row's natural top (align-items:start, no negative
-    // margin) so it's never pulled outside .c-quote-block's padding — the
-    // body drops down relative to it instead, giving the same "mark sits
-    // above the text" relationship from the Figma reference without
-    // breaking containment.
-    margin-top: 1.75rem;
+    margin-top: 1.75rem; // body drops down to clear the mark, kept at its natural top
   }
   font-family: var(--wp--preset--font-family--nata-sans);
-  // Default ('large', .c-quote--large) size — the Figma "Short" variant's
-  // scale. .c-quote--standard below overrides this for the "Long" variant's
-  // smaller scale, matching each variant's actual typographic treatment
-  // (not just quote length).
-  @extend .u-quote;
+  @extend .u-quote; // 'large' (default) size — the Figma "Short" variant's scale
   color: var(--c-quote-color);
 
   p {
