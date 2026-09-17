@@ -7,46 +7,16 @@ use Log1x\AcfComposer\Builder;
 
 class Quote extends Block
 {
-    /**
-     * The block name.
-     *
-     * @var string
-     */
     public $name = 'Quote';
 
-    /**
-     * The block slug.
-     *
-     * @var string
-     */
     public $slug = 'quote';
 
-    /**
-     * The block description.
-     *
-     * @var string
-     */
     public $description = 'A pull quote with optional attribution name and role.';
 
-    /**
-     * The block category.
-     *
-     * @var string
-     */
     public $category = 'text';
 
-    /**
-     * The block icon.
-     *
-     * @var string|array
-     */
     public $icon = 'format-quote';
 
-    /**
-     * The block keywords.
-     *
-     * @var array
-     */
     public $keywords = [
         'quote',
         'pull quote',
@@ -54,70 +24,25 @@ class Quote extends Block
         'attribution',
     ];
 
-    /**
-     * The block post type allow list.
-     *
-     * @var array
-     */
     public $post_types = ['post', 'page'];
 
-    /**
-     * The parent block type allow list.
-     *
-     * @var array
-     */
     public $parent = [];
 
-    /**
-     * The ancestor block type allow list.
-     *
-     * @var array
-     */
     public $ancestor = [];
 
-    /**
-     * The default block mode.
-     *
-     * @var string
-     */
     public $mode = 'auto';
 
-    /**
-     * The default block alignment.
-     *
-     * @var string
-     */
     public $align = '';
 
-    /**
-     * The default block text alignment.
-     *
-     * @var string
-     */
     public $align_text = '';
 
-    /**
-     * The default block content alignment.
-     *
-     * @var string
-     */
     public $align_content = '';
 
-    /**
-     * The default block spacing.
-     *
-     * @var array
-     */
     public $spacing = [
         'padding' => null,
         'margin' => null,
     ];
 
-    /**
-     * The supported block features.
-     *
-     * @var array
-     */
     public $supports = [
         'align' => true,
         'align_text' => false,
@@ -138,16 +63,9 @@ class Quote extends Block
         ],
     ];
 
-    /**
-     * The block styles.
-     *
-     * @var array
-     */
     public $styles = [];
 
     /**
-     * The block preview example data.
-     *
      * Figma showed "Short" and "Long" variants — both have attribution,
      * the difference is quote *length* (a punchy one-liner at a larger
      * type size vs. a multi-paragraph quote), not presence/absence of
@@ -156,8 +74,6 @@ class Quote extends Block
      * attribution is simply optional and hides when blank. $examples
      * below shows both on the pattern library page for awareness (see
      * build-acf-block skill §6).
-     *
-     * @var array
      */
     public $example = [
         'quote_size' => 'large',
@@ -166,9 +82,6 @@ class Quote extends Block
         'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
     ];
 
-    /**
-     * @var array
-     */
     public $examples = [
         'Short' => [
             'quote_size' => 'large',
@@ -184,9 +97,6 @@ class Quote extends Block
         ],
     ];
 
-    /**
-     * Data to be passed to the block before rendering.
-     */
     public function with(): array
     {
         return [
@@ -197,9 +107,6 @@ class Quote extends Block
         ];
     }
 
-    /**
-     * The block field group.
-     */
     public function fields(): array
     {
         $fields = Builder::make('quote');
@@ -234,52 +141,33 @@ class Quote extends Block
         return $fields->build();
     }
 
-    /**
-     * Retrieve the quote size ('large' or 'standard').
-     *
-     * @return string
-     */
     public function quoteSize()
     {
         return get_field('quote_size') ?: $this->example['quote_size'];
     }
 
     /**
-     * Retrieve the quote text. `get_field()` already applies the `quote`
-     * field's `new_lines => 'wpautop'` formatting to real saved data; the
-     * $example fallback is plain text, so it needs the same wpautop() pass
-     * manually to match (real <p> tags for multi-paragraph "Long" quotes).
-     *
-     * @return string
+     * `get_field()` already applies the `quote` field's `new_lines => 'wpautop'`
+     * formatting to real saved data; the $example fallback is plain text, so
+     * it needs the same wpautop() pass manually to match (real <p> tags for
+     * multi-paragraph "Long" quotes).
      */
     public function quote()
     {
         return get_field('quote') ?: wpautop($this->example['quote']);
     }
 
-    /**
-     * Retrieve the attribution name.
-     *
-     * @return string
-     */
     public function attributionName()
     {
         return get_field('attribution_name') ?: $this->example['attribution_name'];
     }
 
-    /**
-     * Retrieve the attribution role.
-     *
-     * @return string
-     */
     public function attributionRole()
     {
         return get_field('attribution_role') ?: $this->example['attribution_role'];
     }
 
     /**
-     * Assets enqueued with 'enqueue_block_assets' when rendering the block.
-     *
      * @link https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/#editor-content-scripts-and-styles
      */
     public function assets(array $block): void
