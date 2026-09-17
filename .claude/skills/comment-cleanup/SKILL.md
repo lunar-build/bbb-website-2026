@@ -1,5 +1,5 @@
 ---
-name: comment-restriction
+name: comment-cleanup
 description: Clean up code comments in WordPress Sage theme — remove AI-generated over-commenting, narration, and noise while preserving comments that carry real context. Use whenever the user asks to clean, tidy, prune, fix, audit, or review comments in Sage theme files (PHP, Blade templates, config), mentions "too many comments", "verbose comments", "comment pass", "de-AI the comments", or asks to apply comment guidelines to a Sage file, controller, template, or PR. Also use after an implementation when the user asks to tidy up before committing.
 ---
 
