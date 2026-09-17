@@ -26,6 +26,10 @@ Applies to:
 - **Blade templates** — `.blade.php` files in `resources/views`
 - **Theme config** — `theme.json`, `config/theme.php`, setup/registration arrays
 - **Filter/hook registrations** — actions and filters (often heavily over-commented)
+- **SCSS/CSS files** — `resources/styles/**/*.scss`, including component/block partials
+  (these routinely carry the same AI-narration bloat as PHP/Blade — see dedicated section below)
+- **JS files** — `resources/js/**/*.js`, including `components.js` and Alpine/vanilla behaviour
+  scripts (same narration patterns as PHP: restating what a function/listener does line-by-line)
 
 ## The core principle
 
@@ -193,6 +197,84 @@ All six rules apply inside Blade files. Additionally:
 - HTML structure comments (`<!-- Header -->`', `<!-- Main Content -->`) are navigation.
   Keep them if they mark large sections (helps readability) or if nesting is deep; delete them
   if they state the obvious next to a `<div>`.
+
+## SCSS/CSS Files
+
+All six rules apply here, and this codebase's component partials
+(`resources/styles/components/_*.scss`, `resources/styles/blocks/_*.scss`) tend to accumulate
+the densest AI-narration of anywhere in the theme — a multi-line header block restating the
+Figma node, the layout, and the responsive breakpoints in prose the selectors below already
+show. Apply rule 4 hard here, not just rules 1–3:
+
+- **A Figma node reference is a breadcrumb, not license for a paragraph.** `// Matches Figma
+  "X" (node 12:34)` is worth keeping in one line. Everything after it that just narrates the
+  selectors below — column counts, breakpoint names, "same pattern as every other grid" — is
+  restating code the `@include bp.respond(...)` blocks already show. Cut to the node reference
+  plus only the part no selector can show (why this breakpoint, why this exception).
+- **One rationale, one line, next to the property it governs.** A 3–5 line header comment that
+  bundles the block's identity + layout choice + a cross-file pointer should usually split into
+  a single one-line Figma/identity comment at the top, and short inline comments (`// optional,
+  set via the "Background colour" ACF field`) directly on the rule they explain — not a block
+  above the whole file.
+- **Don't restate what a property already says.** `padding-block: 2.125rem; // 34px` is a useful
+  px-equivalent annotation (keep); a comment above it re-explaining that padding exists is not.
+- **Design-system/WCAG rationale earns its place, tightened.** A contrast-failure flag, a
+  rejected-layout note, or a cross-file consistency pointer is a real keep (rule 6) — but trim it
+  to the constraint and the reason, not a walkthrough of the alternatives considered.
+
+```scss
+// Before (5 lines, narrates the grid the code below already shows):
+// Matches Figma "Icon link grid" (node 10:4389): a light-blue full-bleed
+// section containing a row of icon-led links, each icon/heading+arrow/
+// description — 1 column on phones, 2 from tablet (`md`), 3 from desktop
+// (`lg`), same responsive pattern as every other grid in this theme even
+// though the reference mock only shows the 3-up desktop state.
+.c-icon-link-grid-block {
+
+// After (1 line — the breadcrumb, nothing the grid-template-columns below already says):
+// Figma "Icon link grid" (node 10:4389)
+.c-icon-link-grid-block {
+```
+
+```scss
+// Before (3 lines, cross-file pointer buried in restatement):
+// Background colour is optional and set inline per the block's
+// "Background colour" ACF field (resources/views/blocks/icon-link-grid.blade.php) —
+// defaults to Blue light per the Figma reference, but nothing here if unset.
+padding-block: 2.125rem;
+
+// After (1 line, kept adjacent to what it actually explains — the block file, not this rule):
+padding-block: 2.125rem; // background colour itself is set inline via the block's ACF field
+```
+
+## JS Files
+
+Same six rules, applied to `resources/js/**/*.js` (component registration, Alpine/vanilla
+behaviour scripts). Narration here looks like:
+
+- `// Get the element`, `// Add event listener`, `// Loop through items`, `// Return the value`
+  → delete — the code shows this.
+- JSDoc blocks that only restate the function name and parameter types (`@param {string} id -
+  the id`) → delete or reduce to what the signature can't show (units, side effects, when it
+  throws/returns null, browser quirks the code is compensating for).
+- Comments explaining *why* a listener is attached at a given point (event delegation, avoiding
+  a double-bind, a Safari/WebKit quirk, a Web Awesome component lifecycle gotcha) → keep, per
+  rule 6.
+
+```js
+// Before: narrates each line
+// Get the button element
+const button = document.querySelector('.c-button');
+// Add a click event listener
+button.addEventListener('click', () => {
+  // Toggle the open class
+  button.classList.toggle('is-open');
+});
+
+// After: no comment needed — the code is self-explanatory
+const button = document.querySelector('.c-button');
+button.addEventListener('click', () => button.classList.toggle('is-open'));
+```
 
 ## PHP Controllers and Service Providers
 
