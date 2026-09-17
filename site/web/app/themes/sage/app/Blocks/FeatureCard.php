@@ -2,6 +2,8 @@
 
 namespace App\Blocks;
 
+use App\Fields\Copy;
+use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
@@ -154,6 +156,11 @@ class FeatureCard extends Block
     public $example = [
         'card_style' => 'link',
         'cta_style' => 'icon',
+        'heading_text' => 'Loan a bike',
+        'heading_level' => 'h3',
+        'heading_style' => 'match',
+        'body_text' => 'Example body copy for the card — replace with real content.',
+        'body_style' => 'body',
         'link' => [
             'title' => 'Get involved',
             'url' => 'https://betterbybike.info/get-involved/',
@@ -174,7 +181,7 @@ class FeatureCard extends Block
         'Link' => [],
         'Bikeability' => ['card_style' => 'bikeability', 'cta_style' => 'button'],
         'Event' => ['card_style' => 'event', 'cta_style' => 'button', 'date' => '2nd July 2026'],
-        'News' => ['card_style' => 'news', 'cta_style' => 'button', 'date' => '12th June 2026'],
+        'News' => ['card_style' => 'news', 'cta_style' => 'button', 'date' => '12th June 2026', 'body_text' => ''],
     ];
 
     /**
@@ -190,33 +197,6 @@ class FeatureCard extends Block
     }
 
     /**
-     * The block template.
-     *
-     * @var array
-     */
-    public $template = [
-        'core/heading' => ['placeholder' => 'Title', 'level' => 4],
-        'core/paragraph' => ['placeholder' => 'Body text (optional — delete for cards without body copy)…'],
-    ];
-
-    /**
-     * Fixture markup standing in for this block's InnerBlocks content on
-     * the pattern library page (see App\View\Composers\PatternLibrary).
-     * News cards have no body copy, so the paragraph is omitted whenever
-     * the current fixture's card_style is "news".
-     */
-    public function exampleContent(): string
-    {
-        $heading = '<h3>Loan a bike</h3>';
-
-        if (($this->example['card_style'] ?? null) === 'news') {
-            return $heading;
-        }
-
-        return $heading.'<p>Example body copy for the card — replace with real content.</p>';
-    }
-
-    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
@@ -225,6 +205,8 @@ class FeatureCard extends Block
             'cardStyle' => $this->cardStyle(),
             'image' => $this->image(),
             'date' => $this->date(),
+            'heading' => $this->heading(),
+            'body' => $this->body(),
             'link' => $this->link(),
             'ctaStyle' => $this->ctaStyle(),
         ];
@@ -281,7 +263,22 @@ class FeatureCard extends Block
                             ],
                         ],
                     ],
-                ])
+                ]);
+
+        $fields->addPartial(Heading::class, [
+            'name' => 'heading',
+            'label' => 'Title',
+            'default_level' => 'h3',
+            'required' => true,
+        ]);
+
+        $fields->addPartial(Copy::class, [
+            'name' => 'body',
+            'label' => 'Body text',
+            'default_style' => 'body',
+        ]);
+
+        $fields
             ->addTab('Call to Action')
                 ->addLink('link', [
                     'label' => 'Link',
@@ -328,6 +325,34 @@ class FeatureCard extends Block
     public function date()
     {
         return get_field('date') ?: ($this->example['date'] ?? null);
+    }
+
+    /**
+     * Retrieve the heading text/level/style.
+     *
+     * @return array
+     */
+    public function heading()
+    {
+        return [
+            'text' => get_field('heading_text') ?: $this->example['heading_text'],
+            'level' => get_field('heading_level') ?: $this->example['heading_level'],
+            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+        ];
+    }
+
+    /**
+     * Retrieve the body text/style. Empty text is valid — News cards have
+     * no body copy.
+     *
+     * @return array
+     */
+    public function body()
+    {
+        return [
+            'text' => get_field('body_text') ?: ($this->example['body_text'] ?? ''),
+            'style' => get_field('body_style') ?: ($this->example['body_style'] ?? 'body'),
+        ];
     }
 
     /**

@@ -31,7 +31,14 @@
     @endif
 
     <div class="c-feature-card__content">
-      <InnerBlocks template="{{ $block->template }}" />
+      <x-heading :level="$heading['level']" :style="$heading['style']">
+        {{ $heading['text'] }}
+      </x-heading>
+      @if (! empty($body['text']))
+        <x-copy :style="$body['style']">
+          {{ $body['text'] }}
+        </x-copy>
+      @endif
     </div>
 
     @if (! empty($link['url']) && $ctaStyle !== 'none')
