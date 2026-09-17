@@ -15,6 +15,13 @@
 // Purely decorative (the actual quote meaning is carried by the real
 // <blockquote> text), so no WCAG 1.4.11 contrast requirement applies to
 // its colour.
+//
+// TODO: once the typography-system branch (worktree-typography-system /
+// de4d0c9 "Add full typography utility system sourced from Figma") is
+// merged, swap the hand-rolled font-size/line-height/weight declarations
+// below for its utility classes/mixins — .c-quote__body (large) matches
+// its .u-heading-4, .c-quote--standard .c-quote__body and
+// .c-quote__attribution-* match its .u-standfirst.
 
 .c-quote {
   display: grid;
