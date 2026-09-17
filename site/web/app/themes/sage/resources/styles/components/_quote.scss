@@ -94,6 +94,10 @@
     @include bp.respond($min: bp.$md) {
       grid-column: 1;
       grid-row: 2;
+      // Default layout's 1.75rem margin-top exists to clear the mark
+      // sitting beside it in the same row — not needed here, the mark's
+      // already on its own row above, spaced by .c-quote's row-gap.
+      margin-top: 0;
     }
   }
 
