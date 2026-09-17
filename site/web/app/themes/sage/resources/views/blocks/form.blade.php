@@ -4,7 +4,19 @@
 
   <div class="c-form__inner">
     <div class="c-form__content">
-      <InnerBlocks template="{{ $block->template }}" />
+      <x-heading :level="$heading['level']" :style="$heading['style']">
+        {{ $heading['text'] }}
+      </x-heading>
+      @if (! empty($subheading['text']))
+        <x-heading :level="$subheading['level']" :style="$subheading['style']">
+          {{ $subheading['text'] }}
+        </x-heading>
+      @endif
+      @if (! empty($intro['text']))
+        <x-copy :style="$intro['style']">
+          {{ $intro['text'] }}
+        </x-copy>
+      @endif
     </div>
 
     <div class="c-form__form">
