@@ -8,9 +8,7 @@
 >
 
 <div class="o-container">
-  <x-icon-link-grid :items="$items">
-    <InnerBlocks template="{{ $block->template }}" />
-  </x-icon-link-grid>
+  <x-icon-link-grid :items="$items" :heading="$heading" />
 </div>
 
 </section>

@@ -1,10 +1,8 @@
-@props(['items' => []])
+@props(['items' => [], 'heading' => null])
 
 <div {{ $attributes->class(['c-icon-link-grid']) }}>
-  @if (trim($slot ?? ''))
-    <div class="c-icon-link-grid__heading">
-      {{ $slot }}
-    </div>
+  @if ($heading)
+    <h2 class="c-icon-link-grid__heading">{{ $heading }}</h2>
   @endif
 
   <div class="c-icon-link-grid__list">
