@@ -92,3 +92,24 @@ function social_links_from_options(): array
 
     return array_values(array_filter($links, fn($link) => ! empty($link['url'])));
 }
+
+/**
+ * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
+ * every SVG in resources/svg/ — the curated icon set used by `<x-icon
+ * name="...">` (see resources/views/components/icon.blade.php). Glob-based
+ * so the icon picker on any ACF select field using this grows automatically
+ * as new SVGs are added to that folder, with no code change needed here.
+ */
+function svg_icon_choices(): array
+{
+    $files = glob(get_theme_file_path('resources/svg/*.svg')) ?: [];
+
+    $choices = [];
+
+    foreach ($files as $file) {
+        $slug = basename($file, '.svg');
+        $choices[$slug] = ucwords(str_replace(['-', '_'], ' ', $slug));
+    }
+
+    return $choices;
+}

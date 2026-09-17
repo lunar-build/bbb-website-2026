@@ -1,0 +1,69 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Responsive icon + link grid: 1 column on phones, 2 from tablet (`md`),
+// 3 from desktop (`lg`) — a typical "icon link grid" layout. The heading
+// slot (optional core/heading InnerBlocks content, or a hardcoded caller's
+// own markup) sits above the grid when present.
+.c-icon-link-grid__heading {
+  margin-block-end: 1.5rem;
+
+  :is(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+  }
+}
+
+.c-icon-link-grid__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  @include bp.respond($min: bp.$lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.c-icon-link-grid__item {
+  margin: 0;
+}
+
+.c-icon-link-grid__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--wp--preset--color--lightest-grey);
+  border-radius: 0.5rem;
+  color: var(--wp--preset--color--blue-dark);
+  text-decoration: none;
+  transition: border-color var(--wa-transition-normal, 0.15s) ease,
+    background-color var(--wa-transition-normal, 0.15s) ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--wp--preset--color--blue);
+    background-color: var(--wp--preset--color--blue-light);
+  }
+}
+
+.c-icon-link-grid__icon {
+  flex: none;
+  display: inline-flex;
+  color: var(--wp--preset--color--blue);
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.c-icon-link-grid__label {
+  font-weight: 700;
+}
