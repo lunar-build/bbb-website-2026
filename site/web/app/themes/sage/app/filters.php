@@ -16,6 +16,20 @@ add_filter('excerpt_more', function () {
 });
 
 /**
+ * Register a "Cards" block category so the card blocks (Card Row, Cycle
+ * Route Card, Feature Card, Filter Result Card, Image Card) group together
+ * in the inserter instead of sitting loose under "Text".
+ */
+add_filter('block_categories_all', function (array $categories) {
+    return array_merge([
+        [
+            'slug' => 'cards',
+            'title' => __('Cards', 'sage'),
+        ],
+    ], $categories);
+});
+
+/**
  * Our own ACF Composer blocks each render their own <section>/.o-container
  * wrapper (see the build-acf-block skill's "<section> root" convention),
  * but third-party/core blocks placed directly in post content — e.g. the

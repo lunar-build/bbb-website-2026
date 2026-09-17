@@ -1,6 +1,7 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 @use '../components/header' as header;
+@use '../base/typography';
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
 // sibling of <header class="c-site-header"> in header.blade.php,
@@ -8,7 +9,7 @@
 // `transform` (part of its sticky auto-hide, present even when not
 // currently hidden), which would make it the containing block for a
 // nested position:fixed descendant: the overlay would size against the
-// header's own ~84px box instead of the viewport, slide away with the
+// header's own ~5.25rem box instead of the viewport, slide away with the
 // header's hide-on-scroll transform, and lose the stacking fight for
 // z-index against the header's own (non-positioned) content. As a proper
 // sibling, position:fixed here is contained by the real viewport, and
@@ -18,12 +19,15 @@
 //
 // This overlay only ever shows below bp.$sm (see the display rule below),
 // so there's exactly one header height to account for: Figma's Mobile
-// header row is a fixed 84px regardless of content (logo/CTA/search/menu
-// toggle all share that row height) — hardcoded rather than measured via
-// JS, since it doesn't vary within the breakpoint range this overlay is
-// visible in. The extra 2.25rem (36px) below it is Figma's own gap before
-// the menu content starts (node 4:1257: content top sits at 13.73% of the
-// 874px frame, ~120px — 84px header + 36px gap).
+// header row is a fixed 84px (5.25rem) regardless of content (logo/CTA/
+// search/menu toggle all share that row height) — hardcoded rather than
+// measured via JS, since it doesn't vary within the breakpoint range this
+// overlay is visible in. The extra 2.25rem (36px) below it is Figma's own
+// gap before the menu content starts (node 4:1257: content top sits at
+// 13.73% of the 874px frame, ~120px — 84px header + 36px gap).
+//
+// NOTE (a11y): converted 84px -> 5.25rem so this offset scales with the
+// user's root font-size/zoom like the rest of the theme.
 .c-primary-nav {
   position: fixed;
   inset: 0;
@@ -33,7 +37,7 @@
   scrollbar-gutter: stable; // avoids a horizontal shift between short/long panels
   overscroll-behavior: contain;
   background: var(--wp--preset--color--blue);
-  padding: calc(84px + 4rem) 1rem 3rem;
+  padding: calc(5.25rem + 4rem) 1rem 3rem;
   display: none;
 
   &:not([hidden]) {
@@ -79,10 +83,11 @@
   padding: 0.875rem 0.25rem; // inline padding reset for <button> items, not just <a>
   border: none;
   background: none;
+  @extend .u-mobile-menu-link;
   color: var(--wp--preset--color--white);
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 1rem;
   text-align: start;
   text-decoration: none;
   cursor: pointer;
@@ -93,7 +98,7 @@
   &:hover > span,
   &:focus-visible > span {
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: 0.25rem;
   }
 
   &:focus-visible {
@@ -107,8 +112,8 @@
 
   svg {
     display: block;
-    width: 11px;
-    height: 7px;
+    width: 0.6875rem;
+    height: 0.4375rem;
     transform: rotate(-90deg);
   }
 }
@@ -121,13 +126,14 @@
 }
 
 .c-primary-nav__heading {
+  @extend .u-mobile-menu-link;
   margin: 0;
   padding-block-end: 0.75rem;
   border-block-end: 1px solid rgb(255 255 255 / 30%);
   color: var(--wp--preset--color--white);
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .c-primary-nav__list--sub {
@@ -135,13 +141,14 @@
 }
 
 .c-primary-nav__link--sub {
+  @extend .u-mobile-menu-sublink;
   padding-block: 0;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem;
 
   .c-primary-nav__chevron svg {
-    width: 9px;
-    height: 6px;
+    width: 0.5625rem;
+    height: 0.375rem;
   }
 }
 
@@ -157,24 +164,22 @@
   gap: 0.625rem;
   align-self: flex-start;
   flex-shrink: 0; // panel is a flex column, don't let long content squeeze this
-  height: 40px;
+  height: 2.5rem;
   padding-inline: 1rem;
   border: 2px solid var(--wp--preset--color--white);
   border-radius: 999px;
   background: none;
   color: var(--wp--preset--color--white);
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 14px;
   cursor: pointer;
-
+  
+  @extend .u-cta-small;
   @include focus.ring;
 }
 
 .c-primary-nav__back-icon svg {
   display: block;
-  width: 16px;
-  height: 12px;
+  width: 1rem;
+  height: 0.75rem;
   transform: scaleX(-1); // arrow-right.svg mirrored
 }
 
@@ -198,15 +203,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   background: var(--wp--preset--color--blue-medium);
   color: var(--wp--preset--color--white);
 
   svg {
-    width: 16px;
-    height: 16px;
+    width: 1rem;
+    height: 1rem;
   }
 
   @include focus.ring;
@@ -239,14 +244,13 @@
 .c-primary-nav-desktop__link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.375rem;
   border: none;
   background: none;
   padding: 0;
   color: var(--wp--preset--color--charcoal);
   font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: 16px;
+  @extend .u-nav-link;
   text-decoration: none;
   cursor: pointer;
 
@@ -258,7 +262,7 @@
   &:focus-visible > span,
   &[aria-expanded='true'] > span {
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: 0.25rem;
   }
 
   &:focus-visible {
@@ -272,8 +276,8 @@
 
   svg {
     display: block;
-    width: 9px;
-    height: 5px;
+    width: 0.5625rem;
+    height: 0.3125rem;
     transition: transform 0.15s ease;
   }
 }
@@ -305,26 +309,27 @@
 .c-primary-nav-desktop__column {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 0.8125rem;
   flex: none;
-  width: 220px;
+  width: 13.75rem;
 }
 
 .c-primary-nav-desktop__heading {
+  @extend .u-mobile-menu-link;
   margin: 0;
   color: var(--wp--preset--color--white);
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .c-primary-nav-desktop__sublist {
   display: flex;
   flex-direction: column;
-  gap: 19px;
+  gap: 1.1875rem;
   list-style: none;
   margin: 0;
-  padding-inline-start: 16px; // creates the divider-line look with the border below
+  padding-inline-start: 1rem; // creates the divider-line look with the border below
   border-inline-start: 1px solid var(--wp--preset--color--white);
 }
 
@@ -335,14 +340,13 @@
   gap: 0.75rem;
   color: var(--wp--preset--color--white);
   font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: 14px;
+  @extend .u-nav-sublink;
   text-decoration: none;
 
   &:hover > span,
   &:focus-visible > span {
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: 0.25rem;
   }
 
   &:focus-visible {
@@ -358,8 +362,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 45px;
-  height: 45px;
+  width: 2.8125rem;
+  height: 2.8125rem;
   margin-inline-start: 1rem;
   border: none;
   border-radius: 50%;
@@ -368,8 +372,8 @@
   cursor: pointer;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   @include focus.ring;
@@ -401,7 +405,7 @@
     // whole row now that the button is a real flex sibling.
     width: auto !important;
     flex: 1 1 auto;
-    font-size: 16px; // Figma: 16px vs the shared 14px default
+    font-size: 1rem; // Figma: 16px vs the shared 14px default
     border-radius: 999px 0 0 999px !important;
     border-right: none !important;
   }
@@ -411,7 +415,7 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   padding-inline: 1rem;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-left: none; // no seam line — flows straight from the input
@@ -419,13 +423,12 @@
   background: var(--wp--preset--color--yellow);
   color: var(--wp--preset--color--charcoal);
   font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 20px;
+  @extend .u-cta-large;
   cursor: pointer;
 
   svg {
-    width: 18px;
-    height: 18px;
+    width: 1.125rem;
+    height: 1.125rem;
   }
 
   @include focus.ring;
@@ -433,15 +436,14 @@
 
 .c-primary-nav-desktop__search-close {
   flex: none;
-  height: 45px;
+  height: 2.8125rem;
   padding-inline: 1rem;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   background: var(--wp--preset--color--white);
   color: var(--wp--preset--color--charcoal);
   font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 20px;
+  @extend .u-cta-large;
   cursor: pointer;
 
   @include focus.ring;

@@ -176,6 +176,38 @@ heading + paragraph template — see `app/Blocks/TextHero.php`/`CtaStrip.php`/
 `<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
 block's library entry just shows an empty content area.
 
+**Never hardcode `font-size`/`line-height`/`font-weight`.** Every text style used
+anywhere in the site's Figma design has a matching rule in
+`resources/styles/base/_typography.scss`, backed by `theme.json`
+`settings.typography.fontSizes` presets (`--wp--preset--font-size--*`). `InnerBlocks`
+headings/paragraphs (`core/heading`, `core/paragraph`) already inherit the base
+`h1`-`h6`/`body` rules for free - no extra classes needed. For any other text in a
+block (buttons, card titles, badges, captions, nav-style links, table headers, quotes,
+standfirst/intro paragraphs, form labels/placeholders), add the matching `.u-*` utility
+class instead of writing new font rules:
+
+| Utility class | Use for |
+|---|---|
+| `.u-standfirst` | Intro/lede paragraph under a heading |
+| `.u-body-large` / `.u-body-regular` | Body copy at 16px / 14px (base `body` already covers the default case) |
+| `.u-cta-large` / `.u-cta-small` | Button/CTA label text (Anonymous Pro) |
+| `.u-input-label` / `.u-input-placeholder` | Form field labels / placeholder text |
+| `.u-card-date` | Date text on event/news cards |
+| `.u-card-title-small` | Small card title (Anonymous Pro) |
+| `.u-short-form-link` | Short-form link list items (Anonymous Pro) |
+| `.u-quote` / `.u-quote-citation` | Pull-quote body / citation |
+| `.u-nav-link` / `.u-nav-sublink` | Top nav link / sublink |
+| `.u-mobile-menu-link` / `.u-mobile-menu-sublink` | Mobile menu link / sublink |
+| `.u-footer-link` | Footer link |
+| `.u-table-column-heading` / `.u-table-cell-heading` | Table header row / row-heading cell |
+| `.u-filter-service-label` | Filter-result service labels |
+| `.u-news-row-card-title` | News card-row titles |
+
+If a block genuinely needs a text style with no match above, add a new `fontSizes`
+entry to `theme.json` plus a `.u-*` rule in `_typography.scss` following that file's
+existing pattern (font-size from the new preset var, explicit `line-height` in px,
+explicit `font-weight`) - don't hardcode the value inline in the block's own SCSS.
+
 ## 4. Build the Blade view
 
 Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
@@ -203,12 +235,34 @@ class. Use `$attributes` bare (no `->class()`) if you don't need an extra class.
 
 **Wrap the block's content in `.o-container`** (`resources/styles/base/_container.scss`)
 as a `<div>` *inside* the `<section>`, not on the `<section>` itself — this keeps content
-capped at the shared 1280px width while letting the section's own background bleed full
-width if needed. Give any child that should bleed edge-to-edge (a full-bleed image inside
-otherwise-contained content) the `.o-container__full` class instead of wrapping it
-separately. See `cta-strip.blade.php`/`feature-card.blade.php` for the plain case and
-`video-hero.blade.php` for wrapping an existing bespoke-grid inner div without breaking
-its own `grid-template-columns`.
+capped at the shared 80rem (1280px) width while letting the section's own background
+bleed full width if needed. Give any child that should bleed edge-to-edge (a full-bleed
+image inside otherwise-contained content) the `.o-container__full` class instead of
+wrapping it separately. See `cta-strip.blade.php`/`feature-card.blade.php` for the plain
+case and `video-hero.blade.php` for wrapping an existing bespoke-grid inner div without
+breaking its own `grid-template-columns`.
+
+### Sizing: use rem, not px
+
+Every value written in a block's SCSS must be `rem`, not `px` — this theme targets WCAG
+1.4.4/1.4.10 zoom/reflow, which requires text and layout to scale with the user's
+browser zoom/font-size preference, and `px` doesn't. Convert with `px ÷ 16 = rem`
+(confirmed no `html`/`body` font-size override exists in `base/_reset.scss`, so root
+stays the browser default 16px).
+
+Convert to rem: `font-size`, `line-height`, `padding`/`margin`/`gap`,
+`width`/`height`/`max-width` for content/layout sizing (including icon, logo, and
+button/hit-area dimensions), and real visible `border-radius` values.
+
+Leave as px (the only exceptions): hairline/stroke `border`/`outline` widths (1–2px),
+`box-shadow` offset/blur, the `.u-sr-only` visually-hidden clip pattern
+(`base/_utilities.scss` — converting it would break the clip technique), and `999px`
+pill-radius sentinels (they just need to exceed half the element's height, not represent
+a real measurement).
+
+When copying a px value straight from a Figma spec, convert it before it lands in SCSS —
+don't paste `20px` and fix it later. See `resources/styles/components/_header.scss` and
+`_primary-nav.scss` for worked examples of icon/logo/spacing values converted this way.
 
 ### Shaping WP/ACF data for structured component props
 
