@@ -183,9 +183,6 @@ class IconLinkGrid extends Block
         ],
     ];
 
-    /**
-     * Data to be passed to the block before rendering.
-     */
     public function with(): array
     {
         return [
@@ -194,9 +191,6 @@ class IconLinkGrid extends Block
         ];
     }
 
-    /**
-     * The block field group.
-     */
     public function fields(): array
     {
         $fields = Builder::make('icon_link_grid');
@@ -241,11 +235,6 @@ class IconLinkGrid extends Block
         return $fields->build();
     }
 
-    /**
-     * Retrieve the items.
-     *
-     * @return array
-     */
     public function items()
     {
         return get_field('items') ?: $this->example['items'];
@@ -263,8 +252,6 @@ class IconLinkGrid extends Block
     }
 
     /**
-     * Assets enqueued with 'enqueue_block_assets' when rendering the block.
-     *
      * @link https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/#editor-content-scripts-and-styles
      */
     public function assets(array $block): void
