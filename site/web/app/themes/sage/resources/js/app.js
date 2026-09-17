@@ -10,5 +10,6 @@ import './components.js';
 import './header-search.js';
 import './primary-nav.js';
 import './journey-planner-widget.js';
+import './video-hero.js';
 import '../styles/app.scss';
 

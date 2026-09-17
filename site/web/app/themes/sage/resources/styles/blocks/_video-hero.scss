@@ -1,79 +1,134 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
 
 .c-video-hero {
-  &__inner {
-    display: grid;
-    gap: 2rem;
-    align-items: center;
-    padding: 2rem 1rem;
+  position: relative;
+}
 
-    @include bp.respond($min: bp.$lg) {
-      grid-template-columns: 5fr 11fr;
-      padding: 3rem 2rem;
-    }
+.c-video-hero__media {
+  position: relative;
+  aspect-ratio: 1440 / 574;
+  overflow: hidden;
+
+  @include bp.respond($max: bp.$md) {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.c-video-hero__video {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// Aligns with the .o-container content edge once there's room for it.
+.c-video-hero__toggle {
+  position: absolute;
+  top: 2rem;
+  right: 1.5rem;
+  z-index: 1;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+
+  @include focus.ring($color: white);
+
+  @include bp.respond($min: bp.$lg) {
+    right: max(1.5rem, calc((100% - 1280px) / 2));
+  }
+}
+
+.c-video-hero__toggle-icon {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+
+  @include bp.respond($min: bp.$lg) {
+    width: 3.375rem;
+    height: 3.375rem;
   }
 
-  &__media {
-    order: 1;
-    position: relative;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 0.75rem;
-
-    @include bp.respond($min: bp.$lg) {
-      order: 2;
-      aspect-ratio: auto;
-      height: 100%;
-    }
-  }
-
-  &__video {
-    // lunar-video's shadow-DOM wrapper is an auto-height block; an `auto` grid
-    // track sizes to its content (the video's intrinsic aspect ratio) instead
-    // of the host's own box, so it must be pinned to 1fr to fill height/width
-    // instead of overflowing past the host's bounds.
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    grid-template-columns: minmax(0, 1fr);
-    position: absolute;
-    inset: 0;
+  svg {
+    display: block;
     width: 100%;
     height: 100%;
   }
 
-  &__placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    background: #e5e5e5;
-    color: #737373;
-    text-align: center;
-    padding: 1rem;
+  &[hidden] {
+    display: none;
   }
+}
 
-  &__content {
-    order: 2;
+.c-video-hero__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #e5e5e5;
+  color: #737373;
+  text-align: center;
+  padding: 1rem;
+}
 
-    @include bp.respond($min: bp.$lg) {
-      order: 1;
-    }
+.c-video-hero__lower {
+  position: relative;
+  background: var(--wp--preset--color--lightest-grey);
+  padding-block: 2.5rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 3.5rem;
   }
+}
 
-  &__heading {
-    margin: 0 0 1rem;
+// Content + widget share one grid row so the widget's overlap (below) is a
+// fixed offset from their shared row-start, not dependent on content height.
+.c-video-hero__row {
+  @include bp.respond($min: bp.$xl) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 3rem;
+    align-items: start;
   }
+}
 
-  &__intro {
-    margin: 0 0 2rem;
+.c-video-hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 34rem;
+
+  @include bp.respond($min: bp.$xl) {
+    max-width: none;
   }
+}
 
-  &__cta-text {
-    margin: 0 0 0.75rem;
-  }
+.c-video-hero__heading {
+  margin: 0;
+  color: var(--wp--preset--color--blue-medium);
+}
 
-  &__cta-label {
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+.c-video-hero__intro {
+  margin: 0;
+  color: var(--wp--preset--color--blue-dark);
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 30px;
+}
+
+// Stacked below $xl. At $xl+, overlaps the media above by 3rem — margin
+// must first clear .c-video-hero__lower's own 3.5rem padding-block-start,
+// hence -6.5rem.
+.c-video-hero__widget {
+  margin-block-start: 1.5rem;
+
+  @include bp.respond($min: bp.$xl) {
+    margin-block-start: -6.5rem;
+    position: relative;
+    z-index: 1;
   }
 }
