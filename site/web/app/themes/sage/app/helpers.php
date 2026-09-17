@@ -111,3 +111,27 @@ function svg_icon_choices(): array
 
     return $choices;
 }
+
+/**
+ * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
+ * the theme's global colour palette (`theme.json`'s `color.palette`, via
+ * WP's own settings API so it reflects any core/plugin overrides too) —
+ * for ACF select fields offering a background colour pick tied to
+ * `var(--wp--preset--color--{slug})`, e.g. IconLinkGrid's `background_color`.
+ */
+function theme_color_choices(): array
+{
+    // wp_get_global_settings(['color', 'palette']) groups by origin
+    // (theme/default/custom) — 'theme' is specifically this theme.json's
+    // own brand palette; WP core's generic 'default' swatches (vivid-red,
+    // pale-pink, etc.) aren't wanted as background choices here.
+    $palette = wp_get_global_settings(['color', 'palette', 'theme']) ?: [];
+
+    $choices = [];
+
+    foreach ($palette as $color) {
+        $choices[$color['slug']] = $color['name'];
+    }
+
+    return $choices;
+}

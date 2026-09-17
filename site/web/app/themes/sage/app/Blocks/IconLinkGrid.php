@@ -171,6 +171,7 @@ class IconLinkGrid extends Block
      * @var array
      */
     public $example = [
+        'background_color' => 'blue-light',
         'items' => [
             [
                 'icon' => 'cycling-route',
@@ -209,6 +210,7 @@ class IconLinkGrid extends Block
     {
         return [
             'items' => $this->items(),
+            'backgroundColor' => $this->backgroundColor(),
         ];
     }
 
@@ -220,6 +222,15 @@ class IconLinkGrid extends Block
         $fields = Builder::make('icon_link_grid');
 
         $fields
+            ->addSelect('background_color', [
+                'label' => 'Background colour',
+                'instructions' => 'Optional — matches the Figma reference\'s "Blue light" by default. Leave blank for no background.',
+                'choices' => theme_color_choices(),
+                'allow_null' => true,
+                'ui' => 1,
+                'placeholder' => 'None',
+                'default_value' => 'blue-light',
+            ])
             ->addRepeater('items', [
                 'label' => 'Items',
                 'button_label' => 'Add item',
@@ -254,6 +265,17 @@ class IconLinkGrid extends Block
     public function items()
     {
         return get_field('items') ?: $this->example['items'];
+    }
+
+    /**
+     * Retrieve the background colour (a theme.json palette slug, or empty
+     * for no background).
+     *
+     * @return string
+     */
+    public function backgroundColor()
+    {
+        return get_field('background_color') ?: $this->example['background_color'];
     }
 
     /**

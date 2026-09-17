@@ -9,7 +9,9 @@
 // own markup) sits above the grid when present — not part of the Figma
 // reference itself, which has no heading.
 .c-icon-link-grid-block {
-  background: var(--wp--preset--color--blue-light);
+  // Background colour is optional and set inline per the block's
+  // "Background colour" ACF field (resources/views/blocks/icon-link-grid.blade.php) —
+  // defaults to Blue light per the Figma reference, but nothing here if unset.
   padding-block: 2.125rem; // 34px
 }
 
