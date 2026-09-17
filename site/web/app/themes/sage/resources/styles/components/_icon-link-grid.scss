@@ -70,8 +70,11 @@
   color: var(--wp--preset--color--orange);
 
   svg {
-    width: auto;
-    height: 3.125rem; // 50px, matches the tallest reference icon
+    // Fixed 49x49 square box — consistent footprint across icons regardless
+    // of each SVG's own (non-square) viewBox; the browser's default
+    // preserveAspectRatio scales each glyph to fit within it uncropped.
+    width: 3.0625rem; // 49px
+    height: 3.0625rem; // 49px
   }
 }
 
@@ -93,8 +96,8 @@
   flex: none;
 
   svg {
-    width: 22px;
-    height: 14px;
+    width: 1.375rem; // 22px
+    height: 0.875rem; // 14px
     overflow: visible;
   }
 
