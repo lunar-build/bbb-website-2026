@@ -29,7 +29,10 @@ document.querySelectorAll('[data-video-background]').forEach((wrapper) => {
   video.addEventListener('pause', () => setPressed(false));
 
   const respectReducedMotion = () => {
-    if (reducedMotion.matches) video.pause();
+    if (reducedMotion.matches) {
+      video.pause();
+      setPressed(false);
+    }
   };
 
   respectReducedMotion();
