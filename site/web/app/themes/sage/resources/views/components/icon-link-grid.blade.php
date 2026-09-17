@@ -1,13 +1,11 @@
 @props(['items' => []])
 
 <div {{ $attributes->class(['c-icon-link-grid']) }}>
-  @isset($slot)
-    @if (trim($slot))
-      <div class="c-icon-link-grid__heading">
-        {{ $slot }}
-      </div>
-    @endif
-  @endisset
+  @if (trim($slot ?? ''))
+    <div class="c-icon-link-grid__heading">
+      {{ $slot }}
+    </div>
+  @endif
 
   <ul class="c-icon-link-grid__list">
     @foreach ($items as $item)
