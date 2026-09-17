@@ -102,11 +102,6 @@
 .c-quote__mark {
   display: inline-flex;
   color: var(--wp--preset--color--yellow);
-  // Offset upward relative to the body text, per the Figma reference (the
-  // mark's top sits above the quote text's top, not level with it) — a
-  // negative margin-top pulls it up out of the shared grid-row's aligned
-  // start edge.
-  margin-top: -0.75rem;
 
   svg {
     // Fixed 49x49 box, same convention as Icon Link Grid's icons — the
@@ -128,6 +123,12 @@
   @include bp.respond($min: bp.$md) {
     grid-column: 2;
     grid-row: 1;
+    // Mark stays at the row's natural top (align-items:start, no negative
+    // margin) so it's never pulled outside .c-quote-block's padding — the
+    // body drops down relative to it instead, giving the same "mark sits
+    // above the text" relationship from the Figma reference without
+    // breaking containment.
+    margin-top: 0.75rem;
   }
   font-family: var(--wp--preset--font-family--nata-sans);
   // Default ('large', .c-quote--large) size — the Figma "Short" variant's
