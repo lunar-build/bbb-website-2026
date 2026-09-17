@@ -49,6 +49,15 @@
   text-decoration: none;
 
   @include focus.ring;
+
+  // The arrow's hover/focus animation (below) grows its path a few px wider
+  // with overflow:visible, same trick as .c-button's arrow — that's normally
+  // invisible inside a button's own padding, but this card has none, so the
+  // default 2px outline-offset isn't enough room for the longest heading's
+  // arrow (sitting closest to the card edge) to stay inside the ring.
+  &:focus-visible {
+    outline-offset: 0.5rem;
+  }
 }
 
 .c-icon-link-grid__icon {
