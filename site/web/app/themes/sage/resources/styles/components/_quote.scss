@@ -42,12 +42,16 @@
 }
 
 .c-quote__mark {
-  font-family: Georgia, 'Times New Roman', serif;
-  // 8.75rem (140px) — the Figma reference's exact mark size. Not tied to
-  // the Icon Link Grid icon convention (49px) — that's a different kind of
-  // element (a small in-flow icon vs. this quote's dominant decorative
-  // mark), so matching them looked visually wrong against the design.
-  font-size: 8.75rem;
+  // Nata Sans, not a serif fallback — matches the Figma reference exactly
+  // (its mark is plain Nata Sans text, not a bundled asset), and it's this
+  // theme's own self-hosted font rather than relying on Georgia/Times New
+  // Roman being installed.
+  font-family: var(--wp--preset--font-family--nata-sans);
+  // Smaller on mobile — at the full desktop size, stacked above the quote
+  // body (no side column to sit in) it dominated the layout and pushed
+  // the text too far down. 6rem from `md` up, once it moves into its own
+  // grid column beside the text.
+  font-size: 3.5rem;
   font-weight: 700;
   line-height: 1;
   color: var(--wp--preset--color--yellow);
@@ -55,6 +59,7 @@
   @include bp.respond($min: bp.$md) {
     grid-column: 1;
     grid-row: 1;
+    font-size: 6rem;
   }
 }
 
