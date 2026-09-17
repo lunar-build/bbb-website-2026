@@ -73,6 +73,7 @@
         </div>
     </div>
 
+    @include('sections.primary-nav-desktop', ['items' => $items])
 </header>
 
 {{-- Deliberately OUTSIDE <header class="c-site-header">: site-header.js's

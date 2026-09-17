@@ -40,6 +40,8 @@
             class="c-video__control"
             data-video-control
             aria-pressed="true"
+            data-label-pause="{{ __('Pause background video', 'sage') }}{{ $label ? ': '.$label : '' }}"
+            data-label-play="{{ __('Play background video', 'sage') }}{{ $label ? ': '.$label : '' }}"
             aria-label="{{ __('Pause background video', 'sage') }}{{ $label ? ': '.$label : '' }}"
         >
             <svg class="c-video__control-icon c-video__control-icon--pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">

@@ -25,13 +25,14 @@ if (header) {
 
     if (currentScrollY <= header.offsetHeight) {
       setHidden(false);
+      lastScrollY = currentScrollY;
     } else if (delta > SCROLL_DELTA_THRESHOLD) {
       setHidden(true);
+      lastScrollY = currentScrollY;
     } else if (delta < -SCROLL_DELTA_THRESHOLD) {
       setHidden(false);
+      lastScrollY = currentScrollY;
     }
-
-    lastScrollY = currentScrollY;
   };
 
   window.addEventListener(
