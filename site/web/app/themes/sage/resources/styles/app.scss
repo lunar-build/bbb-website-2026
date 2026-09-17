@@ -14,9 +14,17 @@
 @use 'components/breadcrumbs';
 @use 'components/quote';
 @use 'components/video';
+@use 'components/pill';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'blocks/generic';
 @use 'blocks/video-hero';
 @use 'blocks/cta-banner';
 @use 'blocks/journey-planner-widget';
+@use 'blocks/feature-card';
+@use 'blocks/image-card';
+@use 'blocks/filter-result-card';
+@use 'blocks/cycle-route-card';
+@use 'blocks/card-row';
+@use 'blocks/post-hero';
+@use 'blocks/image-hero';

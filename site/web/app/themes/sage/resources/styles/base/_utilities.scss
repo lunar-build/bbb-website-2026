@@ -1,3 +1,6 @@
+// px, not rem, is intentional here — this is a visually-hidden clip
+// technique (1px box shrunk to nothing via a negative margin), not a
+// visual size, so it must not scale with the user's zoom/font-size.
 .u-sr-only {
   position: absolute;
   width: 1px;
