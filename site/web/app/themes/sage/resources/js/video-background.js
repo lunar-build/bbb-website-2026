@@ -11,6 +11,10 @@ document.querySelectorAll('[data-video-background]').forEach((wrapper) => {
 
   const setPressed = (playing) => {
     control.setAttribute('aria-pressed', String(playing));
+    control.setAttribute(
+      'aria-label',
+      playing ? control.dataset.labelPause : control.dataset.labelPlay,
+    );
   };
 
   control.addEventListener('click', () => {
