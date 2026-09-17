@@ -20,16 +20,24 @@ different task.
 Whitespace left behind by deleted comments should be tidied (no orphaned blank
 lines), but the code itself must be byte-identical.
 
-Applies to:
+**Applies to every file type in the theme — not a fixed list.** Any file this codebase (or an
+agent working in it) can put a comment in is in scope: PHP, Blade, SCSS/CSS, JS, JSON/theme.json,
+YAML, Markdown docs, `.env.example`, anything. Do not read the list below as exhaustive and skip
+a file type it doesn't name — if it has a comment syntax, this pass applies to it. The list exists
+only to flag file types with dedicated guidance elsewhere in this doc:
 
 - **PHP files** — controllers, service providers, utility functions, ACF setup
-- **Blade templates** — `.blade.php` files in `resources/views`
+- **Blade templates** — `.blade.php` files in `resources/views` (see dedicated section below —
+  this includes component doc-comment headers, `{{-- ... --}}`, not just inline directives)
 - **Theme config** — `theme.json`, `config/theme.php`, setup/registration arrays
 - **Filter/hook registrations** — actions and filters (often heavily over-commented)
 - **SCSS/CSS files** — `resources/styles/**/*.scss`, including component/block partials
   (these routinely carry the same AI-narration bloat as PHP/Blade — see dedicated section below)
 - **JS files** — `resources/js/**/*.js`, including `components.js` and Alpine/vanilla behaviour
   scripts (same narration patterns as PHP: restating what a function/listener does line-by-line)
+
+When asked to run this pass on "a branch," "these files," or a component, that means every file
+touched — walk the whole diff/directory, not just the one file type most recently discussed.
 
 ## The core principle
 
@@ -197,6 +205,29 @@ All six rules apply inside Blade files. Additionally:
 - HTML structure comments (`<!-- Header -->`', `<!-- Main Content -->`) are navigation.
   Keep them if they mark large sections (helps readability) or if nesting is deep; delete them
   if they state the obvious next to a `<div>`.
+- **Reusable-component doc-comment headers** (`{{-- ... --}}` blocks at the top of a
+  `resources/views/components/*.blade.php` file documenting `@props`) get rule 4 applied hard,
+  same as SCSS headers below. These carry a real contract — prop names/defaults aren't
+  type-hinted in Blade, so the doc is often the only place a caller learns what `$size` or
+  `$layout` accept and what happens when attribution is empty. Keep the contract; cut the
+  padding around it:
+  - One usage sentence, not a paragraph, on where/how the component is used elsewhere.
+  - Each prop gets its accepted values + behavior in one line, not a full sentence of
+    justification for why the prop exists.
+  - Drop restated cross-file pointers beyond a single breadcrumb (one "see X" per fact, not
+    "see X (which does Y, because Z, matching W)").
+
+```blade
+{{-- Before (24 lines): three paragraphs of usage history, prop rationale, and cross-file
+     pointers repeated for both props and both attribution fields. --}}
+
+{{-- After (contract only, no padding): --}}
+{{--
+  Pull-quote fragment. $size: 'large' (default) | 'standard' — matches Figma scale.
+  $layout: 'default' | 'centered' — see _quote.scss's .c-quote--centered.
+  Attribution hides when $attributionName is empty; $attributionRole needs both.
+--}}
+```
 
 ## SCSS/CSS Files
 
