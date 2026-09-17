@@ -49,22 +49,20 @@
   // Offset upward relative to the body text, per the Figma reference (the
   // mark's top sits above the quote text's top, not level with it) — a
   // negative margin-top pulls it up out of the shared grid-row's aligned
-  // start edge. Slightly less offset on mobile to match its smaller size.
+  // start edge.
   margin-top: -0.75rem;
 
   svg {
-    width: 4.5rem; // sized up from 3.5rem — still read as too small on mobile
-    height: auto;
+    // Fixed 49x49 box, same convention as Icon Link Grid's icons — the
+    // browser's default preserveAspectRatio scales this (non-square,
+    // 44x32) glyph to fit within it uncropped.
+    width: 3.0625rem; // 49px
+    height: 3.0625rem; // 49px
   }
 
   @include bp.respond($min: bp.$md) {
     grid-column: 1;
     grid-row: 1;
-    margin-top: -1.25rem;
-
-    svg {
-      width: 6rem;
-    }
   }
 }
 
