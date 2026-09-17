@@ -27,6 +27,17 @@
 
 @use '../abstracts/breakpoints' as bp;
 
+// Section padding for the Quote block used standalone (not hardcoded into
+// another block's view) — same default rhythm as .c-block's generic
+// third-party-block containment (resources/styles/blocks/_generic.scss).
+.c-quote-block {
+  padding-block: 2rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 3rem;
+  }
+}
+
 .c-quote {
   display: grid;
   // Mobile: single column, mark/body/attribution stack in source order via
@@ -35,7 +46,11 @@
   // column, body the next.
   row-gap: 1rem;
   align-items: start;
+  // Stays this width rather than stretching to fill .o-container's full
+  // content column — margin-inline:auto centres it within that wider column
+  // instead of hugging the left edge.
   max-width: 46rem;
+  margin-inline: auto;
 
   @include bp.respond($min: bp.$md) {
     grid-template-columns: auto 1fr;
