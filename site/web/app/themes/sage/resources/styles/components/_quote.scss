@@ -28,9 +28,9 @@
 .c-quote {
   display: grid;
   // Mobile: single column, mark/body/attribution stack in source order via
-  // normal auto-placement — even at the mark's reduced 49px size, a fixed
-  // icon column crowds text on a narrow phone. From `md` up: mark gets its
-  // own column, body the next.
+  // normal auto-placement — the mark's large size would crowd the text in
+  // a fixed column on a narrow phone. From `md` up: mark gets its own
+  // column, body the next.
   row-gap: 1rem;
   align-items: start;
   max-width: 46rem;
@@ -43,7 +43,11 @@
 
 .c-quote__mark {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 3.0625rem; // 49px — matches the Icon Link Grid icon size convention
+  // 8.75rem (140px) — the Figma reference's exact mark size. Not tied to
+  // the Icon Link Grid icon convention (49px) — that's a different kind of
+  // element (a small in-flow icon vs. this quote's dominant decorative
+  // mark), so matching them looked visually wrong against the design.
+  font-size: 8.75rem;
   font-weight: 700;
   line-height: 1;
   color: var(--wp--preset--color--yellow);
