@@ -1,0 +1,49 @@
+// Figma "Image card": image with a linked caption bar, no body copy.
+@use '../base/typography';
+@use '../components/button';
+
+.c-image-card {
+  &__card {
+    display: block;
+    max-width: 572px;
+    border-radius: 12px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    background: var(--wp--preset--color--white);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      @include button.arrow-hover;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-bottom: 1px solid var(--wp--preset--color--light-grey);
+  }
+
+  &__caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 20px 24px;
+  }
+
+  &__title {
+    @extend .u-cta-large;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex: none;
+    width: 29px;
+    height: 12px;
+    color: var(--wp--preset--color--charcoal);
+  }
+}

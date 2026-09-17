@@ -2,35 +2,35 @@ body {
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 400;
   font-size: var(--wp--preset--font-size--body);
-  line-height: 24px;
+  line-height: 1.5rem;
   color: var(--wp--preset--color--charcoal);
 }
 
 h1,
 .u-heading-1 {
   font-size: var(--wp--preset--font-size--heading-1);
-  line-height: 64px;
+  line-height: 4rem;
   font-weight: 700;
 }
 
 h2,
 .u-heading-2 {
   font-size: var(--wp--preset--font-size--heading-2);
-  line-height: 54px;
+  line-height: 3.375rem;
   font-weight: 700;
 }
 
 h3,
 .u-heading-3 {
   font-size: var(--wp--preset--font-size--heading-3);
-  line-height: 44px;
+  line-height: 2.75rem;
   font-weight: 700;
 }
 
 h4,
 .u-heading-4 {
   font-size: var(--wp--preset--font-size--heading-4);
-  line-height: 34px;
+  line-height: 2.125rem;
   font-weight: 700;
 }
 
@@ -39,20 +39,150 @@ h5,
 h6,
 .u-heading-5 {
   font-size: var(--wp--preset--font-size--heading-5);
-  line-height: 36px;
+  line-height: 2.25rem;
   font-weight: 700;
 }
 
 .u-standfirst {
   font-size: var(--wp--preset--font-size--standfirst);
-  line-height: 30px;
+  line-height: 1.875rem;
   font-weight: 400;
 }
 
 .u-input-label {
   font-size: var(--wp--preset--font-size--input-label);
-  line-height: 26px;
+  line-height: 1.625rem;
   font-weight: 500;
+}
+
+.u-news-tag {
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 32px;
+  font-weight: 500;
+}
+
+.u-filter-service-label {
+  font-size: var(--wp--preset--font-size--filter-service-label);
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.u-body-large {
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 26px;
+  font-weight: 400;
+}
+
+.u-body-regular {
+  font-size: var(--wp--preset--font-size--body-regular);
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.u-contact-text {
+  font-size: var(--wp--preset--font-size--body-regular);
+  line-height: 24px;
+  font-weight: 700;
+}
+
+.u-news-row-card-title {
+  font-size: var(--wp--preset--font-size--news-row-card-title);
+  line-height: 36px;
+  font-weight: 700;
+}
+
+.u-cta-large {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--button-label);
+  line-height: 1.875rem;
+  font-weight: 700;
+}
+
+.u-cta-small {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--cta-small);
+  line-height: 1.125rem;
+  font-weight: 700;
+}
+
+.u-input-placeholder {
+  font-size: var(--wp--preset--font-size--input-placeholder);
+  line-height: 18px;
+  font-weight: 500;
+}
+
+.u-card-date {
+  font-size: var(--wp--preset--font-size--card-date);
+  line-height: 24px;
+  font-weight: 700;
+}
+
+.u-card-title-small {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--card-title-small);
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.u-short-form-link {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: var(--wp--preset--font-size--short-form-link);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-quote {
+  font-size: var(--wp--preset--font-size--quote);
+  line-height: 40px;
+  font-weight: 400;
+}
+
+.u-quote-citation {
+  font-size: var(--wp--preset--font-size--quote-citation);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-nav-link {
+  font-size: var(--wp--preset--font-size--nav-link);
+  line-height: normal;
+  font-weight: 500;
+}
+
+.u-nav-sublink {
+  font-size: var(--wp--preset--font-size--nav-sublink);
+  line-height: normal;
+  font-weight: 500;
+}
+
+.u-mobile-menu-link {
+  font-size: var(--wp--preset--font-size--mobile-menu-link);
+  line-height: normal;
+  font-weight: 700;
+}
+
+.u-mobile-menu-sublink {
+  font-size: var(--wp--preset--font-size--mobile-menu-sublink);
+  line-height: normal;
+  font-weight: 500;
+}
+
+.u-footer-link {
+  font-size: var(--wp--preset--font-size--footer-link);
+  line-height: 26px;
+  font-weight: 700;
+}
+
+.u-table-column-heading {
+  font-size: var(--wp--preset--font-size--table-column-heading);
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.u-table-cell-heading {
+  font-size: var(--wp--preset--font-size--table-cell-heading);
+  line-height: 26px;
+  font-weight: 700;
 }
 
 .u-callout {
@@ -64,5 +194,5 @@ h6,
   background: var(--wp--preset--color--blue-light);
   color: var(--wp--preset--color--blue-dark);
   font-size: var(--wp--preset--font-size--body);
-  line-height: 24px;
+  line-height: 1.5rem;
 }

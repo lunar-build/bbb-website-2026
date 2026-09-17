@@ -1,25 +1,66 @@
 @use '../base/focus' as focus;
+@use '../base/typography';
 
-// Site buttons only ever use variant="brand"|"neutral" appearance="accent" pill,
-// with a c-icon--arrow-right in the `end` slot. WA's "filled" appearance uses the
-// soft -fill-normal/-on-normal tokens (a light tint); "accent" is the one that
-// uses -fill-loud/-on-loud, which is what our brand-token override in
-// base/_wa-theme.scss targets for a solid, bold CTA look.
+// Large CTAs: variant="brand"|"neutral" appearance="accent" pill. WA's
+// "filled" appearance uses the soft -fill-normal/-on-normal tokens (a light
+// tint); "accent" is the one that uses -fill-loud/-on-loud, which is what
+// our brand-token override in base/_wa-theme.scss targets for a solid,
+// bold CTA look.
+//
+// Small CTAs (size="small", Figma "CTA | Small", node 135-2255): the same
+// component at pill/40px, used where a compact button sits inside a card —
+// three colour states, all sharing the arrow-hover animation below.
+//   - variant="neutral" appearance="accent"   → filled charcoal, white text/border
+//   - variant="neutral" appearance="outlined" → transparent, charcoal text/border
+//   - variant="brand"   appearance="accent"   → filled yellow, charcoal text/border (shared with the large brand button's border rule below)
 
 wa-button::part(label) {
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: var(--wp--preset--font-size--button-label);
-  line-height: 30px;
+  @extend .u-cta-large;
   letter-spacing: 0.02em;
+}
+
+wa-button[size='small']::part(label) {
+  @extend .u-cta-small;
+  letter-spacing: normal;
+}
+
+wa-button[size='small']::part(button) {
+  height: 40px;
+  padding-inline: 16px;
+  gap: 10px;
 }
 
 wa-button[variant='brand'][appearance='accent']::part(button) {
   border: 2px solid var(--wp--preset--color--charcoal);
 }
 
+wa-button[size='small'][variant='neutral'][appearance='accent']::part(button) {
+  border: 2px solid var(--wp--preset--color--white);
+}
+
+wa-button[size='small'][variant='neutral'][appearance='outlined']::part(button) {
+  border: 2px solid var(--wp--preset--color--charcoal);
+  color: var(--wp--preset--color--charcoal);
+}
+
 wa-button::part(button) {
   @include focus.ring;
+}
+
+// A decorative wa-button — visually a button, but not itself the click
+// target (e.g. FeatureCard's whole card is the real link, so its CTA is
+// marked aria-hidden + tabindex="-1") — must let clicks/hover pass through
+// to whatever real link sits behind/around it instead of swallowing them.
+wa-button[aria-hidden='true'] {
+  pointer-events: none;
+}
+
+// The hover path ('M1 7H28…') extends past the icon's own 22-wide viewBox —
+// browsers clip SVG content to the viewBox by default, so every arrow-right
+// icon used as a CTA (not just inside <wa-button>) needs this, or the
+// animation gets cut off mid-extension instead of overflowing visibly.
+.c-icon--arrow-right svg {
+  overflow: visible;
 }
 
 wa-button .c-icon--arrow-right {
@@ -27,17 +68,26 @@ wa-button .c-icon--arrow-right {
   margin-inline-start: 0.5em;
 
   svg {
-    width: 22px;
-    height: 14px;
+    width: 1.375rem;
+    height: 0.875rem;
     flex: none;
-    overflow: visible;
-  }
-
-  .c-icon__arrow {
-    transition: d 0.15s ease;
   }
 }
 
-wa-button:is(:hover, :focus-within) .c-icon--arrow-right .c-icon__arrow {
-  d: path('M1 7H28M28 7L22 1M28 7L22 13');
+// The arrow-right icon's morph-on-hover animation, extracted so any
+// hand-rolled CTA that can't use <wa-button> directly — because the whole
+// card, not the button, is the click target (see _feature-card.scss) —
+// can still reproduce this exact interaction under its own hover trigger.
+.c-icon--arrow-right .c-icon__arrow {
+  transition: d 0.15s ease;
+}
+
+@mixin arrow-hover {
+  .c-icon--arrow-right .c-icon__arrow {
+    d: path('M1 7H28M28 7L22 1M28 7L22 13');
+  }
+}
+
+wa-button:is(:hover, :focus-within) {
+  @include arrow-hover;
 }

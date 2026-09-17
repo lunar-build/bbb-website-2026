@@ -1,3 +1,5 @@
+@use '../base/typography';
+
 // Figma: font-size 20px, line-height 30px, letter-spacing 0.4px, color
 // blue-dark (#003852). Current page (last item) is underlined and not a
 // link — WA renders a plain <button> for items with no href, so it's also
@@ -14,12 +16,13 @@
 }
 
 wa-breadcrumb-item {
+  @extend .u-cta-large;
   color: var(--c-breadcrumbs-color);
   font-family: var(--wp--preset--font-family--anonymous-pro);
   font-weight: 700;
-  font-size: 20px;
-  line-height: 30px;
-  letter-spacing: 0.4px;
+  font-size: 1.25rem;
+  line-height: 1.875rem;
+  letter-spacing: 0.025rem;
 }
 
 wa-breadcrumb-item::part(label) {
@@ -40,8 +43,8 @@ wa-breadcrumb-item .c-icon--arrow-right {
   color: var(--c-breadcrumbs-color);
 
   svg {
-    width: 14px;
-    height: 9px;
+    width: 0.875rem;
+    height: 0.5625rem;
     flex: none;
   }
 }

@@ -3,30 +3,30 @@
 // from _input.scss/_choice.scss — this only covers the card shell.
 
 .c-journey-planner-widget {
-  max-width: 641px;
+  max-width: 40.0625rem;
 }
 
 .c-journey-planner-widget__card {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 40px;
+  gap: 1.25rem;
+  padding: 2.5rem;
   background: var(--wp--preset--color--yellow);
-  border-radius: 20px;
+  border-radius: 1.25rem;
 }
 
 .c-journey-planner-widget__heading {
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 700;
-  font-size: 40px;
-  line-height: 40px;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
   color: var(--wp--preset--color--charcoal);
 }
 
 .c-journey-planner-widget__form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.25rem;
   align-items: flex-start;
 }
 
@@ -36,8 +36,8 @@
 .c-journey-planner-widget__options {
   display: flex;
   flex-wrap: wrap;
-  column-gap: 60px;
-  row-gap: 12px;
+  column-gap: 3.75rem;
+  row-gap: 0.75rem;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -47,7 +47,7 @@
 .c-journey-planner-widget__options legend {
   width: 100%;
   padding: 0;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 // Figma's CTA is a solid charcoal pill — neither wa-button token preset
