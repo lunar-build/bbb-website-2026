@@ -1,0 +1,11 @@
+.c-text-hero {
+  padding-block: 3rem;
+
+  @media (min-width: 64rem) {
+    padding-block: 4rem;
+  }
+
+  &__heading {
+    margin-bottom: 1rem;
+  }
+}
