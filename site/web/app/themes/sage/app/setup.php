@@ -66,11 +66,9 @@ add_filter('theme_file_path', function ($path, $file) {
 add_filter('should_load_separate_core_block_assets', '__return_false');
 
 /**
- * Exclude specific core/other-plugin blocks from the inserter — for blocks
- * we've built our own ACF Composer replacement for (e.g. 'core/quote' vs.
- * our own "Quote" block, app/Blocks/Quote.php), so editors aren't shown two
- * confusingly similar options. Add a block name here any time this comes up
- * again for a different block.
+ * Excludes core/other-plugin blocks we've built our own ACF Composer
+ * replacement for (avoids two confusingly similar options in the inserter).
+ * Add a block name here any time this comes up again.
  *
  * @link https://developer.wordpress.org/reference/hooks/allowed_block_types_all/
  */
