@@ -1,8 +1,8 @@
 {{--
   Reusable pull-quote fragment. Used by resources/views/blocks/quote.blade.php
-  (default slot = the Quote block's rendered InnerBlocks content) and free to
-  hardcode directly into any other block's Blade view later (default slot =
-  literal text/HTML in that case instead).
+  (default slot = the Quote block's 'quote' ACF field, already wpautop-
+  formatted) and free to hardcode directly into any other block's Blade
+  view later (default slot = literal text/HTML in that case instead).
 
   $size ('large'|'standard') matches the Figma Short/Long variants' two
   typographic scales — 'large' (default) suits a punchy one-liner, 'standard'
