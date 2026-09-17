@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Matches Figma "Icon link grid" (node 10:4389): a light-blue full-bleed
 // section containing a row of icon-led links, each icon/heading+arrow/
@@ -71,10 +72,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  font-family: var(--wp--preset--font-family--anonymous-pro);
-  font-weight: 700;
-  font-size: 1.5rem;
-  line-height: 1.25;
+  @extend .u-short-form-link;
   letter-spacing: 0.06rem;
   text-transform: uppercase;
   color: var(--wp--preset--color--blue-medium);
