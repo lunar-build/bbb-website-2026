@@ -62,7 +62,7 @@ Theme translations (from `/site/web/app/themes/sage`): `npm run translate` (pot 
 
 **ACF Composer** (`log1x/acf-composer`) provides an Artisan-like CLI for defining ACF field groups and Gutenberg blocks in PHP instead of the ACF UI. Blocks live in `app/Blocks/*.php` with a matching Blade view at `resources/views/blocks/<kebab-block-name>.blade.php` (auto-discovered, no manual registration). Standalone field groups go in `app/Fields/`; global options pages go in `app/Options/*.php` extending `Log1x\AcfComposer\Options` (see `app/Options/ThemeOptions.php`, read via `get_field('field_name', 'option')`). **For the full block-building workflow** — scaffolding, `fields()`/`with()`, ACF fields vs. `InnerBlocks`, the `<section>` root convention, `$mode`/cache gotchas, Web Awesome usage, and the WP/ACF-data-shaping convention — see the `build-acf-block` skill (`.claude/skills/build-acf-block/SKILL.md`); that skill is the source of truth for block work, not this file.
 
-**Web Awesome** (`@awesome.me/webawesome`) is a framework-agnostic web component library, registered globally in `resources/js/app.js` (not `editor.js`, so unavailable in the block editor). Full usage details and import gotchas are in the `build-acf-block` skill, not duplicated here.
+**Web Awesome** (`@awesome.me/webawesome`) is a framework-agnostic web component library; its component registrations live in `resources/js/components.js`, which is imported by both `resources/js/app.js` and `resources/js/editor.js`. Full usage details and import gotchas are in the `build-acf-block` skill, not duplicated here.
 
 ## Notes
 
