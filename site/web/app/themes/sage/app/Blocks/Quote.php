@@ -148,17 +148,39 @@ class Quote extends Block
     /**
      * The block preview example data.
      *
-     * Figma showed separate "Short" (quote only) and "Long" (quote +
-     * attribution) variants — merged here into a single block where
-     * attribution is simply optional, so the fixture below deliberately
-     * includes both name + role to show the richest case on the pattern
-     * library page (see build-acf-block skill §6).
+     * Figma showed "Short" and "Long" variants — both have attribution,
+     * the difference is quote *length* (a punchy one-liner at a larger
+     * type size vs. a multi-paragraph quote), not presence/absence of
+     * attribution. Merged into a single block (no variant field) since
+     * that's purely a content-length difference, not a structural one —
+     * attribution is simply optional and hides when blank. $examples
+     * below shows both on the pattern library page for awareness (see
+     * build-acf-block skill §6 and PatternLibrary::render()'s `_content`
+     * handling for InnerBlocks-based variant content).
      *
      * @var array
      */
     public $example = [
         'attribution_name' => 'Priya Chandra',
         'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
+    ];
+
+    /**
+     * @var array
+     */
+    public $examples = [
+        'Short' => [
+            'attribution_name' => 'Ben',
+            'attribution_role' => 'Cyclists in Bristol',
+            '_content' => '<p>Find the right cycling group for you — there\'s plenty of choice!</p>',
+        ],
+        'Long' => [
+            'attribution_name' => 'Councillor Lucy Hodge',
+            'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
+            '_content' => '<p>We want to make it safer, easier and more pleasant for people to get around, whether they are walking, wheeling, cycling or using the bus and these schemes will help achieve that. They will improve everyday connections and, at Bear Flat, help buses run more reliably.</p>'
+                .'<p>In Royal Victoria Park, we have listened to feedback and refined the plans, retaining vehicle access while delivering better facilities for people walking, wheeling and cycling through the park. The improvements will create safer crossings, better accessibility and a more welcoming environment for everyone.</p>'
+                .'<p>We will do our best to reduce disruption to traffic while these are installed and want to thank people for their patience as these improvements are put in.</p>',
+        ],
     ];
 
     /**
@@ -171,8 +193,11 @@ class Quote extends Block
     ];
 
     /**
-     * Fixture markup standing in for this block's InnerBlocks content on
-     * the pattern library page (see App\View\Composers\PatternLibrary).
+     * Default fixture markup standing in for this block's InnerBlocks
+     * content — used for the block editor's own empty-state preview, and
+     * as the pattern-library fallback for any block without $examples set.
+     * On the pattern library page specifically, $examples above (via its
+     * per-variant `_content` key) overrides this per variant instead.
      *
      * @var string
      */

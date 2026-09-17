@@ -4,37 +4,39 @@
 // 53:989 (both Short/Long variants collapsed into one block — see
 // app/Blocks/Quote.php's $example doc comment).
 //
-// Large decorative quote mark via ::before rather than a bundled SVG icon —
-// resources/svg/ currently has no quote-mark asset. Purely decorative
-// (the actual quote meaning is carried by the real <blockquote> text), so
-// no WCAG 1.4.11 contrast requirement applies to its colour.
+// Grid-stacked (mark / body / attribution as separate rows with an explicit
+// gap) rather than the quote mark absolutely-positioned over the text —
+// the large ~8rem glyph has enough visual overhang from its own font
+// metrics that absolute positioning overlapped the first line(s) of quote
+// text; stacking guarantees real separation regardless of quote length.
+//
+// Quote mark is a real (but aria-hidden, decorative) element rather than a
+// bundled SVG icon — resources/svg/ currently has no quote-mark asset.
+// Purely decorative (the actual quote meaning is carried by the real
+// <blockquote> text), so no WCAG 1.4.11 contrast requirement applies to
+// its colour.
 
 .c-quote {
-  position: relative;
+  display: grid;
+  gap: 0.5rem;
   max-width: 46rem;
 }
 
+.c-quote__mark {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 8rem; // ~128px, matching the Figma reference's 140px mark
+  font-weight: 700;
+  line-height: 1;
+  color: var(--wp--preset--color--yellow);
+}
+
 .c-quote__body {
-  position: relative;
   margin: 0;
-  padding-inline-start: 3rem;
   font-family: var(--wp--preset--font-family--nata-sans);
   font-size: var(--wp--preset--font-size--heading-4); // clamps up to 30px, matching the Figma reference
   line-height: 1.3;
   font-weight: 400;
   color: var(--wp--preset--color--charcoal);
-
-  &::before {
-    content: '\201C';
-    position: absolute;
-    top: -1.6rem;
-    left: 0;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 8rem; // ~128px, matching the Figma reference's 140px mark
-    font-weight: 700;
-    line-height: 1;
-    color: var(--wp--preset--color--yellow);
-  }
 
   p {
     margin: 0;
@@ -47,8 +49,7 @@
 
 .c-quote__attribution {
   display: block;
-  margin-top: 1.5rem;
-  padding-inline-start: 3rem;
+  margin-top: 1rem;
   font-style: normal;
   text-align: right;
 }
