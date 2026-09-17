@@ -7,16 +7,46 @@ use Log1x\AcfComposer\Builder;
 
 class Quote extends Block
 {
+    /**
+     * The block name.
+     *
+     * @var string
+     */
     public $name = 'Quote';
 
+    /**
+     * The block slug.
+     *
+     * @var string
+     */
     public $slug = 'quote';
 
+    /**
+     * The block description.
+     *
+     * @var string
+     */
     public $description = 'A pull quote with optional attribution name and role.';
 
+    /**
+     * The block category.
+     *
+     * @var string
+     */
     public $category = 'text';
 
+    /**
+     * The block icon.
+     *
+     * @var string|array
+     */
     public $icon = 'format-quote';
 
+    /**
+     * The block keywords.
+     *
+     * @var array
+     */
     public $keywords = [
         'quote',
         'pull quote',
@@ -24,25 +54,70 @@ class Quote extends Block
         'attribution',
     ];
 
+    /**
+     * The block post type allow list.
+     *
+     * @var array
+     */
     public $post_types = ['post', 'page'];
 
+    /**
+     * The parent block type allow list.
+     *
+     * @var array
+     */
     public $parent = [];
 
+    /**
+     * The ancestor block type allow list.
+     *
+     * @var array
+     */
     public $ancestor = [];
 
+    /**
+     * The default block mode.
+     *
+     * @var string
+     */
     public $mode = 'auto';
 
+    /**
+     * The default block alignment.
+     *
+     * @var string
+     */
     public $align = '';
 
+    /**
+     * The default block text alignment.
+     *
+     * @var string
+     */
     public $align_text = '';
 
+    /**
+     * The default block content alignment.
+     *
+     * @var string
+     */
     public $align_content = '';
 
+    /**
+     * The default block spacing.
+     *
+     * @var array
+     */
     public $spacing = [
         'padding' => null,
         'margin' => null,
     ];
 
+    /**
+     * The supported block features.
+     *
+     * @var array
+     */
     public $supports = [
         'align' => true,
         'align_text' => false,
@@ -63,9 +138,16 @@ class Quote extends Block
         ],
     ];
 
+    /**
+     * The block styles.
+     *
+     * @var array
+     */
     public $styles = [];
 
     /**
+     * The block preview example data.
+     *
      * Figma showed "Short" and "Long" variants — both have attribution,
      * the difference is quote *length* (a punchy one-liner at a larger
      * type size vs. a multi-paragraph quote), not presence/absence of
@@ -74,6 +156,8 @@ class Quote extends Block
      * attribution is simply optional and hides when blank. $examples
      * below shows both on the pattern library page for awareness (see
      * build-acf-block skill §6).
+     *
+     * @var array
      */
     public $example = [
         'quote_size' => 'large',
@@ -82,6 +166,9 @@ class Quote extends Block
         'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
     ];
 
+    /**
+     * @var array
+     */
     public $examples = [
         'Short' => [
             'quote_size' => 'large',
