@@ -1,3 +1,5 @@
+@use '../base/typography';
+
 // Layout/label extras for the `<x-radio>` and `<x-checkbox>` Blade
 // components (resources/views/components/{radio,checkbox}.blade.php). The
 // actual control styling (circle/square, border, checked-state fill) is a
@@ -13,9 +15,7 @@
 }
 
 .c-choice__label {
+  @extend .u-input-label;
   font-family: var(--wp--preset--font-family--nata-sans);
-  font-weight: 500;
-  font-size: var(--wp--preset--font-size--input-label);
-  line-height: 1.625rem;
   color: var(--wp--preset--color--black);
 }

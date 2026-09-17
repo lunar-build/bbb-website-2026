@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 .c-header-top {
   display: flex;
@@ -75,8 +76,7 @@
   }
 
   &::part(label) {
-    font-size: 0.875rem;
-    line-height: 1.125rem;
+    @extend .u-cta-small;
   }
 
   .c-icon--arrow-right svg {

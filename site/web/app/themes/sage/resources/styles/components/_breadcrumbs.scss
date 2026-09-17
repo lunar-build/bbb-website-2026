@@ -1,3 +1,5 @@
+@use '../base/typography';
+
 // Figma: font-size 20px, line-height 30px, letter-spacing 0.4px, color
 // blue-dark (#003852). Current page (last item) is underlined and not a
 // link — WA renders a plain <button> for items with no href, so it's also
@@ -14,6 +16,7 @@
 }
 
 wa-breadcrumb-item {
+  @extend .u-cta-large;
   color: var(--c-breadcrumbs-color);
   font-family: var(--wp--preset--font-family--anonymous-pro);
   font-weight: 700;

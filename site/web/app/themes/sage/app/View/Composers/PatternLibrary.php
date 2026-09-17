@@ -82,7 +82,9 @@ class PatternLibrary extends Composer
      */
     protected function renderVariant(Block $block): string
     {
-        $content = $block->exampleContent ?? '';
+        $content = method_exists($block, 'exampleContent')
+            ? $block->exampleContent()
+            : ($block->exampleContent ?? '');
 
         $html = $block->render([], $content, true);
 
