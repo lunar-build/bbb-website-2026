@@ -4,16 +4,20 @@
   hardcode directly into any other block's Blade view later (default slot =
   literal text/HTML in that case instead).
 
-  Attribution is optional and hides entirely when $attributionName is empty;
-  $attributionRole only renders when both are present.
+  $size ('large'|'standard') matches the Figma Short/Long variants' two
+  typographic scales — 'large' (default) suits a punchy one-liner, 'standard'
+  suits a longer, multi-paragraph quote. Attribution is optional and hides
+  entirely when $attributionName is empty; $attributionRole only renders
+  when both are present.
 --}}
 
 @props([
+    'size' => 'large',
     'attributionName' => null,
     'attributionRole' => null,
 ])
 
-<div {{ $attributes->class(['c-quote']) }}>
+<div {{ $attributes->class(['c-quote', 'c-quote--'.$size]) }}>
     <span class="c-quote__mark" aria-hidden="true">&ldquo;</span>
 
     <blockquote class="c-quote__body">

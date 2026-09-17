@@ -161,6 +161,7 @@ class Quote extends Block
      * @var array
      */
     public $example = [
+        'quote_size' => 'large',
         'attribution_name' => 'Priya Chandra',
         'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
     ];
@@ -170,11 +171,13 @@ class Quote extends Block
      */
     public $examples = [
         'Short' => [
+            'quote_size' => 'large',
             'attribution_name' => 'Ben',
             'attribution_role' => 'Cyclists in Bristol',
             '_content' => '<p>Find the right cycling group for you — there\'s plenty of choice!</p>',
         ],
         'Long' => [
+            'quote_size' => 'standard',
             'attribution_name' => 'Councillor Lucy Hodge',
             'attribution_role' => 'Cabinet Member for Sustainable Transport Delivery',
             '_content' => '<p>We want to make it safer, easier and more pleasant for people to get around, whether they are walking, wheeling, cycling or using the bus and these schemes will help achieve that. They will improve everyday connections and, at Bear Flat, help buses run more reliably.</p>'
@@ -209,6 +212,7 @@ class Quote extends Block
     public function with(): array
     {
         return [
+            'quoteSize' => $this->quoteSize(),
             'attributionName' => $this->attributionName(),
             'attributionRole' => $this->attributionRole(),
         ];
@@ -222,6 +226,16 @@ class Quote extends Block
         $fields = Builder::make('quote');
 
         $fields
+            ->addSelect('quote_size', [
+                'label' => 'Quote size',
+                'instructions' => 'Matches the Figma "Short"/"Long" variants — Large suits a punchy one-liner, Standard suits a longer, multi-paragraph quote.',
+                'choices' => [
+                    'large' => 'Large (short quote)',
+                    'standard' => 'Standard (long quote)',
+                ],
+                'default_value' => 'large',
+                'required' => 1,
+            ])
             ->addText('attribution_name', [
                 'label' => 'Attribution name',
                 'required' => 0,
@@ -233,6 +247,16 @@ class Quote extends Block
             ]);
 
         return $fields->build();
+    }
+
+    /**
+     * Retrieve the quote size ('large' or 'standard').
+     *
+     * @return string
+     */
+    public function quoteSize()
+    {
+        return get_field('quote_size') ?: $this->example['quote_size'];
     }
 
     /**

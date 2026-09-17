@@ -3,7 +3,7 @@
 @endunless
 
 <div class="o-container">
-  <x-quote :attribution-name="$attributionName" :attribution-role="$attributionRole">
+  <x-quote :size="$quoteSize" :attribution-name="$attributionName" :attribution-role="$attributionRole">
     <InnerBlocks template="{{ $block->template }}" />
   </x-quote>
 </div>
