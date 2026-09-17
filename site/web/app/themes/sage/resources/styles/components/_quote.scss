@@ -66,15 +66,16 @@
   }
 }
 
-// Mark centred above centred text, rather than beside it — the arrangement
-// seen in the (not-yet-built) carousel card, Figma node 7:2013. That block
-// will still need its own markup for the image/name-heading/CTA button
-// around this — .c-quote only owns the mark+body(+optional attribution)
-// part of that design.
+// Mark stays left-aligned above centred text, rather than beside it — the
+// arrangement seen in the (not-yet-built) carousel card, Figma node 7:2013.
+// Per that design's own coordinates, the mark is NOT centred with the text
+// below it (mark ~19-25% from the card's left edge; the text block sits
+// centred around ~35%) — only the body/attribution are centred, the mark
+// keeps its natural left position. That block will still need its own
+// markup for the image/name-heading/CTA button around this — .c-quote only
+// owns the mark+body(+optional attribution) part of that design.
 .c-quote--centered {
   --c-quote-color: var(--wp--preset--color--blue); // matches node 7:2013's blue quote text, not the default charcoal
-  justify-items: center;
-  text-align: center;
 
   @include bp.respond($min: bp.$md) {
     grid-template-columns: 1fr; // stays single-column/stacked, doesn't switch to the default's side-by-side
@@ -88,6 +89,8 @@
   }
 
   .c-quote__body {
+    text-align: center;
+
     @include bp.respond($min: bp.$md) {
       grid-column: 1;
       grid-row: 2;
