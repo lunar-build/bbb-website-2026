@@ -2,16 +2,9 @@
 @use '../base/focus' as focus;
 @use '../base/typography';
 
-// Matches Figma "Icon link grid" (node 10:4389): a light-blue full-bleed
-// section containing a row of icon-led links, each icon/heading+arrow/
-// description — 1 column on phones, 2 from tablet (`md`), 3 from desktop
-// (`lg`), same responsive pattern as every other grid in this theme even
-// though the reference mock only shows the 3-up desktop state.
+// Figma "Icon link grid" (node 10:4389)
 .c-icon-link-grid-block {
-  // Background colour is optional and set inline per the block's
-  // "Background colour" ACF field (resources/views/blocks/icon-link-grid.blade.php) —
-  // defaults to Blue light per the Figma reference, but nothing here if unset.
-  padding-block: 2.125rem; // 34px
+  padding-block: 2.125rem; // 34px — background colour itself is set inline via the block's ACF field
 }
 
 .c-icon-link-grid__list {
@@ -40,30 +33,22 @@
 
   @include focus.ring;
 
-  // The arrow's hover/focus animation (below) grows its path a few px wider
-  // with overflow:visible, same trick as .c-button's arrow — that's normally
-  // invisible inside a button's own padding, but this card has none, so the
-  // default 2px outline-offset isn't enough room for the longest heading's
-  // arrow (sitting closest to the card edge) to stay inside the ring.
   &:focus-visible {
+    // Wider than the 2px default — this card has no padding, so the ring
+    // needs room for the arrow's hover-animation (overflow:visible) to stay inside it.
     outline-offset: 0.5rem;
   }
 }
 
 .c-icon-link-grid__icon {
-  // KNOWN WCAG 1.4.11 (Non-text Contrast) FAILURE: --orange (#F69502, the
-  // exact Figma brand colour) is ~2.3:1 against white and ~1.9:1 against
-  // Blue light — both below the required 3:1 for meaningful icons. This is
-  // a design-system colour choice, not something to silently override here
-  // — flag to design/client rather than picking an off-brand replacement.
+  // KNOWN WCAG 1.4.11 FAILURE: --orange is ~2.3:1 on white, ~1.9:1 on Blue
+  // light — below the required 3:1. Design-system colour choice; flag to
+  // design/client rather than silently swapping to an off-brand colour.
   display: inline-flex;
   color: var(--wp--preset--color--orange);
 
   svg {
-    // Fixed 49x49 square box — consistent footprint across icons regardless
-    // of each SVG's own (non-square) viewBox; the browser's default
-    // preserveAspectRatio scales each glyph to fit within it uncropped.
-    width: 3.0625rem; // 49px
+    width: 3.0625rem; // 49px, fixed square box regardless of each SVG's own viewBox
     height: 3.0625rem; // 49px
   }
 }
