@@ -10,11 +10,13 @@
 // separation but didn't match the intended side-by-side layout). Attribution
 // spans both columns as its own row underneath.
 //
-// Quote mark is a real (but aria-hidden, decorative) element rather than a
-// bundled SVG icon — resources/svg/ currently has no quote-mark asset.
-// Purely decorative (the actual quote meaning is carried by the real
-// <blockquote> text), so no WCAG 1.4.11 contrast requirement applies to
-// its colour.
+// Quote mark is <x-icon name="quote-mark">, a new addition to resources/svg/
+// (this theme's curated icon set — see build-acf-block skill) rather than a
+// text glyph — consistent rendering across platforms instead of depending
+// on a serif font's own quotation-mark glyph. Automatically aria-hidden via
+// <x-icon> (resources/views/components/icon.blade.php) and purely decorative
+// (the actual quote meaning is carried by the real <blockquote> text), so no
+// WCAG 1.4.11 contrast requirement applies to its colour.
 //
 // TODO: once the typography-system branch (worktree-typography-system /
 // de4d0c9 "Add full typography utility system sourced from Figma") is
@@ -42,24 +44,27 @@
 }
 
 .c-quote__mark {
-  // Nata Sans, not a serif fallback — matches the Figma reference exactly
-  // (its mark is plain Nata Sans text, not a bundled asset), and it's this
-  // theme's own self-hosted font rather than relying on Georgia/Times New
-  // Roman being installed.
-  font-family: var(--wp--preset--font-family--nata-sans);
-  // Smaller on mobile — at the full desktop size, stacked above the quote
-  // body (no side column to sit in) it dominated the layout and pushed
-  // the text too far down. 6rem from `md` up, once it moves into its own
-  // grid column beside the text.
-  font-size: 3.5rem;
-  font-weight: 700;
-  line-height: 1;
+  display: inline-flex;
   color: var(--wp--preset--color--yellow);
+  // Offset upward relative to the body text, per the Figma reference (the
+  // mark's top sits above the quote text's top, not level with it) — a
+  // negative margin-top pulls it up out of the shared grid-row's aligned
+  // start edge. Slightly less offset on mobile to match its smaller size.
+  margin-top: -0.75rem;
+
+  svg {
+    width: 4.5rem; // sized up from 3.5rem — still read as too small on mobile
+    height: auto;
+  }
 
   @include bp.respond($min: bp.$md) {
     grid-column: 1;
     grid-row: 1;
-    font-size: 6rem;
+    margin-top: -1.25rem;
+
+    svg {
+      width: 6rem;
+    }
   }
 }
 

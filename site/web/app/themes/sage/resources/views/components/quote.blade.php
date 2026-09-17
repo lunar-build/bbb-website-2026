@@ -18,7 +18,7 @@
 ])
 
 <div {{ $attributes->class(['c-quote', 'c-quote--'.$size]) }}>
-    <span class="c-quote__mark" aria-hidden="true">&ldquo;</span>
+    <x-icon name="quote-mark" class="c-quote__mark" />
 
     <blockquote class="c-quote__body">
         {{ $slot }}
