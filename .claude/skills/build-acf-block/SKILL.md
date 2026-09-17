@@ -229,6 +229,8 @@ class instead of writing new font rules:
 | `.u-mobile-menu-link` / `.u-mobile-menu-sublink` | Mobile menu link / sublink |
 | `.u-footer-link` | Footer link |
 | `.u-table-column-heading` / `.u-table-cell-heading` | Table header row / row-heading cell |
+| `.u-filter-service-label` | Filter-result service labels |
+| `.u-news-row-card-title` | News card-row titles |
 
 If a block genuinely needs a text style with no match above, add a new `fontSizes`
 entry to `theme.json` plus a `.u-*` rule in `_typography.scss` following that file's
