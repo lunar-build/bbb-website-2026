@@ -1,9 +1,18 @@
 @use '../abstracts/breakpoints' as bp;
 
-// Responsive icon + link grid: 1 column on phones, 2 from tablet (`md`),
-// 3 from desktop (`lg`) — a typical "icon link grid" layout. The heading
+// Matches Figma "Icon link grid" (node 10:4389): a light-blue full-bleed
+// section containing a row of icon-led links, each icon/heading+arrow/
+// description — 1 column on phones, 2 from tablet (`md`), 3 from desktop
+// (`lg`), same responsive pattern as every other grid in this theme even
+// though the reference mock only shows the 3-up desktop state. The heading
 // slot (optional core/heading InnerBlocks content, or a hardcoded caller's
-// own markup) sits above the grid when present.
+// own markup) sits above the grid when present — not part of the Figma
+// reference itself, which has no heading.
+.c-icon-link-grid-block {
+  background: var(--wp--preset--color--blue-light);
+  padding-block: 2.125rem; // 34px
+}
+
 .c-icon-link-grid__heading {
   margin-block-end: 1.5rem;
 
@@ -15,55 +24,75 @@
 .c-icon-link-grid__list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  gap: 2rem;
 
   @include bp.respond($min: bp.$md) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
   }
 
   @include bp.respond($min: bp.$lg) {
     grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
   }
 }
 
 .c-icon-link-grid__item {
-  margin: 0;
-}
-
-.c-icon-link-grid__link {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--wp--preset--color--lightest-grey);
-  border-radius: 0.5rem;
-  color: var(--wp--preset--color--blue-dark);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding-block: 1rem;
+  color: inherit;
   text-decoration: none;
-  transition: border-color var(--wa-transition-normal, 0.15s) ease,
-    background-color var(--wa-transition-normal, 0.15s) ease;
-
-  &:hover,
-  &:focus-visible {
-    border-color: var(--wp--preset--color--blue);
-    background-color: var(--wp--preset--color--blue-light);
-  }
 }
 
 .c-icon-link-grid__icon {
-  flex: none;
   display: inline-flex;
-  color: var(--wp--preset--color--blue);
+  color: var(--wp--preset--color--orange);
 
   svg {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: auto;
+    height: 3.125rem; // 50px, matches the tallest reference icon
   }
 }
 
-.c-icon-link-grid__label {
+.c-icon-link-grid__item-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--wp--preset--font-family--anonymous-pro);
   font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-icon-link-grid__arrow {
+  display: inline-flex;
+  flex: none;
+
+  svg {
+    width: 22px;
+    height: 14px;
+    overflow: visible;
+  }
+
+  .c-icon__arrow {
+    transition: d 0.15s ease;
+  }
+}
+
+.c-icon-link-grid__item:is(:hover, :focus-visible) .c-icon-link-grid__arrow .c-icon__arrow {
+  d: path('M1 7H28M28 7L22 1M28 7L22 13');
+}
+
+.c-icon-link-grid__description {
+  margin: 0;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--wp--preset--color--charcoal);
 }

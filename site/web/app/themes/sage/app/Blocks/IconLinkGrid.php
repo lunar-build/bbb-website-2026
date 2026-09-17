@@ -26,7 +26,7 @@ class IconLinkGrid extends Block
      *
      * @var string
      */
-    public $description = 'A grid of icon + link items, with an optional heading.';
+    public $description = 'A row of icon-led links, each with a heading, description, and destination URL.';
 
     /**
      * The block category.
@@ -157,10 +157,13 @@ class IconLinkGrid extends Block
     /**
      * Fixture markup standing in for this block's InnerBlocks content on
      * the pattern library page (see App\View\Composers\PatternLibrary).
+     * Empty by default — the Figma reference for this block has no heading
+     * above the grid, so the fixture matches that (heading is optional,
+     * for callers who do want one).
      *
      * @var string
      */
-    public $exampleContent = '<h2>Get involved</h2>';
+    public $exampleContent = '';
 
     /**
      * The block preview example data.
@@ -170,34 +173,29 @@ class IconLinkGrid extends Block
     public $example = [
         'items' => [
             [
-                'icon' => 'arrow-right',
+                'icon' => 'cycling-route',
+                'description' => 'Find a route that suits you. Discover the shortest and safest cycle routes to get you where you want to go',
                 'link' => [
-                    'title' => 'Find a route',
+                    'title' => 'Plan a cycling route',
                     'url' => 'https://betterbybike.info/routes/',
                     'target' => '',
                 ],
             ],
             [
-                'icon' => 'instagram',
+                'icon' => 'bike',
+                'description' => 'Borrow one of our FREE electric, hybrid or folding bikes for up to a month',
                 'link' => [
-                    'title' => 'Follow us on Instagram',
-                    'url' => 'https://www.instagram.com/betterbybike/',
-                    'target' => '_blank',
+                    'title' => 'Need a bike?',
+                    'url' => 'https://betterbybike.info/loan-a-bike/',
+                    'target' => '',
                 ],
             ],
             [
-                'icon' => 'facebook',
+                'icon' => 'cycling-person',
+                'description' => 'Training is available for adults, children, and people with learning and physical difficulties',
                 'link' => [
-                    'title' => 'Join us on Facebook',
-                    'url' => 'https://www.facebook.com/betterbybike/',
-                    'target' => '_blank',
-                ],
-            ],
-            [
-                'icon' => 'send',
-                'link' => [
-                    'title' => 'Get in touch',
-                    'url' => 'https://betterbybike.info/contact/',
+                    'title' => 'Learn how to ride',
+                    'url' => 'https://betterbybike.info/training/',
                     'target' => '',
                 ],
             ],
@@ -235,8 +233,13 @@ class IconLinkGrid extends Block
                 ])
                 ->addLink('link', [
                     'label' => 'Link',
-                    'instructions' => 'Link text (used as the item label) + URL.',
+                    'instructions' => 'Link text (used as the item heading) + URL.',
                     'required' => 1,
+                ])
+                ->addTextarea('description', [
+                    'label' => 'Description',
+                    'rows' => 2,
+                    'required' => 0,
                 ])
             ->endRepeater();
 

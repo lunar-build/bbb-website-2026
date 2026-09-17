@@ -7,18 +7,24 @@
     </div>
   @endif
 
-  <ul class="c-icon-link-grid__list">
+  <div class="c-icon-link-grid__list">
     @foreach ($items as $item)
-      <li class="c-icon-link-grid__item">
-        <a
-          class="c-icon-link-grid__link"
-          href="{{ $item['link']['url'] }}"
-          @if (! empty($item['link']['target'])) target="{{ $item['link']['target'] }}" @endif
-        >
-          <x-icon name="{{ $item['icon'] }}" class="c-icon-link-grid__icon" />
-          <span class="c-icon-link-grid__label">{{ $item['link']['title'] }}</span>
-        </a>
-      </li>
+      <a
+        class="c-icon-link-grid__item"
+        href="{{ $item['link']['url'] }}"
+        @if (! empty($item['link']['target'])) target="{{ $item['link']['target'] }}" @endif
+      >
+        <x-icon name="{{ $item['icon'] }}" class="c-icon-link-grid__icon" />
+
+        <span class="c-icon-link-grid__item-heading">
+          {{ $item['link']['title'] }}
+          <x-icon name="arrow-right" class="c-icon-link-grid__arrow" />
+        </span>
+
+        @if (! empty($item['description']))
+          <p class="c-icon-link-grid__description">{{ $item['description'] }}</p>
+        @endif
+      </a>
     @endforeach
-  </ul>
+  </div>
 </div>
