@@ -39,6 +39,14 @@
 }
 
 .c-quote {
+  // --c-quote-color / --c-quote-attribution-color: override from a calling
+  // block's own wrapper class (e.g. a future dark-background stat-banner
+  // block matching Figma node 7:1972) rather than editing this component —
+  // same "override the custom property from an ancestor" convention as
+  // base/_focus.scss's --focus-color.
+  --c-quote-color: var(--wp--preset--color--charcoal);
+  --c-quote-attribution-color: var(--wp--preset--color--blue);
+
   display: grid;
   // Mobile: single column, mark/body/attribution stack in source order via
   // normal auto-placement — the mark's large size would crowd the text in
@@ -55,6 +63,39 @@
   @include bp.respond($min: bp.$md) {
     grid-template-columns: auto 1fr;
     column-gap: 1.5rem;
+  }
+}
+
+// Mark centred above centred text, rather than beside it — the arrangement
+// seen in the (not-yet-built) carousel card, Figma node 7:2013. That block
+// will still need its own markup for the image/name-heading/CTA button
+// around this — .c-quote only owns the mark+body(+optional attribution)
+// part of that design.
+.c-quote--centered {
+  --c-quote-color: var(--wp--preset--color--blue); // matches node 7:2013's blue quote text, not the default charcoal
+  justify-items: center;
+  text-align: center;
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: 1fr; // stays single-column/stacked, doesn't switch to the default's side-by-side
+  }
+
+  .c-quote__mark {
+    @include bp.respond($min: bp.$md) {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  .c-quote__body {
+    @include bp.respond($min: bp.$md) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+
+  .c-quote__attribution {
+    text-align: center;
   }
 }
 
@@ -96,7 +137,7 @@
   font-size: var(--wp--preset--font-size--heading-4);
   line-height: 1.3;
   font-weight: 400;
-  color: var(--wp--preset--color--charcoal);
+  color: var(--c-quote-color);
 
   p {
     margin: 0;
@@ -128,7 +169,7 @@
   font-weight: 700;
   font-size: var(--wp--preset--font-size--standfirst);
   line-height: 1.5;
-  color: var(--wp--preset--color--blue);
+  color: var(--c-quote-attribution-color);
 }
 
 .c-quote__attribution-role {
@@ -137,5 +178,5 @@
   font-weight: 400;
   font-size: var(--wp--preset--font-size--standfirst);
   line-height: 1.5;
-  color: var(--wp--preset--color--blue);
+  color: var(--c-quote-attribution-color);
 }
