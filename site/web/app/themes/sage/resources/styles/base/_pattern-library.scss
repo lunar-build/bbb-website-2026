@@ -26,6 +26,24 @@
   padding: 1.5rem;
   background: var(--wp--preset--color--lightest-grey);
   border-radius: 0.5rem;
+  height: 50dvh;
+  overflow-y: auto;
+
+  &::after {
+    content: '';
+    display: block;
+    height: 2rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--wp--preset--color--lightest-grey)
+    );
+    pointer-events: none;
+  }
 
   ul {
     list-style: none;
