@@ -2,6 +2,8 @@
 
 namespace App\Blocks;
 
+use App\Fields\Copy;
+use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -73,7 +75,7 @@ class TextHero extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.
@@ -139,29 +141,27 @@ class TextHero extends Block
     public $styles = [];
 
     /**
-     * The block template.
+     * The block preview example data.
      *
      * @var array
      */
-    public $template = [
-        'core/heading' => ['placeholder' => 'Hello World', 'level' => 1],
-        'core/paragraph' => ['placeholder' => 'Welcome to the Text Hero block.', 'fontSize' => 'lg'],
+    public $example = [
+        'heading_text' => 'Get people cycling in Bristol',
+        'heading_level' => 'h1',
+        'heading_style' => 'match',
+        'intro_text' => 'Example intro text for the hero — replace with real page content.',
+        'intro_style' => 'standfirst',
     ];
-
-    /**
-     * Fixture markup standing in for this block's InnerBlocks content on
-     * the pattern library page (see App\View\Composers\PatternLibrary).
-     *
-     * @var string
-     */
-    public $exampleContent = '<h1>Get people cycling in Bristol</h1><p>Example intro text for the hero — replace with real page content.</p>';
 
     /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
-        return [];
+        return [
+            'heading' => $this->heading(),
+            'intro' => $this->intro(),
+        ];
     }
 
     /**
@@ -170,7 +170,48 @@ class TextHero extends Block
     public function fields(): array
     {
         $fields = Builder::make('text_hero');
+
+        $fields->addPartial(Heading::class, [
+            'name' => 'heading',
+            'label' => 'Heading',
+            'default_level' => 'h1',
+            'required' => true,
+        ]);
+
+        $fields->addPartial(Copy::class, [
+            'name' => 'intro',
+            'label' => 'Intro text',
+            'default_style' => 'standfirst',
+        ]);
+
         return $fields->build();
+    }
+
+    /**
+     * Retrieve the heading text/level/style.
+     *
+     * @return array
+     */
+    public function heading()
+    {
+        return [
+            'text' => get_field('heading_text') ?: $this->example['heading_text'],
+            'level' => get_field('heading_level') ?: $this->example['heading_level'],
+            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+        ];
+    }
+
+    /**
+     * Retrieve the intro text/style.
+     *
+     * @return array
+     */
+    public function intro()
+    {
+        return [
+            'text' => get_field('intro_text') ?: $this->example['intro_text'],
+            'style' => get_field('intro_style') ?: $this->example['intro_style'],
+        ];
     }
 
     /**
