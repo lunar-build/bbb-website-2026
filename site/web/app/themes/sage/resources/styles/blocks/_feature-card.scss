@@ -4,6 +4,7 @@
 // picture (arrow-only CTA), Bikeability, Event card and News card (button
 // CTA, the latter two adding a date above the heading).
 @use '../base/typography';
+@use '../base/focus' as focus;
 @use '../components/button';
 
 .c-feature-card {
@@ -30,6 +31,15 @@
     position: absolute;
     inset: 0;
     z-index: 1;
+
+    // Default outline-offset (2px, outside the box) would get clipped by
+    // &__card's own overflow:hidden, since this link is already flush
+    // with &__card's edges — pull it inward instead so it stays visible.
+    @include focus.ring;
+
+    &:focus-visible {
+      outline-offset: -3px;
+    }
   }
 
   &__body {

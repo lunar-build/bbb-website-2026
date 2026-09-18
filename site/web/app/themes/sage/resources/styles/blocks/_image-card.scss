@@ -1,5 +1,6 @@
 // Figma "Image card": image with a linked caption bar, no body copy.
 @use '../base/typography';
+@use '../base/focus' as focus;
 @use '../components/button';
 
 .c-image-card {
@@ -12,8 +13,16 @@
     background: var(--wp--preset--color--white);
     text-decoration: none;
 
-    &:hover,
+    @include focus.ring;
+
+    // Default outline-offset (2px, outside the box) would get clipped by
+    // this element's own overflow:hidden — pull it inward instead.
     &:focus-visible {
+      outline-offset: -3px;
+      @include button.arrow-hover;
+    }
+
+    &:hover {
       @include button.arrow-hover;
     }
   }
