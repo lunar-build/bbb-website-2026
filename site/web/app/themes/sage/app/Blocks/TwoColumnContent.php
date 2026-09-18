@@ -29,7 +29,7 @@ class TwoColumnContent extends Block
      *
      * @var string
      */
-    public $description = 'A two-column content block, in Image+Text/Image+Button/Quote+Text layouts.';
+    public $description = 'A two-column layout — each side independently picks an Image, Text, Quote, or Button.';
 
     /**
      * The block category.
@@ -154,46 +154,47 @@ class TwoColumnContent extends Block
      * @var array
      */
     public $example = [
-        'layout' => 'image_text',
-        'flip' => false,
-        'heading_text' => 'Or plan your own route, simply.',
-        'heading_level' => 'h3',
-        'heading_style' => 'match',
-        'body_text' => 'Find the quickest, quietest or most balanced cycle routes and leisure rides around the West of England. Helping you to discover the best way to get around. Powered by CycleStreets.',
-        'body_style' => 'body',
-        'link' => [
-            'title' => 'Plan a cycling route',
-            'url' => '#',
-            'target' => '',
+        'left' => [
+            'type' => 'image',
+        ],
+        'right' => [
+            'type' => 'text',
+            'heading_text' => 'Or plan your own route, simply.',
+            'heading_level' => 'h3',
+            'heading_style' => 'match',
+            'body_text' => 'Find the quickest, quietest or most balanced cycle routes and leisure rides around the West of England. Helping you to discover the best way to get around. Powered by CycleStreets.',
+            'body_style' => 'body',
         ],
     ];
 
     /**
-     * Layout variants to render stacked on the pattern-library page (see
-     * App\View\Composers\PatternLibrary::render()) — each entry is merged
-     * onto $example above, so only needs to override what differs.
+     * Component combinations to render stacked on the pattern-library page
+     * (see App\View\Composers\PatternLibrary::render()) — each entry is
+     * merged onto $example above, so only needs to override what differs.
      *
      * @var array
      */
     public $examples = [
-        'Image and assorted text' => [],
-        'Image and button' => [
-            'layout' => 'image_button',
-            'heading_text' => '',
-            'body_text' => '',
-            'link' => ['title' => 'Link to order online maps', 'url' => '#', 'target' => ''],
+        'Image + Text' => [],
+        'Image + Button' => [
+            'right' => [
+                'type' => 'button',
+                'link' => ['title' => 'Link to order online maps', 'url' => '#', 'target' => ''],
+            ],
         ],
-        // TODO: replace once the dedicated quote-component PR merges — this
-        // layout currently reuses the Heading/Copy fields as a stand-in
-        // (citation/quote text), not real quote fields. See two-column-content.blade.php.
-        'Quote and text (TODO)' => [
-            'layout' => 'quote_text',
-            'heading_text' => 'Ben, Cyclists in Bristol',
-            'body_text' => 'Find the right cycling group for you — there\'s plenty of choice!',
-            'link' => ['title' => '', 'url' => '', 'target' => ''],
-        ],
-        'Flipped' => [
-            'flip' => true,
+        // TODO: replace once the dedicated quote-component PR merges — the
+        // "quote" layout currently reuses the Heading field as a stand-in
+        // for quote text, no citation field yet. See fields() below.
+        'Quote + Text (TODO)' => [
+            'left' => [
+                'type' => 'quote',
+                'heading_text' => 'Find the right cycling group for you — there\'s plenty of choice!',
+            ],
+            'right' => [
+                'type' => 'text',
+                'heading_text' => '',
+                'body_text' => 'Nam eu tortor pellentesque, semper ligula malesuada, posuere arcu. Morbi feugiat imperdiet velit. Proin ac dictum risus.',
+            ],
         ],
     ];
 
@@ -203,12 +204,8 @@ class TwoColumnContent extends Block
     public function with(): array
     {
         return [
-            'layout' => $this->layout(),
-            'flip' => $this->flip(),
-            'image' => $this->image(),
-            'heading' => $this->heading(),
-            'body' => $this->body(),
-            'link' => $this->link(),
+            'left' => $this->slot('left'),
+            'right' => $this->slot('right'),
         ];
     }
 
@@ -219,127 +216,117 @@ class TwoColumnContent extends Block
     {
         $fields = Builder::make('two_column_content');
 
-        $fields
-            ->addSelect('layout', [
-                'label' => 'Layout',
-                'instructions' => 'Fields below are shared across every layout — fill in whichever apply and the layout controls how they\'re arranged.',
-                'choices' => [
-                    'image_text' => 'Image and assorted text',
-                    'image_button' => 'Image and button',
-                    // TODO: quote layout currently reuses Heading (as
-                    // citation) + Copy (as quote text) below, pending a
-                    // dedicated quote component.
-                    'quote_text' => 'Quote and text',
-                ],
-                'default_value' => 'image_text',
-                'ui' => true,
-            ])
-            ->addTrueFalse('flip', [
-                'label' => 'Flip sides',
-                'instructions' => 'Mirror which side the image/quote sits on vs. the text.',
-                'default_value' => 0,
-                'ui' => true,
-            ])
-            ->addImage('image', [
-                'label' => 'Image',
-                'instructions' => 'Shown on the Image and assorted text / Image and button layouts.',
-                'return_format' => 'array',
-                'preview_size' => 'medium',
+        foreach (['left' => 'Left column', 'right' => 'Right column'] as $name => $label) {
+            $flexible = $fields->addFlexibleContent($name, [
+                'label' => $label,
+                'button_label' => 'Choose component',
+                'min' => 1,
+                'max' => 1,
             ]);
 
-        $fields->addPartial(Heading::class, [
-            'name' => 'heading',
-            'label' => 'Heading',
-            'default_level' => 'h3',
-        ]);
+            $flexible->addLayout('image', ['label' => 'Image'])
+                ->addImage('image', [
+                    'label' => 'Image',
+                    'return_format' => 'array',
+                    'preview_size' => 'medium',
+                    'required' => 1,
+                ]);
 
-        $fields->addPartial(Copy::class, [
-            'name' => 'body',
-            'label' => 'Body copy',
-            'default_style' => 'body',
-        ]);
+            $text = $flexible->addLayout('text', ['label' => 'Text']);
+            $text->addPartial(Heading::class, ['name' => 'heading', 'label' => 'Heading', 'default_level' => 'h3']);
+            $text->addPartial(Copy::class, ['name' => 'body', 'label' => 'Body copy', 'default_style' => 'body']);
 
-        $fields
-            ->addLink('link', [
-                'label' => 'CTA link',
-                'instructions' => 'Shown on the Image and assorted text / Image and button layouts. Leave empty for no CTA.',
+            // TODO: dedicated quote_text/quote_citation fields, pending the
+            // in-flight quote-component PR — reusing Heading as a stand-in
+            // for the quote sentence in the meantime, no citation yet.
+            $quote = $flexible->addLayout('quote', ['label' => 'Quote']);
+            $quote->addPartial(Heading::class, [
+                'name' => 'heading',
+                'label' => 'Quote text',
+                'default_level' => 'h3',
             ]);
+
+            $flexible->addLayout('button', ['label' => 'Button'])
+                ->addLink('link', [
+                    'label' => 'Link',
+                    'required' => true,
+                ]);
+
+            $flexible->endFlexibleContent();
+        }
 
         return $fields->build();
     }
 
     /**
-     * Retrieve the layout.
-     *
-     * @return string
-     */
-    public function layout()
-    {
-        return get_field('layout') ?: $this->example['layout'];
-    }
-
-    /**
-     * Retrieve whether the layout should be flipped.
-     *
-     * @return bool
-     */
-    public function flip()
-    {
-        $value = get_field('flip');
-
-        return $value !== null ? (bool) $value : (bool) ($this->example['flip'] ?? false);
-    }
-
-    /**
-     * Retrieve the image (Image and assorted text / Image and button layouts).
-     *
-     * @return array|null
-     */
-    public function image()
-    {
-        return get_field('image') ?: [
-            'url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'),
-            'alt' => '',
-        ];
-    }
-
-    /**
-     * Retrieve the heading text/level/style.
+     * Retrieve one column's chosen component, normalized to a
+     * `['type' => ..., ...fields]` shape regardless of which layout
+     * (image/text/quote/button) was picked.
      *
      * @return array
      */
-    public function heading()
+    protected function slot(string $name): array
     {
-        return [
-            'text' => get_field('heading_text') ?: ($this->example['heading_text'] ?? ''),
-            'level' => get_field('heading_level') ?: ($this->example['heading_level'] ?? 'h3'),
-            'style' => get_field('heading_style') ?: ($this->example['heading_style'] ?? 'match'),
-        ];
+        $rows = get_field($name);
+        $row = is_array($rows) ? ($rows[0] ?? null) : null;
+
+        if (! $row) {
+            $row = $this->example[$name] ?? ['type' => 'text'];
+            $row = ['acf_fc_layout' => $row['type']] + $row;
+        }
+
+        $type = $row['acf_fc_layout'] ?? 'text';
+
+        return match ($type) {
+            'image' => [
+                'type' => 'image',
+                'image' => is_array($row['image'] ?? null) && ! empty($row['image']['url']) ? $row['image'] : [
+                    'url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'),
+                    'alt' => '',
+                ],
+            ],
+            'quote' => [
+                'type' => 'quote',
+                'heading' => [
+                    'text' => $row['heading_text'] ?? '',
+                    'level' => $row['heading_level'] ?? 'h3',
+                    'style' => $row['heading_style'] ?? 'match',
+                ],
+            ],
+            'button' => [
+                'type' => 'button',
+                'link' => $this->normalizeLink($row['link'] ?? null),
+            ],
+            default => [
+                'type' => 'text',
+                'heading' => [
+                    'text' => $row['heading_text'] ?? '',
+                    'level' => $row['heading_level'] ?? 'h3',
+                    'style' => $row['heading_style'] ?? 'match',
+                ],
+                'body' => [
+                    'text' => $row['body_text'] ?? '',
+                    'style' => $row['body_style'] ?? 'body',
+                ],
+            ],
+        };
     }
 
     /**
-     * Retrieve the body copy text/style.
+     * Coerce an ACF `link` field value to its expected shape — ACF normally
+     * returns an array, but a legacy/incomplete row can store a plain
+     * string (or nothing at all), which would fatal on array access.
      *
+     * @param  mixed  $link
      * @return array
      */
-    public function body()
+    protected function normalizeLink($link)
     {
-        return [
-            'text' => get_field('body_text') ?: ($this->example['body_text'] ?? ''),
-            'style' => get_field('body_style') ?: ($this->example['body_style'] ?? 'body'),
-        ];
-    }
+        if (is_array($link)) {
+            return $link + ['title' => '', 'url' => '', 'target' => ''];
+        }
 
-    /**
-     * Retrieve the CTA link.
-     *
-     * @return array
-     */
-    public function link()
-    {
-        $link = get_field('link') ?: ($this->example['link'] ?? null);
-
-        return is_array($link) ? $link + ['title' => '', 'url' => '', 'target' => ''] : ['title' => '', 'url' => '', 'target' => ''];
+        return ['title' => '', 'url' => (string) ($link ?? ''), 'target' => ''];
     }
 
     /**

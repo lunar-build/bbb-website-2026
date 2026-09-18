@@ -16,16 +16,8 @@
     }
   }
 
-  &--flip &__media {
-    @media (min-width: 64rem) {
-      order: 2;
-    }
-  }
-
-  &--flip &__content {
-    @media (min-width: 64rem) {
-      order: 1;
-    }
+  &__column > * + * {
+    margin-top: 1rem;
   }
 
   &__image {
@@ -44,9 +36,5 @@
 
   &__quote {
     margin: 0;
-  }
-
-  &__content > * + * {
-    margin-top: 1rem;
   }
 }
