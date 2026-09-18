@@ -61,7 +61,14 @@ input[type='checkbox'] {
   height: 1.125rem !important;
   margin: 0 !important;
 
-  @include focus.ring;
+  // Also target plain `:focus` — GF's own blue focus ring fires on `:focus`,
+  // which unlike `:focus-visible` also matches a mouse click here.
+  &:focus,
+  &:focus-visible {
+    outline: 2px solid var(--focus-color) !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+  }
 }
 
 input[type='radio'] {
@@ -120,5 +127,11 @@ input[type='checkbox'] {
 
   &:checked {
     background-image: url('../../svg/checkbox-checked.svg') !important;
+  }
+
+  // GF layers its own blue tick glyph on this same ::before — hide it so
+  // only our svg's charcoal tick shows.
+  &::before {
+    content: none !important;
   }
 }

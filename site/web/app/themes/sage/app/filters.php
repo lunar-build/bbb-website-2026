@@ -99,9 +99,7 @@ add_filter('gform_field_content', function ($content, $field) {
 
 /**
  * Replace Gravity Forms' plain `<input type="submit">` with our brand
- * `<wa-button>` (yellow pill + arrow) so form CTAs match every other CTA on
- * the site. wa-button is a form-associated custom element — `type="submit"`
- * submits the surrounding <form> natively, same as the input it replaces.
+ * `<wa-button>` (yellow pill + arrow) so form CTAs match every other CTA.
  */
 add_filter('gform_submit_button', function ($button, $form) {
     preg_match('/value="([^"]*)"/', $button, $matches);
