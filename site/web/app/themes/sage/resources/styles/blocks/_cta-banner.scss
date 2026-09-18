@@ -138,6 +138,18 @@
   }
 }
 
+// Left (blue) — same grid as Left, but blue bg + white text, matching the
+// Figma "Card grid" banner (instructor illustration on a solid blue field).
+.c-cta-banner--left-blue {
+  background: var(--wp--preset--color--blue);
+  color: var(--wp--preset--color--white);
+
+  .c-cta-banner__heading,
+  .c-cta-banner__body {
+    color: var(--wp--preset--color--white);
+  }
+}
+
 .c-cta-banner__image--column {
   display: none;
   width: 100%;

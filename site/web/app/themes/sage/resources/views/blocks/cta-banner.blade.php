@@ -2,7 +2,7 @@
      block has no InnerBlocks, and its whole point (background colour per
      layout) is invisible without the <section>, which broke it on the
      pattern-library page where $block->preview is always true. --}}
-<section {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout]) }}>
+<section {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout, $layout === 'left' && $leftBackground === 'blue' ? 'c-cta-banner--left-blue' : null]) }}>
 
 @if ($layout === 'centred')
   @if ($imageLeft)

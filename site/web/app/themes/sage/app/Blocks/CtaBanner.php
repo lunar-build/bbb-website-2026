@@ -159,6 +159,7 @@ class CtaBanner extends Block
         '' => 'None',
         'bmx' => 'BMX rider',
         'mountain_biker' => 'Mountain biker',
+        'instructor' => 'Cycle instructor',
     ];
 
     /**
@@ -178,6 +179,7 @@ class CtaBanner extends Block
         'image_left' => 'bmx',
         'image_right' => 'mountain_biker',
         'image' => 'mountain_biker',
+        'left_background' => 'light',
     ];
 
     /**
@@ -190,6 +192,7 @@ class CtaBanner extends Block
     public $examples = [
         'Centred' => [],
         'Left' => ['layout' => 'left'],
+        'Left (blue)' => ['layout' => 'left', 'left_background' => 'blue', 'image' => 'instructor'],
         'Slimline' => ['layout' => 'slimline'],
     ];
 
@@ -206,6 +209,7 @@ class CtaBanner extends Block
             'imageLeft' => $this->imageLeft(),
             'imageRight' => $this->imageRight(),
             'image' => $this->image(),
+            'leftBackground' => $this->leftBackground(),
         ];
     }
 
@@ -293,6 +297,15 @@ class CtaBanner extends Block
                     'ui' => true,
                     'allow_null' => true,
                 ])
+                ->addSelect('left_background', [
+                    'label' => 'Background',
+                    'choices' => [
+                        'light' => 'Light',
+                        'blue' => 'Blue',
+                    ],
+                    'default_value' => 'light',
+                    'ui' => true,
+                ])
         ;
 
         return $fields->build();
@@ -366,6 +379,16 @@ class CtaBanner extends Block
     public function image()
     {
         return $this->illustrationUrl(get_field('image') ?: ($this->layout() === 'left' ? $this->example['image'] : ''));
+    }
+
+    /**
+     * Retrieve the Left layout's background choice.
+     *
+     * @return string
+     */
+    public function leftBackground()
+    {
+        return get_field('left_background') ?: ($this->layout() === 'left' ? ($this->example['left_background'] ?? 'light') : 'light');
     }
 
     /**

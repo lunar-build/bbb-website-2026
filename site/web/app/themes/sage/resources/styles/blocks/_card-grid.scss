@@ -1,0 +1,28 @@
+.c-card-grid {
+  padding-block: 3rem;
+  text-align: center;
+
+  @media (min-width: 64rem) {
+    padding-block: 4rem;
+  }
+
+  &__heading {
+    margin-bottom: 1rem;
+  }
+
+  &__intro {
+    max-width: 45rem;
+    margin-inline: auto;
+    margin-bottom: 2rem;
+  }
+
+  &__cards {
+    display: grid;
+    gap: 1.5rem;
+    text-align: left;
+
+    @media (min-width: 48rem) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
