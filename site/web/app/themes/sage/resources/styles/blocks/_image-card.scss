@@ -1,5 +1,6 @@
 // Figma "Image card": image with a linked caption bar, no body copy.
 @use '../base/typography';
+@use '../base/focus' as focus;
 @use '../components/button';
 
 .c-image-card {
@@ -8,9 +9,10 @@
     max-width: 572px;
     border-radius: 12px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
     background: var(--wp--preset--color--white);
     text-decoration: none;
+
+    @include focus.ring;
 
     &:hover,
     &:focus-visible {
@@ -18,11 +20,16 @@
     }
   }
 
+  // No overflow:hidden on &__card (removed so the focus ring isn't
+  // clipped) — round &__image's own top corners to match &__card's shape
+  // instead. &__caption below needs no radius of its own: it's the same
+  // white as &__card, so square corners there aren't visible.
   &__image {
     display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    border-radius: 12px 12px 0 0;
     border-bottom: 1px solid var(--wp--preset--color--light-grey);
   }
 

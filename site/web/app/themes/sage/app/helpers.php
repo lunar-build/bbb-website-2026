@@ -90,3 +90,19 @@ function social_links_from_options(): array
 
     return array_values(array_filter($links, fn($link) => ! empty($link['url'])));
 }
+
+/**
+ * Coerce an ACF `link` field value to its expected shape — ACF normally
+ * returns an array, but a legacy/incomplete row can store a plain string
+ * (or nothing at all), which would fatal on array access. Shared by any
+ * block with a repeater of link-bearing rows (see CardRow.php's own
+ * near-identical normalizeLink(), predating this helper).
+ */
+function normalize_link($link): array
+{
+    if (is_array($link)) {
+        return $link + ['title' => '', 'url' => '', 'target' => ''];
+    }
+
+    return ['title' => '', 'url' => (string) ($link ?? ''), 'target' => ''];
+}
