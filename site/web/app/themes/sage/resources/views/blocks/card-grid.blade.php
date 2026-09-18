@@ -17,7 +17,7 @@
     </x-copy>
   @endif
 
-  <div class="c-card-grid__cards">
+  <div class="c-card-grid__cards @if ($sideImage) c-card-grid__cards--with-side-image @endif">
     @foreach ($cards as $card)
       @if ($cardStyle === 'image_card')
         <x-image-card :image="$card['image']" :link="$card['link']" class="c-card-grid__card" />

@@ -2,6 +2,7 @@
 
 .c-card-grid {
   position: relative;
+  overflow-x: clip;
   padding-block: 3rem;
   text-align: center;
   background: var(--wp--preset--color--lightest-grey);
@@ -10,7 +11,10 @@
     padding-block: 4rem;
   }
 
+  // Reduced width + centred, matching the Figma heading (wraps to 2 lines).
   &__heading {
+    max-width: 45rem;
+    margin-inline: auto;
     margin-bottom: 1rem;
   }
 
@@ -30,24 +34,32 @@
     }
   }
 
-  // Decorative illustration "standing" at the bottom-right of the block,
-  // deliberately bleeding past the block's own bottom padding/edge (and a
-  // few px into whatever sits below it) so it reads as a figure standing
-  // over the section rather than boxed inside it. Hidden below `lg`, per
-  // design: not shown on mobile/tablet. Anchored the same way as
-  // .c-cta-banner__image--left — clamped to the container's right gutter
-  // on narrower large screens, held at a fixed distance from centre once
-  // there's room, rather than drifting to the raw section edge.
+  // Reserves room for &__side-image (a pure overlay, doesn't reflow the
+  // grid) so it reads as standing beside the grid, not on top of it.
+  // Narrower than the image itself — some overlap is fine.
+  &__cards--with-side-image {
+    @include bp.respond($min: bp.$xl) {
+      padding-right: 16rem;
+    }
+  }
+
+  // Decorative figure bleeding past the block's bottom edge (and a few px
+  // into whatever's below it), so it reads as standing over the section.
+  // `right` mirrors .o-container's own gutter calc (base/_container.scss)
+  // minus a constant 8rem, so the overlay past the container edge stays
+  // the same at any viewport width — a flat rem value looked right on
+  // ultra-wide screens but overshot badly on laptop widths, where the
+  // container's own gutter is still small. xl+ only; needs the room.
   &__side-image {
     display: none;
     position: absolute;
-    right: max(2rem, calc(50% - 40rem));
-    bottom: -0.75rem;
-    width: 18rem;
+    right: calc(max(1.5rem, (100% - 80rem) / 2) - 8rem);
+    bottom: -0.25rem;
+    width: 30rem;
     height: auto;
     pointer-events: none;
 
-    @include bp.respond($min: bp.$lg) {
+    @include bp.respond($min: bp.$xl) {
       display: block;
     }
   }
