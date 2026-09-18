@@ -27,7 +27,7 @@ class CtaBanner extends Block
      *
      * @var string
      */
-    public $description = 'A call-to-action banner with a heading, body text, and link, in Centred/Left/Slimline layouts.';
+    public $description = 'A call-to-action banner with a heading, body text, and link, in Centred/Left/Row/Slimline layouts.';
 
     /**
      * The block category.
@@ -180,7 +180,6 @@ class CtaBanner extends Block
         'image_left' => 'bmx',
         'image_right' => 'mountain_biker',
         'image' => 'mountain_biker',
-        'left_background' => 'light',
     ];
 
     /**
@@ -193,7 +192,7 @@ class CtaBanner extends Block
     public $examples = [
         'Centred' => [],
         'Left' => ['layout' => 'left'],
-        'Left (blue)' => ['layout' => 'left', 'left_background' => 'blue', 'image' => 'cyclist'],
+        'Row' => ['layout' => 'row', 'image' => 'cyclist'],
         'Slimline' => ['layout' => 'slimline'],
     ];
 
@@ -210,7 +209,6 @@ class CtaBanner extends Block
             'imageLeft' => $this->imageLeft(),
             'imageRight' => $this->imageRight(),
             'image' => $this->image(),
-            'leftBackground' => $this->leftBackground(),
         ];
     }
 
@@ -228,6 +226,7 @@ class CtaBanner extends Block
                     'choices' => [
                         'centred' => 'Centred',
                         'left' => 'Left',
+                        'row' => 'Row',
                         'slimline' => 'Slimline',
                     ],
                     'default_value' => 'centred',
@@ -252,8 +251,7 @@ class CtaBanner extends Block
                 ])
                 ->addLink('link', [
                     'label' => 'Link',
-                    'instructions' => 'Link text + URL for the CTA.',
-                    'required' => true,
+                    'instructions' => 'Link text + URL for the CTA. Optional — leave empty for no button.',
                 ])
             ->addTab('Centred layout images', [
                 'conditional_logic' => [
@@ -289,6 +287,13 @@ class CtaBanner extends Block
                             'value' => 'left',
                         ],
                     ],
+                    [
+                        [
+                            'field' => 'layout',
+                            'operator' => '==',
+                            'value' => 'row',
+                        ],
+                    ],
                 ],
             ])
                 ->addSelect('image', [
@@ -297,15 +302,6 @@ class CtaBanner extends Block
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,
-                ])
-                ->addSelect('left_background', [
-                    'label' => 'Background',
-                    'choices' => [
-                        'light' => 'Light',
-                        'blue' => 'Blue',
-                    ],
-                    'default_value' => 'light',
-                    'ui' => true,
                 ])
         ;
 
@@ -343,13 +339,21 @@ class CtaBanner extends Block
     }
 
     /**
-     * Retrieve the link.
+     * Retrieve the link. Empty is valid — the CTA button is optional; on a
+     * real saved post an empty field means no button, not the fixture link
+     * (only pattern-library/editor preview falls back to that).
      *
      * @return array
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        $link = get_field('link');
+
+        if ($link) {
+            return $link;
+        }
+
+        return $this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
     }
 
     /**
@@ -373,23 +377,15 @@ class CtaBanner extends Block
     }
 
     /**
-     * Retrieve the Left layout's illustration URL.
+     * Retrieve the Left/Row layouts' illustration URL.
      *
      * @return string|null
      */
     public function image()
     {
-        return $this->illustrationUrl(get_field('image') ?: ($this->layout() === 'left' ? $this->example['image'] : ''));
-    }
+        $isLeftLayout = in_array($this->layout(), ['left', 'row'], true);
 
-    /**
-     * Retrieve the Left layout's background choice.
-     *
-     * @return string
-     */
-    public function leftBackground()
-    {
-        return get_field('left_background') ?: ($this->layout() === 'left' ? ($this->example['left_background'] ?? 'light') : 'light');
+        return $this->illustrationUrl(get_field('image') ?: ($isLeftLayout ? $this->example['image'] : ''));
     }
 
     /**

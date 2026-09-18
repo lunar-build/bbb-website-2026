@@ -127,10 +127,10 @@
   }
 }
 
-// Left (blue) — same grid as Left, but blue bg + white text, image on the
-// LEFT instead of the right (Figma "Card grid" banner: cyclist illustration
-// on a solid blue field, opposite side from the light "Left" layout).
-.c-cta-banner--left-blue {
+// Row — same grid as Left, but blue bg + white text, image / text / button
+// in a single row (Figma "Card grid" banner: cyclist illustration on a
+// solid blue field, image on the LEFT — opposite side from Left's own).
+.c-cta-banner--row {
   background: var(--wp--preset--color--blue);
   color: var(--wp--preset--color--white);
 
@@ -139,39 +139,33 @@
     color: var(--wp--preset--color--white);
   }
 
-  // The image is a small absolute overlay here (below), not a real grid
-  // column like the light "Left" layout — content just takes the full
-  // width. Overridden from `md` already (not just `xl`, where the image
-  // itself appears) so it doesn't inherit the light "Left" layout's 2-col
-  // grid-template-columns in the md–xl range, which would otherwise waste
-  // half the row since there's only one grid item (content) here.
+  // Image + content as real flex items sharing one row, both using the
+  // same 2rem gap that &__content's own text/button row uses (below) —
+  // so image-to-text and text-to-button read as the same spacing, rather
+  // than the image being an absolutely-positioned overlay with its own
+  // one-off offset. Below `md` this stays a column (base &__grid rule).
   .c-cta-banner__grid {
     @include bp.respond($min: bp.$md) {
-      grid-template-columns: 1fr;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
     }
   }
 
-  // Text left, button right from `md` (no image yet — that only appears
-  // at `xl`, see &__image--column below); stacks to a column below `md`.
-  // padding-left only kicks in with the image at `xl`, reserving room for
-  // it beside the text — deliberately narrower than the image itself, so
-  // it overlaps the text's left edge slightly.
+  // Text left, button right from `md`; stacks to a column below `md`.
   .c-cta-banner__content {
+    // The base rule caps &__content at 40rem — fine for Centred/Slimline,
+    // but Row is no longer a sub-variant of "Left" (which clears this the
+    // same way), so it needs its own override or the row can't spread
+    // past 40rem regardless of the flex/gap rules below.
+    max-width: none;
+
     @include bp.respond($min: bp.$md) {
+      flex: 1;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
       gap: 2rem;
-    }
-
-    @include bp.respond($min: bp.$xl) {
-      padding-left: 16rem;
-    }
-  }
-
-  .c-cta-banner__text {
-    @include bp.respond($min: bp.$md) {
-      max-width: 28rem;
     }
   }
 
@@ -182,11 +176,11 @@
     }
   }
 
-  // Smaller than the light "Left" layout's image, and a pure overlay
-  // (doesn't reflow the grid/content) — bleeds slightly past the
-  // section's own left edge, per design. Source art faces left, so it's
-  // mirrored to face the text/content, same reasoning as the light
-  // "Left" layout (just the opposite direction).
+  // Smaller than the light "Left" layout's image. Source art faces left,
+  // so it's mirrored to face the text/content, same reasoning as the
+  // light "Left" layout (just the opposite direction). `order: -1` puts
+  // it first in the row regardless of DOM order (it renders after
+  // &__content in the markup).
   //
   // Hidden until `xl` (not `lg`, unlike every other layout's image) —
   // the base rule below shows it from `lg`, but there isn't enough room
@@ -197,9 +191,10 @@
 
     @include bp.respond($min: bp.$xl) {
       display: block;
-      position: absolute;
-      left: 1rem;
-      bottom: 0;
+      position: relative;
+      bottom: -4rem;
+      order: -1;
+      flex: none;
       max-width: 14rem;
     }
 
