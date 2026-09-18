@@ -160,6 +160,7 @@ class CtaBanner extends Block
         'bmx' => 'BMX rider',
         'mountain_biker' => 'Mountain biker',
         'instructor' => 'Cycle instructor',
+        'cyclist' => 'Cyclist on bike',
     ];
 
     /**
@@ -192,7 +193,7 @@ class CtaBanner extends Block
     public $examples = [
         'Centred' => [],
         'Left' => ['layout' => 'left'],
-        'Left (blue)' => ['layout' => 'left', 'left_background' => 'blue', 'image' => 'instructor'],
+        'Left (blue)' => ['layout' => 'left', 'left_background' => 'blue', 'image' => 'cyclist'],
         'Slimline' => ['layout' => 'slimline'],
     ];
 

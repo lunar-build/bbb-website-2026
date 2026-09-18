@@ -28,6 +28,12 @@
   max-width: 40rem;
 }
 
+.c-cta-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .c-cta-banner__heading,
 .c-cta-banner__body {
   margin: 0;
@@ -39,11 +45,8 @@
 
 // Centred layout's decorative illustrations — absolutely positioned
 // against the section itself (not .o-container), and capped narrow via
-// clamp() so they stay clear of the centred text column at in-between
-// (lg–xl) viewport widths. Vertically centred on the section. Sit BEHIND
-// the text (z-index below .c-cta-banner__content's), hidden on phones,
-// visible (clipped, behind the text) from tablet (`md`) up rather than
-// only appearing at `lg` like before.
+// clamp(). Vertically centred on the section. Hidden until `xl` — below
+// that there isn't room beside the centred text without overlapping it.
 .c-cta-banner__image {
   display: none;
   position: absolute;
@@ -53,39 +56,25 @@
   width: var(--c-cta-banner-image-width);
   pointer-events: none;
 
-  @include bp.respond($min: bp.$md) {
+  @include bp.respond($min: bp.$xl) {
     display: block;
   }
 }
 
-// Two states, not one:
-// - md–xl: positioned relative to the section's centre (not its full-bleed
-//   raw edge, which let the gap to the fixed-width text keep growing on
-//   wide screens) but still close enough to sit BEHIND the text — there
-//   isn't room to clear it at these widths, so overlap is intentional.
-// - xl and up: enough room to sit beside the text without overlapping it.
-//   Anchored a fixed distance from centre (half the text's 34rem max-width
-//   + a gap) rather than the section edge, so they hold that gap instead
-//   of collapsing toward centre (too-close) or drifting to the edges
-//   (too-far) as the viewport keeps growing.
+// Anchored a fixed distance from centre (half the text's 34rem max-width
+// + a gap) rather than the section edge, so they hold that gap instead of
+// collapsing toward centre (too-close) or drifting to the edges (too-far)
+// as the viewport keeps growing.
 .c-cta-banner__image--left {
-  left: max(2rem, calc(50% - 22rem));
+  left: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
   transform: translateY(-50%);
-
-  @include bp.respond($min: bp.$xl) {
-    left: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
-  }
 }
 
 .c-cta-banner__image--right {
-  right: max(2rem, calc(50% - 22rem));
+  right: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
   // Both Centred illustrations face outward (away from the text) — the
   // source art faces left, so the right-hand rider needs mirroring.
   transform: translateY(-50%) scaleX(-1);
-
-  @include bp.respond($min: bp.$xl) {
-    right: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
-  }
 }
 
 // Centred — Figma "Layout=Centred": blue bg, white centred text/CTA, two
@@ -138,8 +127,9 @@
   }
 }
 
-// Left (blue) — same grid as Left, but blue bg + white text, matching the
-// Figma "Card grid" banner (instructor illustration on a solid blue field).
+// Left (blue) — same grid as Left, but blue bg + white text, image on the
+// LEFT instead of the right (Figma "Card grid" banner: cyclist illustration
+// on a solid blue field, opposite side from the light "Left" layout).
 .c-cta-banner--left-blue {
   background: var(--wp--preset--color--blue);
   color: var(--wp--preset--color--white);
@@ -147,6 +137,73 @@
   .c-cta-banner__heading,
   .c-cta-banner__body {
     color: var(--wp--preset--color--white);
+  }
+
+  // The image is a small absolute overlay here (below), not a real grid
+  // column like the light "Left" layout — content just takes the full
+  // width. Overridden from `md` already (not just `xl`, where the image
+  // itself appears) so it doesn't inherit the light "Left" layout's 2-col
+  // grid-template-columns in the md–xl range, which would otherwise waste
+  // half the row since there's only one grid item (content) here.
+  .c-cta-banner__grid {
+    @include bp.respond($min: bp.$md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Text left, button right from `md` (no image yet — that only appears
+  // at `xl`, see &__image--column below); stacks to a column below `md`.
+  // padding-left only kicks in with the image at `xl`, reserving room for
+  // it beside the text — deliberately narrower than the image itself, so
+  // it overlaps the text's left edge slightly.
+  .c-cta-banner__content {
+    @include bp.respond($min: bp.$md) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    @include bp.respond($min: bp.$xl) {
+      padding-left: 16rem;
+    }
+  }
+
+  .c-cta-banner__text {
+    @include bp.respond($min: bp.$md) {
+      max-width: 28rem;
+    }
+  }
+
+  .c-cta-banner__cta {
+    @include bp.respond($min: bp.$md) {
+      align-self: center;
+      flex: none;
+    }
+  }
+
+  // Smaller than the light "Left" layout's image, and a pure overlay
+  // (doesn't reflow the grid/content) — bleeds slightly past the
+  // section's own left edge, per design. Source art faces left, so it's
+  // mirrored to face the text/content, same reasoning as the light
+  // "Left" layout (just the opposite direction).
+  //
+  // Hidden until `xl` (not `lg`, unlike every other layout's image) —
+  // the base rule below shows it from `lg`, but there isn't enough room
+  // for image+row-text+button to coexist that early; overridden back to
+  // none here until `xl`.
+  .c-cta-banner__image--column {
+    display: none;
+
+    @include bp.respond($min: bp.$xl) {
+      display: block;
+      position: absolute;
+      left: 1rem;
+      bottom: 0;
+      max-width: 14rem;
+    }
+
+    transform: scaleX(-1);
   }
 }
 
@@ -185,5 +242,14 @@
   .c-cta-banner__body {
     color: var(--wp--preset--color--white);
     max-width: 40rem;
+  }
+
+  // The base &__cta rule forces align-self:flex-start regardless of the
+  // parent's own align-items, so it needs its own override here to
+  // actually sit centred on the row's cross axis.
+  .c-cta-banner__cta {
+    @include bp.respond($min: bp.$md) {
+      align-self: center;
+    }
   }
 }

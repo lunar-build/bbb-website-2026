@@ -17,11 +17,13 @@
 <div class="o-container">
   <div class="c-cta-banner__grid">
     <div class="c-cta-banner__content">
-      @if ($heading)
-        <h2 class="c-cta-banner__heading u-heading-1">{{ $heading }}</h2>
-      @endif
+      <div class="c-cta-banner__text">
+        @if ($heading)
+          <h2 class="c-cta-banner__heading u-heading-1">{{ $heading }}</h2>
+        @endif
 
-      <p class="c-cta-banner__body u-standfirst">{{ $body }}</p>
+        <p class="c-cta-banner__body u-standfirst">{{ $body }}</p>
+      </div>
 
       <wa-button
         class="c-cta-banner__cta"
