@@ -262,34 +262,36 @@ class CardGrid extends Block
                 ],
                 'default_value' => 'link',
                 'ui' => true,
-            ])
-            ->addRepeater('cards', [
-                'label' => 'Cards',
-                'button_label' => 'Add card',
-                'min' => 0,
-                'layout' => 'block',
-            ])
-                ->addImage('image', [
-                    'label' => 'Image',
-                    'return_format' => 'array',
-                    'preview_size' => 'medium',
-                    'required' => 1,
-                ]);
+            ]);
 
-        $fields->addPartial(Heading::class, [
+        $cards = $fields->addRepeater('cards', [
+            'label' => 'Cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
+        ]);
+
+        $cards->addImage('image', [
+            'label' => 'Image',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'required' => 1,
+        ]);
+
+        $cards->addPartial(Heading::class, [
             'name' => 'heading',
             'label' => 'Title',
             'default_level' => 'h3',
             'required' => true,
         ]);
 
-        $fields->addPartial(Copy::class, [
+        $cards->addPartial(Copy::class, [
             'name' => 'body',
             'label' => 'Body text',
             'default_style' => 'body',
         ]);
 
-        $fields
+        $cards
             ->addDatePicker('date', [
                 'label' => 'Date',
                 'instructions' => 'Only shown when the grid\'s Card style is Event or News.',
@@ -299,8 +301,9 @@ class CardGrid extends Block
             ->addLink('link', [
                 'label' => 'Link',
                 'required' => true,
-            ])
-            ->endRepeater();
+            ]);
+
+        $cards->endRepeater();
 
         return $fields->build();
     }
