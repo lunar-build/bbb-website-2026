@@ -27,6 +27,15 @@ rather not set it up now — this step is optional, never blocking.
 If no link is offered, skip straight to step 1 and work from the developer's
 description.
 
+## 0.5 Isolated worktree development (optional)
+
+If the developer wants to build this block in an isolated git worktree instead of
+directly on their current branch — e.g. to test it in isolation before merging, or to
+work on multiple blocks in parallel — use the `worktree-preview` skill. DDEV only
+serves `/site` in the main checkout, so a worktree needs its branch swapped into
+`/site` to actually preview in the browser; that skill covers the swap-in/swap-out
+mechanic. Skip this and work directly in `/site` if no isolation is needed.
+
 ## 1. Decide what UI each part of the block needs
 
 For every piece of UI in the new block, pick one:
