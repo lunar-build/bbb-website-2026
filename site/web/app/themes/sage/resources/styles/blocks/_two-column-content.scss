@@ -1,0 +1,52 @@
+.c-two-column-content {
+  padding-block: 3rem;
+
+  @media (min-width: 64rem) {
+    padding-block: 4rem;
+  }
+
+  &__inner {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+
+    @media (min-width: 64rem) {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  &--flip &__media {
+    @media (min-width: 64rem) {
+      order: 2;
+    }
+  }
+
+  &--flip &__content {
+    @media (min-width: 64rem) {
+      order: 1;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+  }
+
+  &__quote-mark {
+    display: block;
+    color: var(--wp--preset--color--yellow);
+    font-size: 8.75rem;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  &__quote {
+    margin: 0;
+  }
+
+  &__content > * + * {
+    margin-top: 1rem;
+  }
+}
