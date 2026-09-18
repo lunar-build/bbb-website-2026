@@ -15,7 +15,6 @@
     max-width: 443px;
     border-radius: 12px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-    overflow: hidden; // clips the image's square corners to the card radius
     background: var(--wp--preset--color--white);
   }
 
@@ -32,14 +31,7 @@
     inset: 0;
     z-index: 1;
 
-    // Default outline-offset (2px, outside the box) would get clipped by
-    // &__card's own overflow:hidden, since this link is already flush
-    // with &__card's edges — pull it inward instead so it stays visible.
     @include focus.ring;
-
-    &:focus-visible {
-      outline-offset: -3px;
-    }
   }
 
   &__body {
@@ -48,6 +40,12 @@
     flex: 1;
     gap: 16px;
     padding: 20px;
+    // &__card has no overflow:hidden (removed so the stretched-link's
+    // focus ring isn't clipped) — this rounds &__body's own bottom
+    // corners to match, since it's the only other piece (besides &__image,
+    // already self-rounded) that could otherwise show square corners
+    // poking out past &__card's rounded shape.
+    border-radius: 0 0 12px 12px;
   }
 
   &__date {
