@@ -13,20 +13,7 @@
     @break
 
   @case('button')
-    @if (! empty($slot['link']['url']))
-      <wa-button
-        class="c-two-column-content__cta"
-        variant="brand"
-        appearance="accent"
-        pill
-        with-end
-        href="{{ $slot['link']['url'] }}"
-        @if (($slot['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-      >
-        {{ $slot['link']['title'] }}
-        <x-icon name="arrow-right" slot="end" />
-      </wa-button>
-    @endif
+    @include('partials.two-column-content-cta', ['link' => $slot['link']])
     @break
 
   @default
@@ -41,4 +28,6 @@
         {!! $slot['body']['text'] !!}
       </x-copy>
     @endif
+
+    @include('partials.two-column-content-cta', ['link' => $slot['link'] ?? []])
 @endswitch

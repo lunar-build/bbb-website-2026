@@ -164,6 +164,7 @@ class TwoColumnContent extends Block
             'heading_style' => 'match',
             'body_text' => 'Find the quickest, quietest or most balanced cycle routes and leisure rides around the West of England. Helping you to discover the best way to get around. Powered by CycleStreets.',
             'body_style' => 'body',
+            'link' => ['title' => 'Plan a cycling route', 'url' => '#', 'target' => ''],
         ],
     ];
 
@@ -235,6 +236,10 @@ class TwoColumnContent extends Block
             $text = $flexible->addLayout('text', ['label' => 'Text']);
             $text->addPartial(Heading::class, ['name' => 'heading', 'label' => 'Heading', 'default_level' => 'h3']);
             $text->addPartial(Copy::class, ['name' => 'body', 'label' => 'Body copy', 'default_style' => 'body']);
+            $text->addLink('link', [
+                'label' => 'CTA link',
+                'instructions' => 'Optional — shown as a button below the text if filled in.',
+            ]);
 
             // TODO: dedicated quote_text/quote_citation fields, pending the
             // in-flight quote-component PR — reusing Heading as a stand-in
@@ -308,6 +313,7 @@ class TwoColumnContent extends Block
                     'text' => $row['body_text'] ?? '',
                     'style' => $row['body_style'] ?? 'body',
                 ],
+                'link' => $this->normalizeLink($row['link'] ?? null),
             ],
         };
     }
