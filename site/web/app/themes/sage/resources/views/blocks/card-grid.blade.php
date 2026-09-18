@@ -17,30 +17,28 @@
     </x-copy>
   @endif
 
-  <div class="c-card-grid__layout">
-    <div class="c-card-grid__cards">
-      @foreach ($cards as $card)
-        @if ($cardStyle === 'image_card')
-          <x-image-card :image="$card['image']" :link="$card['link']" class="c-card-grid__card" />
-        @else
-          <x-card
-            :card-style="$cardStyle"
-            :image="$card['image']"
-            :date="$card['date']"
-            :heading="$card['heading']"
-            :body="$card['body']"
-            :link="$card['link']"
-            :cta-style="$ctaStyle"
-            class="c-card-grid__card"
-          />
-        @endif
-      @endforeach
-    </div>
-
-    @if ($sideImage)
-      <img class="c-card-grid__side-image" src="{{ $sideImage['url'] }}" alt="{{ $sideImage['alt'] ?? '' }}">
-    @endif
+  <div class="c-card-grid__cards">
+    @foreach ($cards as $card)
+      @if ($cardStyle === 'image_card')
+        <x-image-card :image="$card['image']" :link="$card['link']" class="c-card-grid__card" />
+      @else
+        <x-card
+          :card-style="$cardStyle"
+          :image="$card['image']"
+          :date="$card['date']"
+          :heading="$card['heading']"
+          :body="$card['body']"
+          :link="$card['link']"
+          :cta-style="$ctaStyle"
+          class="c-card-grid__card"
+        />
+      @endif
+    @endforeach
   </div>
 </div>
+
+@if ($sideImage)
+  <img class="c-card-grid__side-image" src="{{ $sideImage }}" alt="" aria-hidden="true">
+@endif
 
 </section>

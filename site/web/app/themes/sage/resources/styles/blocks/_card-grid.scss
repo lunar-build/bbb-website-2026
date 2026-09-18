@@ -1,6 +1,7 @@
 @use '../abstracts/breakpoints' as bp;
 
 .c-card-grid {
+  position: relative;
   padding-block: 3rem;
   text-align: center;
   background: var(--wp--preset--color--lightest-grey);
@@ -19,15 +20,8 @@
     margin-bottom: 2rem;
   }
 
-  &__layout {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
-
   &__cards {
     display: grid;
-    flex: 1;
     gap: 1.5rem;
     text-align: left;
 
@@ -36,12 +30,22 @@
     }
   }
 
-  // Decorative — hidden below `lg`, per design: not shown on mobile/tablet.
+  // Decorative illustration "standing" at the bottom-right of the block,
+  // deliberately bleeding past the block's own bottom padding/edge (and a
+  // few px into whatever sits below it) so it reads as a figure standing
+  // over the section rather than boxed inside it. Hidden below `lg`, per
+  // design: not shown on mobile/tablet. Anchored the same way as
+  // .c-cta-banner__image--left — clamped to the container's right gutter
+  // on narrower large screens, held at a fixed distance from centre once
+  // there's room, rather than drifting to the raw section edge.
   &__side-image {
     display: none;
-    flex: none;
+    position: absolute;
+    right: max(2rem, calc(50% - 40rem));
+    bottom: -0.75rem;
     width: 18rem;
     height: auto;
+    pointer-events: none;
 
     @include bp.respond($min: bp.$lg) {
       display: block;

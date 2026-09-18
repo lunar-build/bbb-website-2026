@@ -219,7 +219,7 @@ class CardGrid extends Block
             'card_style' => 'image_card',
         ],
         'Link (with side image)' => [
-            'side_image' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+            'show_side_image' => true,
         ],
     ];
 
@@ -271,11 +271,11 @@ class CardGrid extends Block
                 'default_value' => 'link',
                 'ui' => true,
             ])
-            ->addImage('side_image', [
-                'label' => 'Side image',
-                'instructions' => 'Optional decorative image shown beside the grid on large screens only — hidden on mobile/tablet.',
-                'return_format' => 'array',
-                'preview_size' => 'medium',
+            ->addTrueFalse('show_side_image', [
+                'label' => 'Show side image',
+                'instructions' => 'Decorative illustration standing at the bottom-right of the grid, large screens only — hidden on mobile/tablet. Image is fixed for now, not editable.',
+                'default_value' => 0,
+                'ui' => true,
             ]);
 
         $cards = $fields->addRepeater('cards', [
@@ -371,23 +371,18 @@ class CardGrid extends Block
     }
 
     /**
-     * Retrieve the optional decorative side image (large screens only).
+     * Retrieve the optional decorative side image (large screens only). The
+     * image itself is fixed/hardcoded for now — matches the Figma asset —
+     * not an editable field; `show_side_image` only toggles it on/off.
      *
-     * @return array|null
+     * @return string|null
      */
     public function sideImage()
     {
-        $image = get_field('side_image') ?: ($this->example['side_image'] ?? null);
+        $show = get_field('show_side_image');
+        $show = $show !== null ? (bool) $show : (bool) ($this->example['show_side_image'] ?? false);
 
-        if (! $image) {
-            return null;
-        }
-
-        if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-content/uploads/placeholder.jpg') {
-            $image = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => $image['alt'] ?? ''];
-        }
-
-        return $image;
+        return $show ? Vite::asset('resources/images/illustrations/instructor.png') : null;
     }
 
     /**
