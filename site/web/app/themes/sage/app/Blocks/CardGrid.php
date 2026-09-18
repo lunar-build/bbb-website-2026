@@ -29,7 +29,7 @@ class CardGrid extends Block
      *
      * @var string
      */
-    public $description = 'A section heading with a grid of cards, sharing FeatureCard\'s Link/Bikeability/Event/News styles.';
+    public $description = 'A section heading with a grid of cards (FeatureCard\'s Link/Bikeability/Event/News styles, or a plain Image card), with an optional decorative image beside the grid on large screens.';
 
     /**
      * The block category.
@@ -215,6 +215,12 @@ class CardGrid extends Block
                 ['date' => '9th July 2026'],
             ],
         ],
+        'Image card' => [
+            'card_style' => 'image_card',
+        ],
+        'Link (with side image)' => [
+            'side_image' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+        ],
     ];
 
     /**
@@ -228,6 +234,7 @@ class CardGrid extends Block
             'cardStyle' => $this->cardStyle(),
             'ctaStyle' => $this->ctaStyle(),
             'cards' => $this->cards(),
+            'sideImage' => $this->sideImage(),
         ];
     }
 
@@ -259,9 +266,16 @@ class CardGrid extends Block
                     'bikeability' => 'Bikeability (button CTA, no date)',
                     'event' => 'Event card (button CTA, date shown)',
                     'news' => 'News card (button CTA, date shown, no body copy)',
+                    'image_card' => 'Image card (image + linked caption bar only, no heading/body/date)',
                 ],
                 'default_value' => 'link',
                 'ui' => true,
+            ])
+            ->addImage('side_image', [
+                'label' => 'Side image',
+                'instructions' => 'Optional decorative image shown beside the grid on large screens only — hidden on mobile/tablet.',
+                'return_format' => 'array',
+                'preview_size' => 'medium',
             ]);
 
         $cards = $fields->addRepeater('cards', [
@@ -357,6 +371,26 @@ class CardGrid extends Block
     }
 
     /**
+     * Retrieve the optional decorative side image (large screens only).
+     *
+     * @return array|null
+     */
+    public function sideImage()
+    {
+        $image = get_field('side_image') ?: ($this->example['side_image'] ?? null);
+
+        if (! $image) {
+            return null;
+        }
+
+        if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-content/uploads/placeholder.jpg') {
+            $image = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => $image['alt'] ?? ''];
+        }
+
+        return $image;
+    }
+
+    /**
      * Retrieve the cards, normalized to a safe shape and with the date
      * cleared unless the grid's card style actually shows one.
      *
@@ -372,7 +406,7 @@ class CardGrid extends Block
         return array_map(function ($card) use ($placeholder, $showDate) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];
 
-            if (empty($image['url'])) {
+            if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-content/uploads/placeholder.jpg') {
                 $image = ['url' => $placeholder, 'alt' => $image['alt'] ?? ''];
             }
 

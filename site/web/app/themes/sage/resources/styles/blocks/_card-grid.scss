@@ -3,6 +3,7 @@
 .c-card-grid {
   padding-block: 3rem;
   text-align: center;
+  background: var(--wp--preset--color--lightest-grey);
 
   @include bp.respond($min: bp.$lg) {
     padding-block: 4rem;
@@ -18,13 +19,32 @@
     margin-bottom: 2rem;
   }
 
+  &__layout {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
   &__cards {
     display: grid;
+    flex: 1;
     gap: 1.5rem;
     text-align: left;
 
     @include bp.respond($min: bp.$md) {
       grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  // Decorative — hidden below `lg`, per design: not shown on mobile/tablet.
+  &__side-image {
+    display: none;
+    flex: none;
+    width: 18rem;
+    height: auto;
+
+    @include bp.respond($min: bp.$lg) {
+      display: block;
     }
   }
 }
