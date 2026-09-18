@@ -36,7 +36,7 @@
       </x-heading>
       @if (! empty($body['text']))
         <x-copy :style="$body['style']">
-          {{ $body['text'] }}
+          {!! $body['text'] !!}
         </x-copy>
       @endif
     </div>

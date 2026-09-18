@@ -7,7 +7,7 @@
     {{ $heading['text'] }}
   </x-heading>
   <x-copy :style="$intro['style']" class="c-text-hero__intro">
-    {{ $intro['text'] }}
+    {!! $intro['text'] !!}
   </x-copy>
 </div>
 

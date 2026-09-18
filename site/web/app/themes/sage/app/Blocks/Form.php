@@ -83,7 +83,7 @@ class Form extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.
@@ -228,7 +228,7 @@ class Form extends Block
             // Don't crash WP-CLI: it bootstraps this same block-registration hook,
             // so a hard throw here would block `wp plugin activate` itself — the
             // one command that fixes this.
-            if (defined('WP_CLI') && WP_CLI) {
+            if (defined('WP_CLI') && \WP_CLI) {
                 return [];
             }
 
