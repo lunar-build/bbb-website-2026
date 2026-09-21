@@ -231,22 +231,28 @@ explicit `font-weight`) - don't hardcode the value inline in the block's own SCS
 Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
 
 ```blade
-@unless ($block->preview)
-  <section {{ $attributes->class(['c-block-name']) }}>
-@endunless
+<section {{ $attributes->class(['c-block-name']) }}>
 
   {{-- block content --}}
 
-@unless ($block->preview)
-  </section>
-@endunless
+</section>
 ```
 
-**Root element is always `<section>`, never `<div>`.** Every block is a distinct
-region of page content, so `<section>` is the correct semantic wrapper — this is a
-fixed convention, not a per-block choice. If a block's content already has its own
-inner `<section>` (e.g. an "inner" wrapper), rename that inner one to `<div>` rather
-than nesting two `<section>`s (see `video-hero.blade.php`'s `.c-video-hero__inner`).
+**Root element is always `<section>`, never `<div>`, and is never guarded by
+`@unless ($block->preview)`.** Every block is a distinct region of page content, so
+`<section>` is the correct semantic wrapper — this is a fixed convention, not a
+per-block choice. If a block's content already has its own inner `<section>` (e.g. an
+"inner" wrapper), rename that inner one to `<div>` rather than nesting two `<section>`s
+(see `video-hero.blade.php`'s `.c-video-hero__inner`).
+
+Earlier blocks guarded the wrapper with `@unless ($block->preview) ... @endunless`
+(ACF Composer's own scaffold stub does this). Don't do this — `$block->preview` is
+`true` for both the real Gutenberg editor canvas and the `/pattern-library` page (see
+§6), so guarding the wrapper hides it — and everything attached to it, including any
+block-supports-driven styling like spacing padding — in both of those contexts, leaving
+only the front end correctly styled. This bit `CtaBanner`'s background colour first,
+then every other block's new padding support; the wrapper is now always rendered
+everywhere.
 
 `$attributes->class([...])` merges Gutenberg's wrapper classes with your own BEM root
 class. Use `$attributes` bare (no `->class()`) if you don't need an extra class. This
@@ -372,3 +378,19 @@ Placeholder assets live at `resources/images/placeholder/pattern-placeholder.svg
 `resources/videos/placeholder/pattern-placeholder.mp4`, committed to the repo (not
 fetched externally) so they work offline and are trivial to swap — replace the file
 in place and rebuild, no code changes needed.
+
+**`$block->preview` is `true` for both this page's render and the real Gutenberg
+editor canvas** — ACF sets it whenever `is_admin() && acf_is_block_editor()`, not just
+for a genuinely context-less standalone render. ACF Composer's `getHtmlAttributes()`
+returns `[]` whenever `$this->preview` is true, since it normally reads
+`WP_Block_Supports::get_instance()->apply_block_supports()`, which needs a real
+`WP_Block` render context that a synthetic `$block->render([], $content, true)` call
+doesn't have. That means any block-supports-driven styling (spacing padding, in
+particular) never reaches the rendered `style` attribute here, even though the same
+support renders correctly on the front end. `PatternLibrary::injectPreviewSpacingStyle()`
+works around this specifically for spacing/padding by recomputing the CSS by hand from
+the block's own `$spacing` default via `wp_style_engine_get_styles()` (the same style
+engine `WP_Block_Supports` calls internally) and merging it onto the rendered
+`<section>`'s `style` attribute. If a future support (e.g. a background colour driven
+by `settings.color`, not an ACF field) needs the same treatment here, follow that
+method's pattern rather than fighting the `$preview` flag itself.

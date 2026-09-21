@@ -1,11 +1,4 @@
-{{-- The difficulty modifier lives on .c-cycle-route-card__card below, not
-     this <section> — the <section> is skipped when $block->preview is true
-     (both the real Gutenberg editor preview and the pattern-library page
-     render with preview=true), which would make it invisible on
-     /pattern-library if the difficulty styling depended on this wrapper. --}}
-@unless ($block->preview)
-  <section {{ $attributes->class(['c-cycle-route-card']) }}>
-@endunless
+<section {{ $attributes->class(['c-cycle-route-card']) }}>
 
 <div class="o-container">
   <div class="c-cycle-route-card__card c-cycle-route-card--{{ $difficulty }}">
@@ -47,6 +40,4 @@
   </div>
 </div>
 
-@unless ($block->preview)
-  </section>
-@endunless
+</section>

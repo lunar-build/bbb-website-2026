@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-filter-result-card']) }}>
-@endunless
 
 <div class="o-container">
   <div class="c-filter-result-card__card">
@@ -53,6 +51,4 @@
   </div>
 </div>
 
-@unless ($block->preview)
   </section>
-@endunless

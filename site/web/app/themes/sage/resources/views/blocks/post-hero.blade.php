@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-post-hero']) }}>
-@endunless
 
 <div class="o-container">
   <div class="c-post-hero__meta">
@@ -42,6 +40,4 @@
   @endif
 </div>
 
-@unless ($block->preview)
   </section>
-@endunless

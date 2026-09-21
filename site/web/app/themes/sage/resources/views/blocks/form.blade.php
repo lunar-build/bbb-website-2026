@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-form']) }}>
-@endunless
 
   <div class="o-container">
     <div class="c-form__inner">
@@ -32,6 +30,4 @@
     </div>
   </div>
 
-@unless ($block->preview)
   </section>
-@endunless

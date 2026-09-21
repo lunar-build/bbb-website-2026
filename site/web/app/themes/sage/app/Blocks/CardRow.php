@@ -543,7 +543,7 @@ class CardRow extends Block
         return array_map(function ($card) use ($placeholder) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];
 
-if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-content/uploads/placeholder.jpg') {
+            if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-content/uploads/placeholder.jpg') {
                 $image = ['url' => $placeholder, 'alt' => $image['alt'] ?? ''];
             }
 
@@ -580,7 +580,7 @@ if (empty($image['url']) || $image['url'] === 'https://betterbybike.info/wp-cont
     {
         $rows = get_field('area_links') ?: ($this->example['area_links'] ?? []);
 
-        return array_map(fn ($row) => ['link' => $this->normalizeLink($row['link'] ?? null)], $rows);
+        return array_map(fn($row) => ['link' => $this->normalizeLink($row['link'] ?? null)], $rows);
     }
 
     /**

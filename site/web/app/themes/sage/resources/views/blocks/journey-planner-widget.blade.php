@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-journey-planner-widget', 'c-journey-planner-widget--'.str_replace('_', '-', $variant)]) }}>
-@endunless
 
 @if ($contained)
 <div class="o-container">
@@ -63,6 +61,4 @@
 </div>
 @endif
 
-@unless ($block->preview)
   </section>
-@endunless

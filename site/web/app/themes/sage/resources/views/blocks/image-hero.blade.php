@@ -1,7 +1,3 @@
-{{-- No @unless ($block->preview) guard here (unlike other blocks) — this
-     block has no InnerBlocks, and its whole point (the background image)
-     is invisible without the <section>, which broke it on the
-     pattern-library page where $block->preview is always true. --}}
 <section {{ $attributes->class(['c-image-hero']) }}>
 
 @if ($backgroundImage['url'] ?? null)

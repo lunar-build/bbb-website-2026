@@ -92,7 +92,45 @@ class PatternLibrary extends Composer
             $html = acf_replace_inner_blocks_in_block_content($content, $html);
         }
 
-        return $html;
+        return $this->injectPreviewSpacingStyle($html, $block);
+    }
+
+    /**
+     * Standalone preview rendering (`$block->preview = true`) skips ACF
+     * Composer's normal `WP_Block_Supports::apply_block_supports()` call
+     * (there's no real `WP_Block` context to read from outside a genuine
+     * `render_block()` pass), so a block's default spacing support never
+     * makes it into the rendered `style` attribute here — unlike the front
+     * end and real editor canvas, which both go through that real pipeline.
+     * Recreate just the padding declarations by hand from the block's own
+     * `$spacing` default, using the same style engine WP_Block_Supports
+     * itself calls internally, and merge them onto the root wrapper.
+     */
+    protected function injectPreviewSpacingStyle(string $html, Block $block): string
+    {
+        $spacing = array_filter($block->spacing ?? []);
+
+        if (empty($spacing)) {
+            return $html;
+        }
+
+        $css = wp_style_engine_get_styles(['spacing' => $spacing])['css'] ?? '';
+
+        if ($css === '') {
+            return $html;
+        }
+
+        return preg_replace_callback('/<section\b[^>]*>/', function ($matches) use ($css) {
+            $tag = $matches[0];
+
+            if (preg_match('/style="([^"]*)"/', $tag, $styleMatch)) {
+                $merged = rtrim($styleMatch[1], ';') . ';' . $css;
+
+                return str_replace($styleMatch[0], 'style="' . esc_attr($merged) . '"', $tag);
+            }
+
+            return substr($tag, 0, -1) . ' style="' . esc_attr($css) . '">';
+        }, $html, 1);
     }
 
     /**

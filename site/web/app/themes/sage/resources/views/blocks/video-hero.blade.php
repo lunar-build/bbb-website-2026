@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-video-hero']) }}>
-@endunless
 
 <div class="c-video-hero__media" data-video-hero>
   @if ($video['url'] ?? null)
@@ -70,6 +68,4 @@
   </div>
 </div>
 
-@unless ($block->preview)
   </section>
-@endunless

@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-quote-block']) }}>
-@endunless
 
 <div class="o-container">
   <x-quote :size="$quoteSize" :attribution-name="$attributionName" :attribution-role="$attributionRole">
@@ -8,6 +6,4 @@
   </x-quote>
 </div>
 
-@unless ($block->preview)
   </section>
-@endunless

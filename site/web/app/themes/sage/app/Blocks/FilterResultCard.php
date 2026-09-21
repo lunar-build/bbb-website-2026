@@ -302,7 +302,7 @@ class FilterResultCard extends Block
             $rows = $this->preview ? $this->example['contact_info'] : [];
         }
 
-        return array_map(fn ($row) => $row + ['href' => $this->contactHref($row['icon'], $row['text'])], $rows);
+        return array_map(fn($row) => $row + ['href' => $this->contactHref($row['icon'], $row['text'])], $rows);
     }
 
     /**
@@ -316,10 +316,10 @@ class FilterResultCard extends Block
     protected function contactHref($icon, $text)
     {
         return match ($icon) {
-            'phone' => 'tel:'.preg_replace('/[^0-9+]/', '', $text),
-            'envelope' => 'mailto:'.trim($text),
-            'location-dot' => 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($text),
-            'globe' => preg_match('#^https?://#i', $text) ? $text : 'https://'.$text,
+            'phone' => 'tel:' . preg_replace('/[^0-9+]/', '', $text),
+            'envelope' => 'mailto:' . trim($text),
+            'location-dot' => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($text),
+            'globe' => preg_match('#^https?://#i', $text) ? $text : 'https://' . $text,
             default => null,
         };
     }

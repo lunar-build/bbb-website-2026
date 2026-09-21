@@ -1,6 +1,4 @@
-@unless ($block->preview)
   <section {{ $attributes->class(['c-two-column-content']) }}>
-@endunless
 
 <div class="o-container">
   <div class="c-two-column-content__inner">
@@ -14,6 +12,4 @@
   </div>
 </div>
 
-@unless ($block->preview)
   </section>
-@endunless

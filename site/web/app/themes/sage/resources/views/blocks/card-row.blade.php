@@ -1,12 +1,4 @@
-{{-- The type modifier lives on the .o-container div below, not this
-     <section> — the <section> is skipped when $block->preview is true (both
-     the real Gutenberg editor preview and the pattern-library page render
-     with preview=true), which would make every type-specific rule invisible
-     on /pattern-library if it depended on this wrapper (see CtaBanner's own
-     note on the same $block->preview quirk). --}}
-@unless ($block->preview)
-  <section {{ $attributes->class(['c-card-row']) }}>
-@endunless
+<section {{ $attributes->class(['c-card-row']) }}>
 
 <div class="o-container c-card-row--{{ $type }}">
   <h2 class="c-card-row__heading">
@@ -118,6 +110,4 @@
   @endif
 </div>
 
-@unless ($block->preview)
-  </section>
-@endunless
+</section>

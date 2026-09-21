@@ -1,7 +1,3 @@
-{{-- No @unless ($block->preview) guard — the grey section background is
-     essential to how this block looks, and would be invisible on
-     /pattern-library (where preview is always true) if it depended on this
-     wrapper (see CtaBanner's own note on the same $block->preview quirk). --}}
 <section {{ $attributes->class(['c-card-grid']) }}>
 
 <div class="o-container">
