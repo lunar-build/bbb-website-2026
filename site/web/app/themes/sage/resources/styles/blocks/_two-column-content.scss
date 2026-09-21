@@ -1,0 +1,42 @@
+@use '../abstracts/breakpoints' as bp;
+
+.c-two-column-content {
+  padding-block: 3rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 4rem;
+  }
+
+  &__inner {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+
+    @include bp.respond($min: bp.$lg) {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  &__column > * + * {
+    margin-top: 1rem;
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+  }
+
+  &__quote-mark {
+    display: block;
+    color: var(--wp--preset--color--yellow);
+    font-size: 8.75rem;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  &__quote {
+    margin: 0;
+  }
+}

@@ -1,7 +1,9 @@
+@use '../abstracts/breakpoints' as bp;
+
 .c-text-hero {
   padding-block: 3rem;
 
-  @media (min-width: 64rem) {
+  @include bp.respond($min: bp.$lg) {
     padding-block: 4rem;
   }
 
