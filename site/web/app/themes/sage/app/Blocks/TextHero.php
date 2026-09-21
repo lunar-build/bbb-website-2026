@@ -104,7 +104,10 @@ class TextHero extends Block
      * @var array
      */
     public $spacing = [
-        'padding' => null,
+        'padding' => [
+            'top' => 'var:preset|spacing|large',
+            'bottom' => 'var:preset|spacing|large',
+        ],
         'margin' => null,
     ];
 

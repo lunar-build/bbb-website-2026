@@ -301,6 +301,23 @@ editor-facing control and produces double spacing. Internal component spacing (p
 inside a card, button, or sub-section of a block) is unaffected by this and should stay
 in the block's own SCSS as normal.
 
+Every block also sets `$spacing` (the default block attribute value, distinct from
+`$supports`) so a newly inserted block defaults to Large padding top and bottom rather
+than no padding:
+```php
+public $spacing = [
+    'padding' => [
+        'top' => 'var:preset|spacing|large',
+        'bottom' => 'var:preset|spacing|large',
+    ],
+    'margin' => null,
+];
+```
+The `var:preset|spacing|{slug}` string is WordPress's own preset-reference format — the
+slug must match a `theme.json` `settings.spacing.spacingSizes` entry (`small`/`large`).
+Set this on every new block the same way; leaving it `null` means the block renders with
+no padding until an editor manually opens the Dimensions panel and picks one.
+
 ### Shaping WP/ACF data for structured component props
 
 Whenever a block's Blade view hands data to a component expecting a structured
