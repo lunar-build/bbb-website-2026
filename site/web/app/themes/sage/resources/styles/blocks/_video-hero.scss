@@ -79,10 +79,10 @@
 .c-video-hero__lower {
   position: relative;
   background: var(--wp--preset--color--lightest-grey);
-  padding-block: 2.5rem;
+  padding-top: 2.5rem;
 
   @include bp.respond($min: bp.$lg) {
-    padding-block: 3.5rem;
+    padding-top: 3.5rem;
   }
 }
 
