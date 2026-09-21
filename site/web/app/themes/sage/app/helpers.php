@@ -90,3 +90,48 @@ function social_links_from_options(): array
 
     return array_values(array_filter($links, fn($link) => ! empty($link['url'])));
 }
+
+/**
+ * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
+ * every SVG in resources/svg/ — the curated icon set used by `<x-icon
+ * name="...">` (see resources/views/components/icon.blade.php). Glob-based
+ * so the icon picker on any ACF select field using this grows automatically
+ * as new SVGs are added to that folder, with no code change needed here.
+ */
+function svg_icon_choices(): array
+{
+    $files = glob(get_theme_file_path('resources/svg/*.svg')) ?: [];
+
+    $choices = [];
+
+    foreach ($files as $file) {
+        $slug = basename($file, '.svg');
+        $choices[$slug] = ucwords(str_replace(['-', '_'], ' ', $slug));
+    }
+
+    return $choices;
+}
+
+/**
+ * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
+ * the theme's global colour palette (`theme.json`'s `color.palette`, via
+ * WP's own settings API so it reflects any core/plugin overrides too) —
+ * for ACF select fields offering a background colour pick tied to
+ * `var(--wp--preset--color--{slug})`, e.g. IconLinkGrid's `background_color`.
+ */
+function theme_color_choices(): array
+{
+    // wp_get_global_settings(['color', 'palette']) groups by origin
+    // (theme/default/custom) — 'theme' is specifically this theme.json's
+    // own brand palette; WP core's generic 'default' swatches (vivid-red,
+    // pale-pink, etc.) aren't wanted as background choices here.
+    $palette = wp_get_global_settings(['color', 'palette', 'theme']) ?: [];
+
+    $choices = [];
+
+    foreach ($palette as $color) {
+        $choices[$color['slug']] = $color['name'];
+    }
+
+    return $choices;
+}

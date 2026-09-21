@@ -1,0 +1,133 @@
+// Figma node 53:989 — reusable pull-quote, also hardcodable into other blocks.
+//
+// Two-column grid (mark, then body) rather than absolutely-positioning the
+// mark (overlapped the text) or stacking it above (didn't match the design).
+//
+// Mark is <x-icon>, not a text glyph, for cross-platform rendering; purely
+// decorative (auto aria-hidden), so its colour is exempt from WCAG 1.4.11.
+
+@use '../abstracts/breakpoints' as bp;
+@use '../base/typography';
+
+// Standalone-only padding — same rhythm as .c-block's generic containment.
+.c-quote-block {
+  padding-block: 2rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 3rem;
+  }
+}
+
+.c-quote {
+  // Overridable from a calling block's wrapper class (e.g. a future
+  // dark-background usage, node 7:1972) instead of editing this component.
+  --c-quote-color: var(--wp--preset--color--charcoal);
+  --c-quote-attribution-color: var(--wp--preset--color--blue);
+
+  display: grid;
+  row-gap: 1rem; // mobile: single column, stacked via source order
+  align-items: start;
+  max-width: 46rem; // narrower than .o-container; centred via margin-inline
+  margin-inline: auto;
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: auto 1fr;
+    column-gap: 1.5rem;
+  }
+}
+
+// Figma node 7:2013 (carousel card, not yet built) — mark stays left-aligned
+// above centred text; per that design it is NOT centred with the text below
+// it, only body/attribution are.
+.c-quote--centered {
+  --c-quote-color: var(--wp--preset--color--blue); // matches node 7:2013's blue quote text, not the default charcoal
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: 1fr; // stays single-column/stacked, doesn't switch to the default's side-by-side
+  }
+
+  .c-quote__mark {
+    @include bp.respond($min: bp.$md) {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  .c-quote__body {
+    text-align: center;
+
+    @include bp.respond($min: bp.$md) {
+      grid-column: 1;
+      grid-row: 2;
+      margin-top: 0; // default layout's margin-top clears the mark beside it; not needed here
+    }
+  }
+
+  .c-quote__attribution {
+    text-align: center;
+  }
+}
+
+.c-quote__mark {
+  display: inline-flex;
+  color: var(--wp--preset--color--yellow);
+
+  svg {
+    width: 3.0625rem; // 49px, same fixed box convention as Icon Link Grid
+    height: 3.0625rem; // 49px
+  }
+
+  @include bp.respond($min: bp.$md) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+.c-quote__body {
+  margin: 0;
+
+  @include bp.respond($min: bp.$md) {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 1.75rem; // body drops down to clear the mark, kept at its natural top
+  }
+  font-family: var(--wp--preset--font-family--nata-sans);
+  @extend .u-quote; // 'large' (default) size — the Figma "Short" variant's scale
+  color: var(--c-quote-color);
+
+  p {
+    margin: 0;
+
+    & + p {
+      margin-top: 1em;
+    }
+  }
+}
+
+.c-quote--standard .c-quote__body {
+  @extend .u-standfirst; // matches the Figma "Long" variant's smaller scale
+}
+
+.c-quote__attribution {
+  display: block;
+  font-style: normal;
+  text-align: right;
+
+  @include bp.respond($min: bp.$md) {
+    grid-column: 1 / -1;
+  }
+}
+
+.c-quote__attribution-name {
+  display: block;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  @extend .u-quote-citation;
+  color: var(--c-quote-attribution-color);
+}
+
+.c-quote__attribution-role {
+  display: block;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  @extend .u-standfirst;
+  color: var(--c-quote-attribution-color);
+}

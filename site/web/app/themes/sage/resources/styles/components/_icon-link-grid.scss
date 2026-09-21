@@ -1,0 +1,92 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+@use '../base/typography';
+
+// Figma "Icon link grid" (node 10:4389)
+.c-icon-link-grid-block {
+  padding-block: 2.125rem; // 34px — background colour itself is set inline via the block's ACF field
+}
+
+.c-icon-link-grid__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include bp.respond($min: bp.$lg) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+.c-icon-link-grid__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding-block: 1rem;
+  color: inherit;
+  text-decoration: none;
+
+  @include focus.ring;
+
+  &:focus-visible {
+    // Wider than the 2px default — this card has no padding, so the ring
+    // needs room for the arrow's hover-animation (overflow:visible) to stay inside it.
+    outline-offset: 0.5rem;
+  }
+}
+
+.c-icon-link-grid__icon {
+  // KNOWN WCAG 1.4.11 FAILURE: --orange is ~2.3:1 on white, ~1.9:1 on Blue
+  // light — below the required 3:1. Design-system colour choice; flag to
+  // design/client rather than silently swapping to an off-brand colour.
+  display: inline-flex;
+  color: var(--wp--preset--color--orange);
+
+  svg {
+    width: 3.0625rem; // 49px, fixed square box regardless of each SVG's own viewBox
+    height: 3.0625rem; // 49px
+  }
+}
+
+.c-icon-link-grid__item-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  @extend .u-short-form-link;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-icon-link-grid__arrow {
+  display: inline-flex;
+  flex: none;
+
+  svg {
+    width: 1.375rem; // 22px
+    height: 0.875rem; // 14px
+    overflow: visible;
+  }
+
+  .c-icon__arrow {
+    transition: d 0.15s ease;
+  }
+}
+
+.c-icon-link-grid__item:is(:hover, :focus-visible) .c-icon-link-grid__arrow .c-icon__arrow {
+  d: path('M1 7H28M28 7L22 1M28 7L22 13');
+}
+
+.c-icon-link-grid__description {
+  margin: 0;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--wp--preset--color--charcoal);
+}
