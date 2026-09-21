@@ -32,7 +32,7 @@ class Copy extends Partial
         $fields->addTextarea("{$name}_text", [
             'label' => $label,
             'rows' => $rows,
-            'new_lines' => 'br',
+            'new_lines' => 'wpautop', // wraps each blank-line-separated block in <p> — matches Quote's convention, and the component using this field renders a <div> (not its own <p>) around the result
             'required' => $required,
         ]);
 
