@@ -169,8 +169,6 @@
 }
 
 .c-footer-bottom__tagline {
-  margin-top: 0.75rem;
-
   @include bp.respond($min: bp.$sm) {
     max-width: 42rem;
     margin-inline: auto;

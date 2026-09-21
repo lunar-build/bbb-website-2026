@@ -12,8 +12,18 @@
     }
   }
 
-  &__column > * + * {
-    margin-top: 1rem;
+  &__column {
+    // Reset headings/copy's own margin-bottom (base/_typography.scss) so the
+    // flow rule below is the sole source of spacing between siblings here —
+    // otherwise a heading's margin-bottom stacks with the next sibling's
+    // margin-top, doubling the gap.
+    :where(h1, h2, h3, h4, h5, h6, p) {
+      margin: 0;
+    }
+
+    > * + * {
+      margin-top: 1rem;
+    }
   }
 
   &__image {
