@@ -236,7 +236,7 @@ class VideoHero extends Block
                 ->addTextarea('intro', [
                     'label' => 'Intro text',
                     'rows' => 3,
-                    'new_lines' => 'br',
+                    'new_lines' => 'wpautop', // wraps each blank-line-separated block in <p> — matches Copy/Quote's convention
                 ]);
 
         return $fields->build();

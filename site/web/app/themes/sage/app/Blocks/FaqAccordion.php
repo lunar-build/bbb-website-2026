@@ -206,7 +206,7 @@ class FaqAccordion extends Block
                 ->addTextarea('answer', [
                     'label' => 'Answer',
                     'rows' => 3,
-                    'new_lines' => 'br',
+                    'new_lines' => 'wpautop', // wraps each blank-line-separated block in <p> — matches Copy/Quote's convention
                     'required' => 1,
                 ])
             ->endRepeater();

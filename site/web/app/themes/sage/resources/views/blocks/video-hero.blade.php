@@ -53,7 +53,7 @@
     <div class="c-video-hero__row">
       <div class="c-video-hero__content">
         <h1 class="c-video-hero__heading">{{ $heading }}</h1>
-        <p class="c-video-hero__intro">{{ $intro }}</p>
+        <div class="c-video-hero__intro">{!! $intro !!}</div>
       </div>
 
       {{-- Widget slot — empty by default in the editor until a Journey
