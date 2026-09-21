@@ -3,6 +3,7 @@
 
 .c-video-hero {
   position: relative;
+  background: var(--wp--preset--color--lightest-grey);
 }
 
 .c-video-hero__media {
@@ -78,7 +79,6 @@
 
 .c-video-hero__lower {
   position: relative;
-  background: var(--wp--preset--color--lightest-grey);
   padding-top: 2.5rem;
 
   @include bp.respond($min: bp.$lg) {
