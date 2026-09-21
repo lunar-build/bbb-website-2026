@@ -2,6 +2,8 @@
 
 namespace App\Blocks;
 
+use App\Fields\Copy;
+use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -81,7 +83,7 @@ class Form extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.
@@ -153,17 +155,14 @@ class Form extends Block
      */
     public $example = [
         'form_id' => 1,
-    ];
-
-    /**
-     * The block template.
-     *
-     * @var array
-     */
-    public $template = [
-        ['core/heading' => ['placeholder' => 'Get in touch', 'level' => 2]],
-        ['core/heading' => ['placeholder' => 'Subtitle…', 'level' => 3]],
-        ['core/paragraph' => ['placeholder' => 'A short paragraph of intro copy above the form.']],
+        'heading_text' => 'Get in touch',
+        'heading_level' => 'h2',
+        'heading_style' => 'match',
+        'subheading_text' => 'Subtitle…',
+        'subheading_level' => 'h3',
+        'subheading_style' => 'match',
+        'intro_text' => 'A short paragraph of intro copy above the form.',
+        'intro_style' => 'body',
     ];
 
     /**
@@ -173,6 +172,9 @@ class Form extends Block
     {
         return [
             'formId' => $this->formId(),
+            'heading' => $this->heading(),
+            'subheading' => $this->subheading(),
+            'intro' => $this->intro(),
         ];
     }
 
@@ -182,6 +184,25 @@ class Form extends Block
     public function fields(): array
     {
         $fields = Builder::make('form');
+
+        $fields->addPartial(Heading::class, [
+            'name' => 'heading',
+            'label' => 'Heading',
+            'default_level' => 'h2',
+            'required' => true,
+        ]);
+
+        $fields->addPartial(Heading::class, [
+            'name' => 'subheading',
+            'label' => 'Subheading',
+            'default_level' => 'h3',
+        ]);
+
+        $fields->addPartial(Copy::class, [
+            'name' => 'intro',
+            'label' => 'Intro text',
+            'default_style' => 'body',
+        ]);
 
         $fields
             ->addSelect('form_id', [
@@ -207,7 +228,7 @@ class Form extends Block
             // Don't crash WP-CLI: it bootstraps this same block-registration hook,
             // so a hard throw here would block `wp plugin activate` itself — the
             // one command that fixes this.
-            if (defined('WP_CLI') && WP_CLI) {
+            if (defined('WP_CLI') && \WP_CLI) {
                 return [];
             }
 
@@ -215,6 +236,49 @@ class Form extends Block
         }
 
         return collect(\GFAPI::get_forms())->pluck('title', 'id')->all();
+    }
+
+    /**
+     * Retrieve the heading text/level/style.
+     *
+     * @return array
+     */
+    public function heading()
+    {
+        return [
+            'text' => get_field('heading_text') ?: $this->example['heading_text'],
+            'level' => get_field('heading_level') ?: $this->example['heading_level'],
+            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+        ];
+    }
+
+    /**
+     * Retrieve the subheading text/level/style. Empty text is valid — the
+     * subheading is optional.
+     *
+     * @return array
+     */
+    public function subheading()
+    {
+        return [
+            'text' => get_field('subheading_text') ?: ($this->example['subheading_text'] ?? ''),
+            'level' => get_field('subheading_level') ?: ($this->example['subheading_level'] ?? 'h3'),
+            'style' => get_field('subheading_style') ?: ($this->example['subheading_style'] ?? 'match'),
+        ];
+    }
+
+    /**
+     * Retrieve the intro text/style. Empty text is valid — the intro
+     * paragraph is optional.
+     *
+     * @return array
+     */
+    public function intro()
+    {
+        return [
+            'text' => get_field('intro_text') ?: ($this->example['intro_text'] ?? ''),
+            'style' => get_field('intro_style') ?: ($this->example['intro_style'] ?? 'body'),
+        ];
     }
 
     /**

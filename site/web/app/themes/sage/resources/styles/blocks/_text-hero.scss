@@ -1,0 +1,13 @@
+@use '../abstracts/breakpoints' as bp;
+
+.c-text-hero {
+  padding-block: 3rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 4rem;
+  }
+
+  &__heading {
+    margin-bottom: 1rem;
+  }
+}

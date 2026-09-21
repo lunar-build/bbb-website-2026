@@ -96,3 +96,16 @@ add_filter('gform_field_content', function ($content, $field) {
 
     return preg_replace('/<label\s+for=([\'"])choice_/', '<label role="link" tabindex="0" for=$1choice_', $content);
 }, 10, 2);
+
+/**
+ * Replace Gravity Forms' plain `<input type="submit">` with our brand
+ * `<wa-button>` (yellow pill + arrow) so form CTAs match every other CTA.
+ */
+add_filter('gform_submit_button', function ($button, $form) {
+    preg_match('/value="([^"]*)"/', $button, $matches);
+
+    return view('partials.gf-submit-button', [
+        'id' => 'gform_submit_button_'.$form['id'],
+        'label' => $matches[1] ?? __('Submit', 'sage'),
+    ])->render();
+}, 10, 2);
