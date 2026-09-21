@@ -124,6 +124,15 @@ ddev exec "wp acorn acf:clear"
 Run this any time a block's `fields()`/`$mode`/`$supports` changes and the editor
 doesn't seem to reflect it — this is a real, recurring gotcha, not a one-off.
 
+**`$supports['spacing']['padding']` must be hand-fixed to `['top', 'bottom']` after
+scaffolding, every time.** `wp acorn acf:block`'s Padding checkbox only ever emits
+`'padding' => true` (a boolean) — WordPress core's axial-only padding UI (top/bottom
+only, no left/right) requires the array form `'padding' => ['top', 'bottom']` instead.
+`'margin'` should always stay `false`. This project intentionally restricts all block
+padding to exactly two `theme.json` presets — 2rem and 4rem — top/bottom only; there is
+no arbitrary/custom padding value, and no margin control, on any block. See "Block
+padding: 2rem / 4rem only, top/bottom" below.
+
 **Non-interactive pitfall:** `wp acorn acf:block` uses `laravel/prompts`, which needs a
 real TTY. Run it through a normal `ddev ssh` / interactive terminal and answer the
 prompts yourself. If it's invoked non-interactively (e.g. piping input through
@@ -185,7 +194,7 @@ heading + paragraph template — see `app/Blocks/TextHero.php`/`CtaStrip.php`/
 `<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
 block's library entry just shows an empty content area.
 
-**Never hardcode `font-size`/`line-height`/`font-weight`.** Every text style used
+**Never hardcode `font-size`/`line-height`/`font-weight`/`margin-bottom`.** Every text style used
 anywhere in the site's Figma design has a matching rule in
 `resources/styles/base/_typography.scss`, backed by `theme.json`
 `settings.typography.fontSizes` presets (`--wp--preset--font-size--*`). `InnerBlocks`
@@ -240,7 +249,12 @@ inner `<section>` (e.g. an "inner" wrapper), rename that inner one to `<div>` ra
 than nesting two `<section>`s (see `video-hero.blade.php`'s `.c-video-hero__inner`).
 
 `$attributes->class([...])` merges Gutenberg's wrapper classes with your own BEM root
-class. Use `$attributes` bare (no `->class()`) if you don't need an extra class.
+class. Use `$attributes` bare (no `->class()`) if you don't need an extra class. This
+also already carries WordPress's generated padding `style` attribute (from block
+supports) merged in automatically — `ComponentAttributeBag::class()` preserves any
+existing `style` value rather than dropping it, so `$attributes->class([...])` alone is
+sufficient; no `->style()` call or `{!! $attributes !!}` is ever needed for padding to
+render.
 
 **Wrap the block's content in `.o-container`** (`resources/styles/base/_container.scss`)
 as a `<div>` *inside* the `<section>`, not on the `<section>` itself — this keeps content
@@ -272,6 +286,20 @@ a real measurement).
 When copying a px value straight from a Figma spec, convert it before it lands in SCSS —
 don't paste `20px` and fix it later. See `resources/styles/components/_header.scss` and
 `_primary-nav.scss` for worked examples of icon/logo/spacing values converted this way.
+
+### Block padding: 2rem / 4rem only, top/bottom
+
+Every block's vertical spacing (space between one block and the next) is controlled by
+WordPress's native block padding, not hardcoded SCSS. `theme.json`'s
+`settings.spacing.spacingSizes` is the single source of truth for the two allowed
+values ("Small (2rem)" / "Large (4rem)") — never add a third size or re-enable custom
+values (`customSpacingSize`) without updating both `theme.json` and this doc. There is
+no margin control on any block, and padding is restricted to top/bottom only (see the
+`$supports['spacing']['padding']` callout in §2). Never add your own root-wrapper
+`padding-block`/`padding-top`/`padding-bottom` in a block's SCSS — that duplicates the
+editor-facing control and produces double spacing. Internal component spacing (padding
+inside a card, button, or sub-section of a block) is unaffected by this and should stay
+in the block's own SCSS as normal.
 
 ### Shaping WP/ACF data for structured component props
 

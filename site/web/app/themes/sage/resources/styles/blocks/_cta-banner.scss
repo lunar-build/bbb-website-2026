@@ -7,11 +7,6 @@
 .c-cta-banner {
   position: relative;
   overflow: hidden;
-  padding-block: 3rem;
-
-  @include bp.respond($min: bp.$lg) {
-    padding-block: 4rem;
-  }
 }
 
 .c-cta-banner__content {

@@ -127,7 +127,7 @@ class ImageHero extends Block
             'gradients' => false,
         ],
         'spacing' => [
-            'padding' => false,
+            'padding' => ['top', 'bottom'],
             'margin' => false,
         ],
     ];

@@ -1,12 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 
 .c-two-column-content {
-  padding-block: 3rem;
-
-  @include bp.respond($min: bp.$lg) {
-    padding-block: 4rem;
-  }
-
   &__inner {
     display: grid;
     gap: 2rem;

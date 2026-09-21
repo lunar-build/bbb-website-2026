@@ -1,0 +1,10 @@
+// Shared rem margin-bottom steps for typography (h1-h6, p, ul/ol) — a small,
+// deliberately coarse set of steps, not one distinct value per heading level.
+//
+// Usage:
+//   @use '../abstracts/spacing';
+//   h1 { margin-bottom: spacing.$loose; }
+
+$tight: 0.5rem; // list item spacing (li)
+$base: 1rem; // p, ul, ol, and h3-h6 margin-bottom
+$loose: 1.5rem; // h1, h2 margin-bottom

@@ -1,3 +1,5 @@
+@use '../abstracts/spacing';
+
 body {
   font-family: var(--wp--preset--font-family--nata-sans);
   font-weight: 400;
@@ -6,11 +8,29 @@ body {
   color: var(--wp--preset--color--charcoal);
 }
 
+p {
+  margin-bottom: spacing.$base;
+}
+
+ul,
+ol {
+  margin-bottom: spacing.$base;
+
+  li {
+    margin-bottom: spacing.$tight;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
 h1,
 .u-heading-1 {
   font-size: var(--wp--preset--font-size--heading-1);
   line-height: 4rem;
   font-weight: 700;
+  margin-bottom: spacing.$loose;
 }
 
 h2,
@@ -18,6 +38,7 @@ h2,
   font-size: var(--wp--preset--font-size--heading-2);
   line-height: 3.375rem;
   font-weight: 700;
+  margin-bottom: spacing.$loose;
 }
 
 h3,
@@ -25,6 +46,7 @@ h3,
   font-size: var(--wp--preset--font-size--heading-3);
   line-height: 2.75rem;
   font-weight: 700;
+  margin-bottom: spacing.$base;
 }
 
 h4,
@@ -32,6 +54,7 @@ h4,
   font-size: var(--wp--preset--font-size--heading-4);
   line-height: 2.125rem;
   font-weight: 700;
+  margin-bottom: spacing.$base;
 }
 
 // No distinct H6 spec supplied by design — reuses H5 size until one is provided.
@@ -41,6 +64,7 @@ h6,
   font-size: var(--wp--preset--font-size--heading-5);
   line-height: 2.25rem;
   font-weight: 700;
+  margin-bottom: spacing.$base;
 }
 
 .u-standfirst {

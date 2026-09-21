@@ -3,13 +3,8 @@
 .c-card-grid {
   position: relative;
   overflow-x: clip;
-  padding-block: 3rem;
   text-align: center;
   background: var(--wp--preset--color--lightest-grey);
-
-  @include bp.respond($min: bp.$lg) {
-    padding-block: 4rem;
-  }
 
   // Reduced width + centred, matching the Figma heading (wraps to 2 lines).
   &__heading {

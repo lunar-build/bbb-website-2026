@@ -63,7 +63,7 @@ return [
     */
 
     'generators' => [
-        'supports' => ['align', 'mode', 'multiple', 'jsx'],
+        'supports' => ['align', 'mode', 'multiple', 'jsx', 'padding'],
     ],
 
     /*

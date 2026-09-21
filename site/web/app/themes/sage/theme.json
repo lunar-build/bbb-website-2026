@@ -52,7 +52,13 @@
     },
     "spacing": {
       "padding": true,
-      "units": ["px", "%", "em", "rem", "vw", "vh"]
+      "margin": false,
+      "customSpacingSize": false,
+      "defaultSpacingSizes": false,
+      "spacingSizes": [
+        { "name": "Small (2rem)", "slug": "small", "size": "2rem" },
+        { "name": "Large (4rem)", "slug": "large", "size": "4rem" }
+      ]
     },
     "typography": {
       "defaultFontSizes": false,
