@@ -104,7 +104,6 @@ class VideoHero extends Block
      */
     public $spacing = [
         'padding' => [
-            'top' => 'var:preset|spacing|large',
             'bottom' => 'var:preset|spacing|large',
         ],
         'margin' => null,
