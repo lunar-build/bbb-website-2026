@@ -1,0 +1,78 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Figma "Timeline" (node 81:2355)
+.c-timeline-block {
+  padding-block: 2.125rem; // 34px
+}
+
+.c-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.875rem; // 30px
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-timeline__step {
+  display: flex;
+  align-items: stretch;
+  gap: 1.625rem; // 26px
+  margin: 0;
+
+  &:last-child .c-timeline__marker-col::before {
+    display: none;
+  }
+}
+
+.c-timeline__marker-col {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  width: 3.5625rem; // 57px
+
+  // Connects this step's marker down through the row gap to the top of the
+  // next marker, which sits above it in paint order and covers the seam —
+  // giving a continuous line without measuring variable step heights.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 3.5625rem; // 57px — bottom edge of the marker circle
+    bottom: -1.875rem; // extends through the .c-timeline row gap
+    left: 50%;
+    width: 0.1875rem; // 3px
+    margin-left: -0.09375rem;
+    background: var(--wp--preset--color--yellow);
+  }
+}
+
+.c-timeline__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5625rem; // 57px
+  height: 3.5625rem; // 57px
+  border-radius: 1.25rem; // 20px
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  text-align: center;
+}
+
+.c-timeline__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-block-start: 0.5rem;
+}
+
+.c-timeline__heading {
+  margin: 0;
+  color: var(--wp--preset--color--blue);
+}
+
+.c-timeline__body {
+  margin: 0;
+}
