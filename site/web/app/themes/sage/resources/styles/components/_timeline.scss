@@ -1,0 +1,94 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Figma "Timeline" (node 81:2355)
+.c-timeline-block {
+  padding-block: 2.125rem; // 34px
+}
+
+.c-timeline {
+  --timeline-marker-size: 3.5625rem; // 57px — fits a 2-digit step number
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.875rem; // 30px
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// All markers in a block share one size, set here rather than per-step, so a
+// mix of numbers and dates never renders as mismatched circle sizes.
+.c-timeline--dates {
+  --timeline-marker-size: 6rem; // 96px — fits an 8-char DD/MM/YY date
+}
+
+.c-timeline__step {
+  display: flex;
+  align-items: stretch;
+  gap: 1.625rem; // 26px
+  margin: 0;
+
+  &:last-child .c-timeline__marker-col::before {
+    display: none;
+  }
+}
+
+.c-timeline__marker-col {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  width: var(--timeline-marker-size);
+
+  // Connects this step's marker down through the row gap to the top of the
+  // next marker, which sits above it in paint order and covers the seam —
+  // giving a continuous line without measuring variable step heights.
+  &::before {
+    content: '';
+    position: absolute;
+    top: var(--timeline-marker-size); // bottom edge of the marker circle
+    bottom: -1.875rem; // extends through the .c-timeline row gap
+    left: 50%;
+    width: 0.1875rem; // 3px
+    margin-left: -0.09375rem;
+    background: var(--wp--preset--color--yellow);
+  }
+}
+
+.c-timeline__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--timeline-marker-size);
+  height: var(--timeline-marker-size);
+  padding-inline: 0.25rem;
+  border-radius: 1.25rem; // 20px
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  .c-timeline--dates & {
+    font-size: 0.9375rem; // heading-4's size is tuned for 2 digits, too wide at 8 (DD/MM/YY)
+  }
+}
+
+.c-timeline__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.c-timeline__heading {
+  margin: 0;
+  color: var(--wp--preset--color--blue);
+}
+
+.c-timeline__body {
+  margin: 0;
+}
