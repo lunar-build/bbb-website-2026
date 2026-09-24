@@ -204,9 +204,9 @@ class Timeline extends Block
         'Dates' => [
             'markerSize' => 'date',
             'steps' => [
-                ['label' => '2019', 'heading' => 'Scheme launched', 'body' => 'Better by Bike began with a handful of pilot routes.'],
-                ['label' => '2021', 'heading' => 'Network expanded', 'body' => 'New cycle routes added across the city.'],
-                ['label' => '2024', 'heading' => 'Love to Ride partnership', 'body' => 'Joined forces with Love to Ride to get more people cycling.'],
+                ['label' => '12/03/19', 'heading' => 'Scheme launched', 'body' => 'Better by Bike began with a handful of pilot routes.'],
+                ['label' => '04/07/21', 'heading' => 'Network expanded', 'body' => 'New cycle routes added across the city.'],
+                ['label' => '18/09/24', 'heading' => 'Love to Ride partnership', 'body' => 'Joined forces with Love to Ride to get more people cycling.'],
             ],
         ],
     ];
@@ -237,10 +237,10 @@ class Timeline extends Block
             ])
             ->addSelect('marker_size', [
                 'label' => 'Marker size',
-                'instructions' => 'Applies to every marker in this timeline, so numbers and dates never render as mismatched sizes.',
+                'instructions' => 'Applies to every marker in this timeline, so they never render as mismatched sizes. Use "Date" when Label below holds a date in DD/MM/YY format (e.g. 18/09/24) — that\'s what the larger marker is sized for.',
                 'choices' => [
                     'number' => 'Number (2 digits)',
-                    'date' => 'Date (e.g. a year)',
+                    'date' => 'Date (DD/MM/YY)',
                 ],
                 'default_value' => 'number',
                 'required' => 0,
@@ -253,7 +253,7 @@ class Timeline extends Block
             ])
                 ->addText('label', [
                     'label' => 'Label',
-                    'instructions' => 'Optional — shown in the marker instead of the step\'s position (e.g. a date). Leave blank to show the step number. If using dates, set Marker size above to "Date" so every marker matches.',
+                    'instructions' => 'Optional — shown in the marker instead of the step\'s position (e.g. a date in DD/MM/YY format). Leave blank to show the step number. If using dates, set Marker size above to "Date" so every marker matches.',
                     'required' => 0,
                 ])
                 ->addText('heading', [
