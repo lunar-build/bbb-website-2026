@@ -19,9 +19,17 @@
     margin-bottom: 2rem;
   }
 
+  // Feature Card's own max-width (443px, right for that block standalone)
+  // fights the grid column here — lets the card fill its 1fr column.
+  &__card {
+    max-width: none;
+  }
+
   &__cards {
     display: grid;
-    gap: 1.5rem;
+    // Same value used for row and column gap, and shared with Card Row
+    // (spacing.$card-gap) so event/image/link cards all space identically.
+    gap: spacing.$card-gap;
     text-align: left;
 
     @include bp.respond($min: bp.$md) {

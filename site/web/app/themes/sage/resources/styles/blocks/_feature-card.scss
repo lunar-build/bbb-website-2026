@@ -12,6 +12,9 @@
     display: flex;
     flex-direction: column;
     position: relative; // containing block for the stretched-link overlay
+    // Figma's fixed card width — only right for the standalone Feature
+    // Card block. Card Grid overrides this back to none in _card-grid.scss
+    // so the card fills its grid column instead.
     max-width: 443px;
     border-radius: 12px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
