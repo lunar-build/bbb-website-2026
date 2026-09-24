@@ -55,7 +55,10 @@
 
 .c-icon-link-grid__item-heading {
   display: inline-flex;
-  align-items: center;
+  // flex-start, not center: when the heading text wraps to two lines the
+  // arrow should sit level with the first line, not centred against the
+  // whole wrapped block.
+  align-items: flex-start;
   gap: 0.75rem;
   @extend .u-short-form-link;
   letter-spacing: 0.06rem;
@@ -66,6 +69,8 @@
 .c-icon-link-grid__arrow {
   display: inline-flex;
   flex: none;
+  position: relative;
+  top: 0.45rem;
 
   svg {
     width: 1.375rem; // 22px
