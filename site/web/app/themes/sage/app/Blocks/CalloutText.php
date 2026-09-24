@@ -186,7 +186,7 @@ class CalloutText extends Block
                 'label' => 'Callout text',
                 'required' => 1,
                 'tabs' => 'visual',
-                'toolbar' => 'minimal', // bold/italic/link only, no lists/blockquote/align — see app/filters.php
+                'toolbar' => 'basic',
                 'media_upload' => 0,
                 'delay' => 1,
             ]);

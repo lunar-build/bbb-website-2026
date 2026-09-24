@@ -16,21 +16,6 @@ add_filter('excerpt_more', function () {
 });
 
 /**
- * ACF's built-in WYSIWYG toolbars don't have a "just inline formatting"
- * option — "Basic" still includes lists, blockquote, and alignment, not
- * just the bold/italic/link ACF fields like CalloutText's actually need.
- * Register a slimmed-down toolbar so those fields can opt in via
- * `'toolbar' => 'minimal'` instead.
- */
-add_filter('acf/fields/wysiwyg/toolbars', function (array $toolbars) {
-    $toolbars['Minimal'] = [
-        1 => ['bold', 'italic', 'link', 'undo', 'redo'],
-    ];
-
-    return $toolbars;
-});
-
-/**
  * Register a "Cards" block category so the card blocks (Card Row, Cycle
  * Route Card, Feature Card, Filter Result Card, Image Card) group together
  * in the inserter instead of sitting loose under "Text".
