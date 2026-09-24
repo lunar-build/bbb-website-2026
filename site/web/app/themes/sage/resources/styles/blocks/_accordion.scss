@@ -1,4 +1,5 @@
 @use '../base/typography';
+@use '../base/focus' as focus;
 
 // Figma "Accordion" (node 21:1225)
 .c-accordion__heading {
@@ -17,6 +18,14 @@ wa-accordion-item {
     margin-bottom: 0; // .u-heading-5's margin is for headings, not this button
     color: var(--wp--preset--color--blue-medium);
     align-items: flex-start; // keep icon pinned to the title's first line if it wraps
+
+    // WA's default first/last-child rounds the button corners to match the
+    // host's border-radius, meant for the boxed/filled appearances — our
+    // flat "plain" design has no box, so this only shows up as a stray
+    // rounded corner on the focus outline. Zero it.
+    border-radius: 0;
+
+    @include focus.ring;
   }
 
   &::part(icon) {
