@@ -6,6 +6,17 @@ const SCROLL_DELTA_THRESHOLD = 8; // px of movement before a direction change co
 const header = document.querySelector('.c-site-header');
 
 if (header) {
+  // Exposes the header's real rendered height (it now includes the desktop
+  // nav row, not just the logo/CTA row, and varies by breakpoint) as a CSS
+  // var, so anything sticky further down the page (e.g. the pattern
+  // library nav) can offset itself below it instead of a guessed constant.
+  const updateHeaderHeightVar = () => {
+    document.documentElement.style.setProperty('--site-header-height', `${header.offsetHeight}px`);
+  };
+
+  updateHeaderHeightVar();
+  new ResizeObserver(updateHeaderHeightVar).observe(header);
+
   let lastScrollY = window.scrollY;
   let ticking = false;
 
