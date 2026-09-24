@@ -7,7 +7,7 @@
       <h2 class="c-accordion__heading">{{ $heading }}</h2>
     @endif
 
-    <wa-accordion class="c-accordion__list">
+    <wa-accordion class="c-accordion__list" appearance="plain">
       @foreach ($items as $item)
         <wa-accordion-item
           label="{{ $item['title'] }}"
