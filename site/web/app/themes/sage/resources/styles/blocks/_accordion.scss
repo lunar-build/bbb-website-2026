@@ -32,7 +32,18 @@ wa-accordion-item {
     // rounded corner on the focus outline. Zero it.
     border-radius: 0;
 
+    // WA's default --spacing pads all four sides of the button, but this
+    // block already sits inside .o-container — its own left/right gutter
+    // shouldn't stack on top. Keep vertical spacing only.
+    padding-inline: 0;
+
     @include focus.ring;
+  }
+
+  &::part(content) {
+    // Same reasoning as the button: no extra horizontal padding, container
+    // already provides it.
+    padding-inline: 0;
   }
 
   &::part(icon) {
