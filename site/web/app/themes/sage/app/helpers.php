@@ -92,6 +92,22 @@ function social_links_from_options(): array
 }
 
 /**
+ * Coerce an ACF `link` field value to its expected shape — ACF normally
+ * returns an array, but a legacy/incomplete row can store a plain string
+ * (or nothing at all), which would fatal on array access. Shared by any
+ * block with a repeater of link-bearing rows (see CardRow.php's own
+ * near-identical normalizeLink(), predating this helper).
+ */
+function normalize_link($link): array
+{
+    if (is_array($link)) {
+        return $link + ['title' => '', 'url' => '', 'target' => ''];
+    }
+
+    return ['title' => '', 'url' => (string) ($link ?? ''), 'target' => ''];
+}
+
+/*
  * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
  * every SVG in resources/svg/ — the curated icon set used by `<x-icon
  * name="...">` (see resources/views/components/icon.blade.php). Glob-based

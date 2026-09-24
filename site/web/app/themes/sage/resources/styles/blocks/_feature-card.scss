@@ -4,6 +4,7 @@
 // picture (arrow-only CTA), Bikeability, Event card and News card (button
 // CTA, the latter two adding a date above the heading).
 @use '../base/typography';
+@use '../base/focus' as focus;
 @use '../components/button';
 
 .c-feature-card {
@@ -14,7 +15,6 @@
     max-width: 443px;
     border-radius: 12px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-    overflow: hidden; // clips the image's square corners to the card radius
     background: var(--wp--preset--color--white);
   }
 
@@ -30,6 +30,8 @@
     position: absolute;
     inset: 0;
     z-index: 1;
+
+    @include focus.ring;
   }
 
   &__body {
@@ -38,6 +40,12 @@
     flex: 1;
     gap: 16px;
     padding: 20px;
+    // &__card has no overflow:hidden (removed so the stretched-link's
+    // focus ring isn't clipped) — this rounds &__body's own bottom
+    // corners to match, since it's the only other piece (besides &__image,
+    // already self-rounded) that could otherwise show square corners
+    // poking out past &__card's rounded shape.
+    border-radius: 0 0 12px 12px;
   }
 
   &__date {
