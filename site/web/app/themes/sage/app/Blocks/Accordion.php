@@ -157,16 +157,24 @@ class Accordion extends Block
         'heading' => 'Frequently asked questions',
         'items' => [
             [
-                'title' => 'How do I borrow a bike?',
-                'content' => 'Sign up online, choose a scheme near you, and pick up your bike from one of our local hubs.',
+                'title' => 'Do you have bikes that I can use?',
+                'content' => '<p>Yes. We have a large range of inclusive wheels for all cycles available, including trikes, recumbents, two-seater bikes, hand cycles and a platform wheelchair-accessible bike. These speciality cycles are available for anyone who needs them during all of our cycling sessions.</p>'
+                    .'<p>We also have two-wheeled bikes for adults and children, as well as:</p>'
+                    .'<ul><li>Balance bikes</li><li>Trailers</li><li>Bike seats</li><li>Tag-alongs</li></ul>'
+                    .'<p>For more information about our cycles <a href="#">click here</a>.</p>'
+                    .'<p>There is no charge for using our cycles but at extremely busy times people may need to share. If you do bring your own bike you are still welcome to try ours.</p>',
             ],
             [
-                'title' => 'How long can I keep the bike for?',
-                'content' => 'Loan periods vary by scheme, but most run for up to a month at a time.',
+                'title' => 'Do you sell bikes at Bristol Cycling Centre?',
+                'content' => '<p>No, but our friendly team can point you toward local retailers and workshops if you\'re looking to buy or service a bike.</p>',
             ],
             [
-                'title' => 'What if something goes wrong with the bike?',
-                'content' => 'Get in touch with your local scheme coordinator and we\'ll arrange a repair or replacement.',
+                'title' => 'What about helmets?',
+                'content' => '<p>Helmets are available to borrow free of charge alongside any bike hire, in a range of sizes for adults and children.</p>',
+            ],
+            [
+                'title' => 'Do I need to pre-book?',
+                'content' => '<p>Pre-booking is recommended, especially at weekends and during school holidays, but drop-ins are welcome whenever we have availability.</p>',
             ],
         ],
     ];
@@ -208,7 +216,7 @@ class Accordion extends Block
                     'required' => 1,
                     'tabs' => 'visual',
                     'media_upload' => 0,
-                    'toolbar' => 'basic',
+                    'toolbar' => 'full',
                 ])
             ->endRepeater();
 
