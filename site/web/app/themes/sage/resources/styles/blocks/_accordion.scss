@@ -16,7 +16,6 @@ wa-accordion-item {
     @extend .u-heading-5;
     margin-bottom: 0; // .u-heading-5's margin is for headings, not this button
     color: var(--wp--preset--color--blue-medium);
-    align-items: flex-start;
   }
 
   &::part(icon) {
@@ -31,8 +30,8 @@ wa-accordion-item {
 
 .c-accordion__icon svg {
   display: block;
-  width: 0.6875rem;
-  height: 0.4375rem;
+  width: 1.25rem;
+  height: 0.6875rem;
 }
 
 .c-accordion__content {
