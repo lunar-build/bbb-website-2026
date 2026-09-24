@@ -2,7 +2,7 @@
   'text' => null,
 ])
 
-<p {{ $attributes->class(['c-callout-text', 'u-callout']) }}>
+<div role="note" {{ $attributes->class(['c-callout-text', 'u-callout']) }}>
   <x-icon name="info" class="c-callout-text__icon" />
-  <span class="c-callout-text__text">{{ $text ?? $slot }}</span>
-</p>
+  <div class="c-callout-text__text">{!! $text ?? $slot !!}</div>
+</div>

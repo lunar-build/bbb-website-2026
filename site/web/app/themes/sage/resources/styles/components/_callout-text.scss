@@ -22,6 +22,7 @@
 
 .c-callout-text__icon {
   flex-shrink: 0;
+  padding-top: 0.2rem;
 
   svg {
     width: 1.25rem; // 20px
@@ -31,4 +32,10 @@
 
 .c-callout-text__text {
   flex: 1 0 0;
+
+  // WYSIWYG output wraps content in its own <p> — the global `p` margin
+  // would throw off vertical centering inside this flex pill otherwise.
+  p {
+    margin: 0;
+  }
 }

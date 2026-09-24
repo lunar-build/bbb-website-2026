@@ -151,7 +151,23 @@ class CalloutText extends Block
      * @var array
      */
     public $example = [
-        'text' => 'Visit our online cycle planner to view these rides on your phone, whilst out on your ride.',
+        'text' => '<p>Visit our online cycle planner to view these rides on your phone, whilst out on your ride.</p>',
+    ];
+
+    /**
+     * Layout variants to render stacked on the pattern-library page (see
+     * App\View\Composers\PatternLibrary::render()) — each entry is merged
+     * onto $example above, so only needs to override what differs.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Single line' => [],
+        'Multi-line (list + link)' => [
+            'text' => '<p>Visit our <a href="#">online cycle planner</a> to view these rides on your phone, whilst out on your ride. It works on any device with an internet connection, so you can check your route before you set off or while you\'re out and about.</p>'
+                . '<ul><li>Plan a route in advance</li><li>Save your favourite rides</li><li>Share routes with friends</li></ul>'
+                . '<p>See the <a href="#">full guide</a> for more.</p>',
+        ],
     ];
 
     public function with(): array
@@ -166,11 +182,13 @@ class CalloutText extends Block
         $fields = Builder::make('callout_text');
 
         $fields
-            ->addTextarea('text', [
+            ->addWysiwyg('text', [
                 'label' => 'Callout text',
                 'required' => 1,
-                'rows' => 3,
-                'new_lines' => 'br',
+                'tabs' => 'visual',
+                'toolbar' => 'minimal', // bold/italic/link only, no lists/blockquote/align — see app/filters.php
+                'media_upload' => 0,
+                'delay' => 1,
             ]);
 
         return $fields->build();
