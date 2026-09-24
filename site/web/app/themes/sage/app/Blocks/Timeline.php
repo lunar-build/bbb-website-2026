@@ -109,7 +109,10 @@ class Timeline extends Block
      * @var array
      */
     public $spacing = [
-        'padding' => null,
+        'padding' => [
+            'top' => 'var:preset|spacing|large',
+            'bottom' => 'var:preset|spacing|large',
+        ],
         'margin' => null,
     ];
 
@@ -133,7 +136,7 @@ class Timeline extends Block
             'gradients' => false,
         ],
         'spacing' => [
-            'padding' => false,
+            'padding' => ['top', 'bottom'],
             'margin' => false,
         ],
     ];
@@ -182,11 +185,38 @@ class Timeline extends Block
         ],
     ];
 
+    /**
+     * Layout variants to render stacked on the pattern-library page (see
+     * App\View\Composers\PatternLibrary::render()) — each entry is merged
+     * onto $example above, so only needs to override what differs.
+     *
+     * @var array
+     */
+    public $examples = [
+        'With headings' => [],
+        'Without headings' => [
+            'steps' => [
+                ['label' => '', 'heading' => '', 'body' => 'To register see link below'],
+                ['label' => '', 'heading' => '', 'body' => 'Set a goal for how much you want to get out and ride this month – remember to keep safe by sticking to government guidelines and maintain at least 2m distance from others.'],
+                ['label' => '', 'heading' => '', 'body' => '...with local route information for new and regular riders.'],
+            ],
+        ],
+        'Dates' => [
+            'markerSize' => 'date',
+            'steps' => [
+                ['label' => '2019', 'heading' => 'Scheme launched', 'body' => 'Better by Bike began with a handful of pilot routes.'],
+                ['label' => '2021', 'heading' => 'Network expanded', 'body' => 'New cycle routes added across the city.'],
+                ['label' => '2024', 'heading' => 'Love to Ride partnership', 'body' => 'Joined forces with Love to Ride to get more people cycling.'],
+            ],
+        ],
+    ];
+
     public function with(): array
     {
         return [
             'heading' => $this->heading(),
             'intro' => $this->intro(),
+            'markerSize' => $this->markerSize(),
             'steps' => $this->steps(),
         ];
     }
@@ -205,6 +235,16 @@ class Timeline extends Block
                 'instructions' => 'Optional standfirst shown under the heading.',
                 'required' => 0,
             ])
+            ->addSelect('marker_size', [
+                'label' => 'Marker size',
+                'instructions' => 'Applies to every marker in this timeline, so numbers and dates never render as mismatched sizes.',
+                'choices' => [
+                    'number' => 'Number (2 digits)',
+                    'date' => 'Date (e.g. a year)',
+                ],
+                'default_value' => 'number',
+                'required' => 0,
+            ])
             ->addRepeater('steps', [
                 'label' => 'Steps',
                 'button_label' => 'Add step',
@@ -213,12 +253,12 @@ class Timeline extends Block
             ])
                 ->addText('label', [
                     'label' => 'Label',
-                    'instructions' => 'Optional — shown in the numbered marker instead of the step\'s position (e.g. a date). Leave blank to show the step number.',
+                    'instructions' => 'Optional — shown in the marker instead of the step\'s position (e.g. a date). Leave blank to show the step number. If using dates, set Marker size above to "Date" so every marker matches.',
                     'required' => 0,
                 ])
                 ->addText('heading', [
                     'label' => 'Heading',
-                    'required' => 1,
+                    'required' => 0,
                 ])
                 ->addTextarea('body', [
                     'label' => 'Body',
@@ -239,6 +279,11 @@ class Timeline extends Block
     public function intro()
     {
         return get_field('intro') ?: $this->example['intro'];
+    }
+
+    public function markerSize()
+    {
+        return get_field('marker_size') ?: ($this->example['markerSize'] ?? 'number');
     }
 
     public function steps()

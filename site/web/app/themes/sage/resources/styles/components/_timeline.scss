@@ -6,12 +6,20 @@
 }
 
 .c-timeline {
+  --timeline-marker-size: 3.5625rem; // 57px — fits a 2-digit step number
+
   display: flex;
   flex-direction: column;
   gap: 1.875rem; // 30px
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+// All markers in a block share one size, set here rather than per-step, so a
+// mix of numbers and dates never renders as mismatched circle sizes.
+.c-timeline--dates {
+  --timeline-marker-size: 5rem; // 80px — fits a 4-digit year
 }
 
 .c-timeline__step {
@@ -30,7 +38,7 @@
   flex: none;
   display: flex;
   justify-content: center;
-  width: 3.5625rem; // 57px
+  width: var(--timeline-marker-size);
 
   // Connects this step's marker down through the row gap to the top of the
   // next marker, which sits above it in paint order and covers the seam —
@@ -38,7 +46,7 @@
   &::before {
     content: '';
     position: absolute;
-    top: 3.5625rem; // 57px — bottom edge of the marker circle
+    top: var(--timeline-marker-size); // bottom edge of the marker circle
     bottom: -1.875rem; // extends through the .c-timeline row gap
     left: 50%;
     width: 0.1875rem; // 3px
@@ -51,21 +59,29 @@
   position: relative;
   z-index: 1;
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
-  width: 3.5625rem; // 57px
-  height: 3.5625rem; // 57px
+  width: var(--timeline-marker-size);
+  height: var(--timeline-marker-size);
+  padding-inline: 0.25rem;
   border-radius: 1.25rem; // 20px
   background: var(--wp--preset--color--yellow);
   color: var(--wp--preset--color--charcoal);
   text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  .c-timeline--dates & {
+    font-size: 1.25rem; // heading-4's size is tuned for 2 digits, too wide at 4
+  }
 }
 
 .c-timeline__content {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding-block-start: 0.5rem;
 }
 
 .c-timeline__heading {

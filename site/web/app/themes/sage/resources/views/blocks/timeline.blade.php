@@ -11,7 +11,7 @@
     <p class="u-standfirst">{{ $intro }}</p>
   @endif
 
-  <x-timeline :steps="$steps" />
+  <x-timeline :steps="$steps" :marker-size="$markerSize" />
 </div>
 
 @unless ($block->preview)
