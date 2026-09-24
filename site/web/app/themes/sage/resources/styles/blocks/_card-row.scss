@@ -6,6 +6,7 @@
 
 @use '../base/typography';
 @use '../components/button';
+@use '../abstracts/spacing';
 
 .c-card-row__heading {
   text-align: center;
@@ -27,7 +28,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.5rem;
+  gap: spacing.$card-gap;
   margin-bottom: 2rem;
 }
 

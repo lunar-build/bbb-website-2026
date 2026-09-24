@@ -8,3 +8,8 @@
 $tight: 0.5rem; // list item spacing (li)
 $base: 1rem; // p, ul, ol, and h3-h6 margin-bottom
 $loose: 1.5rem; // h1, h2 margin-bottom
+
+// Shared grid/flex gap for card layouts (Card Grid, Card Row) so their
+// horizontal and vertical card spacing stays identical and in sync across
+// blocks instead of each hardcoding its own rem value.
+$card-gap: 1.5rem;
