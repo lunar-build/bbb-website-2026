@@ -16,6 +16,10 @@
     @include('partials.two-column-content-cta', ['link' => $slot['link']])
     @break
 
+  @case('bullet_list')
+    <x-bullet-list :heading="$slot['heading']" :items="$slot['items']" />
+    @break
+
   @default
     @if (! empty($slot['heading']['text']))
       <x-heading :level="$slot['heading']['level']" :style="$slot['heading']['style']">

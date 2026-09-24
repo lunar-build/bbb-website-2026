@@ -25,6 +25,31 @@ ol {
   }
 }
 
+// Custom bullet marker for real content lists — scoped to post/page body
+// content (.e-content) and the Bullet List block, so it renders identically
+// in both without leaking onto unrelated UI <ul>s elsewhere (nav, the
+// pattern-library's own chrome, etc.) the way an unscoped `ul` selector would.
+.e-content ul,
+.c-bullet-list ul {
+  list-style: none;
+  padding-inline-start: 1.3125rem;
+
+  li {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0.59375rem;
+      left: -1.3125rem;
+      width: 0.3125rem;
+      height: 0.3125rem;
+      border-radius: 999px;
+      background: var(--wp--preset--color--blue);
+    }
+  }
+}
+
 h1,
 .u-heading-1 {
   font-size: var(--wp--preset--font-size--heading-1);

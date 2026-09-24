@@ -29,7 +29,7 @@ class TwoColumnContent extends Block
      *
      * @var string
      */
-    public $description = 'A two-column layout — each side independently picks an Image, Text, Quote, or Button.';
+    public $description = 'A two-column layout — each side independently picks an Image, Text, Quote, Button, or Bullet List.';
 
     /**
      * The block category.
@@ -55,6 +55,7 @@ class TwoColumnContent extends Block
         'image',
         'quote',
         'button',
+        'bullet list',
     ];
 
     /**
@@ -200,6 +201,26 @@ class TwoColumnContent extends Block
                 'body_text' => 'Nam eu tortor pellentesque, semper ligula malesuada, posuere arcu. Morbi feugiat imperdiet velit. Proin ac dictum risus.',
             ],
         ],
+        'Text + Bullet List' => [
+            'left' => [
+                'type' => 'text',
+                'heading_text' => 'We have bikes for everyone',
+                'heading_level' => 'h3',
+                'heading_style' => 'match',
+                'body_text' => 'As well as our full range of two-wheeled bikes, we stock a range of accessories to help you get the most out of your ride.',
+                'body_style' => 'body',
+            ],
+            'right' => [
+                'type' => 'bullet_list',
+                'heading' => 'What you get',
+                'items' => [
+                    ['text' => 'Balance bikes'],
+                    ['text' => 'Trailers'],
+                    ['text' => 'Bike seats'],
+                    ['text' => 'Tag-alongs'],
+                ],
+            ],
+        ],
     ];
 
     /**
@@ -260,6 +281,17 @@ class TwoColumnContent extends Block
                     'required' => true,
                 ]);
 
+            $flexible->addLayout('bullet_list', ['label' => 'Bullet List'])
+                ->addText('heading', ['label' => 'Heading'])
+                ->addRepeater('items', [
+                    'label' => 'Items',
+                    'button_label' => 'Add item',
+                    'min' => 1,
+                    'layout' => 'block',
+                ])
+                    ->addText('text', ['label' => 'Item text', 'required' => 1])
+                ->endRepeater();
+
             $flexible->endFlexibleContent();
         }
 
@@ -304,6 +336,11 @@ class TwoColumnContent extends Block
             'button' => [
                 'type' => 'button',
                 'link' => $this->normalizeLink($row['link'] ?? null),
+            ],
+            'bullet_list' => [
+                'type' => 'bullet_list',
+                'heading' => $row['heading'] ?? '',
+                'items' => $row['items'] ?? [],
             ],
             default => [
                 'type' => 'text',
