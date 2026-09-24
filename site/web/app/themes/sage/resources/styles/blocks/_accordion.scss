@@ -8,6 +8,13 @@
 
 .c-accordion__list {
   display: block;
+
+  // wa-accordion's base :host sets overflow:hidden unconditionally (not
+  // gated by the appearance="plain" we use), which clips the focus-visible
+  // ring on the first/last item. Per this theme's established precedent
+  // (image-card sweep), remove the clip rather than pull the ring inward
+  // with a negative outline-offset.
+  overflow: visible;
 }
 
 wa-accordion-item {
