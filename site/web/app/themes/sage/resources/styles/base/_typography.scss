@@ -25,6 +25,30 @@ ol {
   }
 }
 
+// Custom bullet marker for real content lists (WYSIWYG core/list and the
+// Bullet List block share this so they render identically). Scoped away
+// from `[role='list']` UI lists (nav, etc.), which reset list-style to
+// none in base/_reset.scss and are unrelated to this content styling.
+ul:not([role='list']) {
+  list-style: none;
+  padding-inline-start: 1.3125rem;
+
+  li {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0.59375rem;
+      left: -1.3125rem;
+      width: 0.3125rem;
+      height: 0.3125rem;
+      border-radius: 999px;
+      background: var(--wp--preset--color--blue);
+    }
+  }
+}
+
 h1,
 .u-heading-1 {
   font-size: var(--wp--preset--font-size--heading-1);
