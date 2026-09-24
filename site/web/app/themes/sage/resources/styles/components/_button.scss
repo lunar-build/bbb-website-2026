@@ -24,9 +24,16 @@ wa-button[size='small']::part(label) {
   letter-spacing: normal;
 }
 
+// Horizontal padding matches the solid/black button at every size and
+// appearance — previously scoped to size="small" only, so any full-size or
+// outlined button left off that selector fell back to WA's own (tighter)
+// default padding instead.
+wa-button::part(button) {
+  padding-inline: 16px;
+}
+
 wa-button[size='small']::part(button) {
   height: 40px;
-  padding-inline: 16px;
   gap: 10px;
 }
 
@@ -45,6 +52,14 @@ wa-button[size='small'][variant='neutral'][appearance='outlined']::part(button) 
 
 wa-button::part(button) {
   @include focus.ring;
+}
+
+// No button in this project uses a leading icon, but WA's "start" slot
+// still renders (display:flex, 0 width) and still takes its share of the
+// button's flex `gap` — an invisible ~10px left offset that pushes the
+// label right of the actual padding edge instead of flush against it.
+wa-button::part(start) {
+  display: none;
 }
 
 // A decorative wa-button — visually a button, but not itself the click
