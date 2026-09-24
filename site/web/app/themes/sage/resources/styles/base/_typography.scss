@@ -25,11 +25,12 @@ ol {
   }
 }
 
-// Custom bullet marker for real content lists (WYSIWYG core/list and the
-// Bullet List block share this so they render identically). Scoped away
-// from `[role='list']` UI lists (nav, etc.), which reset list-style to
-// none in base/_reset.scss and are unrelated to this content styling.
-ul:not([role='list']) {
+// Custom bullet marker for real content lists — scoped to post/page body
+// content (.e-content) and the Bullet List block, so it renders identically
+// in both without leaking onto unrelated UI <ul>s elsewhere (nav, the
+// pattern-library's own chrome, etc.) the way an unscoped `ul` selector would.
+.e-content ul,
+.c-bullet-list ul {
   list-style: none;
   padding-inline-start: 1.3125rem;
 
