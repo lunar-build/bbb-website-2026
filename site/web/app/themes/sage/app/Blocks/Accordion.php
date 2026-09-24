@@ -223,21 +223,11 @@ class Accordion extends Block
         return $fields->build();
     }
 
-    /**
-     * Retrieve the heading.
-     *
-     * @return string
-     */
     public function heading()
     {
         return get_field('heading') ?: $this->example['heading'];
     }
 
-    /**
-     * Retrieve the accordion items.
-     *
-     * @return array
-     */
     public function items()
     {
         return get_field('items') ?: $this->example['items'];

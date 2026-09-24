@@ -9,11 +9,9 @@
 .c-accordion__list {
   display: block;
 
-  // wa-accordion's base :host sets overflow:hidden unconditionally (not
-  // gated by the appearance="plain" we use), which clips the focus-visible
-  // ring on the first/last item. Per this theme's established precedent
-  // (image-card sweep), remove the clip rather than pull the ring inward
-  // with a negative outline-offset.
+  // wa-accordion forces overflow:hidden regardless of appearance, clipping
+  // the focus ring on first/last items. Removed rather than using a
+  // negative outline-offset, matching the image-card focus-ring precedent.
   overflow: visible;
 }
 
@@ -26,15 +24,13 @@ wa-accordion-item {
     color: var(--wp--preset--color--blue-medium);
     align-items: flex-start; // keep icon pinned to the title's first line if it wraps
 
-    // WA's default first/last-child rounds the button corners to match the
-    // host's border-radius, meant for the boxed/filled appearances — our
-    // flat "plain" design has no box, so this only shows up as a stray
-    // rounded corner on the focus outline. Zero it.
+    // WA rounds first/last-child button corners to match the host radius
+    // (for the boxed/filled appearances) — our flat "plain" design has no
+    // box, so this only showed up as a stray corner on the focus outline.
     border-radius: 0;
 
-    // WA's default --spacing pads all four sides of the button, but this
-    // block already sits inside .o-container — its own left/right gutter
-    // shouldn't stack on top. Keep vertical spacing only.
+    // WA's --spacing pads all four sides of the button, but this block
+    // already sits inside .o-container for its horizontal gutter.
     padding-inline: 0;
 
     @include focus.ring;
