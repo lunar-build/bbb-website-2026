@@ -2,9 +2,22 @@
 
 <ol {{ $attributes->class(['c-timeline', 'c-timeline--dates' => $markerSize === 'date']) }}>
   @foreach ($steps as $index => $step)
+    @php
+      $label = $step['label'] ?: $index + 1;
+      $datetime = null;
+
+      if ($markerSize === 'date' && preg_match('/^(\d{2})\/(\d{2})\/(\d{2})$/', $step['label'] ?? '', $matches)) {
+        $datetime = "20{$matches[3]}-{$matches[2]}-{$matches[1]}";
+      }
+    @endphp
+
     <li class="c-timeline__step">
       <span class="c-timeline__marker-col">
-        <span class="c-timeline__marker u-heading-4">{{ $step['label'] ?: $index + 1 }}</span>
+        @if ($datetime)
+          <time class="c-timeline__marker u-heading-4" datetime="{{ $datetime }}">{{ $label }}</time>
+        @else
+          <span class="c-timeline__marker u-heading-4">{{ $label }}</span>
+        @endif
       </span>
 
       <div class="c-timeline__content">
