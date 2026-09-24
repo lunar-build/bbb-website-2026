@@ -39,7 +39,6 @@
               @endforeach
               <li><a href="#style-buttons"><span>{{ __('Buttons', 'sage') }}</span></a></li>
               <li><a href="#style-type-scale"><span>{{ __('Type scale', 'sage') }}</span></a></li>
-              <li><a href="#style-callout"><span>{{ __('Callout', 'sage') }}</span></a></li>
             </ul>
           @endif
         </nav>
