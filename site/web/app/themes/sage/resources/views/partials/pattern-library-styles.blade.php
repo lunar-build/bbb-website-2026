@@ -1,9 +1,14 @@
 {{--
   Hand-maintained style primitives for the pattern library's dev-only
-  "Components" section — buttons, the type scale, and the callout style
-  aren't separate files like resources/views/components/*.blade.php, so
-  there's nothing to auto-discover. Add a couple of lines here only when a
-  genuinely new style primitive (not a component, not a block) is built.
+  "Components" section — buttons and the type scale aren't separate files
+  like resources/views/components/*.blade.php, so there's nothing to
+  auto-discover. Add a couple of lines here only when a genuinely new style
+  primitive (not a component, not a block) is built.
+
+  The Callout entry that used to live here was retired once the Callout
+  Text block (app/Blocks/CalloutText.php) shipped — the block's own
+  pattern-library entry (auto-discovered via App\View\Composers\PatternLibrary)
+  now covers it, so keeping both would just show two stale copies.
 --}}
 
 <section id="style-buttons" class="c-pattern-library__entry">
@@ -53,15 +58,5 @@
     <p class="u-standfirst">{{ __('Standfirst text', 'sage') }}</p>
     <p class="u-input-label">{{ __('Input label text', 'sage') }}</p>
     <p>{{ __('Body text', 'sage') }}</p>
-  </div>
-</section>
-
-<section id="style-callout" class="c-pattern-library__entry">
-  <div class="c-pattern-library__meta">
-    <h2>{{ __('Callout', 'sage') }}</h2>
-  </div>
-
-  <div class="c-pattern-library__preview">
-    <p class="u-callout">{{ __('Callout text', 'sage') }}</p>
   </div>
 </section>

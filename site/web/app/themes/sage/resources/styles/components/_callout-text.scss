@@ -1,0 +1,41 @@
+// Figma node 9:2537 — single emphasised line of callout text, reuses the
+// pattern-library's existing `.u-callout` pill style (base/_typography.scss)
+// as its visual base, hardcodable into other blocks via <x-callout-text>.
+
+@use '../abstracts/breakpoints' as bp;
+
+// Standalone-only padding — same rhythm as .c-block's generic containment.
+.c-callout-text-block {
+  padding-block: 2rem;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 3rem;
+  }
+}
+
+.c-callout-text {
+  // .u-callout is a pill sized to its content; a callout used inline in
+  // article copy needs to span the full measure instead.
+  width: 100%;
+  margin: 0;
+}
+
+.c-callout-text__icon {
+  flex-shrink: 0;
+  padding-top: 0.2rem;
+
+  svg {
+    width: 1.25rem; // 20px
+    height: 1.25rem; // 20px
+  }
+}
+
+.c-callout-text__text {
+  flex: 1 0 0;
+
+  // WYSIWYG output wraps content in its own <p> — the global `p` margin
+  // would throw off vertical centering inside this flex pill otherwise.
+  p {
+    margin: 0;
+  }
+}

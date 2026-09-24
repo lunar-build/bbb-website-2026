@@ -105,7 +105,7 @@ add_filter('gform_submit_button', function ($button, $form) {
     preg_match('/value="([^"]*)"/', $button, $matches);
 
     return view('partials.gf-submit-button', [
-        'id' => 'gform_submit_button_'.$form['id'],
+        'id' => 'gform_submit_button_' . $form['id'],
         'label' => $matches[1] ?? __('Submit', 'sage'),
     ])->render();
 }, 10, 2);
