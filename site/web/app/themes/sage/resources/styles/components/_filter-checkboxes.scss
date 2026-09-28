@@ -4,6 +4,7 @@
 // Toggle/count behaviour: resources/js/filter-checkboxes.js.
 
 @use '../base/typography';
+@use '../base/focus';
 
 $breakpoint-desktop: 37.5rem;
 
@@ -15,10 +16,11 @@ $breakpoint-desktop: 37.5rem;
   width: 100%;
   padding: 0.875rem 1.25rem;
   border: 0;
-  border-radius: 0.625rem;
   background: var(--wp--preset--color--blue);
   color: var(--wp--preset--color--white);
   cursor: pointer;
+
+  @include focus.ring;
 
   .c-filter-checkboxes__toggle-label {
     @extend .u-table-column-heading !optional;
@@ -37,7 +39,6 @@ $breakpoint-desktop: 37.5rem;
   @media (max-width: $breakpoint-desktop) {
     padding: 1rem;
     background: var(--wp--preset--color--lightest-grey);
-    border-radius: 0.625rem;
   }
 
   @media (min-width: $breakpoint-desktop) {
