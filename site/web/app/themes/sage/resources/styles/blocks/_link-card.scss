@@ -1,11 +1,17 @@
-// Figma "Standalone link card" / "Download link" / "Transcript download
-// link": a bordered white row with an optional logo, title + description,
-// and a right-aligned CTA that either links out (arrow icon) or triggers a
-// file download (download icon + file size label).
+// Figma: Standalone Link Card / Download Link / Transcript Download Link
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 @use '../components/button';
+
+// Container query, not the shared bp.respond() viewport mixin — the card's
+// own rendered width can be far narrower than the viewport (e.g. the pattern
+// library's sidebar layout), so a viewport breakpoint alone won't reliably
+// stack it. Still reads its cutoff from bp.$md rather than a hardcoded
+// value, to stay in step with the site's shared breakpoints.
+.c-link-card {
+  container-type: inline-size;
+}
 
 .c-link-card__card {
   display: flex;
@@ -22,9 +28,9 @@
   }
 
   // Stacks earlier than the usual $sm cutoff — the card's long single-line
-  // CTA/description text wraps awkwardly on tablet-width screens while
+  // CTA/description text wraps awkwardly on tablet-width containers while
   // still in row layout.
-  @include bp.respond($max: bp.$md) {
+  @container (max-width: #{bp.$md}) {
     flex-direction: column;
     align-items: stretch;
     gap: 1.25rem;
@@ -43,7 +49,7 @@
   justify-content: center;
   width: 8.75rem;
 
-  @include bp.respond($max: bp.$md) {
+  @container (max-width: #{bp.$md}) {
     margin: 0 auto;
   }
 
@@ -86,7 +92,7 @@
     align-items: center;
   }
 
-  @include bp.respond($max: bp.$md) {
+  @container (max-width: #{bp.$md}) {
     align-items: center;
   }
 }

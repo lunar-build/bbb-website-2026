@@ -203,9 +203,6 @@ class LinkCard extends Block
         return ['cards' => $cards];
     }
 
-    /**
-     * Data to be passed to the block before rendering.
-     */
     public function with(): array
     {
         return [
@@ -213,9 +210,6 @@ class LinkCard extends Block
         ];
     }
 
-    /**
-     * The block field group.
-     */
     public function fields(): array
     {
         $fields = Builder::make('link_card');
@@ -314,8 +308,6 @@ class LinkCard extends Block
     }
 
     /**
-     * Retrieve the cards.
-     *
      * @return array
      */
     public function cards()
