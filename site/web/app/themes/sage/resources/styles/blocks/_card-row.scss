@@ -6,6 +6,7 @@
 
 @use '../base/typography';
 @use '../components/button';
+@use '../abstracts/spacing';
 
 .c-card-row__heading {
   text-align: center;
@@ -27,7 +28,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.5rem;
+  gap: spacing.$card-gap;
   margin-bottom: 2rem;
 }
 
@@ -75,6 +76,9 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  // Same fix as .c-card-row__link-cta: pins the CTA to the bottom of the
+  // card regardless of how many lines the title above takes up.
+  margin-top: auto;
   padding: 10px 16px;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
@@ -125,6 +129,11 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  // Pins the CTA to the bottom of the card regardless of how many lines the
+  // title/body above take up, so side-by-side cards' CTAs line up (the card
+  // itself stretches to the tallest card in the row via the parent flex
+  // row's default align-items: stretch).
+  margin-top: auto;
   padding: 10px 16px;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;

@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+
+#!/bin/bash
+
+export CF_API_KEY="{{ vault_cloudflare_origin_ca_key | mandatory }}" && /usr/local/bin/cfca getcert -key-out /etc/nginx/ssl/cloudflare-origin-ca/{{ item.key | quote }}.key -certificate-out /etc/nginx/ssl/cloudflare-origin-ca/{{ item.key | quote }}.pem -days {{ site_cfca_config.days }} -hostnames {{ site_cfca_config.hostnames | join(',') }} -key-size 521 -key-type ecdsa -overwrite && /usr/sbin/service nginx reload

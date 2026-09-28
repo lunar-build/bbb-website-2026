@@ -69,11 +69,23 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 24px;
-    padding-inline: 10px;
+    // Padding + line-height:1 (not a fixed height + line-height:24px, which
+    // fought the flex centring and pushed the text visibly off-centre)
+    // centres the *line box*, and text-box-trim below tightens that box to
+    // the font's cap-height/baseline. Neither fixes the remaining
+    // millimetre: at this size "Easy" still reads slightly low because the
+    // solid cap-height glyphs (E) carry more visual weight than the thin
+    // descender tail (y), so a mathematically-centred box still looks
+    // bottom-heavy. The extra 2px on padding-bottom vs padding-top is an
+    // eyeballed optical correction for that, not a metric-driven one —
+    // nudge it further if new label text (routes vary: Easy/Moderate/
+    // Difficult) reads off again.
+    padding: 4px 10px 6px;
     border-radius: 12px;
     @extend .u-body-large;
-    line-height: 24px;
+    line-height: 1;
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
   }
 
   &__cta {

@@ -1,0 +1,23 @@
+---
+
+- name: Create SSL renewal script
+  template:
+    src: "cfca.j2"
+    dest: /root/cfca.sh
+    owner: root
+    group: root
+    mode: '0700'
+  with_dict: "{{ wordpress_sites }}"
+  when: site_uses_cloudflare_origin_ca | bool
+
+- name: Setup Cloudflare Origin CA SSL renewal CRON
+  cron:
+    name: cloudflare-origin-ca-certificate-renewal
+    user: root
+    job: "/root/cfca.sh"
+    day: "2"
+    hour: "4"
+    minute: "30"
+    state: present
+  with_dict: "{{ wordpress_sites }}"
+  when: site_uses_cloudflare_origin_ca | bool

@@ -1,0 +1,49 @@
+// Figma "Filter checkboxes" — Desktop / Mobile | Closed / Mobile | Open.
+// Desktop always shows the grouped checkboxes; mobile collapses them
+// behind a toggle button labelled with the live selected-filter count.
+// Toggle/count behaviour: resources/js/filter-checkboxes.js.
+
+@use '../base/typography';
+@use '../base/focus';
+
+$breakpoint-desktop: 37.5rem;
+
+.c-filter-checkboxes__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border: 0;
+  background: var(--wp--preset--color--blue);
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  @include focus.ring;
+
+  .c-filter-checkboxes__toggle-label {
+    @extend .u-table-column-heading !optional;
+  }
+
+  @media (min-width: $breakpoint-desktop) {
+    display: none;
+  }
+}
+
+.c-filter-checkboxes__panel {
+  &[hidden] {
+    display: none;
+  }
+
+  @media (max-width: $breakpoint-desktop) {
+    padding: 1rem;
+    background: var(--wp--preset--color--lightest-grey);
+  }
+
+  @media (min-width: $breakpoint-desktop) {
+    &[hidden] {
+      display: block;
+    }
+  }
+}
