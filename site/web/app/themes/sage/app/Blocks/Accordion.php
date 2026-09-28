@@ -5,28 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class FaqAccordion extends Block
+class Accordion extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'FAQ Accordion';
+    public $name = 'Accordion';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'faq-accordion';
+    public $slug = 'accordion';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A list of expandable question and answer items.';
+    public $description = 'A list of expandable, collapsible content items.';
 
     /**
      * The block category.
@@ -48,10 +48,10 @@ class FaqAccordion extends Block
      * @var array
      */
     public $keywords = [
-        'faq',
         'accordion',
-        'questions',
-        'answers',
+        'expand',
+        'collapse',
+        'faq',
     ];
 
     /**
@@ -80,7 +80,7 @@ class FaqAccordion extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.
@@ -157,16 +157,24 @@ class FaqAccordion extends Block
         'heading' => 'Frequently asked questions',
         'items' => [
             [
-                'question' => 'How do I borrow a bike?',
-                'answer' => 'Sign up online, choose a scheme near you, and pick up your bike from one of our local hubs.',
+                'title' => 'Do you have bikes that I can use?',
+                'content' => '<p>Yes. We have a large range of inclusive wheels for all cycles available, including trikes, recumbents, two-seater bikes, hand cycles and a platform wheelchair-accessible bike. These speciality cycles are available for anyone who needs them during all of our cycling sessions.</p>'
+                    .'<p>We also have two-wheeled bikes for adults and children, as well as:</p>'
+                    .'<ul><li>Balance bikes</li><li>Trailers</li><li>Bike seats</li><li>Tag-alongs</li></ul>'
+                    .'<p>For more information about our cycles <a href="#">click here</a>.</p>'
+                    .'<p>There is no charge for using our cycles but at extremely busy times people may need to share. If you do bring your own bike you are still welcome to try ours.</p>',
             ],
             [
-                'question' => 'How long can I keep the bike for?',
-                'answer' => 'Loan periods vary by scheme, but most run for up to a month at a time.',
+                'title' => 'Do you sell bikes at Bristol Cycling Centre?',
+                'content' => '<p>No, but our friendly team can point you toward local retailers and workshops if you\'re looking to buy or service a bike.</p>',
             ],
             [
-                'question' => 'What if something goes wrong with the bike?',
-                'answer' => 'Get in touch with your local scheme coordinator and we\'ll arrange a repair or replacement.',
+                'title' => 'What about helmets?',
+                'content' => '<p>Helmets are available to borrow free of charge alongside any bike hire, in a range of sizes for adults and children.</p>',
+            ],
+            [
+                'title' => 'Do I need to pre-book?',
+                'content' => '<p>Pre-booking is recommended, especially at weekends and during school holidays, but drop-ins are welcome whenever we have availability.</p>',
             ],
         ],
     ];
@@ -187,48 +195,39 @@ class FaqAccordion extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('faq_accordion');
+        $fields = Builder::make('accordion');
 
         $fields
             ->addText('heading', [
                 'label' => 'Heading',
             ])
             ->addRepeater('items', [
-                'label' => 'Questions',
-                'button_label' => 'Add question',
+                'label' => 'Items',
+                'button_label' => 'Add item',
                 'min' => 1,
                 'layout' => 'block',
             ])
-                ->addText('question', [
-                    'label' => 'Question',
+                ->addText('title', [
+                    'label' => 'Title',
                     'required' => 1,
                 ])
-                ->addTextarea('answer', [
-                    'label' => 'Answer',
-                    'rows' => 3,
-                    'new_lines' => 'wpautop', // wraps each blank-line-separated block in <p> — matches Copy/Quote's convention
+                ->addWysiwyg('content', [
+                    'label' => 'Content',
                     'required' => 1,
+                    'tabs' => 'visual',
+                    'media_upload' => 0,
+                    'toolbar' => 'full',
                 ])
             ->endRepeater();
 
         return $fields->build();
     }
 
-    /**
-     * Retrieve the heading.
-     *
-     * @return string
-     */
     public function heading()
     {
         return get_field('heading') ?: $this->example['heading'];
     }
 
-    /**
-     * Retrieve the FAQ items.
-     *
-     * @return array
-     */
     public function items()
     {
         return get_field('items') ?: $this->example['items'];
