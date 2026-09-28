@@ -1,0 +1,11 @@
+site_uses_cloudflare_origin_ca: "{{ ssl_enabled and item.value.ssl.provider | default('manual') == 'cloudflare-origin-ca' }}"
+
+site_cfca_config_default:
+  days: 5475
+  hostnames: "{{ site_hosts | union(multisite_subdomains_wildcards) }}"
+site_cfca_config: "{{ site_cfca_config_default | combine(item.value.cloudflare_origin_ca | default({})) }}"
+
+# the days of a month the cronjob should be run. Make sure to run it rather often, three times per month is a pretty
+# good value. It does not harm to run it often, as it will only regenerate certificates that have passed a certain age
+# (60 days by default).
+site_cfca_cronjob_daysofmonth: "*"

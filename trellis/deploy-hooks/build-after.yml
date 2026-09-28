@@ -1,0 +1,26 @@
+---
+- name: Sync built assets to remote server
+  synchronize:
+    src: "{{ project_local_path }}/web/app/themes/sage/public/build/"
+    dest: "{{ deploy_helper.new_release_path }}/web/app/themes/sage/public/build/"
+    delete: yes
+    rsync_opts:
+      - "--chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r"
+  remote_user: "{{ web_user }}"
+
+- name: Set permissions for Sage build assets
+  file:
+    path: "{{ deploy_helper.new_release_path }}/web/app/themes/sage/public"
+    recurse: yes
+    mode: "0750"
+
+- name: Install Theme Composer dependencies
+  composer:
+    no_scripts: "{{ composer_no_scripts }}"
+    classmap_authoritative: "{{ composer_classmap_authoritative }}"
+    working_dir: "{{ deploy_helper.new_release_path }}/web/app/themes/sage"
+
+- name: Run Acorn optimize
+  command: wp acorn optimize
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"

@@ -13,9 +13,13 @@
 @use 'components/footer';
 @use 'components/breadcrumbs';
 @use 'components/quote';
+@use 'components/callout-text';
 @use 'components/icon-link-grid';
+@use 'components/bullet-list';
 @use 'components/video';
 @use 'components/pill';
+@use 'components/filter-checkbox-group';
+@use 'components/filter-checkboxes';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'blocks/generic';
@@ -33,3 +37,4 @@
 @use 'blocks/card-grid';
 @use 'blocks/two-column-content';
 @use 'blocks/link-card';
+@use 'blocks/accordion';

@@ -1,0 +1,64 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@1
+
+jobs:
+  syntax-check:
+    parameters:
+      ansible-version:
+        type: string
+      python-version:
+        type: string
+    executor:
+      name: python/default
+      tag: <<parameters.python-version>>
+    steps:
+      - run: python --version
+      - run: pip -V
+      - checkout
+      - restore_cache:
+          keys:
+            - syntax-check-pip-v1-<<parameters.python-version>>-<<parameters.ansible-version>>-{{ .Branch }}-
+            - syntax-check-pip-v1-<<parameters.python-version>>-<<parameters.ansible-version>>-
+            - syntax-check-pip-v1-<<parameters.python-version>>-
+      - run: pip install --upgrade ansible<< parameters.ansible-version >>
+      - save_cache:
+          key: syntax-check-pip-v1-<<parameters.python-version>>-<<parameters.ansible-version>>-{{ .Branch }}-{{ epoch }}-
+          paths:
+            - /home/circleci/.cache/pip
+            - /home/circleci/.pyenv/versions/
+            - /home/circleci/.local/lib/
+      - run: ansible --version
+      - run: ansible-playbook -vvv -i 'localhost,' --syntax-check tests/test.yml
+
+  lint:
+    executor: python/default
+    steps:
+      - run: python --version
+      - run: pip -V
+      - checkout
+      - restore_cache:
+          keys:
+            - lint-pip-v1-{{ .Branch }}-
+            - lint-pip-v1-
+      - run: pip install --upgrade ansible-lint
+      - save_cache:
+          key: lint-pip-v1-{{ .Branch }}-{{ epoch }}-
+          paths:
+            - /home/circleci/.cache/pip
+            - /home/circleci/.pyenv/versions/
+            - /home/circleci/.local/lib/
+      - run: ansible-lint --version
+      - run: ansible-lint -vv .
+
+workflows:
+  syntax-check-and-lint:
+    jobs:
+      - syntax-check:
+          name: syntax-check-ansible-<<matrix.ansible-version>>-python-<<matrix.python-version>>
+          matrix:
+            parameters:
+              ansible-version: ["\\<3.0.0", "~=2.10.0"]
+              python-version: ["3.9", "3.8", "3.7"]
+      - lint

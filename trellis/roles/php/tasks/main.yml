@@ -1,0 +1,116 @@
+---
+- name: Remove legacy ondrej/php Launchpad list
+  file:
+    path: "/etc/apt/sources.list.d/ondrej-ubuntu-php-{{ ansible_facts['distribution_release'] }}.list"
+    state: absent
+
+- name: Remove legacy ondrej/php Launchpad key
+  file:
+    path: /etc/apt/trusted.gpg.d/ondrej_ubuntu_php.gpg
+    state: absent
+
+- name: Ensure apt keyrings directory exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Sury PHP signing key
+  get_url:
+    url: https://packages.sury.org/php/apt.gpg
+    dest: /etc/apt/keyrings/sury-php.gpg
+    mode: '0644'
+
+- name: Verify Sury PHP signing key fingerprint
+  command: gpg --show-keys --with-fingerprint --with-colons /etc/apt/keyrings/sury-php.gpg
+  register: sury_key_fpr
+  changed_when: false
+  check_mode: false
+
+- name: Assert Sury PHP signing key fingerprint
+  assert:
+    that:
+      - "'15058500A0235D97F5D10063B188E2B695BD4743' in sury_key_fpr.stdout"
+    fail_msg: "Sury PHP signing key fingerprint does not match expected value."
+
+- name: Add Sury PHP repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ {{ ansible_facts['distribution_release'] }} main"
+    filename: sury-php
+    update_cache: yes
+  register: result
+  until: result is success
+  retries: 3
+  delay: 5
+
+- name: Install PHP and extensions
+  apt:
+    name: "{{ item.key }}"
+    state: "{{ item.value }}"
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+    install_recommends: no
+  loop: "{{ php_extensions | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Ensure correct PHP version selected
+  community.general.alternatives:
+    name: php
+    path: /usr/bin/php{{ php_version }}
+
+- name: Find existing php fpm services
+  find:
+    paths: /etc/init.d
+    patterns: "^php((?!{{ php_version }})(\\d\\.\\d))-fpm$"
+    use_regex: true
+  register: old_php_fpm_services
+
+- name: Stop old php-fpm services
+  service:
+    name: "{{ item.path | basename }}"
+    state: stopped
+    enabled: false
+  loop: "{{ old_php_fpm_services.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  notify: reload php-fpm
+
+- name: Start php fpm service
+  service:
+    name: "php{{ php_version }}-fpm"
+    state: started
+    enabled: true
+
+- name: Copy PHP-FPM php.ini file
+  template:
+    src: php-fpm.ini.j2
+    dest: /etc/php/{{ php_version }}/fpm/php.ini
+    mode: '0644'
+
+- name: Copy PHP-FPM configuration file
+  template:
+    src: php-fpm.conf.j2
+    dest: /etc/php/{{ php_version }}/fpm/php-fpm.conf
+    mode: '0644'
+  notify: reload php-fpm
+
+- name: Copy PHP CLI configuration file
+  template:
+    src: php-cli.ini.j2
+    dest: /etc/php/{{ php_version }}/cli/php.ini
+    mode: '0644'
+
+- name: Copy 10-opcache.ini configuration file
+  template:
+    src: 10-opcache.ini.j2
+    dest: /etc/php/{{ php_version }}/fpm/conf.d/10-opcache.ini
+    mode: '0644'
+  notify: reload php-fpm
+
+- name: Change ImageMagick policy.xml to allow for PDFs
+  replace:
+    path: /etc/ImageMagick-6/policy.xml
+    regexp: '<policy domain="coder" rights="none" pattern="PDF" />'
+    replace: '<policy domain="coder" rights="read" pattern="PDF" />'
+    backup: no
+  notify: reload php-fpm

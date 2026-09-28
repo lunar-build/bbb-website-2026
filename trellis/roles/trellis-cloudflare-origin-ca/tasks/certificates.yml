@@ -1,0 +1,16 @@
+- name: Generate Cloudflare Origin CA
+  command: "cfca getcert \
+    -key-out {{ item.key | quote }}.key \
+    -certificate-out {{ item.key | quote }}.pem \
+    -days {{ site_cfca_config.days }} \
+    -hostnames {{ site_cfca_config.hostnames | join(',') }} \
+    -key-size 521 \
+    -key-type ecdsa"
+  args:
+    chdir: "{{ nginx_ssl_path }}/cloudflare-origin-ca"
+    creates: "{{ item.key }}.*"
+  environment:
+    CF_API_KEY: "{{ vault_cloudflare_origin_ca_key | mandatory }}"
+  no_log: "{{ cloudflare_origin_ca_no_log }}"
+  when: site_uses_cloudflare_origin_ca | bool
+  with_dict: "{{ wordpress_sites }}"
