@@ -8,12 +8,28 @@
 .c-timeline {
   --timeline-marker-size: 3.5625rem; // 57px — fits a 2-digit step number
 
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1.875rem; // 30px
   margin: 0;
   padding: 0;
   list-style: none;
+
+  // Single line spanning first-marker-centre to last-marker-centre, sat
+  // behind the markers (z-index 1) which mask it into a connector between
+  // them. Drawn once on the list so per-step baseline shifts (see
+  // .c-timeline__step) can't throw off a per-row length calculation.
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--timeline-marker-size) / 2);
+    bottom: calc(var(--timeline-marker-size) / 2);
+    left: calc(var(--timeline-marker-size) / 2);
+    width: 0.1875rem; // 3px
+    margin-left: -0.09375rem;
+    background: var(--wp--preset--color--yellow);
+  }
 }
 
 // All markers in a block share one size, set here rather than per-step, so a
@@ -24,35 +40,18 @@
 
 .c-timeline__step {
   display: flex;
-  align-items: stretch;
+  // Content's first line (heading or body) starts level with the marker's
+  // own text baseline, whatever the marker's height happens to be.
+  align-items: baseline;
   gap: 1.625rem; // 26px
   margin: 0;
-
-  &:last-child .c-timeline__marker-col::before {
-    display: none;
-  }
 }
 
 .c-timeline__marker-col {
-  position: relative;
   flex: none;
   display: flex;
   justify-content: center;
   width: var(--timeline-marker-size);
-
-  // Connects this step's marker down through the row gap to the top of the
-  // next marker, which sits above it in paint order and covers the seam —
-  // giving a continuous line without measuring variable step heights.
-  &::before {
-    content: '';
-    position: absolute;
-    top: var(--timeline-marker-size); // bottom edge of the marker circle
-    bottom: -1.875rem; // extends through the .c-timeline row gap
-    left: 50%;
-    width: 0.1875rem; // 3px
-    margin-left: -0.09375rem;
-    background: var(--wp--preset--color--yellow);
-  }
 }
 
 .c-timeline__marker {
