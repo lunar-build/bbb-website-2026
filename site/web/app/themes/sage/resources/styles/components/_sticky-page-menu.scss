@@ -1,0 +1,45 @@
+// Figma "Sticky article nav menu" — page-index list of in-page section
+// links with the current section highlighted. Sticky positioning is
+// applied by the template that places this component, not here.
+
+.c-sticky-page-menu {
+  width: 16.875rem;
+}
+
+.c-sticky-page-menu__heading {
+  color: var(--wp--preset--color--blue-medium);
+  margin: 0 0 1.25rem;
+}
+
+.c-sticky-page-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-sticky-page-menu__item {
+  border-left: 0.1875rem solid transparent;
+  padding-left: 0.8125rem;
+}
+
+.c-sticky-page-menu__item--active {
+  border-left-color: var(--wp--preset--color--blue-medium);
+}
+
+.c-sticky-page-menu__link {
+  display: block;
+  color: var(--wp--preset--color--charcoal);
+  text-decoration: none;
+
+  .c-sticky-page-menu__item--active & {
+    font-weight: 700;
+  }
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
