@@ -13,5 +13,6 @@ import './primary-nav.js';
 import './video-background.js';
 import './journey-planner-widget.js';
 import './video-hero.js';
+import './filter-checkboxes.js';
 import '../styles/app.scss';
 
