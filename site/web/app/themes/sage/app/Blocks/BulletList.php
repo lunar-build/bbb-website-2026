@@ -5,28 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class FaqAccordion extends Block
+class BulletList extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'FAQ Accordion';
+    public $name = 'Bullet List';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'faq-accordion';
+    public $slug = 'bullet-list';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A list of expandable question and answer items.';
+    public $description = 'A styled bullet list with an optional heading, for use within article content.';
 
     /**
      * The block category.
@@ -40,7 +40,7 @@ class FaqAccordion extends Block
      *
      * @var string|array
      */
-    public $icon = 'editor-help';
+    public $icon = 'editor-ul';
 
     /**
      * The block keywords.
@@ -48,10 +48,9 @@ class FaqAccordion extends Block
      * @var array
      */
     public $keywords = [
-        'faq',
-        'accordion',
-        'questions',
-        'answers',
+        'bullet',
+        'list',
+        'ul',
     ];
 
     /**
@@ -80,7 +79,7 @@ class FaqAccordion extends Block
      *
      * @var string
      */
-    public $mode = 'preview';
+    public $mode = 'auto';
 
     /**
      * The default block alignment.
@@ -154,26 +153,16 @@ class FaqAccordion extends Block
      * @var array
      */
     public $example = [
-        'heading' => 'Frequently asked questions',
+        'heading' => 'Example of non-urgent',
         'items' => [
-            [
-                'question' => 'How do I borrow a bike?',
-                'answer' => 'Sign up online, choose a scheme near you, and pick up your bike from one of our local hubs.',
-            ],
-            [
-                'question' => 'How long can I keep the bike for?',
-                'answer' => 'Loan periods vary by scheme, but most run for up to a month at a time.',
-            ],
-            [
-                'question' => 'What if something goes wrong with the bike?',
-                'answer' => 'Get in touch with your local scheme coordinator and we\'ll arrange a repair or replacement.',
-            ],
+            ['text' => 'Missing cycle signage'],
+            ['text' => 'Road markings'],
+            ['text' => 'Potholes'],
+            ['text' => 'Cycle lane needs resurfacing'],
+            ['text' => 'Cutting back brambles'],
         ],
     ];
 
-    /**
-     * Data to be passed to the block before rendering.
-     */
     public function with(): array
     {
         return [
@@ -182,31 +171,24 @@ class FaqAccordion extends Block
         ];
     }
 
-    /**
-     * The block field group.
-     */
     public function fields(): array
     {
-        $fields = Builder::make('faq_accordion');
+        $fields = Builder::make('bullet_list');
 
         $fields
             ->addText('heading', [
                 'label' => 'Heading',
+                'instructions' => 'Optional heading shown above the list.',
+                'required' => 0,
             ])
             ->addRepeater('items', [
-                'label' => 'Questions',
-                'button_label' => 'Add question',
+                'label' => 'List items',
+                'button_label' => 'Add item',
                 'min' => 1,
-                'layout' => 'block',
+                'layout' => 'table',
             ])
-                ->addText('question', [
-                    'label' => 'Question',
-                    'required' => 1,
-                ])
-                ->addTextarea('answer', [
-                    'label' => 'Answer',
-                    'rows' => 3,
-                    'new_lines' => 'wpautop', // wraps each blank-line-separated block in <p> — matches Copy/Quote's convention
+                ->addText('text', [
+                    'label' => 'Item text',
                     'required' => 1,
                 ])
             ->endRepeater();
@@ -214,29 +196,17 @@ class FaqAccordion extends Block
         return $fields->build();
     }
 
-    /**
-     * Retrieve the heading.
-     *
-     * @return string
-     */
     public function heading()
     {
         return get_field('heading') ?: $this->example['heading'];
     }
 
-    /**
-     * Retrieve the FAQ items.
-     *
-     * @return array
-     */
     public function items()
     {
         return get_field('items') ?: $this->example['items'];
     }
 
     /**
-     * Assets enqueued with 'enqueue_block_assets' when rendering the block.
-     *
      * @link https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/#editor-content-scripts-and-styles
      */
     public function assets(array $block): void
