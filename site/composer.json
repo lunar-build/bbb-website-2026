@@ -46,7 +46,7 @@
     }
   ],
   "require": {
-    "php": ">=8.3",
+    "php": ">=8.4",
     "composer/installers": "^2.0",
     "gravityforms/gravityforms": "^3.0",
     "oscarotero/env": "^2.0",
