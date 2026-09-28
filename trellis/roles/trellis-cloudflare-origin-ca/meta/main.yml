@@ -1,0 +1,20 @@
+galaxy_info:
+  author: Tang Rufus
+  description: Add Cloudflare Origin CA to Trellis as a SSL provider
+  company: Typist Tech
+  issue_tracker_url: https://github.com/TypistTech/trellis-cloudflare-origin-ca/issues
+  license: MIT
+  min_ansible_version: 2.10
+  platforms:
+  - name: Ubuntu
+    versions:
+    - bionic
+    - focal
+  galaxy_tags:
+    - trellis
+    - wordpress
+    - nginx
+    - cloudflare
+    - ssl
+    - https
+dependencies: []

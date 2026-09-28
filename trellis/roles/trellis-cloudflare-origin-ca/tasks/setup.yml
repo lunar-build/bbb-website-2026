@@ -1,0 +1,27 @@
+---
+# - name: Add Cloudflare key
+#   apt_key:
+#     url: 'https://pkg.cloudflare.com/cloudflare-main.gpg'
+
+# - name: Add Cloudflare PPA
+#   apt_repository:
+#     repo: 'deb https://pkg.cloudflare.com/cloudflared buster main'
+
+# - name: Install cloudflared
+#   apt:
+#     name: cloudflared
+#     update_cache: yes
+#     cache_valid_time: "{{ apt_cache_valid_time }}"
+
+# - name: Install CFCA
+#   apt:
+#     name: cfca
+#     state: "{{ cfca_package_state }}"
+#     update_cache: yes
+#     cache_valid_time: "{{ apt_cache_valid_time }}"
+
+- name: Create directory and set permission
+  file:
+    path: "{{ nginx_ssl_path }}/cloudflare-origin-ca"
+    mode: '0700'
+    state: directory
