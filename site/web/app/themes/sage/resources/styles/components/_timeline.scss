@@ -47,6 +47,12 @@
   margin: 0;
 }
 
+// No heading: centre copy block on the marker's height instead of baseline-
+// aligning its first line, so a two-line wrap still centres correctly.
+.c-timeline__step--no-heading {
+  align-items: center;
+}
+
 .c-timeline__marker-col {
   flex: none;
   display: flex;
@@ -63,6 +69,7 @@
   justify-content: center;
   width: var(--timeline-marker-size);
   height: var(--timeline-marker-size);
+  margin-bottom: 0; // override .u-heading-4's margin-bottom
   padding-inline: 0.25rem;
   border-radius: 1.25rem; // 20px
   background: var(--wp--preset--color--yellow);

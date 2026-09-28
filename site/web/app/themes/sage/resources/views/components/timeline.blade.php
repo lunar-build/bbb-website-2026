@@ -11,7 +11,7 @@
       }
     @endphp
 
-    <li class="c-timeline__step">
+    <li @class(['c-timeline__step', 'c-timeline__step--no-heading' => empty($step['heading'])])>
       <span class="c-timeline__marker-col">
         @if ($datetime)
           <time class="c-timeline__marker u-heading-4" datetime="{{ $datetime }}">{{ $label }}</time>
