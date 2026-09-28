@@ -356,16 +356,24 @@ class LinkCard extends Block
      * returns an array, but a legacy/incomplete row can store a plain
      * string (or nothing at all), which would fatal on array access.
      *
+     * An empty title would otherwise render an `<a>` with no accessible
+     * name (the arrow icon is aria-hidden) — fall back to a generic label
+     * so the link always announces its purpose (WCAG 2.4.4).
+     *
      * @param  mixed  $link
      * @return array
      */
     protected function normalizeLink($link)
     {
         if (is_array($link)) {
-            return $link + ['title' => '', 'url' => '#', 'target' => ''];
+            $link = $link + ['title' => '', 'url' => '#', 'target' => ''];
+        } else {
+            $link = ['title' => '', 'url' => (string) $link, 'target' => ''];
         }
 
-        return ['title' => '', 'url' => (string) $link, 'target' => ''];
+        $link['title'] = $link['title'] ?: 'Visit website';
+
+        return $link;
     }
 
     /**
