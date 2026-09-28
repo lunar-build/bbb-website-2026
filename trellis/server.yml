@@ -31,7 +31,7 @@
     - { role: composer, tags: [composer] }
     - { role: wp-cli, tags: [wp-cli] }
     - { role: letsencrypt, tags: [letsencrypt], when: sites_using_letsencrypt | count > 0 }
-    - { role: wordpress-setup, tags: [wordpress, wordpress-setup, letsencrypt] }
+    - { role: wordpress-setup, tags: [wordpress, wordpress-setup, letsencrypt, trellis-cloudflare-origin-ca] }
     - { role: trellis-cloudflare-origin-ca, tags: [cloudflare-origin-ca, wordpress-setup], when: sites_using_cloudflare_origin_ca | count }
     - { role: ssl-renewal, tags: [cloudflare-origin-ca, wordpress-setup] }
     - { role: bedrock-site-protect, tags: [htpasswd, wordpress, wordpress-setup, letsencrypt] } 
