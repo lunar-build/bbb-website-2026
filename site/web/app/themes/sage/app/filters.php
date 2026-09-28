@@ -6,11 +6,6 @@
 
 namespace App;
 
-/**
- * Add "… Continued" to the excerpt.
- *
- * @return string
- */
 add_filter('excerpt_more', function () {
     return sprintf(' &hellip; <a href="%s">%s</a>', get_permalink(), __('Continued', 'sage'));
 });
@@ -52,6 +47,27 @@ add_filter('render_block', function ($block_content, $block) {
         '<section class="c-block"><div class="o-container">%s</div></section>',
         $block_content,
     );
+}, 10, 2);
+
+/**
+ * Hide WordPress core's native Accordion blocks (added in WP 6.8) from the
+ * inserter — they share the "Accordion" name with our own ACF Composer
+ * block (app/Blocks/Accordion.php) and editors have picked the wrong one
+ * by mistake. Our block covers every accordion use case in this theme.
+ */
+add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
+    if (! is_array($allowedBlockTypes)) {
+        $allowedBlockTypes = array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered());
+    }
+
+    $hidden = [
+        'core/accordion',
+        'core/accordion-item',
+        'core/accordion-heading',
+        'core/accordion-panel',
+    ];
+
+    return array_values(array_diff($allowedBlockTypes, $hidden));
 }, 10, 2);
 
 /**
