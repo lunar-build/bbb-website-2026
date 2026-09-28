@@ -15,6 +15,7 @@
 @use 'components/quote';
 @use 'components/icon-link-grid';
 @use 'components/timeline';
+@use 'components/bullet-list';
 @use 'components/video';
 @use 'components/pill';
 @use 'base/utilities';
@@ -33,3 +34,4 @@
 @use 'blocks/form';
 @use 'blocks/card-grid';
 @use 'blocks/two-column-content';
+@use 'blocks/accordion';

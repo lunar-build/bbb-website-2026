@@ -21,7 +21,11 @@
 
 .c-pattern-library__nav {
   position: sticky;
-  top: 2rem;
+  // Sits below the sticky site header (--site-header-height, set in
+  // resources/js/site-header.js) rather than a guessed constant — the
+  // header grew once the desktop nav row moved inside it, so a fixed
+  // offset here was letting the header cover the top of this nav.
+  top: calc(var(--site-header-height, 6rem) + 1rem);
   margin-block-start: 3rem;
   padding: 1.5rem;
   background: var(--wp--preset--color--lightest-grey);
