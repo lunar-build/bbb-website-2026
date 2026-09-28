@@ -2,24 +2,25 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class LinkCardList extends Block
+class LinkCard extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'Link Card List';
+    public $name = 'Link Card';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'link-card-list';
+    public $slug = 'link-card';
 
     /**
      * The block description.
@@ -157,7 +158,7 @@ class LinkCardList extends Block
     public $example = [
         'cards' => [
             [
-                'logo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                'logo' => true,
                 'title' => 'Report a non-urgent issue',
                 'description' => 'Help keep yourself and others safe by reporting any road or street faults you see on your cycle routes to the relevant local authority.',
                 'cta_type' => 'link',
@@ -171,7 +172,7 @@ class LinkCardList extends Block
                 'link' => ['title' => 'Visit website', 'url' => '#', 'target' => ''],
             ],
             [
-                'logo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                'logo' => true,
                 'title' => 'City of Bath',
                 'description' => 'Cycle routes in the Bath area.',
                 'cta_type' => 'download',
@@ -181,6 +182,26 @@ class LinkCardList extends Block
             ],
         ],
     ];
+
+    /**
+     * Swap the `true` logo placeholders in the static example above for a
+     * computed placeholder asset URL (Vite::asset isn't available yet when
+     * the static property is declared).
+     *
+     * @return array
+     */
+    public function example(): array
+    {
+        $placeholder = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''];
+
+        $cards = array_map(function ($card) use ($placeholder) {
+            $card['logo'] = $card['logo'] ? $placeholder : null;
+
+            return $card;
+        }, $this->example['cards']);
+
+        return ['cards' => $cards];
+    }
 
     /**
      * Data to be passed to the block before rendering.
@@ -197,7 +218,7 @@ class LinkCardList extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('link_card_list');
+        $fields = Builder::make('link_card');
 
         $fields
             ->addTab('Content')

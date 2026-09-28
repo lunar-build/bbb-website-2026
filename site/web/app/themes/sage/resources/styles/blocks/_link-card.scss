@@ -3,9 +3,11 @@
 // and a right-aligned CTA that either links out (arrow icon) or triggers a
 // file download (download icon + file size label).
 
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
 @use '../components/button';
 
-.c-link-card-list__card {
+.c-link-card__card {
   display: flex;
   align-items: center;
   gap: 3.3125rem;
@@ -19,7 +21,10 @@
     margin-bottom: 0;
   }
 
-  @media (max-width: 37.5rem) {
+  // Stacks earlier than the usual $sm cutoff — the card's long single-line
+  // CTA/description text wraps awkwardly on tablet-width screens while
+  // still in row layout.
+  @include bp.respond($max: bp.$md) {
     flex-direction: column;
     align-items: stretch;
     gap: 1.25rem;
@@ -27,16 +32,20 @@
   }
 }
 
-.c-link-card-list__card--no-logo {
+.c-link-card__card--no-logo {
   gap: 1.5rem;
 }
 
-.c-link-card-list__logo {
+.c-link-card__logo {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 8.75rem;
+
+  @include bp.respond($max: bp.$md) {
+    margin: 0 auto;
+  }
 
   img {
     display: block;
@@ -45,37 +54,44 @@
   }
 }
 
-.c-link-card-list__content {
+.c-link-card__content {
   flex: 1 0 0;
   min-width: 0;
 }
 
-.c-link-card-list__title {
+.c-link-card__title {
   color: var(--wp--preset--color--blue-medium);
+
+  // Description is optional — when title is the only line in &__content,
+  // its base heading margin-bottom would throw it off-centre in the
+  // vertically centred card row.
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
-.c-link-card-list__description {
+.c-link-card__description {
   color: var(--wp--preset--color--charcoal);
   margin: 0;
 }
 
-.c-link-card-list__cta {
+.c-link-card__cta {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.25rem;
 
-  .c-link-card-list__card--no-logo & {
+  .c-link-card__card--no-logo & {
     align-items: center;
   }
 
-  @media (max-width: 37.5rem) {
+  @include bp.respond($max: bp.$md) {
     align-items: center;
   }
 }
 
-.c-link-card-list__cta-link {
+.c-link-card__cta-link {
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
@@ -83,12 +99,20 @@
   text-decoration: none;
   white-space: nowrap;
 
+  @include focus.ring;
+
   &:hover,
   &:focus-visible {
     @include button.arrow-hover;
   }
+
+  // Right padding stops the focus outline overlapping the arrow as it
+  // animates to the right on hover/focus.
+  .c-icon--arrow-right {
+    padding-right: 0.5rem;
+  }
 }
 
-.c-link-card-list__file-size {
+.c-link-card__file-size {
   color: var(--wp--preset--color--charcoal);
 }
