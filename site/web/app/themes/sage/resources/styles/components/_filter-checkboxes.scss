@@ -34,16 +34,15 @@ $breakpoint-desktop: 37.5rem;
     display: none;
   }
 
+  @media (max-width: $breakpoint-desktop) {
+    padding: 1rem;
+    background: var(--wp--preset--color--lightest-grey);
+    border-radius: 0.625rem;
+  }
+
   @media (min-width: $breakpoint-desktop) {
     &[hidden] {
       display: block;
     }
-  }
-}
-
-.c-filter-checkboxes__group {
-  @media (max-width: $breakpoint-desktop) {
-    padding: 1rem;
-    background: var(--wp--preset--color--lightest-grey);
   }
 }

@@ -18,7 +18,7 @@
 @if (count($groups))
     <div {{ $attributes->class(['c-filter-checkboxes']) }}>
         <button type="button" class="c-filter-checkboxes__toggle" aria-expanded="false" aria-controls="{{ $attributes->get('id', 'filter-checkboxes') }}-panel">
-            <span class="c-filter-checkboxes__toggle-label">{{ sprintf(_n('%d filter selected', '%d filters selected', $selectedCount, 'sage'), $selectedCount) }}</span>
+            <span class="c-filter-checkboxes__toggle-label" aria-live="polite" aria-atomic="true">{{ sprintf(_n('%d filter selected', '%d filters selected', $selectedCount, 'sage'), $selectedCount) }}</span>
             <x-icon name="chevron" />
         </button>
 

@@ -6,9 +6,9 @@
     'items' => [], // [['label' => string, 'name' => string|null, 'value' => string|null, 'checked' => bool], ...]
 ])
 
-<div {{ $attributes->class(['c-filter-checkbox-group']) }}>
+<fieldset {{ $attributes->class(['c-filter-checkbox-group']) }}>
     @if ($heading)
-        <p class="c-filter-checkbox-group__heading u-table-column-heading">{{ $heading }}</p>
+        <legend class="c-filter-checkbox-group__heading u-table-column-heading">{{ $heading }}</legend>
     @endif
 
     <div class="c-filter-checkbox-group__items">
@@ -22,4 +22,4 @@
             />
         @endforeach
     </div>
-</div>
+</fieldset>
