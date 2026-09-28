@@ -3,12 +3,17 @@
 // links, either compact Anonymous Pro links grouped under an icon, or
 // larger headline-style links with an optional description underneath.
 
+@use '../base/focus';
 @use '../components/button';
 
 .c-link-list__group {
   display: flex;
   flex-direction: column;
   gap: 1.875rem;
+
+  .c-icon.c-icon--arrow-right {
+    padding-right: 0.5rem;
+  }
 }
 
 .c-link-list__icon {
@@ -39,6 +44,8 @@
   color: var(--wp--preset--color--blue-medium);
   text-decoration: none;
 
+  @include focus.ring;
+
   &:hover,
   &:focus-visible {
     @include button.arrow-hover;
@@ -64,6 +71,8 @@
   align-self: flex-start;
   color: var(--wp--preset--color--blue-medium);
   text-decoration: none;
+
+  @include focus.ring;
 
   &:hover,
   &:focus-visible {
