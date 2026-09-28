@@ -155,11 +155,12 @@ class LinkList extends Block
      */
     public $example = [
         'layout' => 'short_centred',
+        'icon' => 'cycling-route',
         'links' => [
-            ['icon' => 'cycling-route', 'title' => 'Bristol Cycle routes', 'description' => '', 'link' => ['title' => 'Bristol Cycle routes', 'url' => '#', 'target' => '']],
-            ['icon' => '', 'title' => 'Bath & NE Somerset cycle routes', 'description' => '', 'link' => ['title' => 'Bath & NE Somerset cycle routes', 'url' => '#', 'target' => '']],
-            ['icon' => '', 'title' => 'North Somerset cycle routes', 'description' => '', 'link' => ['title' => 'North Somerset cycle routes', 'url' => '#', 'target' => '']],
-            ['icon' => '', 'title' => 'South Glos Cycle routes', 'description' => '', 'link' => ['title' => 'South Glos Cycle routes', 'url' => '#', 'target' => '']],
+            ['description' => '', 'link' => ['title' => 'Bristol Cycle routes', 'url' => '#', 'target' => '']],
+            ['description' => '', 'link' => ['title' => 'Bath & NE Somerset cycle routes', 'url' => '#', 'target' => '']],
+            ['description' => '', 'link' => ['title' => 'North Somerset cycle routes', 'url' => '#', 'target' => '']],
+            ['description' => '', 'link' => ['title' => 'South Glos Cycle routes', 'url' => '#', 'target' => '']],
         ],
     ];
 
@@ -177,22 +178,17 @@ class LinkList extends Block
         ],
         'Long-form, with text' => [
             'layout' => 'long_with_text',
+            'icon' => '',
             'links' => [
                 [
-                    'icon' => '',
-                    'title' => 'Bath Cycling club',
                     'description' => 'Caters for a wide variety of cycling interests and a full range of ability and age.',
                     'link' => ['title' => 'Bath Cycling club', 'url' => '#', 'target' => ''],
                 ],
                 [
-                    'icon' => '',
-                    'title' => 'Bitton and Oldland Cycling Club',
                     'description' => 'A social cycling community, launched in February 2026. Whether you are a seasoned cyclist or haven\'t been on a bike in years, join a "Bimbles" — rides where we prioritise friendship and fun over speed and endurance.',
                     'link' => ['title' => 'Bitton and Oldland Cycling Club', 'url' => '#', 'target' => ''],
                 ],
                 [
-                    'icon' => '',
-                    'title' => 'Clevedon and District Road Club',
                     'description' => 'Have Sunday runs starting from Clevedon Triangle all year.',
                     'link' => ['title' => 'Clevedon and District Road Club', 'url' => '#', 'target' => ''],
                 ],
@@ -200,10 +196,11 @@ class LinkList extends Block
         ],
         'Long-form, just links' => [
             'layout' => 'long_just_links',
+            'icon' => '',
             'links' => [
-                ['icon' => '', 'title' => 'Bath Cycling club', 'description' => '', 'link' => ['title' => 'Bath Cycling club', 'url' => '#', 'target' => '']],
-                ['icon' => '', 'title' => 'Bitton and Oldland Cycling Club', 'description' => '', 'link' => ['title' => 'Bitton and Oldland Cycling Club', 'url' => '#', 'target' => '']],
-                ['icon' => '', 'title' => 'Clevedon and District Road Club', 'description' => '', 'link' => ['title' => 'Clevedon and District Road Club', 'url' => '#', 'target' => '']],
+                ['description' => '', 'link' => ['title' => 'Bath Cycling club', 'url' => '#', 'target' => '']],
+                ['description' => '', 'link' => ['title' => 'Bitton and Oldland Cycling Club', 'url' => '#', 'target' => '']],
+                ['description' => '', 'link' => ['title' => 'Clevedon and District Road Club', 'url' => '#', 'target' => '']],
             ],
         ],
     ];
@@ -215,6 +212,7 @@ class LinkList extends Block
     {
         return [
             'layout' => $this->layout(),
+            'icon' => $this->icon(),
             'links' => $this->links(),
         ];
     }
@@ -239,21 +237,112 @@ class LinkList extends Block
                     'default_value' => 'short_centred',
                     'ui' => true,
                 ])
-                ->addRepeater('links', [
+            ->addTab('Short-form, centred', [
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'layout',
+                            'operator' => '==',
+                            'value' => 'short_centred',
+                        ],
+                    ],
+                ],
+            ])
+                ->addSelect('short_centred_icon', [
+                    'label' => 'Icon',
+                    'instructions' => 'Optional — shown once above the whole list.',
+                    'choices' => svg_icon_choices(),
+                    'allow_null' => true,
+                    'ui' => 1,
+                    'placeholder' => 'None',
+                ])
+                ->addRepeater('short_centred_links', [
                     'label' => 'Links',
                     'button_label' => 'Add link',
                     'min' => 1,
                     'layout' => 'block',
                 ])
-                    ->addText('icon', [
-                        'label' => 'Group icon',
-                        'instructions' => 'Optional. Short-form layouts only — shown above this link to start a new visual group (e.g. one icon per area). Enter an icon name from resources/svg/, e.g. "cycling-route".',
+                    ->addLink('link', [
+                        'label' => 'Link',
+                        'instructions' => "Link's title is used as the link text.",
+                        'required' => true,
                     ])
+                ->endRepeater()
+            ->addTab('Short-form, left align', [
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'layout',
+                            'operator' => '==',
+                            'value' => 'short_left',
+                        ],
+                    ],
+                ],
+            ])
+                ->addSelect('short_left_icon', [
+                    'label' => 'Icon',
+                    'instructions' => 'Optional — shown once above the whole list.',
+                    'choices' => svg_icon_choices(),
+                    'allow_null' => true,
+                    'ui' => 1,
+                    'placeholder' => 'None',
+                ])
+                ->addRepeater('short_left_links', [
+                    'label' => 'Links',
+                    'button_label' => 'Add link',
+                    'min' => 1,
+                    'layout' => 'block',
+                ])
+                    ->addLink('link', [
+                        'label' => 'Link',
+                        'instructions' => "Link's title is used as the link text.",
+                        'required' => true,
+                    ])
+                ->endRepeater()
+            ->addTab('Long-form, with text', [
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'layout',
+                            'operator' => '==',
+                            'value' => 'long_with_text',
+                        ],
+                    ],
+                ],
+            ])
+                ->addRepeater('long_with_text_links', [
+                    'label' => 'Links',
+                    'button_label' => 'Add link',
+                    'min' => 1,
+                    'layout' => 'block',
+                ])
                     ->addTextarea('description', [
                         'label' => 'Description',
-                        'instructions' => 'Optional. Long-form "with text" layout only.',
                         'rows' => 2,
                     ])
+                    ->addLink('link', [
+                        'label' => 'Link',
+                        'instructions' => "Link's title is used as the link text.",
+                        'required' => true,
+                    ])
+                ->endRepeater()
+            ->addTab('Long-form, just links', [
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'layout',
+                            'operator' => '==',
+                            'value' => 'long_just_links',
+                        ],
+                    ],
+                ],
+            ])
+                ->addRepeater('long_just_links_links', [
+                    'label' => 'Links',
+                    'button_label' => 'Add link',
+                    'min' => 1,
+                    'layout' => 'block',
+                ])
                     ->addLink('link', [
                         'label' => 'Link',
                         'instructions' => "Link's title is used as the link text.",
@@ -275,16 +364,46 @@ class LinkList extends Block
     }
 
     /**
-     * Retrieve the links.
+     * Retrieve the single icon shown above the whole list — short-form
+     * layouts only, one per list rather than one per link.
+     *
+     * @return string
+     */
+    public function icon()
+    {
+        $field = match ($this->layout()) {
+            'short_centred' => 'short_centred_icon',
+            'short_left' => 'short_left_icon',
+            default => null,
+        };
+
+        if (! $field) {
+            return '';
+        }
+
+        return get_field($field) ?: $this->example['icon'];
+    }
+
+    /**
+     * Retrieve the links, from the repeater matching the selected layout —
+     * each layout has its own repeater/field set (see fields()) so editors
+     * only ever see fields relevant to their chosen layout.
      *
      * @return array
      */
     public function links()
     {
-        $rows = get_field('links') ?: $this->example['links'];
+        $field = match ($this->layout()) {
+            'short_centred' => 'short_centred_links',
+            'short_left' => 'short_left_links',
+            'long_with_text' => 'long_with_text_links',
+            'long_just_links' => 'long_just_links_links',
+            default => 'short_centred_links',
+        };
+
+        $rows = get_field($field) ?: $this->example['links'];
 
         return array_map(fn($row) => [
-            'icon' => $row['icon'] ?? '',
             'description' => $row['description'] ?? '',
             'link' => $this->normalizeLink($row['link'] ?? null),
         ], $rows);
