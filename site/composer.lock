@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c06bbb0ce8c31278476224c635e3938",
+    "content-hash": "fbe3dcf91663fad037e0c5150face353",
     "packages": [
         {
             "name": "cloudflare/cf-ip-rewrite",
@@ -1985,6 +1985,37 @@
             "time": "2026-09-18T19:40:57+00:00"
         },
         {
+            "name": "wp-plugin/wordfence",
+            "version": "9.0.1",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wordfence/",
+                "reference": "tags/9.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wordfence.9.0.1.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Mark Maunder"
+                }
+            ],
+            "description": "Firewall, Malware Scanner, Two Factor Auth, and Comprehensive Security Features, powered by our 24-hour team. Make security a priority with Wordfence.",
+            "homepage": "https://www.wordfence.com/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/wordfence/#developers",
+                "issues": "https://wordpress.org/support/plugin/wordfence",
+                "source": "https://plugins.svn.wordpress.org/wordfence"
+            },
+            "time": "2026-09-08T15:41:22+00:00"
+        },
+        {
             "name": "wp-plugin/wordpress-seo",
             "version": "28.6",
             "source": {
@@ -2045,6 +2076,36 @@
                 "source": "https://plugins.svn.wordpress.org/wp-mail-smtp"
             },
             "time": "2026-06-25T08:56:20+00:00"
+        },
+        {
+            "name": "wp-plugin/wps-hide-login",
+            "version": "1.9.19",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wps-hide-login/",
+                "reference": "tags/1.9.19"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wps-hide-login.1.9.19.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Remy Perona"
+                }
+            ],
+            "description": "Change wp-login.php to anything you want.",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/wps-hide-login/#developers",
+                "issues": "https://wordpress.org/support/plugin/wps-hide-login",
+                "source": "https://plugins.svn.wordpress.org/wps-hide-login"
+            },
+            "time": "2026-08-13T08:36:23+00:00"
         },
         {
             "name": "wp-plugin/wpscan",
