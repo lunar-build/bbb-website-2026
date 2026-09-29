@@ -1,0 +1,60 @@
+// Figma node 7:2013/7:2022 — testimonial card used inside the Testimonial
+// Card Carousel block's <wa-carousel-item>s (also listed standalone in the
+// pattern library's "Components" section).
+//
+// Reuses <x-quote layout="centered"> for the mark + quote body (blue quote
+// text is already that layout's override — see components/_quote.scss).
+// The name is a heading ABOVE the quote in this design, not <x-quote>'s
+// attribution slot, so it's a separate element here.
+@use '../abstracts/breakpoints' as bp;
+
+.c-testimonial-card {
+  display: grid;
+  height: 100%;
+  border-radius: 1.25rem; // 20px
+  overflow: hidden;
+  background: var(--wp--preset--color--white);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: minmax(0, 235fr) minmax(0, 335fr); // Figma's 235:335 photo/content ratio
+  }
+
+  &__photo {
+    aspect-ratio: 235 / 335;
+
+    @include bp.respond($min: bp.$md) {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  &__name {
+    color: var(--wp--preset--color--blue);
+    margin-bottom: 0;
+  }
+
+  &__quote {
+    max-width: none; // .c-quote's own 46rem cap isn't needed at card width
+  }
+
+  &__cta {
+    margin-top: auto;
+  }
+}

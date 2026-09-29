@@ -13,6 +13,7 @@
 @use 'components/footer';
 @use 'components/breadcrumbs';
 @use 'components/quote';
+@use 'components/testimonial-card';
 @use 'components/callout-text';
 @use 'components/icon-link-grid';
 @use 'components/bullet-list';
@@ -37,3 +38,4 @@
 @use 'blocks/card-grid';
 @use 'blocks/two-column-content';
 @use 'blocks/accordion';
+@use 'blocks/testimonial-card-carousel';

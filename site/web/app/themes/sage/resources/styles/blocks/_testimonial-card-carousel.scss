@@ -1,0 +1,56 @@
+// Figma node 7:2047 "Carousel | Cards" — a <wa-carousel> of
+// <x-testimonial-card>s. Arrow glyph/classnames (.c-testimonial-carousel__nav-icon)
+// are intentionally the shared convention across all 3 carousel blocks
+// (Quote, this one, Rolling Stats) — see the Trello card's "Shared carousel
+// arrows" note — so styling only needs doing once regardless of which block
+// lands first; no shared abstraction is extracted yet.
+
+.c-testimonial-carousel {
+  &__carousel {
+    --aspect-ratio: auto;
+
+    display: block;
+  }
+
+  &__item {
+    display: flex;
+    height: auto;
+    padding-inline: 0.25rem; // small breathing room between slide edge and card shadow
+  }
+
+  // Web Awesome's carousel exposes these CSS parts (base, pagination,
+  // pagination-item, pagination-item--active, navigation, navigation-button)
+  // for styling the built-in dots/arrows without replacing the mechanics.
+  &__carousel::part(pagination) {
+    margin-top: 1.5rem;
+  }
+
+  &__carousel::part(pagination-item) {
+    width: 0.625rem;
+    height: 0.625rem;
+    border: 1px solid var(--wp--preset--color--blue);
+    background: transparent;
+  }
+
+  &__carousel::part(pagination-item--active) {
+    background: var(--wp--preset--color--blue);
+  }
+
+  &__carousel::part(navigation-button) {
+    color: var(--wp--preset--color--dark-orange);
+  }
+
+  &__nav-icon {
+    display: inline-flex;
+    color: var(--wp--preset--color--dark-orange);
+
+    svg {
+      width: 1.8125rem; // 29px, matches Figma's arrow glyph width
+      height: 0.75rem; // 12px
+    }
+  }
+
+  &__nav-icon--prev {
+    transform: scaleX(-1); // arrow-right.svg flipped, no separate left-pointing asset
+  }
+}
