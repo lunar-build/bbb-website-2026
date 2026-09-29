@@ -1,11 +1,7 @@
-// Figma node 7:2013/7:2022 — testimonial card used inside the Testimonial
-// Card Carousel block's <wa-carousel-item>s (also listed standalone in the
-// pattern library's "Components" section).
-//
-// Reuses <x-quote layout="centered"> for the mark + quote body (blue quote
-// text is already that layout's override — see components/_quote.scss).
-// The name is a heading ABOVE the quote in this design, not <x-quote>'s
-// attribution slot, so it's a separate element here.
+// Figma node 7:2013/7:2022 — reuses <x-quote layout="centered"> for the mark +
+// quote body (blue text is already that layout's override, see
+// components/_quote.scss); the name here is a heading ABOVE the quote, not
+// <x-quote>'s attribution slot, so it's a separate element.
 @use '../abstracts/breakpoints' as bp;
 
 .c-testimonial-card {

@@ -8,14 +8,13 @@
 
 .c-testimonial-carousel {
   &__carousel {
-    // wa-carousel's own :host default is `--aspect-ratio: 16/9`, which
-    // gives `.slides` a definite height (aspect-ratio-derived) — its
-    // `grid-auto-rows: 100%` would then resolve against that real number,
-    // producing a fixed row height with no relation to the cards' actual
-    // content. Force it invalid instead (`calc(auto * n)` has no result),
-    // so the row's height is indefinite and sized from content instead —
-    // see the `scroll-container` part rule below for why that's what
-    // makes every card match the tallest one's height.
+    // wa-carousel's own :host default (`--aspect-ratio: 16/9`) gives
+    // `.slides` a definite height, so its `grid-auto-rows: 100%` resolves
+    // against a real number — a fixed row height unrelated to the cards'
+    // content. Force it invalid instead (`calc(auto * n)` has no result) so
+    // the row's height is indefinite and content-sized — see the
+    // `scroll-container` rule below for why that makes every card match
+    // the tallest one's height.
     --aspect-ratio: auto;
 
     display: block;
@@ -26,20 +25,15 @@
     padding-inline: 0.25rem; // small breathing room between slide edge and card shadow
   }
 
-  // Web Awesome's carousel exposes these CSS parts (carousel, scroll-container,
-  // pagination, pagination-item, pagination-item--active, navigation,
-  // navigation-button) for styling the built-in slides/dots/arrows without
-  // replacing the mechanics.
-  //
-  // By default the buttons sit level with the slides, flanking the cards at
-  // the outer edges of the whole grid (its `carousel` part is
-  // `min-content 1fr min-content` columns × `1fr min-content` rows, with
-  // `scroll-container`/`pagination` both in the wide middle column and the
-  // buttons in the narrow outer ones) — this design instead wants the
-  // arrows down with the pagination dots, one either side with only minor
-  // spacing between. Re-template the grid so row 2 is its own tight
-  // [previous, pagination, next] cluster, centred by two flexible outer
-  // gutter columns, rather than reusing the slides row's edge-to-edge ones.
+  // wa-carousel exposes ::part() hooks (carousel, scroll-container,
+  // pagination, navigation-button, ...) for styling its built-in slides/
+  // dots/arrows without replacing the mechanics. By default the nav
+  // buttons flank the full card row at its outer edges, level with the
+  // slides — this design wants them down with the pagination dots instead,
+  // one either side with only minor spacing. Re-template the grid so row 2
+  // is its own tight [previous, pagination, next] cluster, centred by
+  // flexible outer gutter columns, rather than reusing the slides row's
+  // edge-to-edge ones.
   &__carousel::part(carousel) {
     grid-template-columns: 1fr auto auto auto 1fr;
     column-gap: 0.5rem;
@@ -47,27 +41,24 @@
 
   &__carousel::part(scroll-container) {
     grid-column: 1 / -1;
-    // Its own default (align-items: center) leaves every visible slide at
-    // its own content height, so shorter testimonials just float centred
-    // in whatever gap is left instead of the row growing to match the
-    // tallest card. Stretch instead: with no explicit --aspect-ratio, the
-    // row's height is indefinite (its `grid-auto-rows: 100%` then acts as
-    // `auto` per spec), so it auto-sizes to the tallest slide's natural
-    // content height and every other slide stretches to fill it — no JS
-    // measurement needed.
+    // Default (align-items: center) leaves each slide at its own content
+    // height, so shorter testimonials float in whatever gap is left
+    // instead of the row growing to match the tallest card. Stretch
+    // instead: with --aspect-ratio invalid above, the row's height is
+    // indefinite (its `grid-auto-rows: 100%` acts as `auto`), so it sizes
+    // to the tallest slide's content and every other slide stretches to
+    // fill it — no JS measurement needed.
     align-items: stretch;
-    // This part also carries the component's own `overflow-y: hidden`
-    // (it only wants horizontal slide scrolling) — with the row now an
-    // exact fit to the cards' content, that clips the cards' own
-    // box-shadow top/bottom. Pad the scrollable area itself so the shadow
-    // has room to render inside the clip, same idea as __item's inline
-    // padding for the shadow between/beside cards.
+    // This part also carries WA's own overflow-y: hidden (horizontal-only
+    // scrolling) — with the row now an exact fit to the cards, that clips
+    // their box-shadow top/bottom. Pad the scrollable area itself so the
+    // shadow has room inside the clip (same idea as __item's inline
+    // padding for the shadow between/beside cards).
     padding-block: 0.25rem;
-    // This is what's actually focusable when tabbing/arrow-keying through
-    // the carousel — WA gives it `tabindex="0"` for keyboard slide
-    // navigation — so it's effectively "the card" gaining focus even
-    // though the ring itself sits on the scroll-container, not the card
-    // markup. Use the site's shared ring instead of WA's own default one.
+    // This is what's actually focusable via tab/arrow-keys — WA gives it
+    // tabindex="0" for keyboard slide navigation — so it's effectively
+    // "the card" gaining focus even though the ring sits on
+    // scroll-container, not the card markup itself.
     @include focus.ring;
   }
 

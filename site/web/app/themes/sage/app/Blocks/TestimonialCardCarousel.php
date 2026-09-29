@@ -189,13 +189,10 @@ class TestimonialCardCarousel extends Block
         $placeholder = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''];
 
         return [
-            'cards' => array_map(fn ($card) => array_merge($card, ['photo' => $placeholder]), $this->example['cards']),
+            'cards' => array_map(fn($card) => array_merge($card, ['photo' => $placeholder]), $this->example['cards']),
         ];
     }
 
-    /**
-     * Data to be passed to the block before rendering.
-     */
     public function with(): array
     {
         return [
@@ -203,9 +200,6 @@ class TestimonialCardCarousel extends Block
         ];
     }
 
-    /**
-     * The block field group.
-     */
     public function fields(): array
     {
         $fields = Builder::make('testimonial_card_carousel');
