@@ -27,7 +27,7 @@ class RollingStatsCarousel extends Block
      *
      * @var string
      */
-    public $description = 'A carousel of rotating big-number stats (e.g. "7.5 miles of cycling commuter routes in Bristol"), each with a supporting illustration and caption. Numbers count up when their slide becomes active.';
+    public $description = 'A carousel of rotating big-number stats (e.g. "7.5 miles of cycling commuter routes in Bristol"), flanked by optional left/right illustrations. Numbers spin up digit-by-digit, slot-counter style, when their slide becomes active.';
 
     /**
      * The block category.
@@ -150,11 +150,32 @@ class RollingStatsCarousel extends Block
     public $styles = [];
 
     /**
+     * Illustration choices for the block's left/right side images — a
+     * fixed, developer-controlled set (not an open media upload), so the
+     * front end always renders a bundled resources/images/illustrations/*
+     * asset rather than an arbitrary client-uploaded image. See
+     * App\Blocks\CtaBanner, which uses the same pattern.
+     *
+     * @var array
+     */
+    protected $illustrationChoices = [
+        '' => 'None',
+        'pump' => 'Bike pump',
+        'helmet' => 'Cycling helmet',
+        'bmx' => 'BMX rider',
+        'mountain_biker' => 'Mountain biker',
+        'instructor' => 'Cycle instructor',
+        'cyclist' => 'Cyclist on bike',
+    ];
+
+    /**
      * The block preview example data.
      *
      * @var array
      */
     public $example = [
+        'image_left' => 'pump',
+        'image_right' => 'helmet',
         'slides' => [
             [
                 'prefix_text' => 'There are',
@@ -178,29 +199,13 @@ class RollingStatsCarousel extends Block
     ];
 
     /**
-     * Fallback example data requiring a non-constant expression (Vite::asset).
-     *
-     * @return array
-     */
-    public function example(): array
-    {
-        $placeholder = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''];
-
-        $slides = $this->example['slides'];
-
-        foreach ($slides as &$slide) {
-            $slide['image'] = $placeholder;
-        }
-
-        return ['slides' => $slides];
-    }
-
-    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
         return [
+            'imageLeft' => $this->imageLeft(),
+            'imageRight' => $this->imageRight(),
             'slides' => $this->slides(),
         ];
     }
@@ -212,6 +217,22 @@ class RollingStatsCarousel extends Block
     {
         $fields = Builder::make('rolling_stats_carousel');
 
+        $fields
+            ->addSelect('image_left', [
+                'label' => 'Left illustration',
+                'choices' => $this->illustrationChoices,
+                'default_value' => '',
+                'ui' => true,
+                'allow_null' => true,
+            ])
+            ->addSelect('image_right', [
+                'label' => 'Right illustration',
+                'choices' => $this->illustrationChoices,
+                'default_value' => '',
+                'ui' => true,
+                'allow_null' => true,
+            ]);
+
         $slides = $fields->addRepeater('slides', [
             'label' => 'Slides',
             'button_label' => 'Add stat',
@@ -220,13 +241,6 @@ class RollingStatsCarousel extends Block
         ]);
 
         $slides
-            ->addImage('image', [
-                'label' => 'Illustration',
-                'instructions' => 'Supporting illustration shown alongside this stat (e.g. a helmet or pump graphic).',
-                'return_format' => 'array',
-                'preview_size' => 'medium',
-                'required' => 0,
-            ])
             ->addText('prefix_text', [
                 'label' => 'Intro text',
                 'instructions' => 'Shown above the number, e.g. "There are".',
@@ -254,25 +268,19 @@ class RollingStatsCarousel extends Block
     }
 
     /**
-     * Retrieve the slides, normalized to a safe shape with a real
-     * placeholder image and an accessible full-sentence fallback for
-     * screen readers (the number itself is animated presentationally).
+     * Retrieve the slides, normalized to a safe shape with an accessible
+     * full-sentence fallback for screen readers (the number itself is
+     * animated presentationally) and a pre-split 'digits' array driving the
+     * slot-counter reels — each entry is either a single digit character or
+     * '.', built server-side so the front end never has to re-derive it.
      *
      * @return array
      */
     public function slides()
     {
-        $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
-
         $slides = get_field('slides') ?: ($this->example['slides'] ?? []);
 
-        return array_map(function ($slide) use ($placeholder) {
-            $image = is_array($slide['image'] ?? null) ? $slide['image'] : [];
-
-            if (empty($image['url'])) {
-                $image = ['url' => $placeholder, 'alt' => $image['alt'] ?? ''];
-            }
-
+        return array_map(function ($slide) {
             $value = (float) ($slide['value'] ?? 0);
             $decimals = strlen(substr(strrchr((string) $value, '.'), 1) ?: '');
             $prefix = $slide['prefix_text'] ?? '';
@@ -280,22 +288,59 @@ class RollingStatsCarousel extends Block
             $caption = $slide['caption_text'] ?? '';
 
             // No thousands separator — matches the plain toFixed() output the
-            // JS count-up renders visually, so the sr-only sentence never
+            // JS slot counter renders visually, so the sr-only sentence never
             // disagrees with the number left on screen once it finishes.
             $formattedValue = number_format($value, $decimals, '.', '');
 
-            $accessibleText = trim(sprintf('%s %s%s %s', $prefix, $formattedValue, $unit ? ' '.$unit : '', $caption));
+            $accessibleText = trim(sprintf('%s %s%s %s', $prefix, $formattedValue, $unit ? ' ' . $unit : '', $caption));
 
             return [
-                'image' => $image,
                 'prefix' => $prefix,
                 'value' => $value,
                 'decimals' => $decimals,
+                'formattedValue' => $formattedValue,
+                'digits' => str_split($formattedValue),
                 'unit' => $unit,
                 'caption' => $caption,
                 'accessibleText' => $accessibleText,
             ];
         }, $slides);
+    }
+
+    /**
+     * Retrieve the left illustration URL.
+     *
+     * @return string|null
+     */
+    public function imageLeft()
+    {
+        return $this->illustrationUrl(get_field('image_left') ?: $this->example['image_left']);
+    }
+
+    /**
+     * Retrieve the right illustration URL.
+     *
+     * @return string|null
+     */
+    public function imageRight()
+    {
+        return $this->illustrationUrl(get_field('image_right') ?: $this->example['image_right']);
+    }
+
+    /**
+     * Resolve an illustration select value to its bundled asset URL.
+     *
+     * @return string|null
+     */
+    protected function illustrationUrl(?string $key)
+    {
+        if (! $key) {
+            return null;
+        }
+
+        $file = str_replace('_', '-', $key);
+
+        return Vite::asset("resources/images/illustrations/{$file}.png");
     }
 
     /**
