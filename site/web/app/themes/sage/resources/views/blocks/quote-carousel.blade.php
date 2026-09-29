@@ -1,8 +1,8 @@
-<section {{ $attributes->class(['c-quote-carousel']) }}>
+<section {{ $attributes->class(['c-quote-carousel', 'c-quote-carousel--'.$style]) }}>
 
   <div class="o-container">
     <wa-carousel
-      class="c-quote-carousel__carousel c-quote-carousel__carousel--{{ $style }}"
+      class="c-quote-carousel__carousel"
       navigation
       pagination
       loop
@@ -16,10 +16,10 @@
       @endforeach
 
       <span slot="previous-icon" class="c-quote-carousel__nav-icon c-quote-carousel__nav-icon--previous">
-        <x-icon name="arrow-right" class="c-quote-carousel__nav-icon-svg" />
+        <x-icon name="arrow-right" />
       </span>
       <span slot="next-icon" class="c-quote-carousel__nav-icon">
-        <x-icon name="arrow-right" class="c-quote-carousel__nav-icon-svg" />
+        <x-icon name="arrow-right" />
       </span>
     </wa-carousel>
   </div>

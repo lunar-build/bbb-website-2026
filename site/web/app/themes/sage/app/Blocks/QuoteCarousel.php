@@ -155,10 +155,13 @@ class QuoteCarousel extends Block
      * Figma "Property 1" states (node 7:1982 "Default" / 19:582 "Variant2")
      * share the same content model — only a style toggle, matching how
      * Quote.php merged its Short/Long variants into one block rather than
-     * splitting into two. Each slide's quote is split into
-     * prefix/stat/suffix to match the Figma text layer structure (three
-     * spans: regular, bold stat, regular) instead of a single free-text
-     * field with a magic placeholder token.
+     * splitting into two. Variant2's dashed border/light-blue background
+     * was a one-off designer slip (not repeated elsewhere in the file) —
+     * the real second treatment is just a plain white card, so the field
+     * choice is "Filled"/"White", not "Filled"/"Outlined". Each slide's
+     * quote is split into prefix/stat/suffix to match the Figma text layer
+     * structure (three spans: regular, bold stat, regular) instead of a
+     * single free-text field with a magic placeholder token.
      *
      * @var array
      */
@@ -178,7 +181,7 @@ class QuoteCarousel extends Block
      * @var array
      */
     public $examples = [
-        'Filled (dark blue)' => [
+        'Dark' => [
             'style' => 'filled',
             'slides' => [
                 [
@@ -195,14 +198,20 @@ class QuoteCarousel extends Block
                 ],
             ],
         ],
-        'Outlined (light, dashed)' => [
-            'style' => 'outlined',
+        'Light' => [
+            'style' => 'white',
             'slides' => [
                 [
                     'quote_prefix' => 'Every day, cycling in Bristol takes up to ',
                     'stat' => '28,000',
                     'quote_suffix' => ' cars off the road.',
                     'attribution' => 'BikeLife Bristol 2019',
+                ],
+                [
+                    'quote_prefix' => 'Over the last year, our loan bike scheme has saved riders more than ',
+                    'stat' => '£120,000',
+                    'quote_suffix' => ' in fuel and parking costs.',
+                    'attribution' => 'Better by Bike Annual Review',
                 ],
             ],
         ],
@@ -222,10 +231,10 @@ class QuoteCarousel extends Block
 
         $fields->addSelect('style', [
             'label' => 'Style',
-            'instructions' => 'Matches the Figma "Default"/"Variant2" states — Filled suits a dark section background, Outlined suits a light one.',
+            'instructions' => 'Matches the Figma "Default"/"Variant2" states — Filled suits a dark section background, White suits a light one.',
             'choices' => [
                 'filled' => 'Filled (dark blue)',
-                'outlined' => 'Outlined (light, dashed)',
+                'white' => 'White',
             ],
             'default_value' => 'filled',
             'required' => 1,

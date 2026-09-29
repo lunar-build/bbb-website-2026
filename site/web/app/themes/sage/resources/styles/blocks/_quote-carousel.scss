@@ -1,15 +1,85 @@
-// Figma nodes 7:1982 ("Default"/filled) and 19:582 ("Variant2"/outlined) —
+// Figma nodes 7:1982 ("Default"/filled) and 19:582 ("Variant2"/white) —
 // a single block with a style toggle rather than two blocks, matching how
 // Quote.php merged its Short/Long variants (see build-acf-block skill).
+// Variant2's dashed border/light-blue background in Figma was a one-off
+// designer slip; the real second treatment is a plain white card.
+//
+// The coloured background bleeds full-width (same convention as
+// _cta-banner.scss: colour + overflow-clip on the outer <section>, with
+// .o-container inside staying gutter-constrained) — only the quote text and
+// nav arrows are contained to the block's normal width.
 //
 // <wa-carousel> supplies the mechanics (pagination dots, prev/next arrows,
-// swipe, loop); this file only styles it as a "card" (background/border)
-// and re-points <x-quote>'s existing --c-quote-color/--c-quote-attribution-color
-// custom props per variant, plus the new --c-quote-mark-color (see
-// components/_quote.scss) so the quote mark and carousel accents
-// (stat, arrows, active pagination dot) share one colour per variant.
+// swipe, loop); this file re-points <x-quote>'s existing
+// --c-quote-color/--c-quote-attribution-color custom props per variant,
+// plus the new --c-quote-mark-color (see components/_quote.scss) so the
+// quote mark and carousel accents (stat, arrows, active pagination dot)
+// share one colour per variant. Custom properties set on .c-quote-carousel
+// inherit down through .o-container and into <wa-carousel>'s slotted
+// content normally (shadow DOM doesn't break light-DOM inheritance).
+//
+// Focus rings on the nav arrows/pagination dots (both exposed via WA's
+// ::part(), which pseudo-classes like :focus-visible can still chain onto)
+// use the shared focus.ring mixin, flipped white-on-dark vs. dark-on-light
+// per variant so the ring stays visible against each background. ::part()
+// only works directly on the custom element itself, so these selectors
+// chain an ancestor combinator (the section's style modifier) in front of
+// .c-quote-carousel__carousel::part(...) rather than nesting under it.
 
 @use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+
+.c-quote-carousel {
+  // Vertical breathing room comes entirely from the block's own $spacing
+  // support (top/bottom, editable in the editor) — same convention as
+  // _cta-banner.scss, no hardcoded padding duplicated here.
+  position: relative;
+  overflow: hidden;
+
+  &--filled {
+    background: var(--wp--preset--color--blue-dark);
+    --c-quote-color: var(--wp--preset--color--white);
+    --c-quote-attribution-color: var(--wp--preset--color--white);
+    --c-quote-mark-color: var(--wp--preset--color--yellow);
+
+    .c-quote-carousel__carousel::part(pagination-item) {
+      background: transparent;
+      border: 0.125rem solid var(--wp--preset--color--white);
+    }
+
+    .c-quote-carousel__carousel::part(pagination-item-active) {
+      background: var(--wp--preset--color--white);
+    }
+
+    .c-quote-carousel__carousel::part(navigation-button),
+    .c-quote-carousel__carousel::part(pagination-item),
+    .c-quote-carousel__carousel::part(scroll-container) {
+      @include focus.ring($color: var(--wp--preset--color--white));
+    }
+  }
+
+  &--white {
+    background: var(--wp--preset--color--white);
+    --c-quote-color: var(--wp--preset--color--blue-dark);
+    --c-quote-attribution-color: var(--wp--preset--color--blue-dark);
+    --c-quote-mark-color: var(--wp--preset--color--dark-orange);
+
+    .c-quote-carousel__carousel::part(pagination-item) {
+      background: transparent;
+      border: 0.125rem solid var(--wp--preset--color--blue);
+    }
+
+    .c-quote-carousel__carousel::part(pagination-item-active) {
+      background: var(--wp--preset--color--blue);
+    }
+
+    .c-quote-carousel__carousel::part(navigation-button),
+    .c-quote-carousel__carousel::part(pagination-item),
+    .c-quote-carousel__carousel::part(scroll-container) {
+      @include focus.ring;
+    }
+  }
+}
 
 .c-quote-carousel__carousel {
   // Slides vary in height (short vs. long quotes) — a fixed aspect-ratio
@@ -18,45 +88,6 @@
   --aspect-ratio: auto;
 
   display: block;
-  border-radius: 1rem;
-  padding: 2rem;
-
-  @include bp.respond($min: bp.$md) {
-    padding: 3rem 4rem;
-  }
-
-  &--filled {
-    background: var(--wp--preset--color--blue-dark);
-    border: none;
-    --c-quote-color: var(--wp--preset--color--white);
-    --c-quote-attribution-color: var(--wp--preset--color--white);
-    --c-quote-mark-color: var(--wp--preset--color--yellow);
-
-    &::part(pagination-item) {
-      background: rgb(255 255 255 / 35%);
-    }
-
-    &::part(pagination-item-active) {
-      background: var(--wp--preset--color--yellow);
-    }
-  }
-
-  &--outlined {
-    background: var(--wp--preset--color--blue-light);
-    border: 0.125rem dashed var(--wp--preset--color--dark-orange);
-    --c-quote-color: var(--wp--preset--color--blue-dark);
-    --c-quote-attribution-color: var(--wp--preset--color--blue-dark);
-    --c-quote-mark-color: var(--wp--preset--color--dark-orange);
-
-    &::part(pagination-item) {
-      background: var(--wp--preset--color--blue-light);
-      border: 0.0625rem solid var(--wp--preset--color--blue);
-    }
-
-    &::part(pagination-item-active) {
-      background: var(--wp--preset--color--blue);
-    }
-  }
 }
 
 .c-quote-carousel__item {
@@ -74,18 +105,38 @@
 // Carousel and Rolling Stats Carousel blocks) — kept simple/reusable here,
 // no block-specific styling that would make extracting a shared pattern
 // later harder.
+// Sized explicitly on this wrapper itself (not left to auto/content-based
+// sizing) because slotted content inside <wa-carousel>'s shadow DOM sits
+// under a `display: contents` ancestor (its .navigation wrapper) feeding
+// into a `min-content` grid track — some browsers fail to compute an
+// intrinsic min-content contribution for slotted replaced content in that
+// setup and collapse it to 0 width. A definite width/height here sidesteps
+// that entirely instead of relying on the svg's own intrinsic size.
+//
+// Figma's arrow icon on this carousel is ~38x33px — larger, and a stockier
+// aspect ratio, than arrow-right.svg's own natural 22x14 box, so the icon
+// stretches slightly to fill this box rather than just scaling up. Fine at
+// this size/shape, but flagging in case a differently-shaped icon asset is
+// wanted here later instead of reusing arrow-right.
 .c-quote-carousel__nav-icon {
   display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
+  width: 2.375rem; // 38px
+  height: 2.0625rem; // 33px
   color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
+
+  // <x-icon>'s own wrapping <span class="c-icon"> sits between this
+  // element and the raw <svg> — both need to fill this box.
+  .c-icon,
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 }
 
-.c-quote-carousel__nav-icon-svg {
-  width: 1.375rem; // 22px, arrow-right.svg's natural width
-  height: 0.875rem; // 14px, arrow-right.svg's natural height
-}
-
-.c-quote-carousel__nav-icon--previous .c-quote-carousel__nav-icon-svg {
+.c-quote-carousel__nav-icon--previous svg {
   transform: rotate(180deg);
 }
