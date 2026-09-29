@@ -1,0 +1,91 @@
+// Figma nodes 7:1982 ("Default"/filled) and 19:582 ("Variant2"/outlined) —
+// a single block with a style toggle rather than two blocks, matching how
+// Quote.php merged its Short/Long variants (see build-acf-block skill).
+//
+// <wa-carousel> supplies the mechanics (pagination dots, prev/next arrows,
+// swipe, loop); this file only styles it as a "card" (background/border)
+// and re-points <x-quote>'s existing --c-quote-color/--c-quote-attribution-color
+// custom props per variant, plus the new --c-quote-mark-color (see
+// components/_quote.scss) so the quote mark and carousel accents
+// (stat, arrows, active pagination dot) share one colour per variant.
+
+@use '../abstracts/breakpoints' as bp;
+
+.c-quote-carousel__carousel {
+  // Slides vary in height (short vs. long quotes) — a fixed aspect-ratio
+  // would clip or letterbox content, so let the carousel size to its tallest
+  // slide instead.
+  --aspect-ratio: auto;
+
+  display: block;
+  border-radius: 1rem;
+  padding: 2rem;
+
+  @include bp.respond($min: bp.$md) {
+    padding: 3rem 4rem;
+  }
+
+  &--filled {
+    background: var(--wp--preset--color--blue-dark);
+    border: none;
+    --c-quote-color: var(--wp--preset--color--white);
+    --c-quote-attribution-color: var(--wp--preset--color--white);
+    --c-quote-mark-color: var(--wp--preset--color--yellow);
+
+    &::part(pagination-item) {
+      background: rgb(255 255 255 / 35%);
+    }
+
+    &::part(pagination-item-active) {
+      background: var(--wp--preset--color--yellow);
+    }
+  }
+
+  &--outlined {
+    background: var(--wp--preset--color--blue-light);
+    border: 0.125rem dashed var(--wp--preset--color--dark-orange);
+    --c-quote-color: var(--wp--preset--color--blue-dark);
+    --c-quote-attribution-color: var(--wp--preset--color--blue-dark);
+    --c-quote-mark-color: var(--wp--preset--color--dark-orange);
+
+    &::part(pagination-item) {
+      background: var(--wp--preset--color--blue-light);
+      border: 0.0625rem solid var(--wp--preset--color--blue);
+    }
+
+    &::part(pagination-item-active) {
+      background: var(--wp--preset--color--blue);
+    }
+  }
+}
+
+.c-quote-carousel__item {
+  display: flex;
+  align-items: center;
+}
+
+// Bolded stat inline in the quote body — shares the mark/accent colour so
+// stat, mark, and nav arrows read as one accent per style variant.
+.c-quote-carousel__stat {
+  color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
+}
+
+// Shared arrow icon + slot convention (also used by the Testimonial Card
+// Carousel and Rolling Stats Carousel blocks) — kept simple/reusable here,
+// no block-specific styling that would make extracting a shared pattern
+// later harder.
+.c-quote-carousel__nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
+}
+
+.c-quote-carousel__nav-icon-svg {
+  width: 1.375rem; // 22px, arrow-right.svg's natural width
+  height: 0.875rem; // 14px, arrow-right.svg's natural height
+}
+
+.c-quote-carousel__nav-icon--previous .c-quote-carousel__nav-icon-svg {
+  transform: rotate(180deg);
+}

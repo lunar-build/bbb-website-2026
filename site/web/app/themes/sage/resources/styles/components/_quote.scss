@@ -70,7 +70,7 @@
 
 .c-quote__mark {
   display: inline-flex;
-  color: var(--wp--preset--color--yellow);
+  color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
 
   svg {
     width: 3.0625rem; // 49px, same fixed box convention as Icon Link Grid
