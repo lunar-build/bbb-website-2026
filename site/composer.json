@@ -82,7 +82,8 @@
     "installer-paths": {
       "web/app/mu-plugins/{$name}/": [
         "type:wordpress-muplugin",
-        "wpengine/advanced-custom-fields"
+        "wpengine/advanced-custom-fields",
+        "gravityforms/gravityforms"
       ],
       "web/app/plugins/{$name}/": [
         "type:wordpress-plugin"
