@@ -1,7 +1,7 @@
 <section {{ $attributes->class(['c-testimonial-carousel']) }}>
 
   <div class="o-container">
-    <wa-carousel class="c-testimonial-carousel__carousel" navigation pagination loop mouse-dragging>
+    <wa-carousel data-testimonial-carousel class="c-testimonial-carousel__carousel" navigation pagination loop mouse-dragging>
       @foreach ($cards as $card)
         <wa-carousel-item class="c-testimonial-carousel__item">
           <x-testimonial-card

@@ -23,7 +23,7 @@
             {{ $name }}
         </x-heading>
 
-        <x-quote layout="centered" class="c-testimonial-card__quote">
+        <x-quote layout="centered" size="standard" class="c-testimonial-card__quote">
             {!! $quote !!}
         </x-quote>
 

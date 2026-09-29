@@ -239,7 +239,7 @@ class TestimonialCardCarousel extends Block
             ->addLink('link', [
                 'label' => 'Read more link',
                 'instructions' => 'Text + URL for the "Read more" CTA pill.',
-                'required' => true,
+                'required' => false,
             ]);
 
         $cards->endRepeater();

@@ -4,9 +4,18 @@
 // (Quote, this one, Rolling Stats) — see the Trello card's "Shared carousel
 // arrows" note — so styling only needs doing once regardless of which block
 // lands first; no shared abstraction is extracted yet.
+@use '../base/focus' as focus;
 
 .c-testimonial-carousel {
   &__carousel {
+    // wa-carousel's own :host default is `--aspect-ratio: 16/9`, which
+    // gives `.slides` a definite height (aspect-ratio-derived) — its
+    // `grid-auto-rows: 100%` would then resolve against that real number,
+    // producing a fixed row height with no relation to the cards' actual
+    // content. Force it invalid instead (`calc(auto * n)` has no result),
+    // so the row's height is indefinite and sized from content instead —
+    // see the `scroll-container` part rule below for why that's what
+    // makes every card match the tallest one's height.
     --aspect-ratio: auto;
 
     display: block;
@@ -14,15 +23,66 @@
 
   &__item {
     display: flex;
-    height: auto;
     padding-inline: 0.25rem; // small breathing room between slide edge and card shadow
   }
 
-  // Web Awesome's carousel exposes these CSS parts (base, pagination,
-  // pagination-item, pagination-item--active, navigation, navigation-button)
-  // for styling the built-in dots/arrows without replacing the mechanics.
+  // Web Awesome's carousel exposes these CSS parts (carousel, scroll-container,
+  // pagination, pagination-item, pagination-item--active, navigation,
+  // navigation-button) for styling the built-in slides/dots/arrows without
+  // replacing the mechanics.
+  //
+  // By default the buttons sit level with the slides, flanking the cards at
+  // the outer edges of the whole grid (its `carousel` part is
+  // `min-content 1fr min-content` columns × `1fr min-content` rows, with
+  // `scroll-container`/`pagination` both in the wide middle column and the
+  // buttons in the narrow outer ones) — this design instead wants the
+  // arrows down with the pagination dots, one either side with only minor
+  // spacing between. Re-template the grid so row 2 is its own tight
+  // [previous, pagination, next] cluster, centred by two flexible outer
+  // gutter columns, rather than reusing the slides row's edge-to-edge ones.
+  &__carousel::part(carousel) {
+    grid-template-columns: 1fr auto auto auto 1fr;
+    column-gap: 0.5rem;
+  }
+
+  &__carousel::part(scroll-container) {
+    grid-column: 1 / -1;
+    // Its own default (align-items: center) leaves every visible slide at
+    // its own content height, so shorter testimonials just float centred
+    // in whatever gap is left instead of the row growing to match the
+    // tallest card. Stretch instead: with no explicit --aspect-ratio, the
+    // row's height is indefinite (its `grid-auto-rows: 100%` then acts as
+    // `auto` per spec), so it auto-sizes to the tallest slide's natural
+    // content height and every other slide stretches to fill it — no JS
+    // measurement needed.
+    align-items: stretch;
+    // This part also carries the component's own `overflow-y: hidden`
+    // (it only wants horizontal slide scrolling) — with the row now an
+    // exact fit to the cards' content, that clips the cards' own
+    // box-shadow top/bottom. Pad the scrollable area itself so the shadow
+    // has room to render inside the clip, same idea as __item's inline
+    // padding for the shadow between/beside cards.
+    padding-block: 0.25rem;
+    // This is what's actually focusable when tabbing/arrow-keying through
+    // the carousel — WA gives it `tabindex="0"` for keyboard slide
+    // navigation — so it's effectively "the card" gaining focus even
+    // though the ring itself sits on the scroll-container, not the card
+    // markup. Use the site's shared ring instead of WA's own default one.
+    @include focus.ring;
+  }
+
+  &__carousel::part(navigation-button-previous) {
+    grid-column: 2;
+    margin-right: 1rem;
+  }
+
   &__carousel::part(pagination) {
-    margin-top: 1.5rem;
+    grid-column: 3;
+  }
+
+  &__carousel::part(navigation-button-next) {
+    margin-left: 1rem;
+    grid-column: 4;
   }
 
   &__carousel::part(pagination-item) {
@@ -30,27 +90,42 @@
     height: 0.625rem;
     border: 1px solid var(--wp--preset--color--blue);
     background: transparent;
+
+    @include focus.ring;
   }
 
-  &__carousel::part(pagination-item--active) {
+  // WA's exposed part is "pagination-item-active" (single dash) — note the
+  // asymmetry with "navigation-button-previous"/"-next" above, easy to
+  // typo into the BEM-style double dash used everywhere else in this file.
+  &__carousel::part(pagination-item-active) {
     background: var(--wp--preset--color--blue);
   }
 
   &__carousel::part(navigation-button) {
+    grid-row: 2;
+    padding: var(--wa-space-2xs);
+    justify-content: center;
     color: var(--wp--preset--color--dark-orange);
+    @include focus.ring;
   }
 
   &__nav-icon {
     display: inline-flex;
+    flex: none; // prevent the navigation button's flex layout shrinking the icon to 0 width
     color: var(--wp--preset--color--dark-orange);
 
     svg {
-      width: 1.8125rem; // 29px, matches Figma's arrow glyph width
-      height: 0.75rem; // 12px
+      // 38.5 × 33px — the arrow glyph's own bounding box in Figma (node
+      // 7:2044/7:2045), not just a button hit-area around a smaller icon.
+      width: 2.40625rem;
+      height: 2.0625rem;
+      flex: none;
     }
   }
 
   &__nav-icon--prev {
-    transform: scaleX(-1); // arrow-right.svg flipped, no separate left-pointing asset
+    transform: scaleX(
+      -1
+    ); // arrow-right.svg flipped, no separate left-pointing asset
   }
 }
