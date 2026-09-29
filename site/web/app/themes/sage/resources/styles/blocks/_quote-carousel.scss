@@ -5,14 +5,14 @@
   position: relative;
   overflow: hidden; // full-bleed bg; .o-container below keeps content contained
 
-  &--filled {
-    background: var(--wp--preset--color--blue-dark);
+  &--filled,
+  &--blue {
     --c-quote-color: var(--wp--preset--color--white);
     --c-quote-attribution-color: var(--wp--preset--color--white);
     --c-quote-mark-color: var(--wp--preset--color--yellow);
 
     // ::part() must target the custom element directly, hence the ancestor
-    // combinator here rather than nesting under &--filled.
+    // combinator here rather than nesting under &--filled/&--blue.
     .c-quote-carousel__carousel::part(pagination-item) {
       background: transparent;
       border: 0.125rem solid var(--wp--preset--color--white);
@@ -27,6 +27,14 @@
     .c-quote-carousel__carousel::part(scroll-container) {
       @include focus.ring($color: var(--wp--preset--color--white));
     }
+  }
+
+  &--filled {
+    background: var(--wp--preset--color--blue-dark);
+  }
+
+  &--blue {
+    background: var(--wp--preset--color--blue);
   }
 
   &--white {

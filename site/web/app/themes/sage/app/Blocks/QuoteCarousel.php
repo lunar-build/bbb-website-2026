@@ -210,6 +210,23 @@ class QuoteCarousel extends Block
                 ],
             ],
         ],
+        'Blue' => [
+            'style' => 'blue',
+            'slides' => [
+                [
+                    'quote_prefix' => 'Every day, cycling in Bristol takes up to ',
+                    'stat' => '28,000',
+                    'quote_suffix' => ' cars off the road.',
+                    'attribution' => 'BikeLife Bristol 2019',
+                ],
+                [
+                    'quote_prefix' => 'Over the last year, our loan bike scheme has saved riders more than ',
+                    'stat' => '£120,000',
+                    'quote_suffix' => ' in fuel and parking costs.',
+                    'attribution' => 'Better by Bike Annual Review',
+                ],
+            ],
+        ],
     ];
 
     public function with(): array
@@ -226,9 +243,10 @@ class QuoteCarousel extends Block
 
         $fields->addSelect('style', [
             'label' => 'Style',
-            'instructions' => 'Filled suits a dark section background, White suits a light one.',
+            'instructions' => 'Filled/Blue suit a dark section background, White suits a light one.',
             'choices' => [
                 'filled' => 'Filled (dark blue)',
+                'blue' => 'Blue',
                 'white' => 'White',
             ],
             'default_value' => 'filled',
