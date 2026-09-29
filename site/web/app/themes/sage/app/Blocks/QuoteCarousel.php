@@ -251,7 +251,7 @@ class QuoteCarousel extends Block
             ->addText('stat', [
                 'label' => 'Stat (bold)',
                 'instructions' => 'e.g. "28,000" — rendered in bold, inline with the quote.',
-                'required' => 1,
+                'required' => 0,
             ])
             ->addText('quote_suffix', [
                 'label' => 'Quote (after stat)',
