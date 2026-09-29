@@ -21,7 +21,11 @@
   }
 
   &__photo {
-    aspect-ratio: 235 / 335;
+    // 235/335 is the Figma side-column ratio (portrait) — right for a
+    // narrow column beside the content at md+, but at full card width on
+    // mobile that same ratio makes the photo (and so the whole card)
+    // unreasonably tall. Use a shorter landscape ratio below md instead.
+    aspect-ratio: 3 / 2;
 
     @include bp.respond($min: bp.$md) {
       aspect-ratio: auto;
