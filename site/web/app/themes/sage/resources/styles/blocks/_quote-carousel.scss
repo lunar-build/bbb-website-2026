@@ -1,47 +1,31 @@
-// Figma nodes 7:1982 ("Default"/filled) and 19:582 ("Variant2"/white) —
-// a single block with a style toggle rather than two blocks, matching how
-// Quote.php merged its Short/Long variants (see build-acf-block skill).
-// Variant2's dashed border/light-blue background in Figma was a one-off
-// designer slip; the real second treatment is a plain white card.
-//
-// The coloured background bleeds full-width (same convention as
-// _cta-banner.scss: colour + overflow-clip on the outer <section>, with
-// .o-container inside staying gutter-constrained) — only the quote text and
-// nav arrows are contained to the block's normal width.
-//
-// <wa-carousel> supplies the mechanics (pagination dots, prev/next arrows,
-// swipe, loop); this file re-points <x-quote>'s existing
-// --c-quote-color/--c-quote-attribution-color custom props per variant,
-// plus the new --c-quote-mark-color (see components/_quote.scss) so the
-// quote mark and carousel accents (stat, arrows, active pagination dot)
-// share one colour per variant. Custom properties set on .c-quote-carousel
-// inherit down through .o-container and into <wa-carousel>'s slotted
-// content normally (shadow DOM doesn't break light-DOM inheritance).
-//
-// Focus rings on the nav arrows/pagination dots (both exposed via WA's
-// ::part(), which pseudo-classes like :focus-visible can still chain onto)
-// use the shared focus.ring mixin, flipped white-on-dark vs. dark-on-light
-// per variant so the ring stays visible against each background. ::part()
-// only works directly on the custom element itself, so these selectors
-// chain an ancestor combinator (the section's style modifier) in front of
-// .c-quote-carousel__carousel::part(...) rather than nesting under it.
+// Figma "Quote Carousel" (7:1982 "Default" / 19:582 "Variant2") — one block,
+// style field rather than two blocks, since the content is identical.
+// Variant2's dashed border/light-blue bg was a designer slip, not a real
+// second treatment — field choices are "Filled"/"White", not "Filled"/"Outlined".
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 
 .c-quote-carousel {
-  // Vertical breathing room comes entirely from the block's own $spacing
-  // support (top/bottom, editable in the editor) — same convention as
-  // _cta-banner.scss, no hardcoded padding duplicated here.
   position: relative;
+  // Background bleeds full-width; .o-container below keeps the quote/arrows
+  // contained (same convention as _cta-banner.scss). No padding here —
+  // vertical breathing room comes entirely from the block's own $spacing
+  // support (top/bottom, editable in the editor).
   overflow: hidden;
 
+  // --c-quote-*/mark custom props set here inherit through .o-container and
+  // into <wa-carousel>'s slotted <x-quote>/icons normally — shadow DOM
+  // doesn't block light-DOM inheritance.
   &--filled {
     background: var(--wp--preset--color--blue-dark);
     --c-quote-color: var(--wp--preset--color--white);
     --c-quote-attribution-color: var(--wp--preset--color--white);
     --c-quote-mark-color: var(--wp--preset--color--yellow);
 
+    // ::part() only works directly on the custom element, so these chain an
+    // ancestor combinator (this style modifier) in front of
+    // .c-quote-carousel__carousel::part(...) rather than nesting under it.
     .c-quote-carousel__carousel::part(pagination-item) {
       background: transparent;
       border: 0.125rem solid var(--wp--preset--color--white);
@@ -101,23 +85,20 @@
   color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
 }
 
-// Shared arrow icon + slot convention (also used by the Testimonial Card
-// Carousel and Rolling Stats Carousel blocks) — kept simple/reusable here,
-// no block-specific styling that would make extracting a shared pattern
-// later harder.
-// Sized explicitly on this wrapper itself (not left to auto/content-based
-// sizing) because slotted content inside <wa-carousel>'s shadow DOM sits
-// under a `display: contents` ancestor (its .navigation wrapper) feeding
-// into a `min-content` grid track — some browsers fail to compute an
-// intrinsic min-content contribution for slotted replaced content in that
-// setup and collapse it to 0 width. A definite width/height here sidesteps
-// that entirely instead of relying on the svg's own intrinsic size.
+// Shared arrow icon + slot convention with the Testimonial Card Carousel and
+// Rolling Stats Carousel blocks — kept simple/reusable, no block-specific
+// styling that would make extracting a shared pattern later harder.
 //
-// Figma's arrow icon on this carousel is ~38x33px — larger, and a stockier
-// aspect ratio, than arrow-right.svg's own natural 22x14 box, so the icon
-// stretches slightly to fill this box rather than just scaling up. Fine at
-// this size/shape, but flagging in case a differently-shaped icon asset is
-// wanted here later instead of reusing arrow-right.
+// Width/height are set explicitly here rather than left to auto-sizing:
+// slotted content inside <wa-carousel>'s shadow DOM sits under a
+// `display: contents` ancestor feeding a `min-content` grid track, and some
+// browsers fail to compute an intrinsic size for slotted content there,
+// collapsing it to 0 width. A definite size sidesteps the bug.
+//
+// Figma's icon here is ~38x33 — a stockier ratio than arrow-right.svg's own
+// 22x14 box, so it stretches slightly to fill this size rather than just
+// scaling up. Fine for now; flagging in case a differently-shaped icon is
+// wanted here later.
 .c-quote-carousel__nav-icon {
   display: inline-flex;
   flex: none;
