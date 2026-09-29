@@ -1,12 +1,35 @@
 ---
 name: comment-cleanup
-description: Clean up code comments in WordPress Sage theme — remove AI-generated over-commenting, narration, and noise while preserving comments that carry real context. Use whenever the user asks to clean, tidy, prune, fix, audit, or review comments in Sage theme files (PHP, Blade templates, config), mentions "too many comments", "verbose comments", "comment pass", "de-AI the comments", or asks to apply comment guidelines to a Sage file, controller, template, or PR. Also use after an implementation when the user asks to tidy up before committing.
+description: Clean up code comments in WordPress Sage theme — remove AI-generated over-commenting, narration, and noise while preserving comments that carry real context. Use whenever the user asks to clean, tidy, prune, fix, audit, or review comments in Sage theme files (PHP, Blade templates, config), mentions "too many comments", "verbose comments", "comment pass", "de-AI the comments", or asks to apply comment guidelines to a Sage file, controller, template, or PR. Also use after an implementation when the user asks to tidy up before committing. With no files/branch/PR named, defaults to this session's edited .js/.scss/.blade.php files only, run aggressively for concision — app/Blocks/*.php is always skipped regardless of what was edited.
 ---
 
 # Comment Cleanup for WordPress Sage Theme
 
 A comment-only editing pass. Walk every comment in the target files, keep the few
 that carry context the code cannot, delete or rewrite the rest.
+
+## Default target — no explicit file/branch given
+
+When the user invokes this skill with no explicit files, branch, or PR named, do **not**
+ask which files to clean or fall back to "the whole theme." Target the files **this session**
+has actually edited or written (Edit/Write tool calls so far in the conversation) —
+not `git diff` against a branch, since uncommitted-but-untouched-this-session files should
+be left alone.
+
+From that session-edited set, apply this file-type filter — it overrides the general
+"applies to every file type" scope below **for this default-target case only**:
+
+- **`.js`, `.scss`, `.blade.php` files** — in scope. Run the full pass (all six rules),
+  and be aggressive: these should come out **much more concise**, not just narration-free.
+  Favor deletion and one-line rewrites over keeping multi-line "why" comments unless the
+  content genuinely can't be said in one line.
+- **`app/Blocks/*.php` files** — always skip entirely, even if edited this session. Leave
+  every comment (including the exempted property docblocks and anything else) untouched.
+- **Any other file type edited this session** (other PHP, JSON, config, docs) — skip. Only
+  touch it if the user names it explicitly in a later request.
+
+If the user *does* name explicit files, a branch, or a PR, that overrides this section — use
+the file-type scope from the rest of this document (all file types, full rule set) as normal.
 
 ## Scope — read this first
 
