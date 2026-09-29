@@ -81,7 +81,8 @@
   "extra": {
     "installer-paths": {
       "web/app/mu-plugins/{$name}/": [
-        "type:wordpress-muplugin"
+        "type:wordpress-muplugin",
+        "wpengine/advanced-custom-fields"
       ],
       "web/app/plugins/{$name}/": [
         "type:wordpress-plugin"
