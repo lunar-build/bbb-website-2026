@@ -19,11 +19,8 @@
 }
 
 .c-quote {
-  // Charcoal/blue defaults live as fallbacks at point of use (.c-quote__body
-  // etc. below), not declared here — a custom property declared on this
-  // element would shadow any ancestor override (e.g. Quote Carousel's
-  // wrapper setting --c-quote-color), since an element's own declaration
-  // always wins over the same property inherited from an ancestor.
+  // Defaults are fallbacks on .c-quote__body etc. below, not declared here,
+  // so an ancestor (e.g. Quote Carousel) can still override --c-quote-color.
   display: grid;
   row-gap: 1rem; // mobile: single column, stacked via source order
   align-items: start;

@@ -152,16 +152,11 @@ class QuoteCarousel extends Block
     /**
      * The block preview example data.
      *
-     * Figma "Property 1" states (node 7:1982 "Default" / 19:582 "Variant2")
-     * share the same content model — only a style toggle, matching how
-     * Quote.php merged its Short/Long variants into one block rather than
-     * splitting into two. Variant2's dashed border/light-blue background
-     * was a one-off designer slip (not repeated elsewhere in the file) —
-     * the real second treatment is just a plain white card, so the field
-     * choice is "Filled"/"White", not "Filled"/"Outlined". Each slide's
-     * quote is split into prefix/stat/suffix to match the Figma text layer
-     * structure (three spans: regular, bold stat, regular) instead of a
-     * single free-text field with a magic placeholder token.
+     * Dark/White are a style toggle, not two blocks (same content model),
+     * matching how Quote.php merged its Short/Long variants. Quote text is
+     * split into prefix/stat/suffix to match the Figma layer structure
+     * (regular/bold/regular spans) rather than a free-text field with a
+     * placeholder token.
      *
      * @var array
      */
@@ -231,7 +226,7 @@ class QuoteCarousel extends Block
 
         $fields->addSelect('style', [
             'label' => 'Style',
-            'instructions' => 'Matches the Figma "Default"/"Variant2" states — Filled suits a dark section background, White suits a light one.',
+            'instructions' => 'Filled suits a dark section background, White suits a light one.',
             'choices' => [
                 'filled' => 'Filled (dark blue)',
                 'white' => 'White',
