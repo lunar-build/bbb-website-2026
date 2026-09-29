@@ -77,13 +77,23 @@ document.querySelectorAll('[data-rolling-stats-carousel]').forEach((wrapper) => 
     reels.forEach((reel, index) => spinReel(reel, index));
   };
 
-  // Spin the initially-visible slide too, not just later wa-slide-change events.
-  animateSlide(items[0]);
-
   carousel.addEventListener('wa-slide-change', (event) => {
     const index = event.detail?.index;
     animateSlide(typeof index === 'number' ? items[index] : null);
   });
+
+  // Spin the first slide only once it actually scrolls into view, not on page
+  // load — a block below the fold used to spin off-screen and just sit at its
+  // final value by the time the user scrolled down to it.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0].isIntersecting) return;
+      animateSlide(items[0]);
+      observer.disconnect();
+    },
+    { threshold: 0.5 }
+  );
+  observer.observe(wrapper);
 
   syncCarouselHeight(wrapper, carousel);
 
