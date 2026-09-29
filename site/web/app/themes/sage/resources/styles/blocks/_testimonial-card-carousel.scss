@@ -1,20 +1,11 @@
-// Figma node 7:2047 "Carousel | Cards" — a <wa-carousel> of
-// <x-testimonial-card>s. Arrow glyph/classnames (.c-testimonial-carousel__nav-icon)
-// are intentionally the shared convention across all 3 carousel blocks
-// (Quote, this one, Rolling Stats) — see the Trello card's "Shared carousel
-// arrows" note — so styling only needs doing once regardless of which block
-// lands first; no shared abstraction is extracted yet.
+// Figma node 7:2047 — arrow glyph/classnames shared across all 3 carousel
+// blocks (Trello: "Shared carousel arrows"), no abstraction extracted yet.
 @use '../base/focus' as focus;
 
 .c-testimonial-carousel {
   &__carousel {
-    // wa-carousel's own :host default (`--aspect-ratio: 16/9`) gives
-    // `.slides` a definite height, so its `grid-auto-rows: 100%` resolves
-    // against a real number — a fixed row height unrelated to the cards'
-    // content. Force it invalid instead (`calc(auto * n)` has no result) so
-    // the row's height is indefinite and content-sized — see the
-    // `scroll-container` rule below for why that makes every card match
-    // the tallest one's height.
+    // Invalid on purpose — WA's own default (16/9) gives the slides row a
+    // fixed height; this makes it content-sized instead (see scroll-container below).
     --aspect-ratio: auto;
 
     display: block;
@@ -25,15 +16,8 @@
     padding-inline: 0.25rem; // small breathing room between slide edge and card shadow
   }
 
-  // wa-carousel exposes ::part() hooks (carousel, scroll-container,
-  // pagination, navigation-button, ...) for styling its built-in slides/
-  // dots/arrows without replacing the mechanics. By default the nav
-  // buttons flank the full card row at its outer edges, level with the
-  // slides — this design wants them down with the pagination dots instead,
-  // one either side with only minor spacing. Re-template the grid so row 2
-  // is its own tight [previous, pagination, next] cluster, centred by
-  // flexible outer gutter columns, rather than reusing the slides row's
-  // edge-to-edge ones.
+  // Move the nav buttons off the slides row's edges (WA's default) to sit
+  // either side of the pagination dots instead.
   &__carousel::part(carousel) {
     grid-template-columns: 1fr auto auto auto 1fr;
     column-gap: 0.5rem;
@@ -41,24 +25,12 @@
 
   &__carousel::part(scroll-container) {
     grid-column: 1 / -1;
-    // Default (align-items: center) leaves each slide at its own content
-    // height, so shorter testimonials float in whatever gap is left
-    // instead of the row growing to match the tallest card. Stretch
-    // instead: with --aspect-ratio invalid above, the row's height is
-    // indefinite (its `grid-auto-rows: 100%` acts as `auto`), so it sizes
-    // to the tallest slide's content and every other slide stretches to
-    // fill it — no JS measurement needed.
+    // Stretch (not WA's default center) + the invalid --aspect-ratio above
+    // makes every visible slide match the tallest one's content height.
     align-items: stretch;
-    // This part also carries WA's own overflow-y: hidden (horizontal-only
-    // scrolling) — with the row now an exact fit to the cards, that clips
-    // their box-shadow top/bottom. Pad the scrollable area itself so the
-    // shadow has room inside the clip (same idea as __item's inline
-    // padding for the shadow between/beside cards).
+    // Room for the cards' box-shadow, otherwise clipped by WA's own overflow-y: hidden here.
     padding-block: 0.25rem;
-    // This is what's actually focusable via tab/arrow-keys — WA gives it
-    // tabindex="0" for keyboard slide navigation — so it's effectively
-    // "the card" gaining focus even though the ring sits on
-    // scroll-container, not the card markup itself.
+    // WA's tabindex="0" for keyboard slide nav lives here, not on the card.
     @include focus.ring;
   }
 
@@ -85,9 +57,7 @@
     @include focus.ring;
   }
 
-  // WA's exposed part is "pagination-item-active" (single dash) — note the
-  // asymmetry with "navigation-button-previous"/"-next" above, easy to
-  // typo into the BEM-style double dash used everywhere else in this file.
+  // WA's real part name — single dash, not the BEM double dash used elsewhere here.
   &__carousel::part(pagination-item-active) {
     background: var(--wp--preset--color--blue);
   }
@@ -106,8 +76,7 @@
     color: var(--wp--preset--color--dark-orange);
 
     svg {
-      // 38.5 × 33px — the arrow glyph's own bounding box in Figma (node
-      // 7:2044/7:2045), not just a button hit-area around a smaller icon.
+      // 38.5 × 33px — Figma's arrow glyph bounding box itself (node 7:2044/7:2045).
       width: 2.40625rem;
       height: 2.0625rem;
       flex: none;

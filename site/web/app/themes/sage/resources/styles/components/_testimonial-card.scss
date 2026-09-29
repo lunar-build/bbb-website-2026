@@ -1,7 +1,5 @@
 // Figma node 7:2013/7:2022 — reuses <x-quote layout="centered"> for the mark +
-// quote body (blue text is already that layout's override, see
-// components/_quote.scss); the name here is a heading ABOVE the quote, not
-// <x-quote>'s attribution slot, so it's a separate element.
+// body; the name is a heading above the quote, not <x-quote>'s attribution slot.
 @use '../abstracts/breakpoints' as bp;
 
 .c-testimonial-card {
@@ -17,10 +15,8 @@
   }
 
   &__photo {
-    // 235/335 is the Figma side-column ratio (portrait) — right for a
-    // narrow column beside the content at md+, but at full card width on
-    // mobile that same ratio makes the photo (and so the whole card)
-    // unreasonably tall. Use a shorter landscape ratio below md instead.
+    // Figma's 235/335 ratio only works as a narrow side column (md+) — at
+    // full mobile width it makes the card unreasonably tall.
     aspect-ratio: 3 / 2;
 
     @include bp.respond($min: bp.$md) {
