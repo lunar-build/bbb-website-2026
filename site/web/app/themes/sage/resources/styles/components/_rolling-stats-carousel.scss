@@ -1,0 +1,85 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+
+// Figma "Rolling stats" (node 134:481)
+.c-rolling-stats-carousel-block {
+  padding-block: 2rem;
+}
+
+.c-rolling-stats-carousel {
+  width: 100%;
+}
+
+.c-rolling-stats-carousel__carousel {
+  --wa-color-neutral-fill-normal: var(--wp--preset--color--dark-orange);
+  --wa-form-control-height: 2.5rem;
+}
+
+.c-rolling-stats-carousel__item {
+  padding-block: 1rem;
+}
+
+.c-rolling-stats-carousel__content {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+
+  @include bp.respond($min: bp.$lg) {
+    flex-direction: row;
+    justify-content: center;
+    gap: 3rem;
+    text-align: left;
+  }
+}
+
+.c-rolling-stats-carousel__text {
+  max-width: 46rem;
+}
+
+.c-rolling-stats-carousel__prefix,
+.c-rolling-stats-carousel__caption {
+  margin: 0;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-rolling-stats-carousel__stat {
+  margin: 1rem 0;
+  color: var(--wp--preset--color--dark-orange);
+}
+
+.c-rolling-stats-carousel__value,
+.c-rolling-stats-carousel__unit {
+  // Fixed-width numeric glyphs so the counting digits don't jitter the
+  // layout as they tick up.
+  font-variant-numeric: tabular-nums;
+}
+
+.c-rolling-stats-carousel__illustration {
+  flex: none;
+  width: 10rem;
+  height: auto;
+}
+
+// wa-carousel's own pagination/navigation parts are Shadow DOM — colour
+// them via the component's exposed CSS custom properties rather than
+// reaching into the shadow tree with ::part(), which WA's docs recommend
+// against relying on for anything beyond one-off tweaks.
+.c-rolling-stats-carousel__nav-icon {
+  display: inline-flex;
+  color: var(--wp--preset--color--dark-orange);
+
+  svg {
+    width: 1.375rem; // 22px
+    height: 0.875rem; // 14px
+  }
+}
+
+.c-rolling-stats-carousel__nav-icon--previous {
+  transform: scaleX(-1);
+}
+
+wa-carousel-item {
+  @include focus.ring;
+}
