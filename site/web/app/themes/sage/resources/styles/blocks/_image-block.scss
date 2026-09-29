@@ -1,0 +1,91 @@
+// Figma: Media blocks / Image block (node 19:566) — "Image with optional
+// caption" (19:576) and "Image with info box" (21:1321) variants.
+
+@use '../abstracts/breakpoints' as bp;
+
+.c-image-block__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1.25rem;
+}
+
+.c-image-block__caption {
+  margin: 1rem 0 0;
+  text-align: center;
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-image-block__info-box {
+  margin-top: 1.25rem;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--blue-light);
+}
+
+.c-image-block__info-box-content {
+  color: var(--wp--preset--color--charcoal);
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.c-image-block__info-box-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.75rem;
+  }
+}
+
+.c-image-block__info-box-heading {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--wp--preset--color--blue-medium);
+  color: var(--wp--preset--color--blue-dark);
+}
+
+.c-image-block__info-box-rows {
+  margin: 0;
+}
+
+.c-image-block__info-box-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--wp--preset--color--charcoal);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.c-image-block__info-box-icon {
+  flex-shrink: 0;
+  color: var(--wp--preset--color--blue-medium);
+
+  svg {
+    display: block;
+    width: 1.25rem; // 20px
+    height: 1.25rem; // 20px
+  }
+}
+
+// The shared .c-bullet-list heading has no bottom border by default —
+// match the icon-rows column's divider so both columns line up.
+.c-image-block__info-box-bullet-list {
+  .c-bullet-list__heading {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--wp--preset--color--blue-medium);
+    color: var(--wp--preset--color--blue-dark);
+  }
+
+  .c-bullet-list__item {
+    color: var(--wp--preset--color--charcoal);
+  }
+}
