@@ -19,11 +19,8 @@
 }
 
 .c-quote {
-  // Overridable from a calling block's wrapper class (e.g. a future
-  // dark-background usage, node 7:1972) instead of editing this component.
-  --c-quote-color: var(--wp--preset--color--charcoal);
-  --c-quote-attribution-color: var(--wp--preset--color--blue);
-
+  // Defaults are fallbacks on .c-quote__body etc. below, not declared here,
+  // so an ancestor (e.g. Quote Carousel) can still override --c-quote-color.
   display: grid;
   row-gap: 1rem; // mobile: single column, stacked via source order
   align-items: start;
@@ -70,7 +67,7 @@
 
 .c-quote__mark {
   display: inline-flex;
-  color: var(--wp--preset--color--yellow);
+  color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
 
   svg {
     width: 3.0625rem; // 49px, same fixed box convention as Icon Link Grid
@@ -93,7 +90,7 @@
   }
   font-family: var(--wp--preset--font-family--nata-sans);
   @extend .u-quote; // 'large' (default) size — the Figma "Short" variant's scale
-  color: var(--c-quote-color);
+  color: var(--c-quote-color, var(--wp--preset--color--charcoal));
 
   p {
     margin: 0;
@@ -122,12 +119,12 @@
   display: block;
   font-family: var(--wp--preset--font-family--nata-sans);
   @extend .u-quote-citation;
-  color: var(--c-quote-attribution-color);
+  color: var(--c-quote-attribution-color, var(--wp--preset--color--blue));
 }
 
 .c-quote__attribution-role {
   display: block;
   font-family: var(--wp--preset--font-family--nata-sans);
   @extend .u-standfirst;
-  color: var(--c-quote-attribution-color);
+  color: var(--c-quote-attribution-color, var(--wp--preset--color--blue));
 }
