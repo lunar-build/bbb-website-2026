@@ -11,6 +11,8 @@
   height: 100%;
   object-fit: cover;
   border-radius: 1.25rem;
+  z-index: -1;
+  position: relative;
 }
 
 .c-media-thumbnail__play {
