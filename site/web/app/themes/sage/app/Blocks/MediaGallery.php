@@ -162,8 +162,8 @@ class MediaGallery extends Block
             ['media_type' => 'image', 'alt' => 'Gallery image 1', 'column_span' => 1],
             ['media_type' => 'image', 'alt' => 'Gallery image 2', 'column_span' => 1],
             ['media_type' => 'image', 'alt' => 'Gallery image 3', 'column_span' => 1],
-            ['media_type' => 'video', 'alt' => 'Gallery video 1', 'column_span' => 1],
-            ['media_type' => 'video', 'alt' => 'Gallery video 2', 'column_span' => 1],
+            ['media_type' => 'video', 'video_alt' => 'Gallery video 1', 'column_span' => 1],
+            ['media_type' => 'video', 'video_alt' => 'Gallery video 2', 'column_span' => 1],
             ['media_type' => 'image', 'alt' => 'Gallery image 4', 'column_span' => 2],
             ['media_type' => 'image', 'alt' => 'Gallery image 5', 'column_span' => 1],
             ['media_type' => 'image', 'alt' => 'Gallery image 6', 'column_span' => 2],
@@ -303,9 +303,16 @@ class MediaGallery extends Block
                     'conditional_logic' => $videoCondition,
                 ])
                 ->addText('alt', [
-                    'label' => 'Alt text / description',
-                    'instructions' => 'Image alt text, or the video\'s accessible label — also used as the lightbox heading.',
+                    'label' => 'Alt text override',
+                    'instructions' => 'Optional — overrides this image\'s own Media Library alt text (set when it was uploaded). Leave blank to use that instead.',
+                    'required' => 0,
+                    'conditional_logic' => $imageCondition,
+                ])
+                ->addText('video_alt', [
+                    'label' => 'Accessible label',
+                    'instructions' => 'Describes the video for screen readers — also used as the lightbox heading. Videos have no Media Library alt text to fall back on, so this is required.',
                     'required' => 1,
+                    'conditional_logic' => $videoCondition,
                 ])
                 ->addSelect('column_span', [
                     'label' => 'Width',
@@ -360,16 +367,25 @@ class MediaGallery extends Block
         if ($isVideo) {
             $thumbnail = is_array($item['video_poster'] ?? null) ? $item['video_poster'] : null;
             $video = is_array($item['video'] ?? null) ? $item['video'] : null;
+            // Videos have no Media Library alt text to fall back on, so
+            // this field is required — see fields()'s video_alt.
+            $alt = $item['video_alt'] ?? '';
         } else {
             $thumbnail = is_array($item['image'] ?? null) ? $item['image'] : null;
             $video = null;
+            // The repeater's own 'alt' field is an optional override — an
+            // image already carries its own alt text from the Media
+            // Library (ACF's return_format => 'array' includes it), so
+            // only fall back to that rather than duplicating it by
+            // requiring editors to retype it here too.
+            $alt = ($item['alt'] ?? '') ?: ($thumbnail['alt'] ?? '');
         }
 
         return [
             'type' => $isVideo ? 'video' : 'image',
             'thumbnail' => $thumbnail,
             'videoUrl' => $video['url'] ?? null,
-            'alt' => $item['alt'] ?? '',
+            'alt' => $alt,
             'columnSpan' => $columnSpan,
         ];
     }
