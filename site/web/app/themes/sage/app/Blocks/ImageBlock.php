@@ -166,6 +166,20 @@ class ImageBlock extends Block
     ];
 
     /**
+     * Pattern-library variants — each stacked under its label, rendered
+     * with these overrides shallow-merged onto $example. Covers the three
+     * Figma-distinct states: plain caption, info box with icon rows +
+     * bullet list, and info box with freeform rich text.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Caption' => ['content_type' => 'caption'],
+        'Info box — icon rows + bullet list' => ['content_type' => 'info_box', 'info_box_type' => 'columns'],
+        'Info box — rich text' => ['content_type' => 'info_box', 'info_box_type' => 'wysiwyg'],
+    ];
+
+    /**
      * Fallback example data requiring a non-constant expression (Vite::asset).
      *
      * @return array
