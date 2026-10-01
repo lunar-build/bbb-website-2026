@@ -20,6 +20,7 @@
 @use 'components/pill';
 @use 'components/filter-checkbox-group';
 @use 'components/filter-checkboxes';
+@use 'components/media-thumbnail';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'blocks/generic';
@@ -37,3 +38,4 @@
 @use 'blocks/card-grid';
 @use 'blocks/two-column-content';
 @use 'blocks/accordion';
+@use 'blocks/media-gallery';
