@@ -371,13 +371,15 @@ class ImageBlock extends Block
     }
 
     /**
-     * Retrieve the caption.
+     * Retrieve the caption. Empty is valid — the caption is optional; on a
+     * real saved post an empty field means no caption, not the fixture
+     * text (only pattern-library/editor preview falls back to that).
      *
      * @return string
      */
     public function caption()
     {
-        return get_field('caption') ?: '';
+        return get_field('caption') ?: ($this->preview ? ($this->example['caption'] ?? '') : '');
     }
 
     /**
@@ -391,13 +393,15 @@ class ImageBlock extends Block
     }
 
     /**
-     * Retrieve the icon rows column heading.
+     * Retrieve the icon rows column heading. Empty is valid — the heading
+     * is optional; only pattern-library/editor preview falls back to the
+     * fixture text.
      *
      * @return string
      */
     public function infoBoxRowsHeading()
     {
-        return get_field('info_box_rows_heading') ?: '';
+        return get_field('info_box_rows_heading') ?: ($this->preview ? ($this->example['info_box_rows_heading'] ?? '') : '');
     }
 
     /**
@@ -411,13 +415,15 @@ class ImageBlock extends Block
     }
 
     /**
-     * Retrieve the bullet list heading.
+     * Retrieve the bullet list heading. Empty is valid — the heading is
+     * optional; only pattern-library/editor preview falls back to the
+     * fixture text.
      *
      * @return string
      */
     public function infoBoxHeading()
     {
-        return get_field('info_box_heading') ?: '';
+        return get_field('info_box_heading') ?: ($this->preview ? ($this->example['info_box_heading'] ?? '') : '');
     }
 
     /**
