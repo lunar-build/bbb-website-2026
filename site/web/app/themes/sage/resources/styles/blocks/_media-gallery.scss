@@ -49,6 +49,17 @@
 
   @include focus.ring;
 
+  // focus.ring's default outline-offset (+2px) draws the ring OUTSIDE the
+  // tile's own box — fine normally, but edge tiles sit flush against the
+  // grid/carousel boundary, and the carousel's scroll container clips
+  // anything extending past it (WA's internal .slides has overflow:
+  // auto), cropping the ring on whichever side touches that edge. Pull it
+  // inset instead so it's always drawn inside the tile's own bounds,
+  // immune to any ancestor's overflow clipping regardless of position.
+  &:focus-visible {
+    outline-offset: -2px;
+  }
+
   // Clamp matches the grid's own column count at each step above — a
   // span-2 item should never exceed however many columns actually exist.
   @include bp.respond($min: bp.$sm) {
