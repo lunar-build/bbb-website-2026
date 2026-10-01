@@ -1,0 +1,61 @@
+@use '../base/focus' as focus;
+
+// Figma "Table" (node 10:4095). Author-defined column count, so the fixed
+// 2-column header split in the design isn't baked in here — width instead
+// comes from each column sharing the table equally, with a min-width floor
+// so columns stay legible and the table scrolls horizontally rather than
+// crushing content on narrow viewports (WCAG 1.4.10 reflow).
+.c-table__scroll {
+  overflow-x: auto;
+  border: 1px solid var(--wp--preset--color--blue-dark);
+  border-radius: 1.25rem;
+
+  @include focus.ring;
+}
+
+.c-table__table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    min-width: 10rem;
+  }
+
+  thead th {
+    background: var(--wp--preset--color--blue-dark);
+    color: var(--wp--preset--color--white);
+    text-align: left;
+    padding: 0.8125rem 1.625rem;
+  }
+
+  tbody tr:nth-child(odd) {
+    background: var(--wp--preset--color--blue-light);
+  }
+
+  tbody tr:nth-child(even) {
+    background: var(--wp--preset--color--white);
+  }
+
+  tbody th,
+  tbody td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.8125rem 1.875rem 1.125rem 1.8125rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  tbody th {
+    font-weight: 700;
+  }
+
+  tbody td p:last-child {
+    margin-bottom: 0;
+  }
+
+  tbody a {
+    color: var(--wp--preset--color--charcoal);
+
+    @include focus.ring;
+  }
+}
