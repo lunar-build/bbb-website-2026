@@ -308,6 +308,7 @@ class MediaGallery extends Block
     public function pages()
     {
         $items = array_map(fn($item) => $this->normalizeItem($item), $this->items());
+        $items = $this->interleaveBySpan($items);
 
         return $this->paginate($items);
     }
@@ -338,6 +339,63 @@ class MediaGallery extends Block
             'alt' => $item['alt'] ?? '',
             'columnSpan' => $columnSpan,
         ];
+    }
+
+    /**
+     * Spread 2-column ("wide") items evenly among the 1-column ("narrow")
+     * ones, preserving each group's own relative order.
+     *
+     * CSS Grid's `grid-auto-flow: row dense` (see _media-gallery.scss) can
+     * only backfill a gap next to a wide tile if a narrow tile still
+     * remains later in source order to fill it — if an editor happens to
+     * group several wide items together, or the narrow:wide ratio runs out
+     * at a particular column count, dense packing strands those wide tiles
+     * alone in their own row with a dead gap next to them. That's a
+     * property of the item *order*, not of a particular breakpoint — a
+     * sequence that packs perfectly at 4 columns can still leave gaps at 3
+     * or 2 columns, since how many narrow fillers are "left over" when a
+     * wide item is reached depends on the column count. Evenly
+     * interleaving up front (independent of any specific column count)
+     * keeps a narrow filler near every wide item as often as possible,
+     * so dense packing has a fair shot at a gapless grid at every width.
+     *
+     * @param  array  $items
+     * @return array
+     */
+    protected function interleaveBySpan(array $items)
+    {
+        $narrow = array_values(array_filter($items, fn($item) => $item['columnSpan'] === 1));
+        $wide = array_values(array_filter($items, fn($item) => $item['columnSpan'] === 2));
+
+        if (! $narrow || ! $wide) {
+            return $items;
+        }
+
+        $result = [];
+        $narrowTotal = count($narrow);
+        $wideTotal = count($wide);
+        $wideUsed = 0;
+
+        foreach ($narrow as $i => $item) {
+            $result[] = $item;
+
+            // How many wide items "should" have been emitted by this point
+            // if they were spread proportionally across the narrow list.
+            $targetWide = (int) floor((($i + 1) / $narrowTotal) * $wideTotal);
+
+            while ($wideUsed < $targetWide) {
+                $result[] = $wide[$wideUsed];
+                $wideUsed++;
+            }
+        }
+
+        // Rounding can leave a wide item or two unplaced — append them.
+        while ($wideUsed < $wideTotal) {
+            $result[] = $wide[$wideUsed];
+            $wideUsed++;
+        }
+
+        return $result;
     }
 
     /**
