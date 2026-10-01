@@ -84,7 +84,7 @@
   justify-content: center;
   width: 2.375rem; // 38px
   height: 2.0625rem; // 33px
-  color: var(--wp--preset--color--blue);
+  color: var(--wp--preset--color--yellow);
 
   .c-icon,
   svg {
@@ -96,6 +96,48 @@
 
 .c-media-gallery__nav-icon--previous svg {
   transform: rotate(180deg);
+}
+
+// Re-columns prev/pagination/next together, 1rem apart (default puts nav
+// buttons beside the slides instead) — same technique as
+// RollingStatsCarousel's ::part(carousel) remap.
+.c-media-gallery__carousel::part(carousel) {
+  grid-template-columns: 1fr min-content max-content min-content 1fr; // max-content: dots' flex-wrap needs it
+  grid-template-areas: none;
+  gap: 1rem;
+}
+
+.c-media-gallery__carousel::part(scroll-container) {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.c-media-gallery__carousel::part(navigation-button-previous) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.c-media-gallery__carousel::part(pagination) {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.c-media-gallery__carousel::part(navigation-button-next) {
+  grid-column: 4;
+  grid-row: 2;
+}
+
+// Theme-blue dots — solid when active, a ring otherwise.
+.c-media-gallery__carousel::part(pagination-item) {
+  width: 0.75rem;
+  height: 0.75rem;
+  box-sizing: border-box;
+  border: 2px solid var(--wp--preset--color--blue);
+  background-color: transparent;
+}
+
+.c-media-gallery__carousel::part(pagination-item-active) {
+  background-color: var(--wp--preset--color--blue);
 }
 
 .c-media-gallery__carousel::part(navigation-button),
