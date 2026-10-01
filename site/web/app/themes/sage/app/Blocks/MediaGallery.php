@@ -172,7 +172,25 @@ class MediaGallery extends Block
     ];
 
     /**
+     * Pattern-library variants. Left empty here and populated inside
+     * example() below (see that method's docblock for why) rather than
+     * declared statically like ImageBlock's $examples.
+     *
+     * @var array
+     */
+    public $examples = [];
+
+    /**
      * Fallback example data requiring a non-constant expression (Vite::asset).
+     *
+     * Also populates $examples as a side effect, rather than declaring it
+     * as a static property like every other block's $examples: a second
+     * "carousel" variant needs items with real resolved placeholder
+     * URLs (Vite::asset() isn't a constant expression, so those can't
+     * live in a static property default), and PatternLibrary reads
+     * $block->examples only after this method has already run — by which
+     * point $this has full access to the resolved image/video fixtures
+     * built below.
      *
      * @return array
      */
@@ -181,13 +199,28 @@ class MediaGallery extends Block
         $image = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''];
         $video = ['url' => Vite::asset('resources/videos/placeholder/pattern-placeholder.mp4')];
 
-        $items = array_map(function ($item) use ($image, $video) {
-            $item['image'] = $image;
-            $item['video_poster'] = $image;
-            $item['video'] = $video;
+        $resolve = function (array $items) use ($image, $video) {
+            return array_map(function ($item) use ($image, $video) {
+                $item['image'] = $image;
+                $item['video_poster'] = $image;
+                $item['video'] = $video;
 
-            return $item;
-        }, $this->example['items']);
+                return $item;
+            }, $items);
+        };
+
+        $items = $resolve($this->example['items']);
+
+        // The base 9-item fixture sums to exactly PAGE_CAPACITY (12)
+        // units, so it always renders as a single page with no carousel
+        // chrome — duplicate it to 24 units (2 full pages) so the
+        // pagination arrows/dots have something to demonstrate.
+        $this->examples = [
+            'Single page (grid only)' => [],
+            'Multiple pages (carousel)' => [
+                'items' => array_merge($resolve($this->example['items']), $resolve($this->example['items'])),
+            ],
+        ];
 
         return ['items' => $items];
     }
@@ -395,7 +428,43 @@ class MediaGallery extends Block
             $wideUsed++;
         }
 
-        return $result;
+        return $this->desyncWidePositions($result);
+    }
+
+    /**
+     * Shift every other wide item one slot earlier in the sequence.
+     *
+     * Spreading wide items proportionally (above) is correct on average,
+     * but when the narrow:wide ratio divides a row's column count exactly
+     * — e.g. 2 narrow + 1 wide = 4 columns — every row ends up the same
+     * shape, so every wide tile lands in the same column and the grid
+     * reads as a static vertical stripe rather than a genuine mix
+     * (reported: all the wide tiles sitting in the last 2 columns at the
+     * 4-column width). Nudging alternate wide tiles one slot earlier
+     * desyncs them from that repeating rhythm while keeping the overall
+     * spacing balanced — each wide item is still never more than one
+     * narrow-slot away from its evenly-distributed target.
+     *
+     * @param  array  $items
+     * @return array
+     */
+    protected function desyncWidePositions(array $items)
+    {
+        $wideSeen = 0;
+
+        foreach ($items as $i => $item) {
+            if ($item['columnSpan'] !== 2) {
+                continue;
+            }
+
+            if ($wideSeen % 2 === 1 && $i > 0 && $items[$i - 1]['columnSpan'] === 1) {
+                [$items[$i - 1], $items[$i]] = [$items[$i], $items[$i - 1]];
+            }
+
+            $wideSeen++;
+        }
+
+        return $items;
     }
 
     /**
