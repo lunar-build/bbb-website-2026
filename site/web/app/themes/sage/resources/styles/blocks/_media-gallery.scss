@@ -110,6 +110,14 @@
 .c-media-gallery__carousel::part(scroll-container) {
   grid-column: 1 / -1;
   grid-row: 1;
+
+  // WA's own internal .slides rule centres each slide vertically by
+  // default — harmless when every page is the same height, but a
+  // trailing page with fewer rows than the carousel's tallest page (the
+  // scroll track's height follows the tallest slide) ends up vertically
+  // centred in the leftover space instead of starting at the top, which
+  // reads as "images added to the centre row" on a part-empty grid.
+  align-items: start;
 }
 
 .c-media-gallery__carousel::part(navigation-button-previous) {

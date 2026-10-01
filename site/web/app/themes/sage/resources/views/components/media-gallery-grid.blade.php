@@ -19,7 +19,7 @@
       data-poster="{{ $item['thumbnail']['url'] ?? '' }}"
       aria-label="{{ $label }}"
     >
-      <x-media-thumbnail :type="$item['type']" :thumbnail="$item['thumbnail']" />
+      <x-media-thumbnail :type="$item['type']" :thumbnail="$item['thumbnail']" :video-url="$item['videoUrl']" />
     </button>
   @endforeach
 </div>

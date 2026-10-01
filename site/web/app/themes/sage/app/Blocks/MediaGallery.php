@@ -151,24 +151,41 @@ class MediaGallery extends Block
     const PAGE_CAPACITY = 12;
 
     /**
-     * The block preview example data — 9 items reproducing the Figma
-     * reference's masonry layout exactly (4 squares / 1+wide+1 / 2 wides),
-     * to demonstrate the dynamic grid at its densest documented shape.
+     * The 9 raw item specs reproducing the Figma reference's masonry
+     * layout exactly (4 squares / 1+wide+1 / 2 wides), to demonstrate the
+     * dynamic grid at its densest documented shape.
+     *
+     * A class constant, not read from $this->example['items'] — example()
+     * below gets called again on every PatternLibrary variant render (not
+     * just once), and by the second call $this->example['items'] has
+     * already been swapped to whichever variant's override is currently
+     * rendering. Building the "Multiple pages" variant by duplicating
+     * $this->example['items'] at that point would duplicate an
+     * already-duplicated list each time it re-ran, compounding into more
+     * pages than intended. A constant is immune to that — always the same
+     * 9 raw specs regardless of how many times example() runs.
+     *
+     * @var array
+     */
+    const BASE_ITEMS = [
+        ['media_type' => 'image', 'alt' => 'Gallery image 1', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 2', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 3', 'column_span' => 1],
+        ['media_type' => 'video', 'video_alt' => 'Gallery video 1', 'column_span' => 1],
+        ['media_type' => 'video', 'video_alt' => 'Gallery video 2', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 4', 'column_span' => 2],
+        ['media_type' => 'image', 'alt' => 'Gallery image 5', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 6', 'column_span' => 2],
+        ['media_type' => 'image', 'alt' => 'Gallery image 7', 'column_span' => 2],
+    ];
+
+    /**
+     * The block preview example data.
      *
      * @var array
      */
     public $example = [
-        'items' => [
-            ['media_type' => 'image', 'alt' => 'Gallery image 1', 'column_span' => 1],
-            ['media_type' => 'image', 'alt' => 'Gallery image 2', 'column_span' => 1],
-            ['media_type' => 'image', 'alt' => 'Gallery image 3', 'column_span' => 1],
-            ['media_type' => 'video', 'video_alt' => 'Gallery video 1', 'column_span' => 1],
-            ['media_type' => 'video', 'video_alt' => 'Gallery video 2', 'column_span' => 1],
-            ['media_type' => 'image', 'alt' => 'Gallery image 4', 'column_span' => 2],
-            ['media_type' => 'image', 'alt' => 'Gallery image 5', 'column_span' => 1],
-            ['media_type' => 'image', 'alt' => 'Gallery image 6', 'column_span' => 2],
-            ['media_type' => 'image', 'alt' => 'Gallery image 7', 'column_span' => 2],
-        ],
+        'items' => self::BASE_ITEMS,
     ];
 
     /**
@@ -202,14 +219,22 @@ class MediaGallery extends Block
         $resolve = function (array $items) use ($image, $video) {
             return array_map(function ($item) use ($image, $video) {
                 $item['image'] = $image;
-                $item['video_poster'] = $image;
                 $item['video'] = $video;
+
+                // Leave "Gallery video 2" without a poster on purpose, to
+                // demonstrate the native-first-frame fallback (see
+                // <x-media-thumbnail>) alongside "Gallery video 1", which
+                // has one — video_poster is optional, not every video item
+                // will have it set.
+                if (($item['media_type'] ?? null) !== 'video' || ($item['video_alt'] ?? null) !== 'Gallery video 2') {
+                    $item['video_poster'] = $image;
+                }
 
                 return $item;
             }, $items);
         };
 
-        $items = $resolve($this->example['items']);
+        $items = $resolve(self::BASE_ITEMS);
 
         // The base 9-item fixture sums to exactly PAGE_CAPACITY (12)
         // units, so it always renders as a single page with no carousel
@@ -218,7 +243,7 @@ class MediaGallery extends Block
         $this->examples = [
             'Single page (grid only)' => [],
             'Multiple pages (carousel)' => [
-                'items' => array_merge($resolve($this->example['items']), $resolve($this->example['items'])),
+                'items' => array_merge($resolve(self::BASE_ITEMS), $resolve(self::BASE_ITEMS)),
             ],
         ];
 
@@ -296,10 +321,10 @@ class MediaGallery extends Block
                 ])
                 ->addImage('video_poster', [
                     'label' => 'Video poster / thumbnail',
-                    'instructions' => 'Shown in the grid tile before the video is opened.',
+                    'instructions' => 'Optional. Shown in the grid tile before the video is opened — leave blank to use the video\'s own first frame instead (the browser loads just enough of the file to show it, no separate image needed). Upload one only if a specific frame or a custom graphic is wanted here.',
                     'return_format' => 'array',
                     'preview_size' => 'medium',
-                    'required' => 1,
+                    'required' => 0,
                     'conditional_logic' => $videoCondition,
                 ])
                 ->addText('alt', [
