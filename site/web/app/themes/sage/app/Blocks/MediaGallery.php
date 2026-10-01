@@ -257,7 +257,36 @@ class MediaGallery extends Block
     {
         return [
             'pages' => $this->pages(),
+            'isEditorPreview' => $this->isEditorPreview(),
         ];
+    }
+
+    /**
+     * Whether this render is the real wp-admin block editor canvas, as
+     * opposed to the front end or the (also preview=true) /pattern-library
+     * page.
+     *
+     * Tiles are real <button> elements so they're clickable for the
+     * lightbox — but a native interactive element inside a Gutenberg
+     * block's preview intercepts the click before it reaches the editor's
+     * own "select this block" handling, so the block can never be
+     * selected by clicking its content (only via the block list/outline).
+     * Rendering non-interactive tiles specifically in the real editor
+     * canvas avoids that conflict without losing the lightbox anywhere
+     * it's actually usable (front end, pattern-library).
+     *
+     * is_admin() is the right check — verified via logging the actual
+     * request context: ACF renders a block's editor preview through its
+     * own admin-ajax.php?action=acf/ajax/fetch-block, not the WP core
+     * REST API's block-renderer. is_admin() is true there (DOING_AJAX
+     * requests from wp-admin still count); /pattern-library renders via a
+     * normal front-end PHP page template, so this stays false for it.
+     *
+     * @return bool
+     */
+    public function isEditorPreview()
+    {
+        return $this->preview && is_admin();
     }
 
     /**
@@ -292,7 +321,7 @@ class MediaGallery extends Block
                 'label' => 'Items',
                 'button_label' => 'Add item',
                 'min' => 1,
-                'layout' => 'block',
+                'layout' => 'row',
             ])
                 ->addSelect('media_type', [
                     'label' => 'Media type',
