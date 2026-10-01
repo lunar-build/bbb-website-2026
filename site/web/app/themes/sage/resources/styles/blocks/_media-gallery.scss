@@ -18,13 +18,20 @@
   grid-auto-flow: row dense;
   gap: 1rem;
 
+  // 4 columns straight from $md (768px) squeezed every tile too narrow on
+  // tablet/small-laptop widths — step through 2 then 3 columns first and
+  // only go to 4 once there's genuinely enough width for it ($xl).
   @include bp.respond($min: bp.$sm) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @include bp.respond($min: bp.$md) {
-    grid-template-columns: repeat(4, 1fr);
+  @include bp.respond($min: bp.$lg) {
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
+  }
+
+  @include bp.respond($min: bp.$xl) {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -42,11 +49,17 @@
 
   @include focus.ring;
 
+  // Clamp matches the grid's own column count at each step above — a
+  // span-2 item should never exceed however many columns actually exist.
   @include bp.respond($min: bp.$sm) {
     grid-column: span min(var(--column-span, 1), 2);
   }
 
-  @include bp.respond($min: bp.$md) {
+  @include bp.respond($min: bp.$lg) {
+    grid-column: span min(var(--column-span, 1), 3);
+  }
+
+  @include bp.respond($min: bp.$xl) {
     grid-column: span min(var(--column-span, 1), 4);
   }
 }
