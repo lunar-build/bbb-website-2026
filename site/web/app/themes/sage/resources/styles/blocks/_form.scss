@@ -1,3 +1,5 @@
+@use '../abstracts/breakpoints' as bp;
+
 .c-form {
   &__inner {
     display: grid;
@@ -15,6 +17,70 @@
 
     > * + * {
       margin-top: 1rem;
+    }
+  }
+
+  // "Image with form" layout: a coloured panel with the heading/form on the
+  // left and an image filling the right half, bleeding to the panel's own
+  // edge (not the block's — the panel is the full-bleed element here).
+  &--image {
+    .c-form__panel {
+      position: relative;
+      overflow: hidden;
+      background-color: var(--wp--preset--color--blue-light);
+      padding-block: 3rem;
+
+      @include bp.respond($min: bp.$lg) {
+        padding-block: 4rem;
+      }
+    }
+
+    .o-container {
+      position: relative;
+    }
+
+    .c-form__inner {
+      @include bp.respond($min: bp.$lg) {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+      }
+    }
+
+    .c-form__image {
+      aspect-ratio: 16 / 9;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+      overflow: hidden;
+
+      @include bp.respond($min: bp.$lg) {
+        aspect-ratio: auto;
+        margin-bottom: 0;
+        border-radius: 0;
+        position: absolute;
+        inset: 0 0 0 50%;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
+  // "Centred" layout: plain background, no image, a single narrower column
+  // of heading + form centred within the container.
+  &--centred {
+    .c-form__inner {
+      max-width: 48rem;
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    .c-form__content {
+      :where(h1, h2, h3, h4, h5, h6) {
+        text-align: center;
+      }
     }
   }
 }
