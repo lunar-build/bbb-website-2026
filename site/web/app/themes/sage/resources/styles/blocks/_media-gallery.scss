@@ -95,6 +95,18 @@
   --width: 60rem;
 }
 
+// wa-dialog's built-in close button is a NESTED <wa-button> — the part
+// named "close-button" is that component's own host element, which never
+// itself receives :focus-visible (the real focus target is its own inner
+// native <button>, two shadow levels down from here). ::part(close-button)
+// alone is therefore silently inert for a focus-state selector: wa-button's
+// own internal focus style wins instead. wa-dialog forwards that inner
+// element specifically as "close-button__base" (its exported `base` part)
+// for exactly this case — target that instead.
+.c-media-gallery__dialog::part(close-button__base) {
+  @include focus.ring;
+}
+
 .c-media-gallery__dialog-body {
   img,
   video {
@@ -103,5 +115,13 @@
     max-height: 70vh;
     height: auto;
     border-radius: 0.625rem;
+  }
+
+  // The lightbox's own <video controls> is a real tab stop once the
+  // dialog is open — give it the same explicit ring as every other
+  // interactive element in this block rather than leaving it to
+  // whatever the browser's native video focus style happens to be.
+  video {
+    @include focus.ring;
   }
 }
