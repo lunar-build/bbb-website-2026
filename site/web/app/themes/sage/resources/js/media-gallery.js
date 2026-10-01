@@ -1,10 +1,8 @@
-// Media Gallery's lightbox: every grid/carousel tile is a plain <button>
-// (data-media-gallery-item) describing its media via data-* attributes;
-// clicking it fills the block's single <wa-dialog> with a real <img> or
-// <video controls> rather than pre-rendering every tile's full-size media
-// up front. Focus returns to the tile that opened the dialog on close,
-// per WCAG 2.4.3 (Focus Order) — wa-dialog traps focus and handles Esc
-// itself, this only needs to restore focus afterwards.
+// Every tile is a plain <button> (data-media-gallery-item) describing its
+// media via data-* attributes; clicking it fills the block's <wa-dialog>
+// with a real <img> or <video controls> rather than pre-rendering every
+// tile's full-size media up front. wa-dialog traps focus and handles Esc
+// itself — this only restores focus to the trigger on close (WCAG 2.4.3).
 document.querySelectorAll('[data-media-gallery]').forEach((wrapper) => {
   const dialog = wrapper.querySelector('[data-media-gallery-dialog]');
   const body = wrapper.querySelector('[data-media-gallery-dialog-body]');

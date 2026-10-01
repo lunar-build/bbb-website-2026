@@ -1,8 +1,7 @@
-// Figma: Media blocks / Media gallery (node 81:2426) — the Figma frame
-// shows a fixed 9-tile masonry template, but editors pick 1 or 2 column
-// widths per item instead (see MediaGallery::fields()), so the grid below
-// reproduces the *look* (mixed squares/wide tiles, dense packing) without
-// requiring that exact item count/order.
+// Figma: Media blocks / Media gallery (node 81:2426) — the grid is dynamic
+// (editor picks a 1/2-col width per item, see MediaGallery::fields()) rather
+// than matching the frame's fixed 9-tile template, since the exact item
+// count/order can't be guaranteed.
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
@@ -49,13 +48,10 @@
 
   @include focus.ring;
 
-  // focus.ring's default outline-offset (+2px) draws the ring OUTSIDE the
-  // tile's own box — fine normally, but edge tiles sit flush against the
-  // grid/carousel boundary, and the carousel's scroll container clips
-  // anything extending past it (WA's internal .slides has overflow:
-  // auto), cropping the ring on whichever side touches that edge. Pull it
-  // inset instead so it's always drawn inside the tile's own bounds,
-  // immune to any ancestor's overflow clipping regardless of position.
+  // focus.ring's default +2px offset draws the ring outside the tile —
+  // clipped by the carousel's scroll container (WA's .slides has
+  // overflow: auto) on edge tiles. Inset instead so it never leaves the
+  // tile's own bounds.
   &:focus-visible {
     outline-offset: -2px;
   }
@@ -122,12 +118,10 @@
   grid-column: 1 / -1;
   grid-row: 1;
 
-  // WA's own internal .slides rule centres each slide vertically by
-  // default — harmless when every page is the same height, but a
-  // trailing page with fewer rows than the carousel's tallest page (the
-  // scroll track's height follows the tallest slide) ends up vertically
-  // centred in the leftover space instead of starting at the top, which
-  // reads as "images added to the centre row" on a part-empty grid.
+  // WA's own .slides centres each slide vertically by default — fine
+  // when every page is the same height, but a shorter trailing page
+  // (scroll track height follows the tallest page) ends up centred in
+  // the leftover space instead of starting at the top.
   align-items: start;
 }
 
@@ -169,14 +163,11 @@
   --width: 60rem;
 }
 
-// wa-dialog's built-in close button is a NESTED <wa-button> — the part
-// named "close-button" is that component's own host element, which never
-// itself receives :focus-visible (the real focus target is its own inner
-// native <button>, two shadow levels down from here). ::part(close-button)
-// alone is therefore silently inert for a focus-state selector: wa-button's
-// own internal focus style wins instead. wa-dialog forwards that inner
-// element specifically as "close-button__base" (its exported `base` part)
-// for exactly this case — target that instead.
+// wa-dialog's close button is a nested <wa-button> — ::part(close-button)
+// targets that component's own host, which never receives :focus-visible
+// itself (the real focus target is its inner native <button>, two shadow
+// levels down), so wa-button's own focus style wins instead. Target the
+// exported close-button__base part to reach that inner element directly.
 .c-media-gallery__dialog::part(close-button__base) {
   @include focus.ring;
 }
@@ -191,10 +182,9 @@
     border-radius: 0.625rem;
   }
 
-  // The lightbox's own <video controls> is a real tab stop once the
-  // dialog is open — give it the same explicit ring as every other
-  // interactive element in this block rather than leaving it to
-  // whatever the browser's native video focus style happens to be.
+  // The lightbox's <video controls> is a real tab stop — give it the
+  // same explicit ring as every other interactive element here, rather
+  // than the browser's native video focus style.
   video {
     @include focus.ring;
   }
