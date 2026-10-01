@@ -39,18 +39,22 @@ Both plugins are premium/paid, so they aren't on Packagist or [WP Packages](http
 |---|---|---|
 | ACF Pro | `wpengine/advanced-custom-fields` | `git@github.com:lunar-build/advanced-custom-fields-pro.git` |
 | Gravity Forms | `gravityforms/gravityforms` | `git@github.com:lunar-build/gravityforms.git` |
+| Modern Events Calendar Pro | `lunar-build/modern-events-calendar-pro` | `git@github.com:lunar-build/modern-events-calendar.git` |
 
 Both are declared as `"type": "vcs"` entries in `site/composer.json`'s `repositories` array, alongside the `wp-packages` entry. To add another premium plugin later, follow the same pattern: get (or create) a `lunar-build/<plugin-slug>` mirror repo, add a matching `vcs` entry, `require` the package.
 
 Install/update them the same way as any other Composer dependency:
 
 ```bash
-ddev exec "composer install"                          # first install (uses composer.lock)
-ddev composer update wpengine/advanced-custom-fields   # bump ACF Pro only
-ddev composer update gravityforms/gravityforms         # bump Gravity Forms only
+ddev exec "composer install"                                    # first install (uses composer.lock)
+ddev composer update wpengine/advanced-custom-fields             # bump ACF Pro only
+ddev composer update gravityforms/gravityforms                   # bump Gravity Forms only
+ddev composer update lunar-build/modern-events-calendar-pro      # bump Modern Events Calendar Pro only
 ```
 
-Both land in `web/app/plugins/` (gitignored — Composer-managed, don't hand-edit or commit).
+All three land in `web/app/plugins/` (gitignored — Composer-managed, don't hand-edit or commit).
+
+Modern Events Calendar Pro's mirror repo has no version tags yet (just a `main` branch), so it's required as `dev-main` rather than a semver range — `composer.lock` pins the exact commit, same reproducibility guarantee as a tagged release, it just needs `composer update lunar-build/modern-events-calendar-pro` (not a version bump) to pull in a newer commit.
 
 #### Auth: GitHub token required
 
@@ -80,7 +84,7 @@ If `composer install` fails with a 404 downloading either package, or silently f
 Once WP install screen has run (site loads, DB set up):
 
 1. Grab `ACF_PRO_KEY` from 1Password and set it in `site/.env`
-2. Activate ACF Pro and Gravity Forms plugins in WP admin (Plugins)
+2. Activate ACF Pro, Gravity Forms, and Modern Events Calendar Pro plugins in WP admin (Plugins)
 3. Confirm active theme is **Sage** (`web/app/themes/sage`) — WP admin > Appearance > Themes
 
 # [ACF Composer](https://github.com/log1x/acf-composer)

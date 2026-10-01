@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fbe3dcf91663fad037e0c5150face353",
+    "content-hash": "fac372dcb67f83a4339ec78d54099183",
     "packages": [
         {
             "name": "cloudflare/cf-ip-rewrite",
@@ -302,6 +302,41 @@
                 }
             ],
             "time": "2026-09-18T00:31:28+00:00"
+        },
+        {
+            "name": "lunar-build/modern-events-calendar-pro",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:lunar-build/modern-events-calendar.git",
+                "reference": "a617d250ca8dedcf452ab2810a0602bcc7f8d1b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lunar-build/modern-events-calendar/zipball/a617d250ca8dedcf452ab2810a0602bcc7f8d1b9",
+                "reference": "a617d250ca8dedcf452ab2810a0602bcc7f8d1b9",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "^2.0 || ^1.0"
+            },
+            "require-dev": {
+                "tutv95/wp-package-parser": "^1.0"
+            },
+            "default-branch": true,
+            "type": "wordpress-plugin",
+            "extra": {
+                "installer-name": "modern-events-calendar-pro"
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Modern Events Calendar Pro",
+            "support": {
+                "source": "https://github.com/lunar-build/modern-events-calendar/tree/main",
+                "issues": "https://github.com/lunar-build/modern-events-calendar/issues"
+            },
+            "time": "2026-06-22T12:05:02+00:00"
         },
         {
             "name": "oscarotero/env",
@@ -6331,7 +6366,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "lunar-build/modern-events-calendar-pro": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
