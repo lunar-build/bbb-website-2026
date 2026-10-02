@@ -1,7 +1,4 @@
-// Figma node 58:2560 ("Filter result card" in Figma, renamed Business Card
-// here): no image, a business/service listing — heading, contact info +
-// services icon/text repeaters, description, CTA. Also used as Card Grid's
-// "Business card" card style.
+// Figma node 58:2560. Also used as Card Grid's "Business card" style.
 @use '../base/typography';
 @use '../components/button';
 
@@ -54,10 +51,6 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    // Base typography's global `ul, ol li { margin-bottom }` (not scoped to
-    // content lists) stacks on top of the `gap` these lists already use for
-    // spacing, and only on non-last items — that mismatch, not the item
-    // layout itself, was the real cause of items not lining up.
     margin-bottom: 0;
   }
 
