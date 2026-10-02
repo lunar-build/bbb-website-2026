@@ -27,30 +27,15 @@
 .c-sticky-nav-template__nav {
   @include bp.respond($min: bp.$lg) {
     position: sticky;
-    // A fixed `top` — animating position: sticky's own `top` is unreliable
-    // (some browsers mis-recompute the sticky anchor mid-transition, which
-    // threw this element way down the page on scroll-up). The extra gap
-    // for the header is instead a `transform`, which composites separately
-    // from sticky's own positioning math.
-    top: 2rem;
-    // --site-header-offset (resources/js/site-header.js) is 0 while the
-    // header's hidden and its full height while shown, so this settles
-    // below the header when it's visible but rises to meet 2rem from the
-    // viewport top once it slides away — transitioning in step with the
-    // header's own 0.25s slide (base/_header.scss's
-    // $site-header-transition-duration; keep the two in sync if that
-    // value ever changes) rather than leaving a stale gap behind it.
-    transform: translateY(var(--site-header-offset, 0px));
-    transition: transform 0.25s ease;
+    // --site-header-height (resources/js/site-header.js) so this settles
+    // below the sticky, auto-hide header rather than under it once the
+    // header slides back in on scroll-up.
+    top: calc(var(--site-header-height, 0px) + 2rem);
     // max(), not a bare calc(), so a bad --site-header-height reading can't
     // collapse this to near-zero and make the nav disappear — it just
     // scrolls internally past 12rem instead.
     max-height: max(12rem, calc(100dvh - var(--site-header-height, 0px) - 6rem));
     overflow-y: auto;
-
-    @media (prefers-reduced-motion: reduce) {
-      transition: none;
-    }
   }
 }
 
