@@ -25,6 +25,38 @@ add_filter('block_categories_all', function (array $categories) {
 });
 
 /**
+ * log1x/acf-composer (v3.4) hardcodes every block's `acf_block_version` to 2
+ * (see Block::$blockVersion), which stops ACF 6.8.10's own WP 7.1+ default
+ * (version_compare($wp_version, '7.1', '>=') ? 3 : 2) from ever kicking in —
+ * ACF only applies that default when `acf_block_version` is unset. Blocks
+ * stuck on v2 lose the old "auto" mode's inline edit-form swap entirely on
+ * WP 7.1 (its canvas is iframe-only now, and ACF's v2 form injection isn't
+ * iframe-compatible), so clicking a block only ever opens the Inspector
+ * sidebar. Force v3 here, which also brings back the block toolbar's pencil
+ * icon ("expanded editor") — click it to open a full-size pop-out panel with
+ * every field, the same one access point for every block regardless of
+ * field type.
+ *
+ * Deliberately NOT setting `auto_inline_editing` (ACF 6.7+, makes any field
+ * whose value is the sole content of an element — e.g. WYSIWYG text —
+ * editable directly in the canvas, like core InnerBlocks). It looks like it
+ * fixes the sidebar problem, but it only applies to that one field type,
+ * so clients can edit the text inline and assume that's the whole block,
+ * missing the rest of the fields (icon, image, layout options, etc.) which
+ * still need the pop-out editor. Two different edit paths depending on
+ * field type is worse UX than one consistent "click the pencil" path.
+ */
+add_filter('acf/register_block_type_args', function ($block) {
+    if (! str_starts_with($block['name'] ?? '', 'acf/')) {
+        return $block;
+    }
+
+    $block['acf_block_version'] = 3;
+
+    return $block;
+});
+
+/**
  * Our own ACF Composer blocks each render their own <section>/.o-container
  * wrapper (see the build-acf-block skill's "<section> root" convention),
  * but third-party/core blocks placed directly in post content — e.g. the
