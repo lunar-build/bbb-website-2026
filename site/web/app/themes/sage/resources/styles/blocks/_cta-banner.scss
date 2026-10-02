@@ -1,9 +1,7 @@
 @use '../abstracts/breakpoints' as bp;
 
-// Section always bleeds full-width (the coloured background), with a
-// position:relative + overflow:hidden clip so the Centred layout's
-// edge-bleeding illustrations never cause horizontal scroll — .o-container
-// inside stays gutter-constrained per base/_container.scss's convention.
+// overflow:hidden clips Centred's edge-bleeding illustrations so they
+// never cause horizontal scroll.
 .c-cta-banner {
   position: relative;
   overflow: hidden;
@@ -33,10 +31,8 @@
   align-self: flex-start;
 }
 
-// Centred layout's decorative illustrations — absolutely positioned
-// against the section itself (not .o-container), and capped narrow via
-// clamp(). Vertically centred on the section. Hidden until `xl` — below
-// that there isn't room beside the centred text without overlapping it.
+// Centred's decorative illustrations. Hidden below `xl` — no room beside
+// the centred text without overlapping it.
 .c-cta-banner__image {
   display: none;
   position: absolute;
@@ -51,10 +47,8 @@
   }
 }
 
-// Anchored a fixed distance from centre (half the text's 34rem max-width
-// + a gap) rather than the section edge, so they hold that gap instead of
-// collapsing toward centre (too-close) or drifting to the edges (too-far)
-// as the viewport keeps growing.
+// Anchored a fixed distance from centre, not the section edge, so the gap
+// to the text stays constant as the viewport grows.
 .c-cta-banner__image--left {
   left: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
   transform: translateY(-50%);
@@ -128,11 +122,8 @@
     color: var(--wp--preset--color--white);
   }
 
-  // Image + content as real flex items sharing one row, both using the
-  // same 2rem gap that &__content's own text/button row uses (below) —
-  // so image-to-text and text-to-button read as the same spacing, rather
-  // than the image being an absolutely-positioned overlay with its own
-  // one-off offset. Below `md` this stays a column (base &__grid rule).
+  // Same 2rem gap as &__content's text/button row below, so image-to-text
+  // and text-to-button read as equal spacing.
   .c-cta-banner__grid {
     @include bp.respond($min: bp.$md) {
       display: flex;
@@ -141,13 +132,8 @@
     }
   }
 
-  // Text left, button right from `md`; stacks to a column below `md`.
   .c-cta-banner__content {
-    // The base rule caps &__content at 40rem — fine for Centred/Slimline,
-    // but Row is no longer a sub-variant of "Left" (which clears this the
-    // same way), so it needs its own override or the row can't spread
-    // past 40rem regardless of the flex/gap rules below.
-    max-width: none;
+    max-width: none; // base rule caps this at 40rem
 
     @include bp.respond($min: bp.$md) {
       flex: 1;
@@ -165,16 +151,9 @@
     }
   }
 
-  // Smaller than the light "Left" layout's image. Source art faces left,
-  // so it's mirrored to face the text/content, same reasoning as the
-  // light "Left" layout (just the opposite direction). `order: -1` puts
-  // it first in the row regardless of DOM order (it renders after
-  // &__content in the markup).
-  //
-  // Hidden until `xl` (not `lg`, unlike every other layout's image) —
-  // the base rule below shows it from `lg`, but there isn't enough room
-  // for image+row-text+button to coexist that early; overridden back to
-  // none here until `xl`.
+  // `order: -1` puts it first regardless of DOM order. Hidden until `xl`
+  // (not `lg` like the base rule) — no room for image+row-text+button
+  // together that early.
   .c-cta-banner__image--column {
     display: none;
 

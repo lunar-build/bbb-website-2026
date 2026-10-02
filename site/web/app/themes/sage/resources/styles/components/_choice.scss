@@ -1,13 +1,6 @@
-// Theming for <wa-radio>/<wa-checkbox> (resources/views/components/
-// {radio,checkbox}.blade.php). Shared sizing/colour tokens (toggle size,
-// border, activated colour) live in base/_wa-theme.scss; this file covers
-// the bits only CSS parts can reach — control border-radius, checked-state
-// appearance, and the control-to-label gap — plus label typography, which
-// inherits into the shadow DOM via plain element rules.
-//
-// Native input[type=radio]/input[type=checkbox] in base/_forms.scss still
-// styles Gravity Forms' own fields unchanged — WA's shadow DOM is a
-// separate styling surface, so the two never conflict.
+// Theming for <wa-radio>/<wa-checkbox>. Shared tokens (size, border,
+// activated colour) live in base/_wa-theme.scss; GF's own
+// input[type=radio/checkbox] in base/_forms.scss is a separate surface.
 
 wa-radio,
 wa-checkbox {
@@ -21,18 +14,13 @@ wa-checkbox {
   }
 }
 
-// radio's :host is itself the control+label row (flex-direction: row, with
-// the invalid `align-items: top` WA ships — browsers drop that, falling
-// back to stretch) — centre the box on the label text there directly.
+// radio's :host IS the control+label row — centre there directly.
 wa-radio {
   align-items: center;
 }
 
-// checkbox's :host is flex-direction: column (inherited from WA's shared
-// form-control styles, never overridden by checkbox's own) — setting
-// align-items there centres column children HORIZONTALLY, not what we
-// want. The real control+label row is ::part(base) (flex-direction: row,
-// align-items: flex-start by default), so centre it there instead.
+// checkbox's :host is column-direction (not row, unlike radio) — the real
+// control+label row is ::part(base).
 wa-checkbox::part(base) {
   align-items: center;
 }
@@ -44,9 +32,7 @@ wa-checkbox {
     border-radius: 0.1875rem;
   }
 
-  // Figma's checked state keeps the white/outlined box with a dark tick —
-  // not WA's default solid-fill-on-check — so the activated colour is
-  // overridden back on the control itself once checked.
+  // Figma keeps white/outlined + dark tick on check, not WA's default fill.
   &:state(checked)::part(control) {
     background-color: var(--wp--preset--color--white);
     border-color: var(--wp--preset--color--charcoal);

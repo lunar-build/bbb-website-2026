@@ -15,13 +15,10 @@
 
   --wa-color-focus: var(--wp--preset--color--blue);
 
-  // Shared brand styling for every <wa-input>/<wa-textarea>/<wa-checkbox>/
-  // <wa-radio> — see node_modules/@awesome.me/webawesome/dist/
-  // styles/themes/default.css for the full --wa-form-control-* token list.
-  // Native `<input>`/`<textarea>` (Gravity Forms etc) are styled separately
-  // in base/_forms.scss and untouched by these — WA's shadow DOM doesn't
-  // see plain element selectors, and these tokens don't leak onto native
-  // controls either.
+  // Shared brand styling for every wa-input/wa-textarea/wa-checkbox/wa-radio
+  // (full --wa-form-control-* list: webawesome/dist/styles/themes/default.css).
+  // GF's own fields are styled separately in base/_forms.scss; these tokens
+  // don't reach them.
   --wa-form-control-background-color: var(--wp--preset--color--white);
   --wa-form-control-border-color: var(--wp--preset--color--charcoal);
   --wa-form-control-border-width: 2px;
@@ -37,13 +34,8 @@
   --wa-form-control-required-content-color: var(--wp--preset--color--dark-orange);
 }
 
-// WA's own focus ring (--wa-color-focus, blue by default above) doesn't
-// match the site's focus.ring mixin (base/_focus.scss — charcoal, or white
-// in dark-surface contexts via --focus-color). Rather than re-implement a
-// ring per component, repoint the tokens WA's own ring is built from so its
-// built-in :focus-within/:focus-visible styling (the wrapper ring on
-// wa-input/wa-textarea, the --wa-focus-ring outline on wa-checkbox/wa-radio)
-// renders in the theme's colour/width/offset instead.
+// Repoints WA's own focus ring (blue by default) to the theme's
+// focus.ring colour/width instead of reimplementing a ring per component.
 wa-input,
 wa-textarea,
 wa-radio,
@@ -55,14 +47,9 @@ wa-checkbox-group {
   --wa-focus-ring-offset: 2px;
 }
 
-// wa-checkbox/wa-radio draw their ring via the COMPOSITE `--wa-focus-ring`
-// token (`outline: var(--wa-focus-ring)`), not the three raw tokens above —
-// and that composite is itself declared once at :root as
-// `var(--wa-focus-ring-style) var(--wa-focus-ring-width) var(--wa-color-focus)`,
-// so its computed value is resolved (and baked in) at :root using :root's
-// own --wa-color-focus, not re-resolved using the override above further
-// down the tree. Re-declaring the composite itself here is what actually
-// changes it for these elements.
+// wa-checkbox/wa-radio draw their ring via the composite `--wa-focus-ring`
+// token, which is resolved once at :root — overriding the raw tokens above
+// doesn't recompute it, so the composite itself needs re-declaring here.
 wa-radio,
 wa-radio-group,
 wa-checkbox,

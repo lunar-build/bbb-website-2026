@@ -4,30 +4,14 @@
 @use '../base/typography';
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
-// sibling of <header class="c-site-header"> in header.blade.php,
-// deliberately NOT nested inside it — that header always carries a
-// `transform` (part of its sticky auto-hide, present even when not
-// currently hidden), which would make it the containing block for a
-// nested position:fixed descendant: the overlay would size against the
-// header's own ~5.25rem box instead of the viewport, slide away with the
-// header's hide-on-scroll transform, and lose the stacking fight for
-// z-index against the header's own (non-positioned) content. As a proper
-// sibling, position:fixed here is contained by the real viewport, and
-// z-index compares correctly against .c-site-header's own
-// ($site-header-z-index, 100) — the header still paints on top for its
-// own real height.
+// sibling of <header class="c-site-header">, not nested inside it — the
+// header's own `transform` (sticky auto-hide) would otherwise become the
+// containing block for this position:fixed overlay, sizing/sliding it
+// against the header instead of the viewport.
 //
-// This overlay only ever shows below bp.$sm (see the display rule below),
-// so there's exactly one header height to account for: Figma's Mobile
-// header row is a fixed 84px (5.25rem) regardless of content (logo/CTA/
-// search/menu toggle all share that row height) — hardcoded rather than
-// measured via JS, since it doesn't vary within the breakpoint range this
-// overlay is visible in. The extra 2.25rem (36px) below it is Figma's own
-// gap before the menu content starts (node 4:1257: content top sits at
-// 13.73% of the 874px frame, ~120px — 84px header + 36px gap).
-//
-// NOTE (a11y): converted 84px -> 5.25rem so this offset scales with the
-// user's root font-size/zoom like the rest of the theme.
+// Padding-top is a hardcoded 5.25rem (header) + 2.25rem (Figma gap, node
+// 4:1257) rather than measured via JS — fixed because this overlay only
+// shows below bp.$sm, where the mobile header height doesn't vary.
 .c-primary-nav {
   position: fixed;
   inset: 0;
