@@ -1,10 +1,8 @@
 @use '../base/focus' as focus;
 
-// Figma "Table" (node 10:4095). Author-defined column count, so the fixed
-// 2-column header split in the design isn't baked in here — width instead
-// comes from each column sharing the table equally, with a min-width floor
-// so columns stay legible and the table scrolls horizontally rather than
-// crushing content on narrow viewports (WCAG 1.4.10 reflow).
+// Figma "Table" (node 10:4095). Column count is author-defined, not fixed
+// to 2 — min-width + horizontal scroll (not squeeze) keeps columns legible
+// per WCAG 1.4.10.
 .c-table__scroll {
   overflow-x: auto;
   border: 1px solid var(--wp--preset--color--blue-dark);

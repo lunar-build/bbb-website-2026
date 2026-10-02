@@ -61,15 +61,12 @@ add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
     }
 
     $hidden = [
-        // Core's native Accordion blocks, added in WP 6.8 — share the
-        // "Accordion" name with app/Blocks/Accordion.php.
+        // Core's Accordion blocks (WP 6.8) — collide with app/Blocks/Accordion.php.
         'core/accordion',
         'core/accordion-item',
         'core/accordion-heading',
         'core/accordion-panel',
-        // Core's Table block — replaced by app/Blocks/Table.php, which
-        // supports author-defined columns plus the row/column-heading
-        // semantics this theme's table design needs.
+        // Core's Table block — replaced by app/Blocks/Table.php (author-defined columns).
         'core/table',
     ];
 
