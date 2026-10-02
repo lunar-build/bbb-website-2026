@@ -5,8 +5,24 @@
 // per WCAG 1.4.10.
 .c-table__scroll {
   overflow-x: auto;
-  border: 1px solid var(--wp--preset--color--blue-dark);
+  overflow-y: hidden;
   border-radius: 1.25rem;
+  border: 1px solid var(--wp--preset--color--blue-dark);
+  scrollbar-width: thin;
+  scrollbar-color: var(--wp--preset--color--blue-dark) transparent;
+
+  &::-webkit-scrollbar {
+    height: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--wp--preset--color--blue-dark);
+    border-radius: 999px;
+  }
 
   @include focus.ring;
 }

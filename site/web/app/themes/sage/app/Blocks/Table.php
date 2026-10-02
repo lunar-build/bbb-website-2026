@@ -19,7 +19,7 @@ class Table extends Block
      *
      * @var string
      */
-    public $slug = 'table';
+    public $slug = 'data-table';
 
     /**
      * The block description.
