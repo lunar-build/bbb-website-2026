@@ -9,6 +9,18 @@ if (header) {
   let lastScrollY = window.scrollY;
   let ticking = false;
 
+  // Published as --site-header-height so anything that needs to sit below
+  // the sticky header (e.g. a sticky sidebar, or a heading's scroll-margin
+  // for anchor jumps) can offset against its real height instead of a
+  // guessed constant — the header's own height doesn't change when it
+  // hides, only its transform, so this only needs recalculating on resize.
+  const publishHeaderHeight = () => {
+    document.documentElement.style.setProperty('--site-header-height', `${header.offsetHeight}px`);
+  };
+
+  publishHeaderHeight();
+  window.addEventListener('resize', publishHeaderHeight);
+
   // While hidden, the header is also marked inert/aria-hidden so assistive
   // tech and keyboard focus stay in sync with what's visually present
   // (WCAG 4.1.2) — a sighted keyboard user can't tab into controls that
