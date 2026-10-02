@@ -1,10 +1,16 @@
 @props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'link'])
 
+{{-- The rule directly under the name is accented (yellow, per Figma); every
+     rule after it is the plain divider colour — tracked here since which
+     section renders first (contact info / services / description) varies. --}}
+@php($ruleRendered = false)
+
 <div {{ $attributes->class(['c-business-card__card']) }}>
   <h4 class="c-business-card__name">{{ $name }}</h4>
 
   @if (! empty($contactInfo))
-    <hr class="c-business-card__rule">
+    <hr class="c-business-card__rule @if (! $ruleRendered) c-business-card__rule--accent @endif">
+    @php($ruleRendered = true)
 
     <ul class="c-business-card__contact-info">
       @foreach ($contactInfo as $row)
@@ -21,7 +27,8 @@
   @endif
 
   @if (! empty($services))
-    <hr class="c-business-card__rule">
+    <hr class="c-business-card__rule @if (! $ruleRendered) c-business-card__rule--accent @endif">
+    @php($ruleRendered = true)
 
     <ul class="c-business-card__services">
       @foreach ($services as $row)
@@ -34,7 +41,8 @@
   @endif
 
   @if ($description)
-    <hr class="c-business-card__rule">
+    <hr class="c-business-card__rule @if (! $ruleRendered) c-business-card__rule--accent @endif">
+    @php($ruleRendered = true)
 
     <p class="c-business-card__description">{{ $description }}</p>
   @endif
