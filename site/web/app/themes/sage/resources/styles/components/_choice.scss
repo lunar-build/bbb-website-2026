@@ -16,17 +16,23 @@ wa-checkbox {
   line-height: 1.625rem;
   color: var(--wp--preset--color--charcoal);
 
-  // Both default to top-aligning the box against the label's first line
-  // (radio's own :host rule sets the invalid `align-items: top`, which
-  // browsers drop, falling back to stretch; checkbox's ::part(base) sets
-  // flex-start explicitly) — centre the box on the label text instead.
-  align-items: center;
-
   &::part(control) {
     margin-inline-end: 1.25rem;
   }
 }
 
+// radio's :host is itself the control+label row (flex-direction: row, with
+// the invalid `align-items: top` WA ships — browsers drop that, falling
+// back to stretch) — centre the box on the label text there directly.
+wa-radio {
+  align-items: center;
+}
+
+// checkbox's :host is flex-direction: column (inherited from WA's shared
+// form-control styles, never overridden by checkbox's own) — setting
+// align-items there centres column children HORIZONTALLY, not what we
+// want. The real control+label row is ::part(base) (flex-direction: row,
+// align-items: flex-start by default), so centre it there instead.
 wa-checkbox::part(base) {
   align-items: center;
 }

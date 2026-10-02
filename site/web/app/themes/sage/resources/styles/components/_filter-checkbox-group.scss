@@ -26,3 +26,10 @@
   align-items: stretch;
   gap: 0.875rem;
 }
+
+// Each <wa-checkbox> row defaults to shrink-to-fit (inline-flex), so
+// different label lengths stagger their left edges once blockified as flex
+// items — force full-width rows so every checkbox starts at the same x.
+.c-filter-checkbox-group__item {
+  width: 100%;
+}
