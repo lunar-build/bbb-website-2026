@@ -1,9 +1,17 @@
 @use '../base/focus' as focus;
 @use '../base/typography';
+@use '../base/utilities';
 
-// Field styling (border, pill, focus ring) is a global element rule in
-// base/_forms.scss, so it also applies to third-party fields (GF etc) —
-// this only covers what's specific to <x-input>: label + trailing icon.
+// Theming for <wa-input>/<wa-textarea> (resources/views/components/
+// input.blade.php). Shared sizing/colour tokens (border, background,
+// padding) live in base/_wa-theme.scss; this file covers label/value
+// typography (not exposed as tokens, so set directly — these inherit into
+// the shadow DOM) and the icon/icon-button layout, which is real light-DOM
+// markup around wa-input, not inside its shadow root.
+//
+// Native input[type=...]/textarea in base/_forms.scss still styles Gravity
+// Forms' own fields unchanged — WA's shadow DOM is a separate styling
+// surface, so the two never conflict.
 
 .c-input {
   display: flex;
@@ -12,30 +20,56 @@
   width: 100%;
 }
 
-.c-input__label {
-  @extend .u-input-label;
-  font-family: var(--wp--preset--font-family--nata-sans);
-  color: var(--wp--preset--color--charcoal);
+wa-input,
+wa-textarea {
+  width: 100%;
+
+  &::part(label) {
+    font-family: var(--wp--preset--font-family--nata-sans);
+    font-size: var(--wp--preset--font-size--input-label);
+    font-weight: 500;
+    line-height: 1.625rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  &::part(hint) {
+    font-family: var(--wp--preset--font-family--nata-sans);
+    font-size: var(--wp--preset--font-size--input-label);
+    color: var(--wp--preset--color--dark-orange);
+  }
 }
 
-.c-input__required {
+wa-input::part(input),
+wa-textarea::part(textarea) {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: var(--wp--preset--font-size--input-placeholder);
+  font-weight: 500;
+  line-height: 1.125rem;
+}
+
+// Standalone error message, used where a field's error is managed at
+// runtime outside the component (see #from-error/#to-error in
+// journey-planner-widget.blade.php) rather than via the `error` prop.
+.c-input__error {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: var(--wp--preset--font-size--input-label);
   color: var(--wp--preset--color--dark-orange);
 }
 
-.c-input__field {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
+wa-input[hint]::part(input-wrapper),
+wa-textarea[hint]::part(textarea-wrapper) {
+  border-color: var(--wp--preset--color--dark-orange);
+}
+
+// See $ariaLabel note in input.blade.php — a real <label> WA renders
+// internally, just visually hidden (still announced by screen readers).
+.c-input--label-hidden::part(label) {
+  @extend .u-sr-only;
 }
 
 .c-input__icon {
   display: flex;
-  position: absolute;
-  top: 50%;
-  right: 1.25rem;
-  transform: translateY(-50%);
   color: var(--wp--preset--color--charcoal);
-  pointer-events: none;
 
   svg {
     display: block;
@@ -44,47 +78,23 @@
   }
 }
 
-.c-input--has-icon .c-input__field {
-  position: relative; // containing block for the decorative .c-input__icon above
-}
+// Icon-button variant: a real adjacent element, not a slotted overlay —
+// squared off where it meets wa-input so the two read as one control while
+// each keeps its own independent focus ring (see $iconButtonLabel in
+// input.blade.php). wa-input's own right-side border/radius is flattened so
+// the button's left border is the only seam line.
+.c-input__field--icon-button {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
 
-.c-input--has-icon input {
-  padding-right: 3rem; // reserve space so text never sits under the icon
-}
-
-.c-input--textarea .c-input__icon {
-  top: 1.25rem;
-  transform: none;
-}
-
-// Icon-button variant is a real adjacent element, not an overlay — squared
-// off where it meets the input so the two read as one control while each
-// keeps its own independent focus ring (see $iconButtonLabel in
-// input.blade.php). The input's own right border is dropped so the
-// button's left border is the only seam line.
-.c-input--has-icon:has(.c-input__icon--accent) {
-  .c-input__field {
-    position: static;
-  }
-
-  input {
-    // base/_forms.scss sets width:100% !important, which — now that the
-    // button is a real flex sibling rather than an absolute overlay —
-    // claimed the whole row and pushed the button out of the unit.
-    width: auto !important;
-    flex: 1 1 auto;
-    padding-right: 1.25rem;
+  .c-input__field-control::part(input-wrapper) {
     border-radius: 999px 0 0 999px !important;
-    border-right: none !important;
+    border-right: none;
   }
 }
 
 .c-input__icon--accent {
-  // Overrides .c-input__icon's absolute positioning — this element carries
-  // both classes, and unlike the decorative icon this one is a real flex
-  // sibling, not an overlay.
-  position: static;
-  transform: none;
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -103,17 +113,4 @@
   }
 
   @include focus.ring;
-}
-
-.c-input__error {
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-size: var(--wp--preset--font-size--input-label);
-  color: var(--wp--preset--color--dark-orange);
-}
-
-.c-input--error {
-  input,
-  textarea {
-    border-color: var(--wp--preset--color--dark-orange);
-  }
 }
