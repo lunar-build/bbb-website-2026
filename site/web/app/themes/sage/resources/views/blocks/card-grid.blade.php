@@ -14,22 +14,35 @@
   @endif
 
   <div class="c-card-grid__cards @if ($sideImage) c-card-grid__cards--with-side-image @endif">
-    @foreach ($cards as $card)
-      @if ($cardStyle === 'image_card')
-        <x-image-card :image="$card['image']" :link="$card['link']" class="c-card-grid__card" />
-      @else
-        <x-card
-          :card-style="$cardStyle"
-          :image="$card['image']"
-          :date="$card['date']"
-          :heading="$card['heading']"
-          :body="$card['body']"
+    @if ($cardStyle === 'business')
+      @foreach ($businessCards as $card)
+        <x-business-card
+          :name="$card['name']"
+          :contact-info="$card['contact_info']"
+          :services="$card['services']"
+          :description="$card['description']"
           :link="$card['link']"
-          :cta-style="$ctaStyle"
           class="c-card-grid__card"
         />
-      @endif
-    @endforeach
+      @endforeach
+    @else
+      @foreach ($cards as $card)
+        @if ($cardStyle === 'image_card')
+          <x-image-card :image="$card['image']" :link="$card['link']" class="c-card-grid__card" />
+        @else
+          <x-card
+            :card-style="$cardStyle"
+            :image="$card['image']"
+            :date="$card['date']"
+            :heading="$card['heading']"
+            :body="$card['body']"
+            :link="$card['link']"
+            :cta-style="$ctaStyle"
+            class="c-card-grid__card"
+          />
+        @endif
+      @endforeach
+    @endif
   </div>
 </div>
 

@@ -118,9 +118,9 @@
           "name": "Button label"
         },
         {
-          "slug": "filter-service-label",
+          "slug": "business-service-label",
           "size": "12px",
-          "name": "Filter service label"
+          "name": "Business service label"
         },
         {
           "slug": "news-row-card-title",

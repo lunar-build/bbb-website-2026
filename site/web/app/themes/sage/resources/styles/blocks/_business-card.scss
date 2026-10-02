@@ -1,9 +1,11 @@
-// Figma "Filter result card": no image, a business/service listing —
-// heading, contact info + services icon/text repeaters, description, CTA.
+// Figma node 58:2560 ("Filter result card" in Figma, renamed Business Card
+// here): no image, a business/service listing — heading, contact info +
+// services icon/text repeaters, description, CTA. Also used as Card Grid's
+// "Business card" card style.
 @use '../base/typography';
 @use '../components/button';
 
-.c-filter-result-card {
+.c-business-card {
   &__card {
     display: flex;
     flex-direction: column;
@@ -65,7 +67,7 @@
   }
 
   &__service-text {
-    @extend .u-filter-service-label;
+    @extend .u-business-service-label;
     color: var(--wp--preset--color--charcoal);
   }
 

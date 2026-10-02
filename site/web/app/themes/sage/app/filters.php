@@ -12,7 +12,7 @@ add_filter('excerpt_more', function () {
 
 /**
  * Register a "Cards" block category so the card blocks (Card Row, Cycle
- * Route Card, Feature Card, Filter Result Card, Image Card) group together
+ * Route Card, Feature Card, Business Card, Image Card) group together
  * in the inserter instead of sitting loose under "Text".
  */
 add_filter('block_categories_all', function (array $categories) {
