@@ -303,7 +303,8 @@ class Table extends Block
     }
 
     /**
-     * Retrieve the rows.
+     * Retrieve the rows, with a decorative phone icon prefixed onto any
+     * tel: link inside a cell's wysiwyg content.
      *
      * @return array
      */
@@ -315,7 +316,32 @@ class Table extends Block
             $rows = $this->preview ? $this->example['rows'] : [];
         }
 
-        return $rows;
+        return array_map(function ($row) {
+            $row['cells'] = array_map(function ($cell) {
+                $cell['content'] = $this->decorateTelLinks($cell['content']);
+
+                return $cell;
+            }, $row['cells']);
+
+            return $row;
+        }, $rows);
+    }
+
+    /**
+     * Prefix a decorative phone icon onto every tel: link in a block of
+     * cell HTML, matching the Figma design's phone icon next to each
+     * number (node 10:4095).
+     *
+     * @param  string  $html
+     * @return string
+     */
+    protected function decorateTelLinks($html)
+    {
+        return preg_replace(
+            '/<a\s+href="tel:/',
+            '<wa-icon name="phone" aria-hidden="true" class="c-table__icon"></wa-icon><a href="tel:',
+            $html,
+        );
     }
 
     /**
