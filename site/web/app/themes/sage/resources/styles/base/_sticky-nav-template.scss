@@ -27,9 +27,25 @@
 .c-sticky-nav-template__nav {
   @include bp.respond($min: bp.$lg) {
     position: sticky;
-    top: 2rem;
-    max-height: calc(100vh - 6rem);
+    // 2rem once the header's scrolled out of the way (html.is-header-hidden,
+    // toggled by resources/js/site-header.js); while the header's still
+    // showing, clear its height too — see base/_header.scss, no single rem
+    // value covers both states so this isn't a bare top: 2rem.
+    top: 12rem;
+    max-height: calc(100vh - 12rem);
     overflow-y: auto;
+    // Matches base/_header.scss's $site-header-transition-duration, so
+    // this settles in step with the header's own slide rather than
+    // snapping ahead of or behind it.
+    transition: top 0.25s ease;
+
+    html.is-header-hidden & {
+      top: 2rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 }
 

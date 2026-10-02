@@ -25,10 +25,16 @@ if (header) {
   // tech and keyboard focus stay in sync with what's visually present
   // (WCAG 4.1.2) — a sighted keyboard user can't tab into controls that
   // are currently translated off-screen.
+  //
+  // Also toggled on <html> as .is-header-hidden — a plain state class, not
+  // a measured height or custom property — for anything elsewhere that
+  // needs to know whether the header is currently covering the top of the
+  // viewport (e.g. the sticky nav template's `top` offset).
   const setHidden = (hidden) => {
     header.classList.toggle('is-hidden', hidden);
     header.toggleAttribute('inert', hidden);
     header.setAttribute('aria-hidden', String(hidden));
+    document.documentElement.classList.toggle('is-header-hidden', hidden);
   };
 
   const updateVisibility = () => {
