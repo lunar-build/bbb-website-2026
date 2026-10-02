@@ -225,6 +225,20 @@ class Form extends Block
             'required' => true,
         ]);
 
+        $fields->addTab('Content');
+
+        $fields->addPartial(Heading::class, [
+            'name' => 'subheading',
+            'label' => 'Subheading',
+            'default_level' => 'h3',
+        ]);
+
+        $fields->addPartial(Copy::class, [
+            'name' => 'intro',
+            'label' => 'Intro text',
+            'default_style' => 'body',
+        ]);
+
         $imageLayoutConditional = [
             'conditional_logic' => [
                 [
@@ -238,18 +252,6 @@ class Form extends Block
         ];
 
         $fields->addTab('Image layout fields', $imageLayoutConditional);
-
-        $fields->addPartial(Heading::class, [
-            'name' => 'subheading',
-            'label' => 'Subheading',
-            'default_level' => 'h3',
-        ]);
-
-        $fields->addPartial(Copy::class, [
-            'name' => 'intro',
-            'label' => 'Intro text',
-            'default_style' => 'body',
-        ]);
 
         $fields->addImage('image', [
             'label' => 'Image',
@@ -355,8 +357,14 @@ class Form extends Block
      */
     public function intro()
     {
+        // get_field() already applies the 'intro_text' field's
+        // new_lines => 'wpautop' (see Fields\Copy) — the example fallback
+        // bypasses ACF entirely, so it needs the same wpautop() pass
+        // manually to match (real <p> tags for the preview/example).
+        $text = get_field('intro_text');
+
         return [
-            'text' => get_field('intro_text') ?: ($this->example['intro_text'] ?? ''),
+            'text' => $text ?: wpautop($this->example['intro_text'] ?? ''),
             'style' => get_field('intro_style') ?: ($this->example['intro_style'] ?? 'body'),
         ];
     }

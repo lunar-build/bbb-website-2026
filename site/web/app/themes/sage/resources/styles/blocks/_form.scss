@@ -7,16 +7,10 @@
   }
 
   &__content {
-    // Reset headings/copy's own margin-bottom (base/_typography.scss) so the
-    // flow rule below is the sole source of spacing between siblings here —
-    // otherwise a heading's margin-bottom stacks with the next sibling's
-    // margin-top, doubling the gap.
-    :where(h1, h2, h3, h4, h5, h6, p) {
-      margin: 0;
-    }
-
-    > * + * {
-      margin-top: 1rem;
+    // Figma has this block's heading in Blue dark, not the sitewide default
+    // (Charcoal, set globally in base/_typography.scss).
+    :where(h1, h2, h3, h4, h5, h6) {
+      color: var(--wp--preset--color--blue-dark);
     }
   }
 
@@ -35,14 +29,14 @@
       }
     }
 
-    .o-container {
-      position: relative;
-    }
-
+    // Heading + form stack in a single column occupying the panel's left
+    // half — NOT split into side-by-side grid columns, which squeezed the
+    // form into a narrow strip next to the heading and let the image
+    // (sized off this column's height) balloon over it.
     .c-form__inner {
       @include bp.respond($min: bp.$lg) {
-        grid-template-columns: 1fr 1fr;
-        align-items: center;
+        max-width: 50%;
+        padding-right: 2rem;
       }
     }
 

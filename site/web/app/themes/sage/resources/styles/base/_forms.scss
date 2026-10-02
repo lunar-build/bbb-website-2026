@@ -135,3 +135,50 @@ input[type='checkbox'] {
     content: none !important;
   }
 }
+
+// Gravity Forms ships its own label/required/consent/submit-button
+// typography and colour (Orbital theme) — none of it matches the brand
+// tokens above, so it needs the same `!important` treatment as the
+// fields themselves (see note at the top of this file re: specificity).
+.gfield_label,
+.gfield_consent_label {
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 500 !important;
+  font-size: var(--wp--preset--font-size--input-label) !important;
+  line-height: 1.625rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+.gfield_label {
+  margin-bottom: 0.375rem !important;
+}
+
+.gfield_required {
+  color: var(--wp--preset--color--dark-orange) !important;
+}
+
+.gfield_description {
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 400 !important;
+  font-size: var(--wp--preset--font-size--body-regular) !important;
+  line-height: 1.5rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+.gform_button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.875rem !important;
+  padding: 0.625rem 1.625rem !important;
+  background: var(--wp--preset--color--yellow) !important;
+  border: 2px solid var(--wp--preset--color--charcoal) !important;
+  border-radius: 999px !important;
+  font-family: var(--wp--preset--font-family--anonymous-pro) !important;
+  font-weight: 700 !important;
+  font-size: var(--wp--preset--font-size--button-label) !important;
+  line-height: 1.875rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+  cursor: pointer !important;
+
+  @include focus.ring;
+}
