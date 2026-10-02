@@ -1,0 +1,61 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Styles for the Sticky Nav page template
+// (resources/views/template-sticky-nav.blade.php): a sticky left-rail page
+// menu beside the main content column. See base/_pattern-library.scss for
+// the same nav+content grid shape this mirrors.
+//
+// .c-sticky-nav-template gets its own grid-template-columns one level
+// inside .o-container, rather than on .o-container itself — see
+// base/_container.scss's note on why stacking a second grid-template-columns
+// directly on .o-container breaks its named grid-line placement rule.
+
+.c-sticky-nav-template {
+  display: grid;
+  gap: 3rem;
+  align-items: start;
+  padding-block: 3rem;
+
+  @include bp.respond($min: bp.$lg) {
+    // max-content, not a hardcoded width, so this always matches
+    // .c-sticky-page-menu's own width (progress rail + its 16.875rem) —
+    // see resources/styles/components/_sticky-page-menu.scss.
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+}
+
+.c-sticky-nav-template__nav {
+  display: flex;
+  gap: 1rem;
+
+  @include bp.respond($min: bp.$lg) {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100dvh - 4rem);
+    overflow-y: auto;
+  }
+}
+
+// A simple whole-page scroll-progress indicator, filled top-to-bottom by
+// resources/js/sticky-nav-template.js as the reader scrolls — no
+// per-section weighting, just document scroll fraction.
+.c-sticky-nav-template__progress {
+  flex-shrink: 0;
+  width: 0.1875rem;
+  background: var(--wp--preset--color--blue-light);
+  border-radius: 999px;
+}
+
+.c-sticky-nav-template__progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: top;
+  background: var(--wp--preset--color--blue-medium);
+  border-radius: 999px;
+}
+
+.c-sticky-nav-template__content {
+  min-width: 0;
+}
