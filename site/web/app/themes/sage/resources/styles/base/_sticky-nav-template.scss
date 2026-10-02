@@ -36,22 +36,27 @@
   }
 }
 
-// A simple whole-page scroll-progress indicator, filled top-to-bottom by
-// resources/js/sticky-nav-template.js as the reader scrolls — no
-// per-section weighting, just document scroll fraction.
+// The current-section marker's track. resources/js/sticky-nav-template.js
+// measures the active nav item's on-screen position against this track and
+// moves .c-sticky-nav-template__progress-marker to sit level with it — not
+// a scroll-fraction fill, a snap-to-item indicator.
 .c-sticky-nav-template__progress {
+  position: relative;
   flex-shrink: 0;
   width: 0.1875rem;
   background: var(--wp--preset--color--blue-light);
   border-radius: 999px;
 }
 
-.c-sticky-nav-template__progress-fill {
-  display: block;
+.c-sticky-nav-template__progress-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  transform: scaleY(0);
-  transform-origin: top;
+  height: 0;
+  opacity: 0;
+  transform: translateY(0);
+  transition: transform 0.2s ease, height 0.2s ease, opacity 0.2s ease;
   background: var(--wp--preset--color--blue-medium);
   border-radius: 999px;
 }

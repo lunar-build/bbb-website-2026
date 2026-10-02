@@ -20,8 +20,9 @@
   back to an auto-slug of the heading text — see the matching
   render_block_core/heading filter in app/filters.php that injects that
   fallback slug as the rendered heading's `id`. The current-section
-  highlight and the progress indicator are both driven client-side by
-  resources/js/sticky-nav-template.js.
+  highlight and the marker beside it (which snaps level with the active
+  item, rather than filling with overall scroll position) are both driven
+  client-side by resources/js/sticky-nav-template.js.
 --}}
 
 @extends('layouts.app')
@@ -39,8 +40,8 @@
     <div class="o-container">
       <div class="c-sticky-nav-template">
         <div class="c-sticky-nav-template__nav">
-          <div class="c-sticky-nav-template__progress" aria-hidden="true">
-            <span class="c-sticky-nav-template__progress-fill" data-sticky-nav-progress></span>
+          <div class="c-sticky-nav-template__progress" data-sticky-nav-progress aria-hidden="true">
+            <span class="c-sticky-nav-template__progress-marker" data-sticky-nav-progress-marker></span>
           </div>
 
           <x-sticky-page-menu :items="$pageMenuItems" data-sticky-nav-menu />
