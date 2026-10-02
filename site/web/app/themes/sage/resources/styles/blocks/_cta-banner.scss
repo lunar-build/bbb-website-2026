@@ -91,9 +91,8 @@
 }
 
 // Left — Figma "Layout=Left": light bg, dark left-aligned text/CTA, one
-// optional illustration — as a real grid column (contained, not bleeding),
-// per feedback that the single-image variation should sit inside the
-// block rather than overlap/overflow it.
+// optional illustration, as a real grid column (contained, not bleeding)
+// rather than overlapping/overflowing the block.
 .c-cta-banner--left {
   background: var(--wp--preset--color--blue-light);
   color: var(--wp--preset--color--blue-dark);

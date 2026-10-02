@@ -25,9 +25,7 @@ wa-button[size='small']::part(label) {
 }
 
 // Horizontal padding matches the solid/black button at every size and
-// appearance — previously scoped to size="small" only, so any full-size or
-// outlined button left off that selector fell back to WA's own (tighter)
-// default padding instead.
+// appearance — WA's own default is tighter.
 wa-button::part(button) {
   padding-inline: 16px;
 }
