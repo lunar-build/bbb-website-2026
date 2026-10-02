@@ -54,8 +54,15 @@
 
   // Same reason as .c-sticky-nav-template__nav's `top` above — a heading
   // jumped to via the page menu (or a direct #anchor link) would otherwise
-  // land underneath the sticky header.
+  // land underneath the sticky header. Was calc(var(--site-header-height)
+  // + 1rem) — dropped: that var measured wildly wrong in testing (6494px,
+  // collapsing scrollIntoView() to the top of the page), so this uses the
+  // same fixed values as the nav's own `top` instead of a measured one.
   :where(h2, h3, h4) {
-    scroll-margin-top: calc(var(--site-header-height, 0px) + 1rem);
+    scroll-margin-top: 13rem;
+
+    html.is-header-hidden & {
+      scroll-margin-top: 3rem;
+    }
   }
 }
