@@ -1,21 +1,48 @@
-@use '../base/typography';
+// Theming for <wa-radio>/<wa-checkbox> (resources/views/components/
+// {radio,checkbox}.blade.php). Shared sizing/colour tokens (toggle size,
+// border, activated colour) live in base/_wa-theme.scss; this file covers
+// the bits only CSS parts can reach — control border-radius, checked-state
+// appearance, and the control-to-label gap — plus label typography, which
+// inherits into the shadow DOM via plain element rules.
+//
+// Native input[type=radio]/input[type=checkbox] in base/_forms.scss still
+// styles Gravity Forms' own fields unchanged — WA's shadow DOM is a
+// separate styling surface, so the two never conflict.
 
-// Layout/label extras for the `<x-radio>` and `<x-checkbox>` Blade
-// components (resources/views/components/{radio,checkbox}.blade.php). The
-// actual control styling (circle/square, border, checked-state fill) is a
-// global element rule on input[type=radio]/input[type=checkbox] in
-// base/_forms.scss, so it also applies to third-party-rendered fields
-// (Gravity Forms etc.) — this file only adds the row layout + label shared
-// by both, since they're visually identical apart from the input itself.
+wa-radio,
+wa-checkbox {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 1.625rem;
+  color: var(--wp--preset--color--charcoal);
 
-.c-choice {
-  display: flex;
+  // Both default to top-aligning the box against the label's first line
+  // (radio's own :host rule sets the invalid `align-items: top`, which
+  // browsers drop, falling back to stretch; checkbox's ::part(base) sets
+  // flex-start explicitly) — centre the box on the label text instead.
   align-items: center;
-  gap: 1.25rem;
+
+  &::part(control) {
+    margin-inline-end: 1.25rem;
+  }
 }
 
-.c-choice__label {
-  @extend .u-input-label;
-  font-family: var(--wp--preset--font-family--nata-sans);
-  color: var(--wp--preset--color--black);
+wa-checkbox::part(base) {
+  align-items: center;
+}
+
+wa-checkbox {
+  --checked-icon-color: var(--wp--preset--color--charcoal);
+
+  &::part(control) {
+    border-radius: 0.1875rem;
+  }
+
+  // Figma's checked state keeps the white/outlined box with a dark tick —
+  // not WA's default solid-fill-on-check — so the activated colour is
+  // overridden back on the control itself once checked.
+  &:state(checked)::part(control) {
+    background-color: var(--wp--preset--color--white);
+    border-color: var(--wp--preset--color--charcoal);
+  }
 }
