@@ -18,6 +18,25 @@ class StickyNavTemplate extends Composer
     ];
 
     /**
+     * Resolve this composer's data eagerly rather than letting Acorn's
+     * default reflection-based extraction wrap `pageMenuItems()` in a lazy
+     * `InvokableComponentVariable` — Blade's component-tag compiler runs
+     * bound attributes (e.g. `:items="$pageMenuItems"`) through
+     * `sanitizeComponentAttribute()`, which resolves that wrapper and then
+     * tries to HTML-escape the result as a string, which breaks for a
+     * method that returns an array.
+     */
+    protected function with()
+    {
+        return [
+            'pageMenuItems' => $this->pageMenuItems(),
+            'hero' => $this->hero(),
+            'body' => $this->body(),
+            'pagination' => $this->pagination(),
+        ];
+    }
+
+    /**
      * The sticky page menu's items, built from this page's H2 headings.
      */
     public function pageMenuItems(): array
