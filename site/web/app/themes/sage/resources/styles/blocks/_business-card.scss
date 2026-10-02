@@ -44,9 +44,11 @@
   }
 
   &__services {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    // A wrapped flex row with justify-content: space-between spaces each
+    // wrapped line's items independently, so items on different lines don't
+    // line up into columns. A grid keeps every item's start position fixed.
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   }
 
   &__contact-item,
