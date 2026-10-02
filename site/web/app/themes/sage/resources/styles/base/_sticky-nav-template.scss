@@ -18,47 +18,19 @@
 
   @include bp.respond($min: bp.$lg) {
     // max-content, not a hardcoded width, so this always matches
-    // .c-sticky-page-menu's own width (progress rail + its 16.875rem) —
-    // see resources/styles/components/_sticky-page-menu.scss.
+    // .c-sticky-page-menu's own width (16.875rem) — see
+    // resources/styles/components/_sticky-page-menu.scss.
     grid-template-columns: max-content minmax(0, 1fr);
   }
 }
 
 .c-sticky-nav-template__nav {
-  display: flex;
-  gap: 1rem;
-
   @include bp.respond($min: bp.$lg) {
     position: sticky;
     top: 2rem;
     max-height: calc(100dvh - 4rem);
     overflow-y: auto;
   }
-}
-
-// The current-section marker's track. resources/js/sticky-nav-template.js
-// measures the active nav item's on-screen position against this track and
-// moves .c-sticky-nav-template__progress-marker to sit level with it — not
-// a scroll-fraction fill, a snap-to-item indicator.
-.c-sticky-nav-template__progress {
-  position: relative;
-  flex-shrink: 0;
-  width: 0.1875rem;
-  background: var(--wp--preset--color--blue-light);
-  border-radius: 999px;
-}
-
-.c-sticky-nav-template__progress-marker {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  opacity: 0;
-  transform: translateY(0);
-  transition: transform 0.2s ease, height 0.2s ease, opacity 0.2s ease;
-  background: var(--wp--preset--color--blue-medium);
-  border-radius: 999px;
 }
 
 .c-sticky-nav-template__content {
