@@ -44,11 +44,9 @@
   }
 
   &__services {
-    // A wrapped flex row with justify-content: space-between spaces each
-    // wrapped line's items independently, so items on different lines don't
-    // line up into columns. A grid keeps every item's start position fixed.
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
 
   &__contact-item,
@@ -56,6 +54,11 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    // Base typography's global `ul, ol li { margin-bottom }` (not scoped to
+    // content lists) stacks on top of the `gap` these lists already use for
+    // spacing, and only on non-last items — that mismatch, not the item
+    // layout itself, was the real cause of items not lining up.
+    margin-bottom: 0;
   }
 
   &__contact-text {
