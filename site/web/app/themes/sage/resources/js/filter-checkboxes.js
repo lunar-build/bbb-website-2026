@@ -16,11 +16,16 @@ document.querySelectorAll('.c-filter-checkboxes').forEach((root) => {
   });
 
   const updateLabel = () => {
-    const count = panel.querySelectorAll('input[type="checkbox"]:checked').length;
+    const count = [...panel.querySelectorAll('wa-checkbox')].filter(
+      (checkbox) => checkbox.checked,
+    ).length;
     label.textContent = count === 1 ? '1 filter selected' : `${count} filters selected`;
   };
 
+  // wa-checkbox's `change` event retargets to the host element (shadow DOM
+  // event retargeting) — event.target IS the <wa-checkbox>, not a
+  // descendant, so `.matches()` not `.closest()`.
   panel.addEventListener('change', (event) => {
-    if (event.target.matches('input[type="checkbox"]')) updateLabel();
+    if (event.target.matches('wa-checkbox')) updateLabel();
   });
 });

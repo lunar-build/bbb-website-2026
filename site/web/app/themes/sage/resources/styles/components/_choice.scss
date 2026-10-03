@@ -1,21 +1,40 @@
-@use '../base/typography';
+// Theming for <wa-radio>/<wa-checkbox>. Shared tokens (size, border,
+// activated colour) live in base/_wa-theme.scss; GF's own
+// input[type=radio/checkbox] in base/_forms.scss is a separate surface.
 
-// Layout/label extras for the `<x-radio>` and `<x-checkbox>` Blade
-// components (resources/views/components/{radio,checkbox}.blade.php). The
-// actual control styling (circle/square, border, checked-state fill) is a
-// global element rule on input[type=radio]/input[type=checkbox] in
-// base/_forms.scss, so it also applies to third-party-rendered fields
-// (Gravity Forms etc.) — this file only adds the row layout + label shared
-// by both, since they're visually identical apart from the input itself.
+wa-radio,
+wa-checkbox {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 1.625rem;
+  color: var(--wp--preset--color--charcoal);
 
-.c-choice {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  &::part(control) {
+    margin-inline-end: 1.25rem;
+  }
 }
 
-.c-choice__label {
-  @extend .u-input-label;
-  font-family: var(--wp--preset--font-family--nata-sans);
-  color: var(--wp--preset--color--black);
+// radio's :host IS the control+label row — centre there directly.
+wa-radio {
+  align-items: center;
+}
+
+// checkbox's :host is column-direction (not row, unlike radio) — the real
+// control+label row is ::part(base).
+wa-checkbox::part(base) {
+  align-items: center;
+}
+
+wa-checkbox {
+  --checked-icon-color: var(--wp--preset--color--charcoal);
+
+  &::part(control) {
+    border-radius: 0.1875rem;
+  }
+
+  // Figma keeps white/outlined + dark tick on check, not WA's default fill.
+  &:state(checked)::part(control) {
+    background-color: var(--wp--preset--color--white);
+    border-color: var(--wp--preset--color--charcoal);
+  }
 }

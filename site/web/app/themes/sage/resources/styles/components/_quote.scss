@@ -1,10 +1,5 @@
-// Figma node 53:989 — reusable pull-quote, also hardcodable into other blocks.
-//
-// Two-column grid (mark, then body) rather than absolutely-positioning the
-// mark (overlapped the text) or stacking it above (didn't match the design).
-//
-// Mark is <x-icon>, not a text glyph, for cross-platform rendering; purely
-// decorative (auto aria-hidden), so its colour is exempt from WCAG 1.4.11.
+// Figma node 53:989 — reusable pull-quote, also hardcodable into other
+// blocks. Mark is <x-icon> (auto aria-hidden, decorative), not a glyph.
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
@@ -36,9 +31,7 @@
   }
 }
 
-// Figma node 7:2013 (carousel card, not yet built) — mark stays left-aligned
-// above centred text; per that design it is NOT centred with the text below
-// it, only body/attribution are.
+// Figma node 7:2013 — mark stays left-aligned; only body/attribution centre.
 .c-quote--centered {
   --c-quote-color: var(--wp--preset--color--blue); // matches node 7:2013's blue quote text, not the default charcoal
 
