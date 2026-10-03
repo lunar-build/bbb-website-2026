@@ -82,10 +82,10 @@ add_filter('render_block', function ($block_content, $block) {
 }, 10, 2);
 
 /**
- * Hide WordPress core's native Accordion blocks (added in WP 6.8) from the
- * inserter — they share the "Accordion" name with our own ACF Composer
- * block (app/Blocks/Accordion.php) and editors have picked the wrong one
- * by mistake. Our block covers every accordion use case in this theme.
+ * Hide WordPress core blocks we've built our own ACF Composer replacement
+ * for — editors have picked the core block by mistake when both sit in the
+ * inserter with a similar/identical name. Add a block name here any time
+ * this comes up again.
  */
 add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
     if (! is_array($allowedBlockTypes)) {
@@ -97,6 +97,7 @@ add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
         'core/accordion-item',
         'core/accordion-heading',
         'core/accordion-panel',
+        'core/table',
     ];
 
     return array_values(array_diff($allowedBlockTypes, $hidden));
