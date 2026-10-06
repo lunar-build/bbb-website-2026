@@ -245,6 +245,12 @@ class PostHero extends Block
 
         $categories = get_the_category();
 
+        // Every uncategorised post still carries WP's default "Uncategorized"
+        // term — filter it out rather than show a pill that isn't a real
+        // editorial choice (unless a post was explicitly put in it, which
+        // itself just renamed/reused that same default term id).
+        $categories = array_filter($categories, fn($category) => $category->term_id !== (int) get_option('default_category'));
+
         if (empty($categories)) {
             return [];
         }
