@@ -1,0 +1,34 @@
+// Figma "Sample page -> News article": the bits the post-hero/card-grid/
+// cta-banner building blocks don't already cover on their own — the big
+// featured image, standfirst spacing, and the "Also read" section shell.
+
+.c-single-post {
+  &__image {
+    margin-bottom: 2rem;
+  }
+
+  &__image-el {
+    display: block;
+    width: 100%;
+    aspect-ratio: 940 / 564;
+    object-fit: cover;
+    border-radius: 1.25rem;
+  }
+
+  &__standfirst {
+    margin-bottom: 1.5rem;
+  }
+
+  &__related {
+    padding-block: 3.5rem;
+    text-align: center;
+  }
+
+  &__related-heading {
+    margin-bottom: 3.5rem;
+  }
+
+  &__related-cta {
+    margin-top: 3.5rem;
+  }
+}
