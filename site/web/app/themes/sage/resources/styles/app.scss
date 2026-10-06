@@ -12,9 +12,12 @@
 @use 'components/primary-nav';
 @use 'components/footer';
 @use 'components/breadcrumbs';
+@use 'components/sticky-page-menu';
 @use 'components/quote';
+@use 'components/testimonial-card';
 @use 'components/callout-text';
 @use 'components/icon-link-grid';
+@use 'components/timeline';
 @use 'components/bullet-list';
 @use 'components/video';
 @use 'components/pill';
@@ -36,5 +39,9 @@
 @use 'blocks/form';
 @use 'blocks/card-grid';
 @use 'blocks/two-column-content';
+@use 'blocks/link-card';
+@use 'blocks/link-list';
 @use 'blocks/accordion';
 @use 'blocks/image-block';
+@use 'blocks/testimonial-card-carousel';
+@use 'blocks/quote-carousel';
