@@ -60,6 +60,4 @@
       </wa-button>
     </div>
   @endif
-
-  @php(comments_template())
 </article>
