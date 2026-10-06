@@ -3,6 +3,18 @@
 --}}
 
 {{--
+  TODO: currently manually selected per-page via Page Attributes → Template
+  — fine for the few known one-off pages it's built for so far (e.g.
+  "Report a road fault", "Regional cycle maps"), but only tested against
+  short/sparse page content. Revisit once there's a fuller real page to
+  test against (longer content, more headings, nested blocks), and
+  consider whether this should instead be hard-coded as the default
+  `single-{cpt}.blade.php` for a future CPT (e.g. Events) if/when any of
+  these page types turns out to repeat rather than stay one-off — see
+  Trello card https://trello.com/c/nLCSwtXI/72-page-templates.
+--}}
+
+{{--
   Top nav (sections.header, via layouts.app) → hero → sticky left page-menu
   beside the right-hand content column → footer. For pages like "Report a
   road fault" or "Regional cycle maps" that need a persistent jump menu
