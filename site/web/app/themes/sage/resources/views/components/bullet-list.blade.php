@@ -1,11 +1,12 @@
 @props([
   'heading' => null,
+  'headingClass' => null,
   'items' => [],
 ])
 
 <div {{ $attributes->class(['c-bullet-list']) }}>
   @if ($heading)
-    <h3 class="c-bullet-list__heading">{{ $heading }}</h3>
+    <h3 @class(['c-bullet-list__heading', $headingClass])>{{ $heading }}</h3>
   @endif
 
   <ul class="c-bullet-list__list">

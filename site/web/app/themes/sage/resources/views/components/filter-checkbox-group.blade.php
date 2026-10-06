@@ -6,11 +6,7 @@
     'items' => [], // [['label' => string, 'name' => string|null, 'value' => string|null, 'checked' => bool], ...]
 ])
 
-<fieldset {{ $attributes->class(['c-filter-checkbox-group']) }}>
-    @if ($heading)
-        <legend class="c-filter-checkbox-group__heading u-table-column-heading">{{ $heading }}</legend>
-    @endif
-
+<wa-checkbox-group {{ $attributes->class(['c-filter-checkbox-group']) }} @if ($heading) label="{{ $heading }}" @endif>
     <div class="c-filter-checkbox-group__items">
         @foreach ($items as $item)
             <x-checkbox
@@ -22,4 +18,4 @@
             />
         @endforeach
     </div>
-</fieldset>
+</wa-checkbox-group>
