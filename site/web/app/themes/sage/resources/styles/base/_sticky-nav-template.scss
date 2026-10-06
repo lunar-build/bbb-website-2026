@@ -52,6 +52,13 @@
 .c-sticky-nav-template__content {
   min-width: 0;
 
+  // components/_breadcrumbs.scss has no spacing of its own — inside the Image
+  // Hero overlay it relies on that block's flex `gap`, but here it's a
+  // standalone first child.
+  > .c-breadcrumbs {
+    margin-bottom: 2rem;
+  }
+
   // Same reason as .c-sticky-nav-template__nav's `top` above — a heading
   // jumped to via the page menu (or a direct #anchor link) would otherwise
   // land underneath the sticky header. Was calc(var(--site-header-height)

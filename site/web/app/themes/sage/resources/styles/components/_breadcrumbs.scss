@@ -1,3 +1,4 @@
+@use '../base/focus' as focus;
 @use '../base/typography';
 
 // Figma: 20px/30px, letter-spacing 0.4px, blue-dark. Current page (last
@@ -7,6 +8,13 @@
 // via style="--c-breadcrumbs-color: ..." on <x-breadcrumbs> or an ancestor.
 
 .c-breadcrumbs {
+  // <wa-breadcrumb> is an unstyled custom element — defaults to display:
+  // inline, so vertical margin set on it from outside has no effect
+  // (irrelevant inside a flex container, like the Image Hero overlay,
+  // since flex blockifies its items regardless of declared display — but
+  // breaks margin-bottom wherever it's used in normal block flow, e.g.
+  // template-sticky-nav.blade.php).
+  display: block;
   --c-breadcrumbs-color: var(--wp--preset--color--blue-dark);
 }
 
@@ -23,6 +31,10 @@ wa-breadcrumb-item {
 wa-breadcrumb-item::part(label) {
   text-decoration: none;
   transition: text-decoration-color var(--wa-transition-normal, 0.15s) ease;
+  // $color, not the default --focus-color, so the ring stays visible in both
+  // this component's contexts (white inside the dark hero overlay, blue-dark
+  // elsewhere) — same shared mixin used site-wide (see base/_focus.scss).
+  @include focus.ring($color: var(--c-breadcrumbs-color));
 }
 
 wa-breadcrumb-item:not(:last-of-type)::part(label):is(:hover, :focus-visible) {

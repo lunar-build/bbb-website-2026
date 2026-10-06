@@ -24,7 +24,15 @@
   Hero" block as the first block in the page's content, same as any other
   page. Keeping the hero block-editor-driven (rather than template fields)
   means it stays consistent with how every other hero use case in this
-  theme already works.
+  theme already works. Leave the Image Hero block's own "Show breadcrumbs"
+  toggle off on this template — breadcrumbs render below instead (see
+  next paragraph), matching the Figma design where they sit at the top of
+  the content column, inline with the sticky nav's top, not inside the
+  hero overlay.
+
+  Breadcrumbs: hardcoded here (not editor-driven) as the first element in
+  the content column, so its top edge lines up with the sticky nav's —
+  both are sibling grid items starting on the same row.
 
   Page menu: items are generated from this page's top-level (H2) headings
   by App\Support\PageMenu (see app/View/Composers/StickyNavTemplate.php),
@@ -62,6 +70,8 @@
         @endif
 
         <div class="c-sticky-nav-template__content">
+          <x-breadcrumbs :items="App\Support\Breadcrumbs::forPost()" />
+
           {!! $body !!}
 
           @if ($pagination)
