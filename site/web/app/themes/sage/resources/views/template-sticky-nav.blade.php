@@ -38,12 +38,18 @@
     @endif
 
     <div class="o-container">
-      <div class="c-sticky-nav-template">
-        <div class="c-sticky-nav-template__nav">
-          <x-sticky-page-menu :items="$pageMenuItems" data-sticky-nav-menu />
-        </div>
+      {{-- No H2 headings means no page-menu items (App\Support\PageMenu returns
+      []) — skip the two-column grid entirely rather than leaving an empty,
+      collapsed nav column with its grid gap still showing as a stray gap
+      with nothing in it. --}}
+      <div @if (count($pageMenuItems)) class="c-sticky-nav-template" @endif>
+        @if (count($pageMenuItems))
+          <div class="c-sticky-nav-template__nav">
+            <x-sticky-page-menu :items="$pageMenuItems" data-sticky-nav-menu />
+          </div>
+        @endif
 
-        <div class="c-sticky-nav-template__content" data-sticky-nav-content>
+        <div class="c-sticky-nav-template__content">
           {!! $body !!}
 
           @if ($pagination)
