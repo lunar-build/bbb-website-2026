@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-card-grid']) }}>
+<section {{ $attributes->class(['c-card-grid', 'o-full-bleed-bg']) }}>
 
 <div class="o-container">
   @if (! empty($heading['text']))

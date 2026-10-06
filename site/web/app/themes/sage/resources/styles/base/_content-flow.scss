@@ -1,0 +1,11 @@
+// A full-bleed-background block (CTA Banner, Card Grid, Image Hero, Quote
+// Carousel, Video Hero — any block marked `.o-full-bleed-bg` on its root
+// <section>, see its blade view) only pads space *inside* its own coloured
+// area via its $spacing top/bottom padding — that does nothing to separate
+// it from whatever sits outside it. Dropped straight after a WP paragraph
+// block with no background of its own, the colour starts right where the
+// text ends. Give it real external breathing room instead, wherever
+// editorial content renders it (any template using `.e-content`).
+.e-content > .o-full-bleed-bg {
+  margin-block: var(--wp--preset--spacing--large);
+}

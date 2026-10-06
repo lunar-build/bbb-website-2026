@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-image-hero']) }}>
+<section {{ $attributes->class(['c-image-hero', 'o-full-bleed-bg']) }}>
 
 @if ($backgroundImage['url'] ?? null)
   <img class="c-image-hero__background" src="{{ $backgroundImage['url'] }}" alt="">

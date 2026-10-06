@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout]) }}>
+<section {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout, 'o-full-bleed-bg']) }}>
 
 @if ($layout === 'centred')
   @if ($imageLeft)
