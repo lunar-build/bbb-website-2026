@@ -1,19 +1,9 @@
 // Figma node 348:600 — offset two-column grid of image+quote cards.
-// Each column is its own independent flex stack, not a single CSS grid —
-// a grid syncs row height across both columns, which flattens the right
-// column's margin-top into equal row-pairs instead of a true stagger
-// (caught in review: the bottoms of row 1/row 2 were lining up across
-// columns). Two flex columns let the right column's cards run at their
-// own height, genuinely offset start-to-end down the page.
-// Two-column layout kicks in at $lg (1024px), not $md (768px) — at $md
-// each column is too narrow for the card's image/quote content, cramped
-// on tablet widths.
+// Two independent flex columns, not a CSS grid — a grid syncs row height
+// across columns, flattening the stagger.
 @use '../abstracts/breakpoints' as bp;
 
-// Figma's own card gap (row + column) is 40px/2.5rem — distinct from
-// spacing.$card-gap (1.5rem), which is CardGrid/CardRow's shared value and
-// not a match here, so this block uses its own local gap instead.
-$gap: 2.5rem;
+$gap: 2.5rem; // Figma's 40px; distinct from spacing.$card-gap (1.5rem)
 
 .c-case-study-grid {
   &__cards {
