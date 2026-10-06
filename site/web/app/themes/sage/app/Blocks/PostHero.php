@@ -210,7 +210,8 @@ class PostHero extends Block
      */
     public function date()
     {
-        return $this->inPostContext() ? get_the_date() : $this->example['date'];
+        // 'jS F Y' for the ordinal suffix (28th, not 28) — matches Figma and RelatedPosts::latest()'s date format.
+        return $this->inPostContext() ? get_the_date('jS F Y') : $this->example['date'];
     }
 
     /**
