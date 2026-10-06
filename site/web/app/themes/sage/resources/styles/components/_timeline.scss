@@ -1,0 +1,100 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Figma "Timeline" (node 81:2355)
+.c-timeline-block {
+  padding-block: 2.125rem; // 34px
+}
+
+.c-timeline {
+  --timeline-marker-size: 3.5625rem; // 57px — fits a 2-digit step number
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.875rem; // 30px
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  // Single line spanning first-marker-centre to last-marker-centre, sat
+  // behind the markers (z-index 1) which mask it into a connector between
+  // them. Drawn once on the list so per-step baseline shifts (see
+  // .c-timeline__step) can't throw off a per-row length calculation.
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--timeline-marker-size) / 2);
+    bottom: calc(var(--timeline-marker-size) / 2);
+    left: calc(var(--timeline-marker-size) / 2);
+    width: 0.1875rem; // 3px
+    margin-left: -0.09375rem;
+    background: var(--wp--preset--color--yellow);
+  }
+}
+
+// All markers in a block share one size, set here rather than per-step, so a
+// mix of numbers and dates never renders as mismatched circle sizes.
+.c-timeline--dates {
+  --timeline-marker-size: 6rem; // 96px — fits an 8-char DD/MM/YY date
+}
+
+.c-timeline__step {
+  display: flex;
+  // Content's first line (heading or body) starts level with the marker's
+  // own text baseline, whatever the marker's height happens to be.
+  align-items: baseline;
+  gap: 1.625rem; // 26px
+  margin: 0;
+}
+
+// No heading: centre copy block on the marker's height instead of baseline-
+// aligning its first line, so a two-line wrap still centres correctly.
+.c-timeline__step--no-heading {
+  align-items: center;
+}
+
+.c-timeline__marker-col {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  width: var(--timeline-marker-size);
+}
+
+.c-timeline__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--timeline-marker-size);
+  height: var(--timeline-marker-size);
+  margin-bottom: 0; // override .u-heading-4's margin-bottom
+  padding-inline: 0.25rem;
+  border-radius: 1.25rem; // 20px
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  .c-timeline--dates & {
+    font-size: 0.9375rem; // heading-4's size is tuned for 2 digits, too wide at 8 (DD/MM/YY)
+  }
+}
+
+.c-timeline__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.c-timeline__heading {
+  margin: 0;
+  color: var(--wp--preset--color--blue);
+}
+
+.c-timeline__body {
+  margin: 0;
+}
