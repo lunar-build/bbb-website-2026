@@ -1,15 +1,8 @@
-/**
- * Behaviour for the Sticky Nav page template
- * (resources/views/template-sticky-nav.blade.php): highlights the current
- * section in the left-rail page menu as the reader scrolls, and handles
- * clicking a menu item (scroll + active state), since relying on the
- * browser's native #anchor jump wasn't reliably scrolling in testing.
- *
- * The page menu itself (resources/views/components/sticky-page-menu.blade.php)
- * already renders the track and the active item's highlight in CSS
- * (.c-sticky-page-menu__list::before + .c-sticky-page-menu__item--active) —
- * this only has to toggle that active class, nothing needs positioning in JS.
- */
+// Scroll-spy + click handling for the Sticky Nav page menu
+// (resources/views/components/sticky-page-menu.blade.php) — that component
+// only renders the static list; active-state/track styling is CSS, this
+// just toggles the class and handles clicks (native #anchor jump wasn't
+// reliably scrolling in testing).
 const nav = document.querySelector('[data-sticky-nav-menu]');
 
 if (nav) {
@@ -46,8 +39,7 @@ if (nav) {
       return;
     }
 
-    // block: 'start' respects the target's own scroll-margin-top (set in
-    // base/_sticky-nav-template.scss) so it still clears the header.
+    // block: 'start' respects the target's scroll-margin-top so it clears the header.
     target.scrollIntoView({ behavior, block: 'start' });
     setActiveLink(id);
   };
@@ -66,12 +58,17 @@ if (nav) {
     });
   });
 
-  // A URL loaded directly with a #section already in it (not clicked from
-  // this page) gets the browser's own native fragment scroll on load — but
-  // that fires before the Image Hero block above the content finishes
-  // loading and pushes everything down, so it lands correctly for an
-  // instant and then the reflow leaves the page looking like it scrolled
-  // to the top. Re-running the scroll once images have settled fixes it.
+  // Default the first item active on load, before any scroll/intersection fires.
+  if (links[0]) {
+    const firstId = links[0].getAttribute('href')?.replace(/^#/, '');
+
+    if (firstId) {
+      setActiveLink(firstId);
+    }
+  }
+
+  // A direct #section URL load gets the browser's native fragment scroll before the
+  // Image Hero above it finishes loading and reflows the page — re-run once loaded.
   const initialHashId = location.hash.replace(/^#/, '');
 
   if (initialHashId && document.getElementById(initialHashId)) {
@@ -79,9 +76,8 @@ if (nav) {
   }
 
   if (sections.length && 'IntersectionObserver' in window) {
-    // Treat a section as "current" once it's crossed into the top ~30% of
-    // the viewport — picks the top-most section still above that line
-    // rather than whichever fires its observer callback last.
+    // rootMargin shrinks the root to a 1px line at viewport center — symmetric
+    // trigger for both scroll directions, unlike a top-biased zone.
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -92,7 +88,7 @@ if (nav) {
           setActiveLink(visible[0].target.id);
         }
       },
-      { rootMargin: '0px 0px -70% 0px', threshold: 0 }
+      { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
     );
 
     sections.forEach((section) => observer.observe(section));
