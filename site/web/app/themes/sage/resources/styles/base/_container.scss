@@ -16,12 +16,9 @@
 $container-max-width: 80rem;
 $container-gutter: 1.5rem;
 
-// Figma "News article": a 940px reading column inside the 1440px frame —
-// noticeably narrower than the standard 80rem container, not just a
-// smaller gutter. A min() cap (same technique as the base container)
-// means it's barely narrower than normal on mobile/tablet, where the
-// viewport is already well under the cap anyway, and only really bites
-// — growing the gap further — once the viewport is wide enough to hit it.
+// Figma "News article": 940px reading column inside the 1440px frame. Same
+// min() cap technique as the base container, so it barely narrows on
+// mobile/tablet (already under the cap) and only bites on wide desktops.
 $container-narrow-max-width: 58.75rem; // 940px
 $container-narrow-gutter: 2rem;
 

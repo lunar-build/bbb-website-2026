@@ -1,9 +1,7 @@
 .c-post-hero {
   background: var(--wp--preset--color--white);
 
-  // A real inserted block gets this from its own $spacing default via
-  // WP_Block_Supports — this one's always template-rendered (never goes
-  // through render_block()), so it needs the matching padding by hand.
+  // Template-rendered, not run through render_block(), so it never picks up its $spacing default — added by hand.
   padding-block: var(--wp--preset--spacing--large);
 }
 

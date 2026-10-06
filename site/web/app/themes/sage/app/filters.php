@@ -104,12 +104,9 @@ add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
 }, 10, 2);
 
 /**
- * Pre-insert the Standfirst block at the top of every new post's content —
- * the news-article template renders the post body via the_content(), so
- * this is what makes the lead paragraph visible/editable in the canvas
- * the moment an editor clicks "New post", instead of being a hidden field
- * somewhere else. No template_lock: editors can still freely add/remove/
- * reorder blocks after, this only seeds the starting state.
+ * Pre-insert the Standfirst block at the top of every new post's content,
+ * so it's visible/editable in the canvas immediately. No template_lock —
+ * editors can still freely add/remove/reorder blocks after.
  */
 add_action('init', function () {
     $post_type_object = get_post_type_object('post');

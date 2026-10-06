@@ -1,8 +1,4 @@
-// Figma "Sample page -> News article": the bits the post-hero/card-grid/
-// cta-banner building blocks don't already cover on their own — the big
-// featured image and the "Also read" section shell. The Standfirst block
-// needs no scss of its own — just .u-standfirst plus the block's default
-// top/bottom spacing support.
+// Figma "Sample page -> News article": featured image + "Also read" section shell.
 
 .c-single-post {
   &__image {
@@ -26,10 +22,7 @@
     margin-bottom: 3.5rem;
   }
 
-  // wa-button's host defaults to a block box that fills its container
-  // (that's why cta-banner's own CTA needs align-self:flex-start inside a
-  // flex column — see _button.scss/_cta-banner.scss) — here the parent's
-  // just text-align:center, so shrink-to-content + auto margins instead.
+  // wa-button's host defaults to filling its container (see _cta-banner.scss's align-self:flex-start) — shrink + center instead.
   &__related-cta {
     display: block;
     width: fit-content;

@@ -1,8 +1,4 @@
-{{--
-  Reusable post hero fragment (date, share links, title, category pills) —
-  also hardcodable outside the Post Hero block, e.g. the news-article
-  single template, which renders it unconditionally with live post data.
---}}
+{{-- Post hero fragment (date, share links, title, category pills) — shared by the Post Hero block and content-single-post.blade.php. --}}
 
 @props(['date', 'title', 'permalink', 'categories' => []])
 
