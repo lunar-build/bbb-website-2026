@@ -15,3 +15,6 @@ import '@awesome.me/webawesome/dist/components/checkbox/checkbox.js';
 import '@awesome.me/webawesome/dist/components/checkbox-group/checkbox-group.js';
 import '@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js';
 import '@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js';
+import '@awesome.me/webawesome/dist/components/carousel/carousel.js';
+import '@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js';
+import '@awesome.me/webawesome/dist/components/dialog/dialog.js';
