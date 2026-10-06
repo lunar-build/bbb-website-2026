@@ -28,9 +28,13 @@ class RelatedPosts
                 'level' => 'h3',
                 'style' => 'match',
             ],
+            // <x-card>'s stretched-link aria-label falls back to the
+            // current loop post's title when this is blank — wrong here,
+            // since each card links to a *different* post than the one
+            // being viewed. Pass the real title through explicitly.
             'link' => [
                 'url' => get_permalink($post),
-                'title' => '',
+                'title' => get_the_title($post),
             ],
         ], $posts);
     }

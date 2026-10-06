@@ -1,3 +1,8 @@
+@php($hero = $hero())
+@php($standfirst = $standfirst())
+@php($relatedPosts = $relatedPosts())
+@php($pagination = $pagination())
+
 <article @php(post_class('h-entry'))>
   <section class="c-post-hero">
     <div class="o-container">
