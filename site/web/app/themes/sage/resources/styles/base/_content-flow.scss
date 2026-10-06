@@ -1,12 +1,7 @@
-// A full-bleed-background block (CTA Banner, Card Grid, Image Hero, Quote
-// Carousel, Video Hero — any block marked `.o-full-bleed-bg` on its root
-// <section>, see its blade view) only pads space *inside* its own coloured
-// area via its $spacing top/bottom padding — that does nothing to separate
-// it from whatever sits outside it. Dropped straight after a WP paragraph
-// block with no background of its own, the colour starts right where the
-// text ends. Give it real external breathing room — but only on the edge
-// actually touching a paragraph; two of these blocks stacked back to back
-// shouldn't gain a gap neither one asked for.
+// Full-bleed-background blocks (.o-full-bleed-bg — CTA Banner, Card Grid,
+// Image Hero, Quote Carousel, Video Hero) only pad space inside their own
+// coloured area, not outside it. Margin only on the edge touching a
+// paragraph, so two of these stacked back to back stay flush.
 .e-content > .wp-block-paragraph + .o-full-bleed-bg {
   margin-top: var(--wp--preset--spacing--large);
 }
@@ -15,12 +10,9 @@
   margin-bottom: var(--wp--preset--spacing--large);
 }
 
-// Every block (root is always a <section>, per the block-building
-// convention) already has its own 4rem top spacing — margin for
-// .o-full-bleed-bg ones (above), padding-top otherwise, which reads the
-// same as margin since there's no visible section edge to reveal it's
-// padding. Either way, a preceding paragraph's own margin-bottom just
-// stacks an extra, inconsistent gap on top — drop it.
+// Every block already has its own 4rem top spacing (margin above, or
+// padding-top otherwise, same visual effect) — a preceding paragraph's own
+// margin-bottom just stacks an extra gap on top of that. Drop it.
 .e-content > .wp-block-paragraph:has(+ section) {
   margin-bottom: 0;
 }

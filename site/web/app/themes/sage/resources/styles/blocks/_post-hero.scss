@@ -38,10 +38,7 @@
   color: var(--wp--preset--color--charcoal);
 }
 
-// 16x16 visible icon, 44x44 tap target (WCAG 2.5.5) — padding expands the
-// hit area without the icon looking oversized; the matching negative margin
-// cancels the padding's footprint so it doesn't throw off the flex row's
-// spacing/alignment visually.
+// 16x16 visible icon, 44x44 tap target (WCAG 2.5.5) — negative margin cancels the padding's footprint so the row's spacing doesn't shift.
 .c-post-hero__share-link {
   display: inline-flex;
   align-items: center;

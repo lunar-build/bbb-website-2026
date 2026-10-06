@@ -17,7 +17,6 @@
     </div>
   @endif
 
-  {{-- .o-container, not a plain div: narrows plain body content the same as everything else, while c-single-post__full-bleed-blocks below lets specific blocks' own full-width backgrounds escape it. --}}
   <div class="o-container e-content">
     @php(the_content())
   </div>

@@ -1,23 +1,16 @@
 // Figma "Sample page -> News article": featured image + "Also read" section shell.
 
-// Full-bleed-background blocks (.o-full-bleed-bg, see base/_content-flow.scss)
-// normally run edge to edge on standard pages — .e-content is itself an
-// .o-container here, so without this they'd get squeezed into its narrow
-// content column like any other block. Escape them back onto the full-bleed
-// track; their own inner .o-container still narrows their actual content.
+// Full-bleed-background blocks (.o-full-bleed-bg) normally run edge to edge
+// — .e-content is itself an .o-container here, so escape them back onto the
+// full-bleed track; their own inner .o-container still narrows their content.
 .e-content.o-container > .o-full-bleed-bg {
   grid-column: full-start / full-end;
 }
 
-// Every other block's <section> is already the narrow content column
-// (placed there by .e-content's own grid) — almost every block also wraps
-// its content in its own .o-container div (per the block-building
-// convention), which would apply that same narrowing a second time inside
-// an already-narrow section, over-indenting it. Flatten that inner grid to
-// a 100%-width passthrough: content-start/content-end collapse onto
-// full-start/full-end, so .o-container__full escapes still work (relative
-// to the section's own — already narrow — edges), just with no further
-// width/gutter applied.
+// Non-full-bleed blocks are already narrowed (their <section> IS the
+// content column) — most also wrap their content in their own
+// .o-container, which would narrow a second time. Flatten that inner grid
+// to a 100%-width passthrough instead.
 .e-content.o-container > section:not(.o-full-bleed-bg) .o-container {
   grid-template-columns: [full-start content-start] 100% [content-end full-end];
 }

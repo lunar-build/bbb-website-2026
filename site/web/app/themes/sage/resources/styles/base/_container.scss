@@ -7,12 +7,10 @@
 //     <img class="o-container__full" src="…"> <!-- bleeds full width -->
 //   </div>
 //
-// `.o-container--narrow` sets a tighter max-width/gutter (news articles) via
-// custom properties rather than its own grid-template-columns — put it on
-// any ancestor (doesn't need `.o-container` itself) to cascade the narrower
-// size into every `.o-container` underneath, including ones nested inside
-// other blocks' own markup (e.g. CTA Banner rendered into post content) —
-// see resources/styles/components/_single-post.scss.
+// `.o-container--narrow` sets a tighter max-width/gutter via custom
+// properties — put it on any ancestor to cascade into every nested
+// `.o-container` underneath, including other blocks' own markup. See
+// components/_single-post.scss.
 //
 // Never put `.o-container` directly on a <wa-*> custom element — `display:
 // grid` on a shadow host only grids its own shadow-tree wrapper, not the
