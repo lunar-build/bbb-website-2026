@@ -9,3 +9,10 @@
 .e-content > .o-full-bleed-bg {
   margin-block: var(--wp--preset--spacing--large);
 }
+
+// A paragraph's own margin-bottom would otherwise stack with the margin-top
+// above, doubling up the gap — drop it, the block's own margin already
+// covers the separation.
+.e-content > .wp-block-paragraph:has(+ .o-full-bleed-bg) {
+  margin-bottom: 0;
+}
