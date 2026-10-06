@@ -1,0 +1,124 @@
+// Figma: Standalone Link Card / Download Link / Transcript Download Link
+
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+@use '../components/button';
+
+// Container query, not the shared bp.respond() viewport mixin — the card's
+// own rendered width can be far narrower than the viewport (e.g. the pattern
+// library's sidebar layout), so a viewport breakpoint alone won't reliably
+// stack it. Still reads its cutoff from bp.$md rather than a hardcoded
+// value, to stay in step with the site's shared breakpoints.
+.c-link-card {
+  container-type: inline-size;
+}
+
+.c-link-card__card {
+  display: flex;
+  align-items: center;
+  gap: 3.3125rem;
+  padding: 1.3125rem 1.875rem 1.3125rem 2.5rem;
+  margin-bottom: 1rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--white);
+  box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.25);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // Stacks earlier than the usual $sm cutoff — the card's long single-line
+  // CTA/description text wraps awkwardly on tablet-width containers while
+  // still in row layout.
+  @container (max-width: #{bp.$md}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    text-align: center;
+  }
+}
+
+.c-link-card__card--no-logo {
+  gap: 1.5rem;
+}
+
+.c-link-card__logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8.75rem;
+
+  @container (max-width: #{bp.$md}) {
+    margin: 0 auto;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.c-link-card__content {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.c-link-card__title {
+  color: var(--wp--preset--color--blue-medium);
+
+  // Description is optional — when title is the only line in &__content,
+  // its base heading margin-bottom would throw it off-centre in the
+  // vertically centred card row.
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.c-link-card__description {
+  color: var(--wp--preset--color--charcoal);
+  margin: 0;
+}
+
+.c-link-card__cta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+
+  .c-link-card__card--no-logo & {
+    align-items: center;
+  }
+
+  @container (max-width: #{bp.$md}) {
+    align-items: center;
+  }
+}
+
+.c-link-card__cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--wp--preset--color--blue-dark);
+  text-decoration: none;
+  white-space: nowrap;
+
+  @include focus.ring;
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
+
+  // Right padding stops the focus outline overlapping the arrow as it
+  // animates to the right on hover/focus.
+  .c-icon--arrow-right {
+    padding-right: 0.5rem;
+  }
+}
+
+.c-link-card__file-size {
+  color: var(--wp--preset--color--charcoal);
+}

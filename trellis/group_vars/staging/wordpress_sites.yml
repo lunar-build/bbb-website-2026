@@ -1,0 +1,34 @@
+# Documentation: https://roots.io/trellis/docs/remote-server-setup/
+# `wordpress_sites` options: https://roots.io/trellis/docs/wordpress-sites
+# Define accompanying passwords/secrets in group_vars/staging/vault.yml
+
+wordpress_sites:
+  staging2026.betterbybike.info:
+    site_hosts:
+      - canonical: staging2026.betterbybike.info
+    local_path: ../site # path targeting local Bedrock site directory (relative to Ansible root)
+    repo: git@github.com:lunar-build/bbb-website-2026.git
+    repo_subtree_path: site # relative path to your Bedrock/WP directory in your repo
+    branch: main
+    multisite:
+      enabled: false
+    ssl:
+      enabled: true
+      # OCSP stapling must be disabled
+      stapling_enabled: false
+      # Use this role to generate Cloudflare Origin CA certificate
+      provider: cloudflare-origin-ca
+    cloudflare_origin_ca:
+      # Number of days for which the issued cert will be valid. Acceptable options are: 7, 30, 90, 365 (1y), 730 (2y), 1095 (3y), 5475 (15y).
+      # Default: 5475
+      days: 90
+      # List of fully-qualified domain names to include on the certificate as Subject Alternative Names.
+      # Default: All canonical and redirect domains
+      hostnames:
+        - staging2026.betterbybike.info
+    cache:
+      enabled: false
+    nginx_embed_security: true
+    xmlrpc:
+      enabled: false
+    deploy_keep_releases: 3

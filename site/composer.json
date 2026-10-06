@@ -43,23 +43,40 @@
     {
       "type": "vcs",
       "url": "git@github.com:lunar-build/gravityforms.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@github.com:lunar-build/instagram-feed-pro.git"
     }
   ],
   "require": {
-    "php": ">=8.3",
+    "php": ">=8.4",
     "composer/installers": "^2.0",
-    "gravityforms/gravityforms": "^2.0",
+    "gravityforms/gravityforms": "^3.0",
     "oscarotero/env": "^2.0",
     "roots/bedrock-autoloader": "^1.0",
     "roots/bedrock-disallow-indexing": "^2.0",
-    "roots/wordpress": "7.0.2",
+    "roots/wordpress": "^7.0",
     "roots/wp-config": "^1.0",
+    "smashballoon/instagram-feed-pro": "^6.13",
     "vlucas/phpdotenv": "^5.0",
+    "wp-media/wp-rocket": "^3.23",
+    "wp-media/wp-rocket-cli": "^1.3",
+    "wp-plugin/cloudflare": "^4.14",
+    "wp-plugin/disable-comments": "^2.9",
+    "wp-plugin/imagify": "^2.3",
+    "wp-plugin/redirection": "^5.10",
+    "wp-plugin/rollbar": "^3.3",
+    "wp-plugin/wordfence": "^9.0",
+    "wp-plugin/wordpress-seo": "^28.5",
+    "wp-plugin/wp-mail-smtp": "^4.9",
+    "wp-plugin/wps-hide-login": "^1.9",
+    "wp-plugin/wpscan": "^1.16",
     "wpengine/advanced-custom-fields": "^6.8"
   },
   "require-dev": {
     "laravel/pint": "^1.0",
-    "pestphp/pest": "^4.0"
+    "pestphp/pest": "^5.0"
   },
   "config": {
     "optimize-autoloader": true,
@@ -76,7 +93,9 @@
   "extra": {
     "installer-paths": {
       "web/app/mu-plugins/{$name}/": [
-        "type:wordpress-muplugin"
+        "type:wordpress-muplugin",
+        "wpengine/advanced-custom-fields",
+        "gravityforms/gravityforms"
       ],
       "web/app/plugins/{$name}/": [
         "type:wordpress-plugin"
