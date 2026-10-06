@@ -1,15 +1,10 @@
 @use '../base/typography';
 
-// Figma: font-size 20px, line-height 30px, letter-spacing 0.4px, color
-// blue-dark (#003852). Current page (last item) is underlined and not a
-// link — WA renders a plain <button> for items with no href, so it's also
-// stripped of pointer/focus affordances below.
+// Figma: 20px/30px, letter-spacing 0.4px, blue-dark. Current page (last
+// item, WA renders a plain <button>) is underlined and not a link.
 //
-// Colour is a custom property, not a hardcoded value, so it can be
-// overridden per-context (e.g. a dark hero block) without touching this
-// file — set --c-breadcrumbs-color on the <x-breadcrumbs> tag itself
-// (via its `style` attribute) or on any ancestor:
-//   <x-breadcrumbs :items="..." style="--c-breadcrumbs-color: var(--wp--preset--color--white)" />
+// --c-breadcrumbs-color is overridable per-context (e.g. a dark hero)
+// via style="--c-breadcrumbs-color: ..." on <x-breadcrumbs> or an ancestor.
 
 .c-breadcrumbs {
   --c-breadcrumbs-color: var(--wp--preset--color--blue-dark);

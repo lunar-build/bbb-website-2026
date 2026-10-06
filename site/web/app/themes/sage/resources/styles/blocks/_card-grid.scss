@@ -46,13 +46,9 @@
     }
   }
 
-  // Decorative figure bleeding past the block's bottom edge (and a few px
-  // into whatever's below it), so it reads as standing over the section.
-  // `right` mirrors .o-container's own gutter calc (base/_container.scss)
-  // minus a constant 8rem, so the overlay past the container edge stays
-  // the same at any viewport width — a flat rem value looked right on
-  // ultra-wide screens but overshot badly on laptop widths, where the
-  // container's own gutter is still small. xl+ only; needs the room.
+  // `right` mirrors .o-container's own gutter calc minus a constant 8rem,
+  // so the bleed past the container edge stays consistent at any viewport
+  // width (a flat rem value overshot on laptop widths). xl+ only.
   &__side-image {
     display: none;
     position: absolute;

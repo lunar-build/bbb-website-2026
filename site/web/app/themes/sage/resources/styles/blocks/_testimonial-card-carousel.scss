@@ -1,0 +1,91 @@
+// Figma node 7:2047 — arrow glyph/classnames shared across all 3 carousel
+// blocks (Trello: "Shared carousel arrows"), no abstraction extracted yet.
+@use '../base/focus' as focus;
+
+.c-testimonial-carousel {
+  &__carousel {
+    // Invalid on purpose — WA's own default (16/9) gives the slides row a
+    // fixed height; this makes it content-sized instead (see scroll-container below).
+    --aspect-ratio: auto;
+
+    display: block;
+  }
+
+  &__item {
+    display: flex;
+    padding-inline: 0.25rem; // small breathing room between slide edge and card shadow
+  }
+
+  // Move the nav buttons off the slides row's edges (WA's default) to sit
+  // either side of the pagination dots instead.
+  &__carousel::part(carousel) {
+    grid-template-columns: 1fr auto auto auto 1fr;
+    column-gap: 0.5rem;
+  }
+
+  &__carousel::part(scroll-container) {
+    grid-column: 1 / -1;
+    // Stretch (not WA's default center) + the invalid --aspect-ratio above
+    // makes every visible slide match the tallest one's content height.
+    align-items: stretch;
+    // Room for the cards' box-shadow, otherwise clipped by WA's own overflow-y: hidden here.
+    padding-block: 0.25rem;
+    // WA's tabindex="0" for keyboard slide nav lives here, not on the card.
+    @include focus.ring;
+  }
+
+  &__carousel::part(navigation-button-previous) {
+    grid-column: 2;
+    margin-right: 1rem;
+  }
+
+  &__carousel::part(pagination) {
+    grid-column: 3;
+  }
+
+  &__carousel::part(navigation-button-next) {
+    margin-left: 1rem;
+    grid-column: 4;
+  }
+
+  &__carousel::part(pagination-item) {
+    width: 0.625rem;
+    height: 0.625rem;
+    border: 1px solid var(--wp--preset--color--blue);
+    background: transparent;
+
+    @include focus.ring;
+  }
+
+  // WA's real part name — single dash, not the BEM double dash used elsewhere here.
+  &__carousel::part(pagination-item-active) {
+    background: var(--wp--preset--color--blue);
+  }
+
+  &__carousel::part(navigation-button) {
+    grid-row: 2;
+    padding: var(--wa-space-2xs);
+    justify-content: center;
+    color: var(--wp--preset--color--dark-orange);
+    @include focus.ring;
+  }
+
+  &__nav-icon {
+    display: inline-flex;
+    flex: none; // prevent the navigation button's flex layout shrinking the icon to 0 width
+    color: var(--wp--preset--color--dark-orange);
+
+    svg {
+      // 38.5 × 33px — Figma's arrow glyph bounding box itself (node 7:2044/7:2045).
+      width: 2.40625rem;
+      height: 2.0625rem;
+      flex: none;
+    }
+  }
+
+  &__nav-icon--prev {
+    transform: scaleX(
+      -1
+    ); // arrow-right.svg flipped, no separate left-pointing asset
+  }
+}

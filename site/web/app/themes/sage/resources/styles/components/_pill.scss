@@ -1,10 +1,9 @@
 @use '../base/focus' as focus;
 
-// Figma "Tag" component (node 136:3025) — reworked from the original
-// rounded/bordered pill: now plain text with a top+bottom rule only (no
-// radius, no side borders, no icon). Default is a yellow rule; hover
-// switches it to charcoal; focus keeps the charcoal rule and fills the
-// background yellow. The focus ring itself still uses the shared
+// Figma "Tag" component (node 136:3025) — plain text with a top+bottom
+// rule only (no radius, no side borders, no icon). Default is a yellow
+// rule; hover switches it to charcoal; focus keeps the charcoal rule and
+// fills the background yellow. The focus ring itself uses the shared
 // focus.ring mixin rather than reproducing Figma's box-shadow, per the
 // site-wide focus-visible convention.
 
