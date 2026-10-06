@@ -43,11 +43,8 @@
     flex: 1;
     gap: 16px;
     padding: 20px;
-    // &__card has no overflow:hidden (removed so the stretched-link's
-    // focus ring isn't clipped) — this rounds &__body's own bottom
-    // corners to match, since it's the only other piece (besides &__image,
-    // already self-rounded) that could otherwise show square corners
-    // poking out past &__card's rounded shape.
+    // &__card has no overflow:hidden (would clip the stretched-link's
+    // focus ring), so round &__body's own bottom corners to match.
     border-radius: 0 0 12px 12px;
   }
 
@@ -106,10 +103,8 @@
     }
   }
 
-  // The CTA can't rely on its own :hover/:focus-within — it's pointer-events:none
-  // (decorative <wa-button>) or a bare icon, since the card itself is the real
-  // link — so the arrow-morph animation is driven off the card being hovered
-  // instead. See components/_button.scss for the shared mixin/markup this matches.
+  // CTA is pointer-events:none (card itself is the real link), so its
+  // arrow-morph is driven off the card's own hover instead.
   &__card:is(:hover, :focus-within) &__cta,
   &__card:is(:hover, :focus-within) &__cta-icon {
     @include button.arrow-hover;

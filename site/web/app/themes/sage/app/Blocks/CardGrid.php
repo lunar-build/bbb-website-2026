@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasBusinessCardFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
@@ -10,6 +11,8 @@ use Log1x\AcfComposer\Builder;
 
 class CardGrid extends Block
 {
+    use HasBusinessCardFields;
+
     /**
      * The block name.
      *
@@ -29,7 +32,7 @@ class CardGrid extends Block
      *
      * @var string
      */
-    public $description = 'A section heading with a grid of cards (FeatureCard\'s Link/Bikeability/Event/News styles, or a plain Image card), with an optional decorative image beside the grid on large screens.';
+    public $description = 'A section heading with a grid of cards (FeatureCard\'s Link/Bikeability/Event/News styles, a plain Image card, or a Business card listing), with an optional decorative image beside the grid on large screens.';
 
     /**
      * The block category.
@@ -224,6 +227,38 @@ class CardGrid extends Block
         'Link (with side image)' => [
             'show_side_image' => true,
         ],
+        'Business card' => [
+            'card_style' => 'business',
+            'business_cards' => [
+                [
+                    'name' => 'Weston Bicycle Works',
+                    'contact_info' => [
+                        ['icon' => 'location-dot', 'text' => '143 Locking Road, Weston-Super-Mare, BS23 3ER'],
+                        ['icon' => 'phone', 'text' => '01934 629989'],
+                    ],
+                    'services' => [
+                        ['icon' => 'recycle', 'text' => 'Secondhand bikes'],
+                        ['icon' => 'wrench', 'text' => 'Bike servicing'],
+                        ['icon' => 'hand-holding-heart', 'text' => 'Donate a bike'],
+                    ],
+                    'description' => 'A community enterprise selling quality refurbished bikes and welcome bike donations.',
+                    'link' => ['title' => 'Learn more', 'url' => '#', 'target' => '_blank'],
+                ],
+                [
+                    'name' => 'Bristol Bike Project',
+                    'contact_info' => [
+                        ['icon' => 'location-dot', 'text' => '18 Wade Street, St Jude\'s, Bristol, BS2 9UD'],
+                        ['icon' => 'phone', 'text' => '0117 123 4567'],
+                    ],
+                    'services' => [
+                        ['icon' => 'bicycle', 'text' => 'New bikes'],
+                        ['icon' => 'wrench', 'text' => 'Bike servicing'],
+                    ],
+                    'description' => 'A social enterprise bike shop and workshop, running earn-a-bike schemes.',
+                    'link' => ['title' => 'Learn more', 'url' => '#', 'target' => '_blank'],
+                ],
+            ],
+        ],
     ];
 
     /**
@@ -237,6 +272,7 @@ class CardGrid extends Block
             'cardStyle' => $this->cardStyle(),
             'ctaStyle' => $this->ctaStyle(),
             'cards' => $this->cards(),
+            'businessCards' => $this->businessCards(),
             'sideImage' => $this->sideImage(),
         ];
     }
@@ -270,6 +306,7 @@ class CardGrid extends Block
                     'event' => 'Event card (button CTA, date shown)',
                     'news' => 'News card (button CTA, date shown, no body copy)',
                     'image_card' => 'Image card (image + linked caption bar only, no heading/body/date)',
+                    'business' => 'Business card (name, contact info, services, description — no image)',
                 ],
                 'default_value' => 'link',
                 'ui' => true,
@@ -286,6 +323,15 @@ class CardGrid extends Block
             'button_label' => 'Add card',
             'min' => 0,
             'layout' => 'block',
+            'conditional_logic' => [
+                [
+                    [
+                        'field' => 'card_style',
+                        'operator' => '!=',
+                        'value' => 'business',
+                    ],
+                ],
+            ],
         ]);
 
         $cards->addImage('image', [
@@ -321,6 +367,26 @@ class CardGrid extends Block
             ]);
 
         $cards->endRepeater();
+
+        $businessCards = $fields->addRepeater('business_cards', [
+            'label' => 'Business cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
+            'conditional_logic' => [
+                [
+                    [
+                        'field' => 'card_style',
+                        'operator' => '==',
+                        'value' => 'business',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->addBusinessCardFields($businessCards);
+
+        $businessCards->endRepeater();
 
         return $fields->build();
     }
@@ -422,6 +488,23 @@ class CardGrid extends Block
                 'date' => $showDate ? ($card['date'] ?? null) : null,
                 'link' => normalize_link($card['link'] ?? null),
             ];
+        }, $cards);
+    }
+
+    /**
+     * Retrieve the Business card style's cards, each augmented with
+     * contact-info tap/click-through hrefs (see HasBusinessCardFields).
+     *
+     * @return array
+     */
+    public function businessCards()
+    {
+        $cards = get_field('business_cards') ?: ($this->example['business_cards'] ?? []);
+
+        return array_map(function ($card) {
+            $card['contact_info'] = $this->withBusinessCardContactHrefs($card['contact_info'] ?? []);
+
+            return $card;
         }, $cards);
     }
 

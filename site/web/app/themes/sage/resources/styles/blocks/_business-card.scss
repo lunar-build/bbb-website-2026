@@ -1,9 +1,8 @@
-// Figma "Filter result card": no image, a business/service listing —
-// heading, contact info + services icon/text repeaters, description, CTA.
+// Figma node 58:2560. Also used as Card Grid's "Business card" style.
 @use '../base/typography';
 @use '../components/button';
 
-.c-filter-result-card {
+.c-business-card {
   &__card {
     display: flex;
     flex-direction: column;
@@ -25,6 +24,10 @@
     margin: 0;
     border: none;
     border-top: 1px solid var(--wp--preset--color--light-grey);
+
+    &--accent {
+      border-top-color: var(--wp--preset--color--yellow);
+    }
   }
 
   &__contact-info,
@@ -40,7 +43,7 @@
   &__services {
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   &__contact-item,
@@ -48,6 +51,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-bottom: 0;
   }
 
   &__contact-text {
@@ -65,7 +69,7 @@
   }
 
   &__service-text {
-    @extend .u-filter-service-label;
+    @extend .u-business-service-label;
     color: var(--wp--preset--color--charcoal);
   }
 

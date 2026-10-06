@@ -4,6 +4,7 @@ namespace App\Blocks;
 
 use App\Fields\Copy;
 use App\Fields\Heading;
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -28,7 +29,7 @@ class Form extends Block
      *
      * @var string
      */
-    public $description = 'An intro heading/text with a Gravity Forms form.';
+    public $description = 'An intro heading/text with a Gravity Forms form, either alongside an image or centred with no image.';
 
     /**
      * The block category.
@@ -157,8 +158,9 @@ class Form extends Block
      * @var array
      */
     public $example = [
+        'layout' => 'image',
         'form_id' => 1,
-        'heading_text' => 'Get in touch',
+        'heading_text' => 'Stay up to date with the latest news and events in your region',
         'heading_level' => 'h2',
         'heading_style' => 'match',
         'subheading_text' => 'Subtitle…',
@@ -169,15 +171,32 @@ class Form extends Block
     ];
 
     /**
+     * Component combinations to render stacked on the pattern-library page
+     * (see App\View\Composers\PatternLibrary::render()) — each entry is
+     * merged onto $example above, so only needs to override what differs.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Image' => [],
+        'Centred' => [
+            'layout' => 'centred',
+            'heading_text' => 'If you have any questions or would like some advice, please feel free to get in touch.',
+        ],
+    ];
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
         return [
+            'layout' => $this->layout(),
             'formId' => $this->formId(),
             'heading' => $this->heading(),
             'subheading' => $this->subheading(),
             'intro' => $this->intro(),
+            'image' => $this->image(),
         ];
     }
 
@@ -188,12 +207,25 @@ class Form extends Block
     {
         $fields = Builder::make('form');
 
+        $fields->addSelect('layout', [
+            'label' => 'Layout',
+            'instructions' => 'Image: form alongside an image. Centred: form only, no image.',
+            'choices' => [
+                'image' => 'Image with form',
+                'centred' => 'Centred (no image)',
+            ],
+            'default_value' => 'image',
+            'ui' => true,
+        ]);
+
         $fields->addPartial(Heading::class, [
             'name' => 'heading',
             'label' => 'Heading',
             'default_level' => 'h2',
             'required' => true,
         ]);
+
+        $fields->addTab('Content');
 
         $fields->addPartial(Heading::class, [
             'name' => 'subheading',
@@ -206,6 +238,30 @@ class Form extends Block
             'label' => 'Intro text',
             'default_style' => 'body',
         ]);
+
+        $imageLayoutConditional = [
+            'conditional_logic' => [
+                [
+                    [
+                        'field' => 'layout',
+                        'operator' => '==',
+                        'value' => 'image',
+                    ],
+                ],
+            ],
+        ];
+
+        $fields->addTab('Image layout fields', $imageLayoutConditional);
+
+        $fields->addImage('image', [
+            'label' => 'Image',
+            'instructions' => 'Shown alongside the form.',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'required' => 1,
+        ]);
+
+        $fields->addTab('Form');
 
         $fields
             ->addSelect('form_id', [
@@ -239,6 +295,29 @@ class Form extends Block
         }
 
         return collect(\GFAPI::get_forms())->pluck('title', 'id')->all();
+    }
+
+    /**
+     * Retrieve the selected layout.
+     *
+     * @return string
+     */
+    public function layout()
+    {
+        return get_field('layout') ?: $this->example['layout'];
+    }
+
+    /**
+     * Retrieve the image, falling back to a placeholder.
+     *
+     * @return array
+     */
+    public function image()
+    {
+        return get_field('image') ?: [
+            'url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'),
+            'alt' => '',
+        ];
     }
 
     /**
@@ -278,6 +357,12 @@ class Form extends Block
      */
     public function intro()
     {
+        // get_field() already applies the 'intro_text' field's
+        // new_lines => 'wpautop' (see Fields\Copy) — the example fallback
+        // bypasses ACF entirely, so it needs the same wpautop() pass
+        // manually to match (real <p> tags for the preview/example).
+        $text = get_field('intro_text');
+
         return [
             'text' => get_field('intro_text') ?: ($this->preview ? ($this->example['intro_text'] ?? '') : ''),
             'style' => get_field('intro_style') ?: ($this->preview ? ($this->example['intro_style'] ?? 'body') : 'body'),

@@ -2,24 +2,27 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasBusinessCardFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class FilterResultCard extends Block
+class BusinessCard extends Block
 {
+    use HasBusinessCardFields;
+
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'Filter Result Card';
+    public $name = 'Business Card';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'filter-result-card';
+    public $slug = 'business-card';
 
     /**
      * The block description.
@@ -49,7 +52,7 @@ class FilterResultCard extends Block
      */
     public $keywords = [
         'card',
-        'filter',
+        'business',
         'directory',
         'listing',
     ];
@@ -149,35 +152,6 @@ class FilterResultCard extends Block
     public $styles = [];
 
     /**
-     * Icon choices shared by the Contact info repeater — a fixed,
-     * developer-controlled set rendered via <wa-icon>, matching how
-     * FeatureCard.php's `stats` repeater constrains its `pill_variant`
-     * select rather than allowing arbitrary input.
-     *
-     * @var array
-     */
-    protected $contactIconChoices = [
-        'location-dot' => 'Location',
-        'phone' => 'Phone',
-        'envelope' => 'Email',
-        'globe' => 'Website',
-    ];
-
-    /**
-     * Icon choices shared by the Services repeater.
-     *
-     * @var array
-     */
-    protected $serviceIconChoices = [
-        'bicycle' => 'Bicycle',
-        'wrench' => 'Servicing/repair',
-        'recycle' => 'Secondhand/refurbished',
-        'hand-holding-heart' => 'Donate',
-        'shop' => 'Shop',
-        'gift' => 'Hire/loan',
-    ];
-
-    /**
      * The block preview example data.
      *
      * @var array
@@ -220,58 +194,9 @@ class FilterResultCard extends Block
      */
     public function fields(): array
     {
-        $fields = Builder::make('filter_result_card');
+        $fields = Builder::make('business_card');
 
-        $fields
-            ->addText('name', [
-                'label' => 'Name',
-                'required' => 1,
-            ])
-            ->addRepeater('contact_info', [
-                'label' => 'Contact info',
-                'instructions' => 'Address, phone, etc. Leave empty to omit.',
-                'button_label' => 'Add contact info',
-                'min' => 0,
-                'layout' => 'block',
-            ])
-                ->addSelect('icon', [
-                    'label' => 'Icon',
-                    'choices' => $this->contactIconChoices,
-                    'default_value' => 'location-dot',
-                    'ui' => true,
-                ])
-                ->addText('text', [
-                    'label' => 'Text',
-                    'required' => 1,
-                ])
-            ->endRepeater()
-            ->addRepeater('services', [
-                'label' => 'Services',
-                'instructions' => 'Short tag-style service labels. Leave empty to omit.',
-                'button_label' => 'Add service',
-                'min' => 0,
-                'layout' => 'block',
-            ])
-                ->addSelect('icon', [
-                    'label' => 'Icon',
-                    'choices' => $this->serviceIconChoices,
-                    'default_value' => 'bicycle',
-                    'ui' => true,
-                ])
-                ->addText('text', [
-                    'label' => 'Text',
-                    'required' => 1,
-                ])
-            ->endRepeater()
-            ->addTextarea('description', [
-                'label' => 'Description',
-                'rows' => 3,
-            ])
-            ->addLink('link', [
-                'label' => 'Link',
-                'instructions' => 'Link text + URL for the CTA.',
-                'required' => true,
-            ]);
+        $this->addBusinessCardFields($fields);
 
         return $fields->build();
     }
@@ -302,26 +227,7 @@ class FilterResultCard extends Block
             $rows = $this->preview ? $this->example['contact_info'] : [];
         }
 
-        return array_map(fn($row) => $row + ['href' => $this->contactHref($row['icon'], $row['text'])], $rows);
-    }
-
-    /**
-     * Build the tap/click-through URL for a contact info row based on its
-     * icon type.
-     *
-     * @param  string  $icon
-     * @param  string  $text
-     * @return string|null
-     */
-    protected function contactHref($icon, $text)
-    {
-        return match ($icon) {
-            'phone' => 'tel:' . preg_replace('/[^0-9+]/', '', $text),
-            'envelope' => 'mailto:' . trim($text),
-            'location-dot' => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($text),
-            'globe' => preg_match('#^https?://#i', $text) ? $text : 'https://' . $text,
-            default => null,
-        };
+        return $this->withBusinessCardContactHrefs($rows);
     }
 
     /**

@@ -1,28 +1,16 @@
-// Site-wide content container. Wrap nav/block/footer content in `.o-container`
-// to constrain it to a max width and center it with a side gutter. Most direct
-// children stay contained by default; give a child `.o-container__full` to let
-// it bleed edge-to-edge (full-colour backgrounds, full-bleed images/video)
-// without breaking out of the DOM or needing a separate wrapper.
+// Site-wide content container. Wrap content in `.o-container` to constrain
+// it to a max width with a side gutter; give a child `.o-container__full`
+// to let it bleed edge-to-edge instead.
 //
-// Usage:
-//   <section class="c-my-block">
-//     <div class="o-container">
-//       <p>Contained by default…</p>
-//       <img class="o-container__full" src="…"> <!-- bleeds full width -->
-//     </div>
-//   </section>
+//   <div class="o-container">
+//     <p>Contained by default…</p>
+//     <img class="o-container__full" src="…"> <!-- bleeds full width -->
+//   </div>
 //
-// If an entire block's background should bleed (not just one child), simply
-// don't wrap the whole block in `.o-container` — put it on an inner content
-// wrapper instead, so the block's own <section> stays naturally full width.
-//
-// Never put the `.o-container` class directly on a Shadow-DOM custom element
-// (<wa-*>) — `display: grid` on a shadow host only grids that component's
-// OWN shadow-tree wrapper, not the light-DOM content slotted into it, so it
-// can't actually constrain the component's content and produces
-// broken/undefined sizing. Always wrap the custom element in a plain
-// <div class="o-container"> instead, so the whole component becomes one
-// grid item — see sections/header.blade.php.
+// Never put this class directly on a <wa-*> custom element — `display:
+// grid` on a shadow host only grids its own shadow-tree wrapper, not the
+// slotted light-DOM content. Wrap the element in a plain
+// <div class="o-container"> instead — see sections/header.blade.php.
 
 $container-max-width: 80rem;
 $container-gutter: 1.5rem;
