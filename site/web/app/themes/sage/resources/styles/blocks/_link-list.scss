@@ -1,0 +1,90 @@
+// Figma "Short-form link list" (Centred / Left align) and "Long-form link
+// list" (Links with text / Just links) — a repeater of plain, unbordered
+// links, either compact Anonymous Pro links grouped under an icon, or
+// larger headline-style links with an optional description underneath.
+
+@use '../base/focus';
+@use '../components/button';
+
+.c-link-list__group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.875rem;
+
+  .c-icon.c-icon--arrow-right {
+    padding-right: 0.5rem;
+  }
+}
+
+.c-link-list__icon {
+  color: var(--wp--preset--color--orange);
+  width: 3.0625rem;
+}
+
+// Short-form layouts.
+.c-link-list--short-centred,
+.c-link-list--short-left {
+  gap: 1rem;
+}
+
+.c-link-list--short-centred {
+  align-items: center;
+  text-align: center;
+}
+
+.c-link-list--short-left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.c-link-list__short-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--wp--preset--color--blue-medium);
+  text-decoration: none;
+
+  @include focus.ring;
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
+}
+
+// Long-form layouts.
+.c-link-list--long-with-text,
+.c-link-list--long-just-links {
+  gap: 1.5rem;
+}
+
+.c-link-list__long-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.c-link-list__long-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  align-self: flex-start;
+  color: var(--wp--preset--color--blue-medium);
+  text-decoration: none;
+
+  @include focus.ring;
+
+  &:hover,
+  &:focus-visible {
+    @include button.arrow-hover;
+  }
+}
+
+.c-link-list__long-title {
+  margin: 0;
+}
+
+.c-link-list__long-description {
+  margin: 0;
+  color: var(--wp--preset--color--charcoal);
+}
