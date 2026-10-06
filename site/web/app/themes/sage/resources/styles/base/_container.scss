@@ -1,6 +1,7 @@
 // Site-wide content container. Wrap content in `.o-container` to constrain
 // it to a max width with a side gutter; give a child `.o-container__full`
-// to let it bleed edge-to-edge instead.
+// to let it bleed edge-to-edge instead. Add `.o-container--narrow` for a
+// tighter reading column (news articles) — same shape, smaller cap.
 //
 //   <div class="o-container">
 //     <p>Contained by default…</p>
@@ -14,6 +15,15 @@
 
 $container-max-width: 80rem;
 $container-gutter: 1.5rem;
+
+// Figma "News article": a 940px reading column inside the 1440px frame —
+// noticeably narrower than the standard 80rem container, not just a
+// smaller gutter. A min() cap (same technique as the base container)
+// means it's barely narrower than normal on mobile/tablet, where the
+// viewport is already well under the cap anyway, and only really bites
+// — growing the gap further — once the viewport is wide enough to hit it.
+$container-narrow-max-width: 58.75rem; // 940px
+$container-narrow-gutter: 2rem;
 
 .o-container {
   display: grid;
@@ -29,5 +39,13 @@ $container-gutter: 1.5rem;
 
   &__full {
     grid-column: full-start / full-end;
+  }
+
+  &--narrow {
+    grid-template-columns:
+      [full-start] minmax(#{$container-narrow-gutter}, 1fr)
+      [content-start] min(100% - #{$container-narrow-gutter * 2}, #{$container-narrow-max-width})
+      [content-end] minmax(#{$container-narrow-gutter}, 1fr)
+      [full-end];
   }
 }
