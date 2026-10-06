@@ -108,6 +108,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: center;
+  column-gap: 1em; // gap not margin on __unit: survives wrap without adding row spacing
 
   @include bp.respond($min: bp.$xl) {
     justify-content: flex-start;
@@ -117,10 +118,6 @@
 .c-rolling-stats-carousel__value {
   display: inline-flex;
   align-items: baseline;
-}
-
-.c-rolling-stats-carousel__unit {
-  margin-inline-start: 0.25em;
 }
 
 // One digit's "reel" window (0-9 strip x3, see component Blade view); JS translateY()s it.
