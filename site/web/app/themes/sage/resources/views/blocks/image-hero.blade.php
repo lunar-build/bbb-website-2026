@@ -1,7 +1,7 @@
 <section {{ $attributes->class(['c-image-hero']) }}>
 
 @if ($backgroundImage['url'] ?? null)
-  <img class="c-image-hero__background" src="{{ $backgroundImage['url'] }}" alt="">
+  <img class="c-image-hero__background" src="{{ $backgroundImage['url'] }}" alt="" style="object-position: center {{ $imagePosition }};">
 @endif
 
 @if ($showText)

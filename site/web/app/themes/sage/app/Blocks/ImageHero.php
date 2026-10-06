@@ -151,6 +151,7 @@ class ImageHero extends Block
         'show_text' => true,
         'show_breadcrumbs' => true,
         'heading' => 'Bike shops',
+        'image_position' => 'center',
     ];
 
     /**
@@ -171,6 +172,7 @@ class ImageHero extends Block
     {
         return [
             'backgroundImage' => $this->backgroundImage(),
+            'imagePosition' => $this->imagePosition(),
             'showText' => $this->showText(),
             'showBreadcrumbs' => $this->showBreadcrumbs(),
             'heading' => $this->heading(),
@@ -190,6 +192,17 @@ class ImageHero extends Block
                 'required' => true,
                 'return_format' => 'array',
                 'preview_size' => 'large',
+            ])
+            ->addSelect('image_position', [
+                'label' => 'Image position',
+                'instructions' => 'Which part of the image stays visible when it\'s cropped to fit the hero.',
+                'choices' => [
+                    'top' => 'Top',
+                    'center' => 'Center',
+                    'bottom' => 'Bottom',
+                ],
+                'default_value' => 'center',
+                'ui' => true,
             ])
             ->addTrueFalse('show_text', [
                 'label' => 'Show heading & breadcrumbs',
@@ -235,6 +248,16 @@ class ImageHero extends Block
     public function backgroundImage()
     {
         return get_field('background_image') ?: ($this->example['background_image'] ?? null);
+    }
+
+    /**
+     * Retrieve the image position (object-position keyword).
+     *
+     * @return string
+     */
+    public function imagePosition()
+    {
+        return get_field('image_position') ?: 'center';
     }
 
     /**
