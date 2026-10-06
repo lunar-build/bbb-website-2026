@@ -21,6 +21,9 @@ web/.htaccess
 .env.*
 !.env.example
 
+# NPM
+package-lock.json
+
 # Composer
 /vendor
 auth.json

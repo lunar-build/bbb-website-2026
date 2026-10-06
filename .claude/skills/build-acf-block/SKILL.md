@@ -305,6 +305,40 @@ When copying a px value straight from a Figma spec, convert it before it lands i
 don't paste `20px` and fix it later. See `resources/styles/components/_header.scss` and
 `_primary-nav.scss` for worked examples of icon/logo/spacing values converted this way.
 
+### Breakpoints: never write raw `@media`, always use the `respond()` mixin
+
+Every responsive rule in a block's SCSS must go through
+`resources/styles/abstracts/_breakpoints.scss`'s `respond()` mixin, never a hand-written
+`@media (...)` query:
+
+```scss
+@use '../abstracts/breakpoints' as bp;
+
+.c-block-name__thing {
+  @include bp.respond($max: bp.$md) { ... }              // max-width only
+  @include bp.respond($min: bp.$sm) { ... }               // min-width only
+  @include bp.respond($min: bp.$sm, $max: bp.$lg) { ... } // range
+}
+```
+
+Pick the nearest of the 5 shared breakpoints (`$sm` 640px, `$md` 768px, `$lg` 1024px,
+`$xl` 1280px, `$xxl` 1536px) rather than inventing a one-off value to match a Figma
+spec exactly — these are shared across every block so the site's stack/reflow points
+stay consistent. The only exception is `prefers-reduced-motion`/`prefers-color-scheme`
+media features, which aren't breakpoints and stay as raw `@media` (see
+`base/_reset.scss`, `components/_header.scss`).
+
+### Comment the work as it develops, at key stages
+
+Leave a short comment at each meaningful stage of a block's build, not just a single
+comment at the end — e.g. one at the top of the SCSS partial naming the Figma pattern
+it implements (see the top of `_link-card-list.scss`), one wherever a rule exists for a
+non-obvious reason (a workaround, a fix for a specific bug, a convention the file itself
+doesn't make clear), and one at any point a later change might look accidental without
+it (e.g. why a breakpoint value was picked, why a wrapper element isn't guarded by
+`$block->preview`). Keep each comment to the *why*, not the *what* — skip anything a
+well-named class or property already explains on its own.
+
 ### Block padding: 2rem / 4rem only, top/bottom
 
 Every block's vertical spacing (space between one block and the next) is controlled by

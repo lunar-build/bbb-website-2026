@@ -1,0 +1,23 @@
+---
+- name: Install npm dependencies in Sage theme
+  command: ddev exec 'npm --prefix web/app/themes/sage install'
+  delegate_to: localhost
+  args:
+    chdir: "{{ project_local_path }}"
+
+- name: Compile assets for production in Sage theme
+  command: ddev exec 'npm --prefix web/app/themes/sage run build'
+  delegate_to: localhost
+  args:
+    chdir: "{{ project_local_path }}"
+
+- name: Check for manifest
+  stat:
+    path: "{{ project_local_path }}/web/app/themes/sage/public/build/manifest.json"
+  delegate_to: localhost
+  register: manifest_stat
+
+- name: Fail if manifest not found
+  fail:
+    msg: "Vite manifest not found. Build may have failed."
+  when: not manifest_stat.stat.exists

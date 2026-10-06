@@ -1,0 +1,581 @@
+<?php
+
+namespace App\Blocks;
+
+use Illuminate\Support\Facades\Vite;
+use Log1x\AcfComposer\Block;
+use Log1x\AcfComposer\Builder;
+
+class MediaGallery extends Block
+{
+    /**
+     * The block name.
+     *
+     * @var string
+     */
+    public $name = 'Media Gallery';
+
+    /**
+     * The block description.
+     *
+     * @var string
+     */
+    public $description = 'A dynamic masonry-style grid of images/videos, each editor-sized as 1 or 2 columns wide. Paginates into a carousel once the grid would run past 3 rows; every tile opens its full media in an accessible lightbox.';
+
+    /**
+     * The block category.
+     *
+     * @var string
+     */
+    public $category = 'media';
+
+    /**
+     * The block icon.
+     *
+     * @var string|array
+     */
+    public $icon = 'grid-view';
+
+    /**
+     * The block keywords.
+     *
+     * @var array
+     */
+    public $keywords = [
+        'gallery',
+        'media',
+        'grid',
+        'carousel',
+        'lightbox',
+    ];
+
+    /**
+     * The block post type allow list.
+     *
+     * @var array
+     */
+    public $post_types = ['post', 'page'];
+
+    /**
+     * The parent block type allow list.
+     *
+     * @var array
+     */
+    public $parent = [];
+
+    /**
+     * The ancestor block type allow list.
+     *
+     * @var array
+     */
+    public $ancestor = [];
+
+    /**
+     * The default block mode.
+     *
+     * @var string
+     */
+    public $mode = 'auto';
+
+    /**
+     * The default block alignment.
+     *
+     * @var string
+     */
+    public $align = '';
+
+    /**
+     * The default block text alignment.
+     *
+     * @var string
+     */
+    public $align_text = '';
+
+    /**
+     * The default block content alignment.
+     *
+     * @var string
+     */
+    public $align_content = '';
+
+    /**
+     * The default block spacing.
+     *
+     * @var array
+     */
+    public $spacing = [
+        'padding' => [
+            'top' => 'var:preset|spacing|large',
+            'bottom' => 'var:preset|spacing|large',
+        ],
+        'margin' => null,
+    ];
+
+    /**
+     * The supported block features.
+     *
+     * @var array
+     */
+    public $supports = [
+        'align' => true,
+        'align_text' => false,
+        'align_content' => false,
+        'full_height' => false,
+        'anchor' => false,
+        'mode' => true,
+        'multiple' => true,
+        'jsx' => true,
+        'color' => [
+            'background' => false,
+            'text' => false,
+            'gradients' => false,
+        ],
+        'spacing' => [
+            'padding' => ['top', 'bottom'],
+            'margin' => false,
+        ],
+    ];
+
+    /**
+     * The block styles.
+     *
+     * @var array
+     */
+    public $styles = [];
+
+    /**
+     * Maximum column-units per carousel page: 4 grid columns × 3 rows.
+     *
+     * @var int
+     */
+    const PAGE_CAPACITY = 12;
+
+    /**
+     * The 9 raw item specs reproducing the Figma reference's masonry
+     * layout exactly (4 squares / 1+wide+1 / 2 wides), to demonstrate the
+     * dynamic grid at its densest documented shape.
+     *
+     * A class constant, not read from $this->example['items'] — example()
+     * below gets called again on every PatternLibrary variant render (not
+     * just once), and by the second call $this->example['items'] has
+     * already been swapped to whichever variant's override is currently
+     * rendering. Building the "Multiple pages" variant by duplicating
+     * $this->example['items'] at that point would duplicate an
+     * already-duplicated list each time it re-ran, compounding into more
+     * pages than intended. A constant is immune to that — always the same
+     * 9 raw specs regardless of how many times example() runs.
+     *
+     * @var array
+     */
+    const BASE_ITEMS = [
+        ['media_type' => 'image', 'alt' => 'Gallery image 1', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 2', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 3', 'column_span' => 1],
+        ['media_type' => 'video', 'video_alt' => 'Gallery video 1', 'column_span' => 1],
+        ['media_type' => 'video', 'video_alt' => 'Gallery video 2', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 4', 'column_span' => 2],
+        ['media_type' => 'image', 'alt' => 'Gallery image 5', 'column_span' => 1],
+        ['media_type' => 'image', 'alt' => 'Gallery image 6', 'column_span' => 2],
+        ['media_type' => 'image', 'alt' => 'Gallery image 7', 'column_span' => 2],
+    ];
+
+    /**
+     * The block preview example data.
+     *
+     * @var array
+     */
+    public $example = [
+        'items' => self::BASE_ITEMS,
+    ];
+
+    /**
+     * Pattern-library variants. Left empty here and populated inside
+     * example() below (see that method's docblock for why) rather than
+     * declared statically like ImageBlock's $examples.
+     *
+     * @var array
+     */
+    public $examples = [];
+
+    /**
+     * Fallback example data requiring a non-constant expression (Vite::asset).
+     *
+     * Also populates $examples as a side effect, rather than declaring it
+     * as a static property like every other block's $examples: a second
+     * "carousel" variant needs items with real resolved placeholder
+     * URLs (Vite::asset() isn't a constant expression, so those can't
+     * live in a static property default), and PatternLibrary reads
+     * $block->examples only after this method has already run — by which
+     * point $this has full access to the resolved image/video fixtures
+     * built below.
+     *
+     * @return array
+     */
+    public function example(): array
+    {
+        $image = ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''];
+        $video = ['url' => Vite::asset('resources/videos/placeholder/pattern-placeholder.mp4')];
+
+        $resolve = function (array $items) use ($image, $video) {
+            return array_map(function ($item) use ($image, $video) {
+                $item['image'] = $image;
+                $item['video'] = $video;
+
+                // Leave "Gallery video 2" without a poster on purpose, to
+                // demonstrate the native-first-frame fallback (see
+                // <x-media-thumbnail>) alongside "Gallery video 1", which
+                // has one — video_poster is optional, not every video item
+                // will have it set.
+                if (($item['media_type'] ?? null) !== 'video' || ($item['video_alt'] ?? null) !== 'Gallery video 2') {
+                    $item['video_poster'] = $image;
+                }
+
+                return $item;
+            }, $items);
+        };
+
+        $items = $resolve(self::BASE_ITEMS);
+
+        // The base 9-item fixture sums to exactly PAGE_CAPACITY (12)
+        // units, so it always renders as a single page with no carousel
+        // chrome — duplicate it to 24 units (2 full pages) so the
+        // pagination arrows/dots have something to demonstrate.
+        $this->examples = [
+            'Single page (grid only)' => [],
+            'Multiple pages (carousel)' => [
+                'items' => array_merge($resolve(self::BASE_ITEMS), $resolve(self::BASE_ITEMS)),
+            ],
+        ];
+
+        return ['items' => $items];
+    }
+
+    /**
+     * Data to be passed to the block before rendering.
+     */
+    public function with(): array
+    {
+        return [
+            'pages' => $this->pages(),
+            'isEditorPreview' => $this->isEditorPreview(),
+        ];
+    }
+
+    /**
+     * Whether this render is the real wp-admin block editor canvas, as
+     * opposed to the front end or the (also preview=true) /pattern-library
+     * page.
+     *
+     * Tiles are real <button> elements so they're clickable for the
+     * lightbox — but a native interactive element inside a Gutenberg
+     * block's preview intercepts the click before it reaches the editor's
+     * own "select this block" handling, so the block can never be
+     * selected by clicking its content (only via the block list/outline).
+     * Rendering non-interactive tiles specifically in the real editor
+     * canvas avoids that conflict without losing the lightbox anywhere
+     * it's actually usable (front end, pattern-library).
+     *
+     * is_admin() is the right check — verified via logging the actual
+     * request context: ACF renders a block's editor preview through its
+     * own admin-ajax.php?action=acf/ajax/fetch-block, not the WP core
+     * REST API's block-renderer. is_admin() is true there (DOING_AJAX
+     * requests from wp-admin still count); /pattern-library renders via a
+     * normal front-end PHP page template, so this stays false for it.
+     *
+     * @return bool
+     */
+    public function isEditorPreview()
+    {
+        return $this->preview && is_admin();
+    }
+
+    /**
+     * The block field group.
+     */
+    public function fields(): array
+    {
+        $fields = Builder::make('media_gallery');
+
+        $imageCondition = [
+            [
+                [
+                    'field' => 'media_type',
+                    'operator' => '==',
+                    'value' => 'image',
+                ],
+            ],
+        ];
+
+        $videoCondition = [
+            [
+                [
+                    'field' => 'media_type',
+                    'operator' => '==',
+                    'value' => 'video',
+                ],
+            ],
+        ];
+
+        $fields
+            ->addRepeater('items', [
+                'label' => 'Items',
+                'button_label' => 'Add item',
+                'min' => 1,
+                'layout' => 'row',
+            ])
+                ->addSelect('media_type', [
+                    'label' => 'Media type',
+                    'choices' => [
+                        'image' => 'Image',
+                        'video' => 'Video',
+                    ],
+                    'default_value' => 'image',
+                    'ui' => true,
+                ])
+                ->addImage('image', [
+                    'label' => 'Image',
+                    'return_format' => 'array',
+                    'preview_size' => 'medium',
+                    'required' => 1,
+                    'conditional_logic' => $imageCondition,
+                ])
+                ->addFile('video', [
+                    'label' => 'Video file',
+                    'instructions' => 'Upload an MP4 — played in the lightbox when the tile is opened.',
+                    'return_format' => 'array',
+                    'library' => 'all',
+                    'mime_types' => 'mp4',
+                    'required' => 1,
+                    'conditional_logic' => $videoCondition,
+                ])
+                ->addImage('video_poster', [
+                    'label' => 'Video poster / thumbnail',
+                    'instructions' => 'Optional. Shown in the grid tile before the video is opened — leave blank to use the video\'s own first frame instead (the browser loads just enough of the file to show it, no separate image needed). Upload one only if a specific frame or a custom graphic is wanted here.',
+                    'return_format' => 'array',
+                    'preview_size' => 'medium',
+                    'required' => 0,
+                    'conditional_logic' => $videoCondition,
+                ])
+                ->addText('alt', [
+                    'label' => 'Alt text override',
+                    'instructions' => 'Optional — overrides this image\'s own Media Library alt text (set when it was uploaded). Leave blank to use that instead.',
+                    'required' => 0,
+                    'conditional_logic' => $imageCondition,
+                ])
+                ->addText('video_alt', [
+                    'label' => 'Accessible label',
+                    'instructions' => 'Describes the video for screen readers — also used as the lightbox heading. Videos have no Media Library alt text to fall back on, so this is required.',
+                    'required' => 1,
+                    'conditional_logic' => $videoCondition,
+                ])
+                ->addSelect('column_span', [
+                    'label' => 'Width',
+                    'choices' => [
+                        1 => '1 column (square)',
+                        2 => '2 columns (wide)',
+                    ],
+                    'default_value' => 1,
+                    'ui' => true,
+                ])
+            ->endRepeater();
+
+        return $fields->build();
+    }
+
+    /**
+     * Retrieve the raw repeater rows.
+     *
+     * @return array
+     */
+    public function items()
+    {
+        return get_field('items') ?: $this->example['items'];
+    }
+
+    /**
+     * Normalize every item to a shape the view doesn't need to guard
+     * (consistent thumbnail/video-url/column-span keys regardless of
+     * media type), then group into carousel-page chunks.
+     *
+     * @return array
+     */
+    public function pages()
+    {
+        $items = array_map(fn($item) => $this->normalizeItem($item), $this->items());
+        $items = $this->interleaveBySpan($items);
+
+        return $this->paginate($items);
+    }
+
+    /**
+     * Normalize a single repeater row.
+     *
+     * @param  array  $item
+     * @return array
+     */
+    protected function normalizeItem(array $item)
+    {
+        $isVideo = ($item['media_type'] ?? 'image') === 'video';
+        $columnSpan = (int) ($item['column_span'] ?? 1) === 2 ? 2 : 1;
+
+        if ($isVideo) {
+            $thumbnail = is_array($item['video_poster'] ?? null) ? $item['video_poster'] : null;
+            $video = is_array($item['video'] ?? null) ? $item['video'] : null;
+            // Videos have no Media Library alt text to fall back on, so
+            // this field is required — see fields()'s video_alt.
+            $alt = $item['video_alt'] ?? '';
+        } else {
+            $thumbnail = is_array($item['image'] ?? null) ? $item['image'] : null;
+            $video = null;
+            // The repeater's own 'alt' field is an optional override — an
+            // image already carries its own alt text from the Media
+            // Library (ACF's return_format => 'array' includes it), so
+            // only fall back to that rather than duplicating it by
+            // requiring editors to retype it here too.
+            $alt = ($item['alt'] ?? '') ?: ($thumbnail['alt'] ?? '');
+        }
+
+        return [
+            'type' => $isVideo ? 'video' : 'image',
+            'thumbnail' => $thumbnail,
+            'videoUrl' => $video['url'] ?? null,
+            'alt' => $alt,
+            'columnSpan' => $columnSpan,
+        ];
+    }
+
+    /**
+     * Spread 2-column ("wide") items evenly among the 1-column ("narrow")
+     * ones, preserving each group's own relative order.
+     *
+     * CSS Grid's `grid-auto-flow: row dense` (see _media-gallery.scss) can
+     * only backfill a gap next to a wide tile if a narrow tile still
+     * remains later in source order to fill it — if an editor happens to
+     * group several wide items together, or the narrow:wide ratio runs out
+     * at a particular column count, dense packing strands those wide tiles
+     * alone in their own row with a dead gap next to them. That's a
+     * property of the item *order*, not of a particular breakpoint — a
+     * sequence that packs perfectly at 4 columns can still leave gaps at 3
+     * or 2 columns, since how many narrow fillers are "left over" when a
+     * wide item is reached depends on the column count. Evenly
+     * interleaving up front (independent of any specific column count)
+     * keeps a narrow filler near every wide item as often as possible,
+     * so dense packing has a fair shot at a gapless grid at every width.
+     *
+     * @param  array  $items
+     * @return array
+     */
+    protected function interleaveBySpan(array $items)
+    {
+        $narrow = array_values(array_filter($items, fn($item) => $item['columnSpan'] === 1));
+        $wide = array_values(array_filter($items, fn($item) => $item['columnSpan'] === 2));
+
+        if (! $narrow || ! $wide) {
+            return $items;
+        }
+
+        $result = [];
+        $narrowTotal = count($narrow);
+        $wideTotal = count($wide);
+        $wideUsed = 0;
+
+        foreach ($narrow as $i => $item) {
+            $result[] = $item;
+
+            // How many wide items "should" have been emitted by this point
+            // if they were spread proportionally across the narrow list.
+            $targetWide = (int) floor((($i + 1) / $narrowTotal) * $wideTotal);
+
+            while ($wideUsed < $targetWide) {
+                $result[] = $wide[$wideUsed];
+                $wideUsed++;
+            }
+        }
+
+        // Rounding can leave a wide item or two unplaced — append them.
+        while ($wideUsed < $wideTotal) {
+            $result[] = $wide[$wideUsed];
+            $wideUsed++;
+        }
+
+        return $this->desyncWidePositions($result);
+    }
+
+    /**
+     * Shift every other wide item one slot earlier in the sequence.
+     *
+     * Spreading wide items proportionally (above) is correct on average,
+     * but when the narrow:wide ratio divides a row's column count exactly
+     * — e.g. 2 narrow + 1 wide = 4 columns — every row ends up the same
+     * shape, so every wide tile lands in the same column and the grid
+     * reads as a static vertical stripe rather than a genuine mix
+     * (reported: all the wide tiles sitting in the last 2 columns at the
+     * 4-column width). Nudging alternate wide tiles one slot earlier
+     * desyncs them from that repeating rhythm while keeping the overall
+     * spacing balanced — each wide item is still never more than one
+     * narrow-slot away from its evenly-distributed target.
+     *
+     * @param  array  $items
+     * @return array
+     */
+    protected function desyncWidePositions(array $items)
+    {
+        $wideSeen = 0;
+
+        foreach ($items as $i => $item) {
+            if ($item['columnSpan'] !== 2) {
+                continue;
+            }
+
+            if ($wideSeen % 2 === 1 && $i > 0 && $items[$i - 1]['columnSpan'] === 1) {
+                [$items[$i - 1], $items[$i]] = [$items[$i], $items[$i - 1]];
+            }
+
+            $wideSeen++;
+        }
+
+        return $items;
+    }
+
+    /**
+     * Group normalized items into pages, each capped at PAGE_CAPACITY
+     * column-units (4 columns × 3 rows) — a greedy bin-fill using
+     * columnSpan as the per-item unit cost.
+     *
+     * @param  array  $items
+     * @return array
+     */
+    protected function paginate(array $items)
+    {
+        $pages = [];
+        $page = [];
+        $used = 0;
+
+        foreach ($items as $item) {
+            if ($used + $item['columnSpan'] > self::PAGE_CAPACITY && $page) {
+                $pages[] = $page;
+                $page = [];
+                $used = 0;
+            }
+
+            $page[] = $item;
+            $used += $item['columnSpan'];
+        }
+
+        if ($page) {
+            $pages[] = $page;
+        }
+
+        return $pages;
+    }
+
+    /**
+     * Assets enqueued with 'enqueue_block_assets' when rendering the block.
+     *
+     * @link https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/#editor-content-scripts-and-styles
+     */
+    public function assets(array $block): void
+    {
+        //
+    }
+}
