@@ -333,9 +333,9 @@ class CardGrid extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: ($this->example['heading_text'] ?? ''),
-            'level' => get_field('heading_level') ?: ($this->example['heading_level'] ?? 'h2'),
-            'style' => get_field('heading_style') ?: ($this->example['heading_style'] ?? 'match'),
+            'text' => get_field('heading_text') ?: ($this->preview ? ($this->example['heading_text'] ?? '') : ''),
+            'level' => get_field('heading_level') ?: ($this->preview ? ($this->example['heading_level'] ?? 'h2') : 'h2'),
+            'style' => get_field('heading_style') ?: ($this->preview ? ($this->example['heading_style'] ?? 'match') : 'match'),
         ];
     }
 
@@ -347,8 +347,8 @@ class CardGrid extends Block
     public function intro()
     {
         return [
-            'text' => get_field('intro_text') ?: ($this->example['intro_text'] ?? ''),
-            'style' => get_field('intro_style') ?: ($this->example['intro_style'] ?? 'body'),
+            'text' => get_field('intro_text') ?: ($this->preview ? ($this->example['intro_text'] ?? '') : ''),
+            'style' => get_field('intro_style') ?: ($this->preview ? ($this->example['intro_style'] ?? 'body') : 'body'),
         ];
     }
 
@@ -359,7 +359,7 @@ class CardGrid extends Block
      */
     public function cardStyle()
     {
-        return get_field('card_style') ?: ($this->example['card_style'] ?? 'link');
+        return get_field('card_style') ?: ($this->preview ? ($this->example['card_style'] ?? 'link') : 'link');
     }
 
     /**
@@ -383,7 +383,7 @@ class CardGrid extends Block
     public function sideImage()
     {
         $show = get_field('show_side_image');
-        $show = $show !== null ? (bool) $show : (bool) ($this->example['show_side_image'] ?? false);
+        $show = $show !== null ? (bool) $show : ($this->preview ? (bool) ($this->example['show_side_image'] ?? false) : false);
 
         return $show ? Vite::asset('resources/images/illustrations/instructor.png') : null;
     }
@@ -399,7 +399,7 @@ class CardGrid extends Block
         $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
         $showDate = in_array($this->cardStyle(), ['event', 'news'], true);
 
-        $cards = get_field('cards') ?: ($this->example['cards'] ?? []);
+        $cards = get_field('cards') ?: ($this->preview ? ($this->example['cards'] ?? []) : []);
 
         return array_map(function ($card) use ($placeholder, $showDate) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];

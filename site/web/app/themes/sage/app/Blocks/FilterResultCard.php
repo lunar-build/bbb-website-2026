@@ -283,7 +283,7 @@ class FilterResultCard extends Block
      */
     public function name()
     {
-        return get_field('name') ?: $this->example['name'];
+        return get_field('name') ?: ($this->preview ? $this->example['name'] : '');
     }
 
     /**
@@ -363,7 +363,7 @@ class FilterResultCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        return get_field('link') ?: ($this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

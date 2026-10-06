@@ -269,7 +269,7 @@ class CycleRouteCard extends Block
      */
     public function difficulty()
     {
-        return get_field('difficulty') ?: $this->example['difficulty'];
+        return get_field('difficulty') ?: ($this->preview ? $this->example['difficulty'] : 'easy');
     }
 
     /**
@@ -279,7 +279,7 @@ class CycleRouteCard extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return get_field('image') ?: ($this->preview ? $this->example['image'] : null);
     }
 
     /**
@@ -289,7 +289,7 @@ class CycleRouteCard extends Block
      */
     public function routeName()
     {
-        return get_field('route_name') ?: $this->example['route_name'];
+        return get_field('route_name') ?: ($this->preview ? $this->example['route_name'] : '');
     }
 
     /**
@@ -299,7 +299,7 @@ class CycleRouteCard extends Block
      */
     public function timeNeeded()
     {
-        return get_field('time_needed') ?: $this->example['time_needed'];
+        return get_field('time_needed') ?: ($this->preview ? $this->example['time_needed'] : '');
     }
 
     /**
@@ -309,7 +309,7 @@ class CycleRouteCard extends Block
      */
     public function distance()
     {
-        return get_field('distance') ?: $this->example['distance'];
+        return get_field('distance') ?: ($this->preview ? $this->example['distance'] : '');
     }
 
     /**
@@ -319,7 +319,7 @@ class CycleRouteCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        return get_field('link') ?: ($this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

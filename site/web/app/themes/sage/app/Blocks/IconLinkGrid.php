@@ -240,7 +240,7 @@ class IconLinkGrid extends Block
 
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
+        return get_field('items') ?: ($this->preview ? $this->example['items'] : []);
     }
 
     /**
@@ -251,7 +251,7 @@ class IconLinkGrid extends Block
      */
     public function backgroundColor()
     {
-        return get_field('background_color') ?: $this->example['background_color'];
+        return get_field('background_color') ?: ($this->preview ? $this->example['background_color'] : null);
     }
 
     /**

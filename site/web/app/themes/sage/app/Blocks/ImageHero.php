@@ -247,7 +247,7 @@ class ImageHero extends Block
      */
     public function backgroundImage()
     {
-        return get_field('background_image') ?: ($this->example['background_image'] ?? null);
+        return get_field('background_image') ?: ($this->preview ? ($this->example['background_image'] ?? null) : null);
     }
 
     /**
@@ -267,7 +267,7 @@ class ImageHero extends Block
      */
     public function showText()
     {
-        return (bool) (get_field('show_text') ?? $this->example['show_text']);
+        return (bool) (get_field('show_text') ?? ($this->preview ? $this->example['show_text'] : false));
     }
 
     /**
@@ -277,7 +277,7 @@ class ImageHero extends Block
      */
     public function showBreadcrumbs()
     {
-        return (bool) (get_field('show_breadcrumbs') ?? $this->example['show_breadcrumbs']);
+        return (bool) (get_field('show_breadcrumbs') ?? ($this->preview ? $this->example['show_breadcrumbs'] : false));
     }
 
     /**
@@ -287,7 +287,7 @@ class ImageHero extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return get_field('heading') ?: ($this->preview ? $this->example['heading'] : '');
     }
 
     /**

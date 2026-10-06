@@ -307,7 +307,7 @@ class FeatureCard extends Block
      */
     public function cardStyle()
     {
-        return get_field('card_style') ?: $this->example['card_style'];
+        return get_field('card_style') ?: ($this->preview ? $this->example['card_style'] : 'link');
     }
 
     /**
@@ -317,7 +317,7 @@ class FeatureCard extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return get_field('image') ?: ($this->preview ? $this->example['image'] : null);
     }
 
     /**
@@ -327,7 +327,7 @@ class FeatureCard extends Block
      */
     public function date()
     {
-        return get_field('date') ?: ($this->example['date'] ?? null);
+        return get_field('date') ?: ($this->preview ? ($this->example['date'] ?? null) : null);
     }
 
     /**
@@ -338,9 +338,9 @@ class FeatureCard extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: $this->example['heading_text'],
-            'level' => get_field('heading_level') ?: $this->example['heading_level'],
-            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+            'text' => get_field('heading_text') ?: ($this->preview ? $this->example['heading_text'] : ''),
+            'level' => get_field('heading_level') ?: ($this->preview ? $this->example['heading_level'] : 'h3'),
+            'style' => get_field('heading_style') ?: ($this->preview ? $this->example['heading_style'] : 'match'),
         ];
     }
 
@@ -353,8 +353,8 @@ class FeatureCard extends Block
     public function body()
     {
         return [
-            'text' => get_field('body_text') ?: ($this->example['body_text'] ?? ''),
-            'style' => get_field('body_style') ?: ($this->example['body_style'] ?? 'body'),
+            'text' => get_field('body_text') ?: ($this->preview ? ($this->example['body_text'] ?? '') : ''),
+            'style' => get_field('body_style') ?: ($this->preview ? ($this->example['body_style'] ?? 'body') : 'body'),
         ];
     }
 
@@ -381,7 +381,9 @@ class FeatureCard extends Block
      */
     public function ctaStyle()
     {
-        return get_field('cta_style') ?: ($this->example['cta_style'] ?? ($this->cardStyle() === 'link' ? 'icon' : 'button'));
+        $default = $this->cardStyle() === 'link' ? 'icon' : 'button';
+
+        return get_field('cta_style') ?: ($this->preview ? ($this->example['cta_style'] ?? $default) : $default);
     }
 
     /**

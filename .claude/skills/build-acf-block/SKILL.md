@@ -56,7 +56,7 @@ For every piece of UI in the new block, pick one:
   `<script src="webawesome.js">` tag to compute a base path; bundled through Vite there's
   no such tag, so it silently fails to find any component and every `<wa-*>` tag stays an
   inert, undefined custom element — no console error, no network 404, just dead markup
-  (this bit `CtaStrip`'s button once already).
+  (this bit `CtaBanner`'s button once already).
 
   `resources/js/components.js` holds all `<wa-*>` registrations and is imported by both
   `resources/js/app.js` (front end) and `resources/js/editor.js` (block editor), so
@@ -144,8 +144,8 @@ PHP, won't autoload. **After running the command, always open the generated
 `app/Blocks/*.php` file and confirm**: the filename has no spaces and matches
 `{BlockName}.php` in PascalCase, and the `class` declaration uses that same PascalCase
 name (`class BlockName extends Block`). If either is wrong, delete both generated files
-and hand-write them following the structure of an existing block (`CtaStrip.php` /
-`cta-strip.blade.php` is the cleanest reference) instead of trying to patch the broken
+and hand-write them following the structure of an existing block (`CtaBanner.php` /
+`cta-banner.blade.php` is the cleanest reference) instead of trying to patch the broken
 output in place.
 
 ## 3. Wire fields
@@ -157,42 +157,54 @@ In the generated class:
 - `with()` returns the array exposed to the Blade view as variables (no `$block->` prefix
   needed for these).
 - Add one accessor method per field, following the existing pattern (see
-  `app/Blocks/CtaStrip.php`, `app/Blocks/VideoHero.php`):
-  - Text/textarea fields: `return get_field('x') ?: $this->example['x'];`
-  - Link fields: fallback is a hand-built array matching ACF's link shape —
-    `['title' => ..., 'url' => ..., 'target' => '']`.
-  - Image/file/relationship fields: fallback to a bundled placeholder asset, e.g.
-    `return get_field('x') ?: $this->example['x'];` where `$example['x']` is
+  `app/Blocks/CtaBanner.php`, `app/Blocks/VideoHero.php`):
+  - **Gate the `$example` fallback behind `$this->preview`.** `$this->preview` is
+    `true` only for the block-editor canvas preview and the `/pattern-library` page
+    (`App\View\Composers\PatternLibrary` explicitly renders with `preview = true`) —
+    `false` for every real front-end request. A real empty field must render empty,
+    not silently show fixture content: `return get_field('x') ?: ($this->preview ?
+    $this->example['x'] : '');` — the non-preview fallback is a genuine empty value for
+    that type (`''` for text, `null` for image/file, `[]` for repeaters, a blank link
+    shape `['title' => '', 'url' => '', 'target' => '']` for link fields), not
+    `$example['x']`. Previously this codebase used the unconditional
+    `get_field('x') ?: $this->example['x']`, which looked fine in the pattern library
+    but meant a client leaving a real field blank got fixture copy/images on the live
+    site instead of nothing — don't reintroduce that.
+  - Image/file/relationship fields: the preview fallback is a bundled placeholder
+    asset, e.g. `$example['x']` resolving to
     `['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')]`
     (or `resources/videos/placeholder/pattern-placeholder.mp4` for video — see
-    `app/Blocks/VideoHero.php`). Every field needs a real fallback, not just text
-    fields — this is what makes the block render fully populated on `/pattern-library`
-    (see §6) with zero extra work.
+    `app/Blocks/VideoHero.php`). Every field needs a real preview fallback, not just
+    text fields — this is what makes the block render fully populated on
+    `/pattern-library` (see §6) with zero extra work; it just must not also fire on
+    the real front end.
 - `$example` on the class supplies the block-editor preview/empty-state data used by
-  every accessor's fallback. If a fallback value needs to be computed (e.g. calling
-  `Vite::asset()`, which isn't a constant expression so can't live in the property
-  default), override the `example(): array` method instead — ACF Composer merges its
-  return value into `$example` automatically before the block is registered (see
-  `VideoHero::example()`).
+  every accessor's gated fallback above. If a fallback value needs to be computed (e.g.
+  calling `Vite::asset()`, which isn't a constant expression so can't live in the
+  property default), override the `example(): array` method instead — ACF Composer
+  merges its return value into `$example` automatically before the block is registered
+  (see `VideoHero::example()`).
 
 **ACF fields vs. `InnerBlocks` for freeform copy:** a block's editable content can come
 from either ACF fields (`addText`/`addTextarea`, `get_field()`-backed, as above) or
 native `InnerBlocks` (empty `fields()`, a `$template` property, `<InnerBlocks
-template="{{ $block->template }}" />` in Blade — see `app/Blocks/TextHero.php`). Prefer
-`InnerBlocks` for a block's heading/body copy: it gives real, document-outline-correct
-HTML elements (`core/heading` with a CMS-editable H1–H6 level, `core/paragraph`) for
-free, whereas ACF text/textarea fields require you to hand-build that semantics
-yourself (see `app/Blocks/FeatureCard.php`/`CtaStrip.php`, which use `InnerBlocks` for
-this reason). A block can mix both: keep an ACF field for anything `InnerBlocks` has no
-native equivalent for (e.g. a CTA button's `link` field, which stays ACF in both of
-those blocks since there's no core block for a styled `wa-button`). `InnerBlocks`
+template="{{ $block->template }}" />` in Blade). Prefer `InnerBlocks` for a block's
+heading/body copy: it gives real, document-outline-correct HTML elements (`core/heading`
+with a CMS-editable H1–H6 level, `core/paragraph`) for free, whereas ACF text/textarea
+fields require you to hand-build that semantics yourself. A block can mix both: keep an
+ACF field for anything `InnerBlocks` has no native equivalent for (e.g. a CTA button's
+`link` field, since there's no core block for a styled `wa-button`). `InnerBlocks`
 content isn't real ACF field data, so it isn't covered by `$example`/`get_field()`
 fallbacks — instead, give the block a `$exampleContent` string property containing
 hand-written HTML matching its `$template` (e.g. `'<h3>...</h3><p>...</p>'` for a
-heading + paragraph template — see `app/Blocks/TextHero.php`/`CtaStrip.php`/
-`FeatureCard.php`). This is what the pattern library (§6) substitutes into the
-`<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
-block's library entry just shows an empty content area.
+heading + paragraph template). This is what the pattern library (§6) substitutes into
+the `<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
+block's library entry just shows an empty content area. No current block demonstrates
+this simple heading/paragraph case — blocks that needed freeform copy ended up using
+plain ACF text/textarea fields instead. `app/Blocks/VideoHero.php` is the one live
+`InnerBlocks` user, but as a nested-block slot (letting editors insert a Journey Planner
+Widget inside the hero), not freeform copy, so it's a reference for the mechanics
+(`$template`, `allowedBlocks`) but not a worked example of `$exampleContent`.
 
 **Never hardcode `font-size`/`line-height`/`font-weight`/`margin-bottom`.** Every text style used
 anywhere in the site's Figma design has a matching rule in

@@ -221,7 +221,7 @@ class FaqAccordion extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return get_field('heading') ?: ($this->preview ? $this->example['heading'] : '');
     }
 
     /**
@@ -231,7 +231,7 @@ class FaqAccordion extends Block
      */
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
+        return get_field('items') ?: ($this->preview ? $this->example['items'] : []);
     }
 
     /**
