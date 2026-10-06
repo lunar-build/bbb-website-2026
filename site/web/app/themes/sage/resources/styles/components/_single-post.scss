@@ -26,7 +26,14 @@
     margin-bottom: 3.5rem;
   }
 
+  // wa-button's host defaults to a block box that fills its container
+  // (that's why cta-banner's own CTA needs align-self:flex-start inside a
+  // flex column — see _button.scss/_cta-banner.scss) — here the parent's
+  // just text-align:center, so shrink-to-content + auto margins instead.
   &__related-cta {
+    display: block;
+    width: fit-content;
     margin-top: 3.5rem;
+    margin-inline: auto;
   }
 }
