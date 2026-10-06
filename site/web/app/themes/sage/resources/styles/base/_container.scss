@@ -1,14 +1,20 @@
 // Site-wide content container. Wrap content in `.o-container` to constrain
 // it to a max width with a side gutter; give a child `.o-container__full`
-// to let it bleed edge-to-edge instead. Add `.o-container--narrow` for a
-// tighter reading column (news articles) — same shape, smaller cap.
+// to let it bleed edge-to-edge instead.
 //
 //   <div class="o-container">
 //     <p>Contained by default…</p>
 //     <img class="o-container__full" src="…"> <!-- bleeds full width -->
 //   </div>
 //
-// Never put this class directly on a <wa-*> custom element — `display:
+// `.o-container--narrow` sets a tighter max-width/gutter (news articles) via
+// custom properties rather than its own grid-template-columns — put it on
+// any ancestor (doesn't need `.o-container` itself) to cascade the narrower
+// size into every `.o-container` underneath, including ones nested inside
+// other blocks' own markup (e.g. CTA Banner rendered into post content) —
+// see resources/styles/components/_single-post.scss.
+//
+// Never put `.o-container` directly on a <wa-*> custom element — `display:
 // grid` on a shadow host only grids its own shadow-tree wrapper, not the
 // slotted light-DOM content. Wrap the element in a plain
 // <div class="o-container"> instead — see sections/header.blade.php.
@@ -16,18 +22,21 @@
 $container-max-width: 80rem;
 $container-gutter: 1.5rem;
 
-// Figma "News article": 940px reading column inside the 1440px frame. Same
-// min() cap technique as the base container, so it barely narrows on
-// mobile/tablet (already under the cap) and only bites on wide desktops.
+// Figma "News article": 940px reading column inside the 1440px frame.
 $container-narrow-max-width: 58.75rem; // 940px
 $container-narrow-gutter: 2rem;
+
+:root {
+  --o-container-max-width: #{$container-max-width};
+  --o-container-gutter: #{$container-gutter};
+}
 
 .o-container {
   display: grid;
   grid-template-columns:
-    [full-start] minmax(#{$container-gutter}, 1fr)
-    [content-start] min(100% - #{$container-gutter * 2}, #{$container-max-width})
-    [content-end] minmax(#{$container-gutter}, 1fr)
+    [full-start] minmax(var(--o-container-gutter), 1fr)
+    [content-start] min(100% - var(--o-container-gutter) * 2, var(--o-container-max-width))
+    [content-end] minmax(var(--o-container-gutter), 1fr)
     [full-end];
 
   > * {
@@ -37,12 +46,9 @@ $container-narrow-gutter: 2rem;
   &__full {
     grid-column: full-start / full-end;
   }
+}
 
-  &--narrow {
-    grid-template-columns:
-      [full-start] minmax(#{$container-narrow-gutter}, 1fr)
-      [content-start] min(100% - #{$container-narrow-gutter * 2}, #{$container-narrow-max-width})
-      [content-end] minmax(#{$container-narrow-gutter}, 1fr)
-      [full-end];
-  }
+.o-container--narrow {
+  --o-container-max-width: #{$container-narrow-max-width};
+  --o-container-gutter: #{$container-narrow-gutter};
 }

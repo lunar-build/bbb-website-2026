@@ -1,5 +1,22 @@
 // Figma "Sample page -> News article": featured image + "Also read" section shell.
 
+// Blocks that normally run full-bleed-background edge to edge on standard
+// pages (.o-container inside them handles their own content width) — when
+// inserted into a narrowed article body, their background should still
+// bleed full width, same as always. .e-content is itself an .o-container,
+// so by default these blocks would get squeezed into its content column
+// like any other block — escape them back onto the full-bleed track.
+// Add a block here any time a new one with its own full-bleed background
+// becomes insertable into post content.
+.e-content.o-container {
+  > .c-cta-banner,
+  > .c-card-grid,
+  > .c-image-hero,
+  > .c-quote-carousel {
+    grid-column: full-start / full-end;
+  }
+}
+
 .c-single-post {
   &__image {
     margin-bottom: 2rem;
