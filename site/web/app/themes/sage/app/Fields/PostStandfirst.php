@@ -15,7 +15,8 @@ class PostStandfirst extends Field
         $fields = Builder::make('post_standfirst');
 
         $fields
-            ->setLocation('post_type', '==', 'post');
+            ->setLocation('post_type', '==', 'post')
+            ->setGroupConfig('position', 'acf_after_title');
 
         $fields->addTextarea('standfirst', [
             'label' => 'Standfirst',
