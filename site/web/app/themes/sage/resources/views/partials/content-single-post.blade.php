@@ -1,5 +1,4 @@
 @php($hero = $hero())
-@php($standfirst = $standfirst())
 @php($relatedPosts = $relatedPosts())
 @php($pagination = $pagination())
 
@@ -19,10 +18,6 @@
   @endif
 
   <div class="o-container">
-    @if ($standfirst)
-      <p class="c-single-post__standfirst u-standfirst">{{ $standfirst }}</p>
-    @endif
-
     <div class="e-content">
       @php(the_content())
     </div>

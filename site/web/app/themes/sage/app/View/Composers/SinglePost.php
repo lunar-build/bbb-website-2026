@@ -36,14 +36,6 @@ class SinglePost extends Composer
     }
 
     /**
-     * Retrieve the standfirst lead paragraph.
-     */
-    public function standfirst(): string
-    {
-        return (string) get_field('standfirst');
-    }
-
-    /**
      * Retrieve the "Also read" related posts.
      */
     public function relatedPosts(): array
