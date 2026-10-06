@@ -29,6 +29,7 @@ class SinglePost extends Composer
 
         return [
             'date' => $postHero->date(),
+            'dateIso' => $postHero->dateIso(),
             'title' => $postHero->title(),
             'permalink' => $postHero->permalink(),
             'categories' => $postHero->categories(),

@@ -151,6 +151,7 @@ class PostHero extends Block
      */
     public $example = [
         'date' => '30th July 2026',
+        'date_iso' => '2026-07-30',
         'title' => 'Making it easier and safer to walk, wheel and cycle across Bath',
         'permalink' => 'https://betterbybike.info/making-it-easier-and-safer-to-walk-wheel-and-cycle-across-bath/',
         'categories' => [
@@ -172,6 +173,7 @@ class PostHero extends Block
     {
         return [
             'date' => $this->date(),
+            'dateIso' => $this->dateIso(),
             'title' => $this->title(),
             'permalink' => $this->permalink(),
             'categories' => $this->categories(),
@@ -209,6 +211,16 @@ class PostHero extends Block
     public function date()
     {
         return $this->inPostContext() ? get_the_date() : $this->example['date'];
+    }
+
+    /**
+     * Machine-readable date for <time datetime="…">.
+     *
+     * @return string
+     */
+    public function dateIso()
+    {
+        return $this->inPostContext() ? get_the_date('Y-m-d') : $this->example['date_iso'];
     }
 
     /**

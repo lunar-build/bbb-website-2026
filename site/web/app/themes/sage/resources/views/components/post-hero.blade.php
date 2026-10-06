@@ -1,9 +1,9 @@
 {{-- Post hero fragment (date, share links, title, category pills) — shared by the Post Hero block and content-single-post.blade.php. --}}
 
-@props(['date', 'title', 'permalink', 'categories' => []])
+@props(['date', 'dateIso', 'title', 'permalink', 'categories' => []])
 
 <div class="c-post-hero__meta">
-  <p class="c-post-hero__date">{{ $date }}</p>
+  <time class="c-post-hero__date" datetime="{{ $dateIso }}">{{ $date }}</time>
 
   <div class="c-post-hero__share">
     <p class="c-post-hero__share-label">{{ __('Share', 'sage') }}</p>

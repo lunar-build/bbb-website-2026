@@ -5,7 +5,7 @@
 <article @php(post_class('h-entry o-container--narrow'))>
   <section class="c-post-hero">
     <div class="o-container">
-      <x-post-hero :date="$hero['date']" :title="$hero['title']" :permalink="$hero['permalink']" :categories="$hero['categories']" />
+      <x-post-hero :date="$hero['date']" :date-iso="$hero['dateIso']" :title="$hero['title']" :permalink="$hero['permalink']" :categories="$hero['categories']" />
     </div>
   </section>
 
