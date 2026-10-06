@@ -1,18 +1,14 @@
 @use '../base/focus' as focus;
 @use '../base/typography';
 
-// Large CTAs: variant="brand"|"neutral" appearance="accent" pill. WA's
-// "filled" appearance uses the soft -fill-normal/-on-normal tokens (a light
-// tint); "accent" is the one that uses -fill-loud/-on-loud, which is what
-// our brand-token override in base/_wa-theme.scss targets for a solid,
-// bold CTA look.
+// Large CTAs: variant="brand"|"neutral" appearance="accent" pill — "accent"
+// uses the -fill-loud/-on-loud tokens base/_wa-theme.scss overrides.
 //
-// Small CTAs (size="small", Figma "CTA | Small", node 135-2255): the same
-// component at pill/40px, used where a compact button sits inside a card —
-// three colour states, all sharing the arrow-hover animation below.
-//   - variant="neutral" appearance="accent"   → filled charcoal, white text/border
-//   - variant="neutral" appearance="outlined" → transparent, charcoal text/border
-//   - variant="brand"   appearance="accent"   → filled yellow, charcoal text/border (shared with the large brand button's border rule below)
+// Small CTAs (size="small", Figma node 135-2255): same component at
+// pill/40px, three colour states sharing the arrow-hover animation below.
+//   - neutral/accent   → filled charcoal, white text/border
+//   - neutral/outlined → transparent, charcoal text/border
+//   - brand/accent     → filled yellow, charcoal text/border
 
 wa-button::part(label) {
   @extend .u-cta-large;
@@ -25,9 +21,7 @@ wa-button[size='small']::part(label) {
 }
 
 // Horizontal padding matches the solid/black button at every size and
-// appearance — previously scoped to size="small" only, so any full-size or
-// outlined button left off that selector fell back to WA's own (tighter)
-// default padding instead.
+// appearance — WA's own default is tighter.
 wa-button::part(button) {
   padding-inline: 16px;
 }
@@ -54,26 +48,20 @@ wa-button::part(button) {
   @include focus.ring;
 }
 
-// No button in this project uses a leading icon, but WA's "start" slot
-// still renders (display:flex, 0 width) and still takes its share of the
-// button's flex `gap` — an invisible ~10px left offset that pushes the
-// label right of the actual padding edge instead of flush against it.
+// No button uses a leading icon, but WA's empty "start" slot still takes a
+// flex `gap` share — an invisible offset pushing the label off the edge.
 wa-button::part(start) {
   display: none;
 }
 
-// A decorative wa-button — visually a button, but not itself the click
-// target (e.g. FeatureCard's whole card is the real link, so its CTA is
-// marked aria-hidden + tabindex="-1") — must let clicks/hover pass through
-// to whatever real link sits behind/around it instead of swallowing them.
+// Decorative wa-button (e.g. FeatureCard's, aria-hidden + tabindex="-1" —
+// the card itself is the real link) must let clicks pass through.
 wa-button[aria-hidden='true'] {
   pointer-events: none;
 }
 
-// The hover path ('M1 7H28…') extends past the icon's own 22-wide viewBox —
-// browsers clip SVG content to the viewBox by default, so every arrow-right
-// icon used as a CTA (not just inside <wa-button>) needs this, or the
-// animation gets cut off mid-extension instead of overflowing visibly.
+// Hover path extends past the icon's 22-wide viewBox — browsers clip SVG
+// to the viewBox by default, so every arrow-right CTA needs this.
 .c-icon--arrow-right svg {
   overflow: visible;
 }
@@ -89,10 +77,8 @@ wa-button .c-icon--arrow-right {
   }
 }
 
-// The arrow-right icon's morph-on-hover animation, extracted so any
-// hand-rolled CTA that can't use <wa-button> directly — because the whole
-// card, not the button, is the click target (see _feature-card.scss) —
-// can still reproduce this exact interaction under its own hover trigger.
+// Extracted so hand-rolled CTAs that can't use <wa-button> directly (the
+// whole card is the click target, see _feature-card.scss) can reuse it.
 .c-icon--arrow-right .c-icon__arrow {
   transition: d 0.15s ease;
 }

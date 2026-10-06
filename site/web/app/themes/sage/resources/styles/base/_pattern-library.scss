@@ -22,9 +22,8 @@
 .c-pattern-library__nav {
   position: sticky;
   // Sits below the sticky site header (--site-header-height, set in
-  // resources/js/site-header.js) rather than a guessed constant — the
-  // header grew once the desktop nav row moved inside it, so a fixed
-  // offset here was letting the header cover the top of this nav.
+  // resources/js/site-header.js) rather than a guessed constant, so this
+  // stays correct if the header's actual height changes.
   top: calc(var(--site-header-height, 6rem) + 1rem);
   margin-block-start: 3rem;
   padding: 1.5rem;

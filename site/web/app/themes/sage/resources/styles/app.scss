@@ -24,6 +24,7 @@
 @use 'components/pill';
 @use 'components/filter-checkbox-group';
 @use 'components/filter-checkboxes';
+@use 'components/media-thumbnail';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'blocks/generic';
@@ -32,7 +33,7 @@
 @use 'blocks/journey-planner-widget';
 @use 'blocks/feature-card';
 @use 'blocks/image-card';
-@use 'blocks/filter-result-card';
+@use 'blocks/business-card';
 @use 'blocks/cycle-route-card';
 @use 'blocks/card-row';
 @use 'blocks/post-hero';
@@ -43,5 +44,8 @@
 @use 'blocks/link-card';
 @use 'blocks/link-list';
 @use 'blocks/accordion';
+@use 'blocks/table';
+@use 'blocks/media-gallery';
+@use 'blocks/image-block';
 @use 'blocks/testimonial-card-carousel';
 @use 'blocks/quote-carousel';
