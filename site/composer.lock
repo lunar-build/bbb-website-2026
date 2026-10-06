@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "960612ad911e64b96c7870dc20e40445",
+    "content-hash": "fbe3dcf91663fad037e0c5150face353",
     "packages": [
         {
             "name": "cloudflare/cf-ip-rewrite",
@@ -793,6 +793,38 @@
                 "source": "https://github.com/roots/wp-config/tree/master"
             },
             "time": "2018-08-10T14:18:38+00:00"
+        },
+        {
+            "name": "smashballoon/instagram-feed-pro",
+            "version": "6.13.1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:lunar-build/instagram-feed-pro.git",
+                "reference": "63cc55cdc6def10a886809fe270395daae218409"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lunar-build/instagram-feed-pro/zipball/63cc55cdc6def10a886809fe270395daae218409",
+                "reference": "63cc55cdc6def10a886809fe270395daae218409",
+                "shasum": ""
+            },
+            "type": "wordpress-plugin",
+            "autoload": {
+                "psr-4": {
+                    "InstagramFeed\\": "inc/"
+                }
+            },
+            "support": {
+                "source": "https://github.com/lunar-build/instagram-feed-pro/tree/6.13.1",
+                "issues": "https://github.com/lunar-build/instagram-feed-pro/issues"
+            },
+            "funding": [
+                {
+                    "type": "github",
+                    "url": "https://github.com/sterner-stuff"
+                }
+            ],
+            "time": "2026-09-24T00:03:16+00:00"
         },
         {
             "name": "symfony/css-selector",
@@ -1798,6 +1830,37 @@
             "time": "2021-03-12T20:47:33+00:00"
         },
         {
+            "name": "wp-plugin/cloudflare",
+            "version": "4.14.4",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/cloudflare/",
+                "reference": "tags/4.14.4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/cloudflare.4.14.4.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Cloudflare"
+                }
+            ],
+            "description": "All of Cloudflare’s performance and security benefits in a simple one-click install.",
+            "homepage": "https://blog.cloudflare.com/new-wordpress-plugin/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/cloudflare/#developers",
+                "issues": "https://wordpress.org/support/plugin/cloudflare",
+                "source": "https://plugins.svn.wordpress.org/cloudflare"
+            },
+            "time": "2026-07-13T19:15:59+00:00"
+        },
+        {
             "name": "wp-plugin/disable-comments",
             "version": "2.9.0",
             "source": {
@@ -1827,6 +1890,37 @@
                 "source": "https://plugins.svn.wordpress.org/disable-comments"
             },
             "time": "2026-09-01T09:41:03+00:00"
+        },
+        {
+            "name": "wp-plugin/imagify",
+            "version": "2.3.4",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/imagify/",
+                "reference": "tags/2.3.4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/imagify.2.3.4.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "WP Media"
+                }
+            ],
+            "description": "Image optimization in 1‑click: compress, resize & convert to WebP/AVIF – free up to 20MB/month. Enjoy the easiest WordPress image optimizer to set up.",
+            "homepage": "https://wordpress.org/plugins/imagify/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/imagify/#developers",
+                "issues": "https://wordpress.org/support/plugin/imagify",
+                "source": "https://plugins.svn.wordpress.org/imagify"
+            },
+            "time": "2026-09-07T07:21:16+00:00"
         },
         {
             "name": "wp-plugin/redirection",
@@ -1860,16 +1954,78 @@
             "time": "2026-09-19T13:51:12+00:00"
         },
         {
-            "name": "wp-plugin/wordpress-seo",
-            "version": "28.5",
+            "name": "wp-plugin/rollbar",
+            "version": "3.3.0",
             "source": {
                 "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/28.5"
+                "url": "https://plugins.svn.wordpress.org/rollbar/",
+                "reference": "tags/3.3.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.28.5.zip"
+                "url": "https://downloads.wordpress.org/plugin/rollbar.3.3.0.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "rollbar"
+                }
+            ],
+            "description": "Official Rollbar full-stack error tracking for WordPress supported by Rollbar, Inc.",
+            "homepage": "https://wordpress.org/plugins/rollbar",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/rollbar/#developers",
+                "issues": "https://wordpress.org/support/plugin/rollbar",
+                "source": "https://plugins.svn.wordpress.org/rollbar"
+            },
+            "time": "2026-09-18T19:40:57+00:00"
+        },
+        {
+            "name": "wp-plugin/wordfence",
+            "version": "9.0.1",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wordfence/",
+                "reference": "tags/9.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wordfence.9.0.1.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Mark Maunder"
+                }
+            ],
+            "description": "Firewall, Malware Scanner, Two Factor Auth, and Comprehensive Security Features, powered by our 24-hour team. Make security a priority with Wordfence.",
+            "homepage": "https://www.wordfence.com/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/wordfence/#developers",
+                "issues": "https://wordpress.org/support/plugin/wordfence",
+                "source": "https://plugins.svn.wordpress.org/wordfence"
+            },
+            "time": "2026-09-08T15:41:22+00:00"
+        },
+        {
+            "name": "wp-plugin/wordpress-seo",
+            "version": "28.6",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
+                "reference": "tags/28.6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.28.6.zip"
             },
             "require": {
                 "composer/installers": "~1.0|~2.0"
@@ -1888,7 +2044,99 @@
                 "issues": "https://wordpress.org/support/plugin/wordpress-seo",
                 "source": "https://plugins.svn.wordpress.org/wordpress-seo"
             },
-            "time": "2026-09-28T12:17:57+00:00"
+            "time": "2026-09-29T05:31:11+00:00"
+        },
+        {
+            "name": "wp-plugin/wp-mail-smtp",
+            "version": "4.9.0",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wp-mail-smtp/",
+                "reference": "tags/4.9.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wp-mail-smtp.4.9.0.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Syed Balkhi"
+                }
+            ],
+            "description": "Make email delivery easy for WordPress. Connect with SMTP, Gmail, Outlook, SendGrid, Mailgun, SES, Zoho, + more. Rated #1 WordPress SMTP Email plugin.",
+            "homepage": "https://wpmailsmtp.com/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/wp-mail-smtp/#developers",
+                "issues": "https://wordpress.org/support/plugin/wp-mail-smtp",
+                "source": "https://plugins.svn.wordpress.org/wp-mail-smtp"
+            },
+            "time": "2026-06-25T08:56:20+00:00"
+        },
+        {
+            "name": "wp-plugin/wps-hide-login",
+            "version": "1.9.19",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wps-hide-login/",
+                "reference": "tags/1.9.19"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wps-hide-login.1.9.19.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Remy Perona"
+                }
+            ],
+            "description": "Change wp-login.php to anything you want.",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/wps-hide-login/#developers",
+                "issues": "https://wordpress.org/support/plugin/wps-hide-login",
+                "source": "https://plugins.svn.wordpress.org/wps-hide-login"
+            },
+            "time": "2026-08-13T08:36:23+00:00"
+        },
+        {
+            "name": "wp-plugin/wpscan",
+            "version": "1.16",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wpscan/",
+                "reference": "tags/1.16"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wpscan.1.16.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "ethicalhack3r"
+                }
+            ],
+            "description": "WPScan WordPress Security Scanner - Scans your system for security vulnerabilities listed in the WPScan Vulnerability Database.",
+            "homepage": "http://wordpress.org/plugins/wpscan/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/wpscan/#developers",
+                "issues": "https://wordpress.org/support/plugin/wpscan",
+                "source": "https://plugins.svn.wordpress.org/wpscan"
+            },
+            "time": "2026-03-23T19:23:21+00:00"
         },
         {
             "name": "wpengine/advanced-custom-fields",
@@ -3287,16 +3535,16 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "327a05bbee54120d4786a0dc67aad30226ad4cf9"
+                "reference": "dbe2133bb23e2e33a6834f4ed417f24a1b167769"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/327a05bbee54120d4786a0dc67aad30226ad4cf9",
-                "reference": "327a05bbee54120d4786a0dc67aad30226ad4cf9",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/dbe2133bb23e2e33a6834f4ed417f24a1b167769",
+                "reference": "dbe2133bb23e2e33a6834f4ed417f24a1b167769",
                 "shasum": ""
             },
             "require": {
@@ -3339,9 +3587,9 @@
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
             "support": {
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
-                "source": "https://github.com/phpDocumentor/TypeResolver/tree/2.0.0"
+                "source": "https://github.com/phpDocumentor/TypeResolver/tree/2.1.0"
             },
-            "time": "2026-01-06T21:53:42+00:00"
+            "time": "2026-09-27T19:32:54+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
