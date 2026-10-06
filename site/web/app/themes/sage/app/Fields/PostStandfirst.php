@@ -16,7 +16,7 @@ class PostStandfirst extends Field
 
         $fields
             ->setLocation('post_type', '==', 'post')
-            ->setGroupConfig('position', 'acf_after_title');
+            ->setGroupConfig('position', 'side');
 
         $fields->addTextarea('standfirst', [
             'label' => 'Standfirst',
