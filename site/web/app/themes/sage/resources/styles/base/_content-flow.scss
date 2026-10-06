@@ -10,9 +10,12 @@
   margin-block: var(--wp--preset--spacing--large);
 }
 
-// A paragraph's own margin-bottom would otherwise stack with the margin-top
-// above, doubling up the gap — drop it, the block's own margin already
-// covers the separation.
-.e-content > .wp-block-paragraph:has(+ .o-full-bleed-bg) {
+// Every block (root is always a <section>, per the block-building
+// convention) already has its own 4rem top spacing — margin for
+// .o-full-bleed-bg ones (above), padding-top otherwise, which reads the
+// same as margin since there's no visible section edge to reveal it's
+// padding. Either way, a preceding paragraph's own margin-bottom just
+// stacks an extra, inconsistent gap on top — drop it.
+.e-content > .wp-block-paragraph:has(+ section) {
   margin-bottom: 0;
 }
