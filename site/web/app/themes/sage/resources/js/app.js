@@ -15,5 +15,6 @@ import './journey-planner-widget.js';
 import './video-hero.js';
 import './filter-checkboxes.js';
 import './rolling-stats-carousel.js';
+import './testimonial-carousel.js';
 import '../styles/app.scss';
 
