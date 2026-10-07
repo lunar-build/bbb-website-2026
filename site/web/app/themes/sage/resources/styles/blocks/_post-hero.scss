@@ -1,5 +1,8 @@
 .c-post-hero {
   background: var(--wp--preset--color--white);
+
+  // Template-rendered, not run through render_block(), so it never picks up its $spacing default — added by hand.
+  padding-block: var(--wp--preset--spacing--large);
 }
 
 .c-post-hero__meta {
@@ -35,13 +38,19 @@
   color: var(--wp--preset--color--charcoal);
 }
 
+// 16x16 visible icon, 44x44 tap target (WCAG 2.5.5) — negative margin cancels the padding's footprint so the row's spacing doesn't shift.
 .c-post-hero__share-link {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem; // 44px
+  height: 2.75rem; // 44px
+  margin: -0.875rem; // 14px
   color: var(--wp--preset--color--charcoal);
 
   svg {
-    width: 30px;
-    height: 30px;
+    width: 1rem; // 16px
+    height: 1rem; // 16px
   }
 }
 

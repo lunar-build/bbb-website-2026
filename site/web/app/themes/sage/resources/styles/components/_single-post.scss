@@ -1,0 +1,47 @@
+// Figma "Sample page -> News article": featured image + "Also read" section shell.
+
+// Full-bleed-background blocks (.o-full-bleed-bg) normally run edge to edge
+// — .e-content is itself an .o-container here, so escape them back onto the
+// full-bleed track; their own inner .o-container still narrows their content.
+.e-content.o-container > .o-full-bleed-bg {
+  grid-column: full-start / full-end;
+}
+
+// Non-full-bleed blocks are already narrowed (their <section> IS the
+// content column) — most also wrap their content in their own
+// .o-container, which would narrow a second time. Flatten that inner grid
+// to a 100%-width passthrough instead.
+.e-content.o-container > section:not(.o-full-bleed-bg) .o-container {
+  grid-template-columns: [full-start content-start] 100% [content-end full-end];
+}
+
+.c-single-post {
+  &__image {
+    margin-bottom: 2rem;
+  }
+
+  &__image-el {
+    display: block;
+    width: 100%;
+    aspect-ratio: 940 / 564;
+    object-fit: cover;
+    border-radius: 1.25rem;
+  }
+
+  &__related {
+    padding-block: 3.5rem;
+    text-align: center;
+  }
+
+  &__related-heading {
+    margin-bottom: 3.5rem;
+  }
+
+  // wa-button's host defaults to filling its container (see _cta-banner.scss's align-self:flex-start) — shrink + center instead.
+  &__related-cta {
+    display: block;
+    width: fit-content;
+    margin-top: 3.5rem;
+    margin-inline: auto;
+  }
+}

@@ -7,7 +7,12 @@
 //     <img class="o-container__full" src="…"> <!-- bleeds full width -->
 //   </div>
 //
-// Never put this class directly on a <wa-*> custom element — `display:
+// `.o-container--narrow` sets a tighter max-width/gutter via custom
+// properties — put it on any ancestor to cascade into every nested
+// `.o-container` underneath, including other blocks' own markup. See
+// components/_single-post.scss.
+//
+// Never put `.o-container` directly on a <wa-*> custom element — `display:
 // grid` on a shadow host only grids its own shadow-tree wrapper, not the
 // slotted light-DOM content. Wrap the element in a plain
 // <div class="o-container"> instead — see sections/header.blade.php.
@@ -15,12 +20,27 @@
 $container-max-width: 80rem;
 $container-gutter: 1.5rem;
 
+// Figma "News article": 940px reading column inside the 1440px frame.
+$container-narrow-max-width: 58.75rem; // 940px
+$container-narrow-gutter: 2rem;
+
+:root {
+  --o-container-max-width: #{$container-max-width};
+  --o-container-gutter: #{$container-gutter};
+}
+
 .o-container {
+  // Explicit, not relying on default block-level sizing — block-level
+  // elements fill their parent's width automatically in normal flow, but
+  // not when `.o-container` ends up as a flex item (e.g. blocks/_image-hero
+  // .scss's .c-image-hero), where it otherwise shrinks to its content's
+  // width instead of spanning the parent, breaking the centering below.
+  width: 100%;
   display: grid;
   grid-template-columns:
-    [full-start] minmax(#{$container-gutter}, 1fr)
-    [content-start] min(100% - #{$container-gutter * 2}, #{$container-max-width})
-    [content-end] minmax(#{$container-gutter}, 1fr)
+    [full-start] minmax(var(--o-container-gutter), 1fr)
+    [content-start] min(100% - var(--o-container-gutter) * 2, var(--o-container-max-width))
+    [content-end] minmax(var(--o-container-gutter), 1fr)
     [full-end];
 
   > * {
@@ -30,4 +50,9 @@ $container-gutter: 1.5rem;
   &__full {
     grid-column: full-start / full-end;
   }
+}
+
+.o-container--narrow {
+  --o-container-max-width: #{$container-narrow-max-width};
+  --o-container-gutter: #{$container-narrow-gutter};
 }

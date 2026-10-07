@@ -233,7 +233,7 @@ class Quote extends Block
 
     public function quoteSize()
     {
-        return get_field('quote_size') ?: $this->example['quote_size'];
+        return get_field('quote_size') ?: ($this->preview ? $this->example['quote_size'] : 'large');
     }
 
     /**
@@ -244,17 +244,17 @@ class Quote extends Block
      */
     public function quote()
     {
-        return get_field('quote') ?: wpautop($this->example['quote']);
+        return get_field('quote') ?: ($this->preview ? wpautop($this->example['quote']) : '');
     }
 
     public function attributionName()
     {
-        return get_field('attribution_name') ?: $this->example['attribution_name'];
+        return get_field('attribution_name') ?: ($this->preview ? $this->example['attribution_name'] : '');
     }
 
     public function attributionRole()
     {
-        return get_field('attribution_role') ?: $this->example['attribution_role'];
+        return get_field('attribution_role') ?: ($this->preview ? $this->example['attribution_role'] : '');
     }
 
     /**

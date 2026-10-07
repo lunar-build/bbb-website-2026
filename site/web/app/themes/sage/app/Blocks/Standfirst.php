@@ -5,28 +5,28 @@ namespace App\Blocks;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
-class BulletList extends Block
+class Standfirst extends Block
 {
     /**
      * The block name.
      *
      * @var string
      */
-    public $name = 'Bullet List';
+    public $name = 'Standfirst';
 
     /**
      * The block slug.
      *
      * @var string
      */
-    public $slug = 'bullet-list';
+    public $slug = 'standfirst';
 
     /**
      * The block description.
      *
      * @var string
      */
-    public $description = 'A styled bullet list with an optional heading, for use within article content.';
+    public $description = 'A short lead paragraph shown above the article body.';
 
     /**
      * The block category.
@@ -40,7 +40,7 @@ class BulletList extends Block
      *
      * @var string|array
      */
-    public $icon = 'editor-ul';
+    public $icon = 'editor-paragraph';
 
     /**
      * The block keywords.
@@ -48,9 +48,10 @@ class BulletList extends Block
      * @var array
      */
     public $keywords = [
-        'bullet',
-        'list',
-        'ul',
+        'standfirst',
+        'lead',
+        'intro',
+        'summary',
     ];
 
     /**
@@ -58,7 +59,7 @@ class BulletList extends Block
      *
      * @var array
      */
-    public $post_types = ['post', 'page'];
+    public $post_types = ['post'];
 
     /**
      * The parent block type allow list.
@@ -127,7 +128,7 @@ class BulletList extends Block
         'full_height' => false,
         'anchor' => false,
         'mode' => true,
-        'multiple' => true,
+        'multiple' => false,
         'jsx' => true,
         'color' => [
             'background' => false,
@@ -153,57 +154,34 @@ class BulletList extends Block
      * @var array
      */
     public $example = [
-        'heading' => 'Example of non-urgent',
-        'items' => [
-            ['text' => 'Missing cycle signage'],
-            ['text' => 'Road markings'],
-            ['text' => 'Potholes'],
-            ['text' => 'Cycle lane needs resurfacing'],
-            ['text' => 'Cutting back brambles'],
-        ],
+        'text' => 'Work on three walking, wheeling and cycling routes to help people get across Bath safely and more easily is set to get under way this summer and autumn.',
     ];
 
     public function with(): array
     {
         return [
-            'heading' => $this->heading(),
-            'items' => $this->items(),
+            'text' => $this->text(),
         ];
     }
 
     public function fields(): array
     {
-        $fields = Builder::make('bullet_list');
+        $fields = Builder::make('standfirst');
 
-        $fields
-            ->addText('heading', [
-                'label' => 'Heading',
-                'instructions' => 'Optional heading shown above the list.',
-                'required' => 0,
-            ])
-            ->addRepeater('items', [
-                'label' => 'List items',
-                'button_label' => 'Add item',
-                'min' => 1,
-                'layout' => 'table',
-            ])
-                ->addText('text', [
-                    'label' => 'Item text',
-                    'required' => 1,
-                ])
-            ->endRepeater();
+        $fields->addTextarea('text', [
+            'label' => 'Standfirst',
+            'instructions' => 'A short lead paragraph, 1-2 sentences.',
+            'rows' => 3,
+            'new_lines' => false,
+            'required' => 1,
+        ]);
 
         return $fields->build();
     }
 
-    public function heading()
+    public function text()
     {
-        return get_field('heading') ?: ($this->preview ? $this->example['heading'] : '');
-    }
-
-    public function items()
-    {
-        return get_field('items') ?: ($this->preview ? $this->example['items'] : []);
+        return get_field('text') ?: $this->example['text'];
     }
 
     /**

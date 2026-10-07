@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-quote-carousel', 'c-quote-carousel--'.$style]) }}>
+<section {{ $attributes->class(['c-quote-carousel', 'c-quote-carousel--'.$style, 'o-full-bleed-bg']) }}>
 
   <div class="o-container">
     <wa-carousel

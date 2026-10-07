@@ -145,6 +145,11 @@
           "size": "24px",
           "name": "Short form link"
         },
+        {
+          "slug": "stat-value",
+          "size": "clamp(3.5rem, 2.607rem + 3.972vw, 8.75rem)",
+          "name": "Stat value"
+        },
         { "slug": "quote", "size": "30px", "name": "Quote" },
         {
           "slug": "quote-citation",

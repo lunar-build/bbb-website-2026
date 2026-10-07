@@ -151,6 +151,7 @@ class PostHero extends Block
      */
     public $example = [
         'date' => '30th July 2026',
+        'date_iso' => '2026-07-30',
         'title' => 'Making it easier and safer to walk, wheel and cycle across Bath',
         'permalink' => 'https://betterbybike.info/making-it-easier-and-safer-to-walk-wheel-and-cycle-across-bath/',
         'categories' => [
@@ -172,6 +173,7 @@ class PostHero extends Block
     {
         return [
             'date' => $this->date(),
+            'dateIso' => $this->dateIso(),
             'title' => $this->title(),
             'permalink' => $this->permalink(),
             'categories' => $this->categories(),
@@ -208,7 +210,18 @@ class PostHero extends Block
      */
     public function date()
     {
-        return $this->inPostContext() ? get_the_date() : $this->example['date'];
+        // 'jS F Y' for the ordinal suffix (28th, not 28) — matches Figma and RelatedPosts::latest()'s date format.
+        return $this->inPostContext() ? get_the_date('jS F Y') : $this->example['date'];
+    }
+
+    /**
+     * Machine-readable date for <time datetime="…">.
+     *
+     * @return string
+     */
+    public function dateIso()
+    {
+        return $this->inPostContext() ? get_the_date('Y-m-d') : $this->example['date_iso'];
     }
 
     /**
@@ -244,6 +257,9 @@ class PostHero extends Block
         }
 
         $categories = get_the_category();
+
+        // Every uncategorised post still carries WP's default "Uncategorized" term — filter it out.
+        $categories = array_filter($categories, fn($category) => $category->term_id !== (int) get_option('default_category'));
 
         if (empty($categories)) {
             return [];

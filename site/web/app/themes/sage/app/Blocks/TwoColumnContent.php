@@ -311,7 +311,7 @@ class TwoColumnContent extends Block
         $row = is_array($rows) ? ($rows[0] ?? null) : null;
 
         if (! $row) {
-            $row = $this->example[$name] ?? ['type' => 'text'];
+            $row = $this->preview ? ($this->example[$name] ?? ['type' => 'text']) : ['type' => 'text'];
             $row = ['acf_fc_layout' => $row['type']] + $row;
         }
 

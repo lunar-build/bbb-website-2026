@@ -219,7 +219,7 @@ class ImageCard extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return get_field('image') ?: ($this->preview ? $this->example['image'] : null);
     }
 
     /**
@@ -229,7 +229,7 @@ class ImageCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        return get_field('link') ?: ($this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

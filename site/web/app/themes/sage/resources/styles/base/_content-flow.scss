@@ -1,0 +1,18 @@
+// Full-bleed-background blocks (.o-full-bleed-bg — CTA Banner, Card Grid,
+// Image Hero, Quote Carousel, Video Hero) only pad space inside their own
+// coloured area, not outside it. Margin only on the edge touching a
+// paragraph, so two of these stacked back to back stay flush.
+.e-content > .wp-block-paragraph + .o-full-bleed-bg {
+  margin-top: var(--wp--preset--spacing--large);
+}
+
+.e-content > .o-full-bleed-bg:has(+ .wp-block-paragraph) {
+  margin-bottom: var(--wp--preset--spacing--large);
+}
+
+// Every block already has its own 4rem top spacing (margin above, or
+// padding-top otherwise, same visual effect) — a preceding paragraph's own
+// margin-bottom just stacks an extra gap on top of that. Drop it.
+.e-content > .wp-block-paragraph:has(+ section) {
+  margin-bottom: 0;
+}
