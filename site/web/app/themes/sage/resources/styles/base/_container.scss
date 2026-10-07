@@ -30,6 +30,12 @@ $container-narrow-gutter: 2rem;
 }
 
 .o-container {
+  // Explicit, not relying on default block-level sizing — block-level
+  // elements fill their parent's width automatically in normal flow, but
+  // not when `.o-container` ends up as a flex item (e.g. blocks/_image-hero
+  // .scss's .c-image-hero), where it otherwise shrinks to its content's
+  // width instead of spanning the parent, breaking the centering below.
+  width: 100%;
   display: grid;
   grid-template-columns:
     [full-start] minmax(var(--o-container-gutter), 1fr)

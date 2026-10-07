@@ -13,8 +13,9 @@ import './primary-nav.js';
 import './video-background.js';
 import './journey-planner-widget.js';
 import './video-hero.js';
+import './sticky-nav-template.js';
 import './filter-checkboxes.js';
+import './rolling-stats-carousel.js';
 import './media-gallery.js';
 import './testimonial-carousel.js';
 import '../styles/app.scss';
-

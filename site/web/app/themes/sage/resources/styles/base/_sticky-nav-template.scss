@@ -1,0 +1,80 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Styles for the Sticky Nav page template
+// (resources/views/template-sticky-nav.blade.php): a sticky left-rail page
+// menu beside the main content column. See base/_pattern-library.scss for
+// the same nav+content grid shape this mirrors.
+//
+// .c-sticky-nav-template gets its own grid-template-columns one level
+// inside .o-container, rather than on .o-container itself — see
+// base/_container.scss's note on why stacking a second grid-template-columns
+// directly on .o-container breaks its named grid-line placement rule.
+
+.c-sticky-nav-template {
+  display: grid;
+  gap: 3rem;
+  align-items: start;
+  padding-block: 3rem;
+
+  @include bp.respond($min: bp.$lg) {
+    // max-content, not a hardcoded width, so this always matches
+    // .c-sticky-page-menu's own width (16.875rem) — see
+    // resources/styles/components/_sticky-page-menu.scss.
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+}
+
+.c-sticky-nav-template__nav {
+  @include bp.respond($min: bp.$lg) {
+    position: sticky;
+    // 2rem once the header's scrolled out of the way (html.is-header-hidden,
+    // toggled by resources/js/site-header.js); while the header's still
+    // showing, clear its height too — see base/_header.scss, no single rem
+    // value covers both states so this isn't a bare top: 2rem.
+    top: 12rem;
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
+    // Matches base/_header.scss's $site-header-transition-duration, so
+    // this settles in step with the header's own slide rather than
+    // snapping ahead of or behind it.
+    transition: top 0.25s ease;
+
+    html.is-header-hidden & {
+      top: 2rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+}
+
+.c-sticky-nav-template__content {
+  min-width: 0;
+
+  // components/_breadcrumbs.scss has no spacing of its own — inside the Image
+  // Hero overlay it relies on that block's flex `gap`, but here it's a
+  // standalone first child.
+  > .c-breadcrumbs {
+    margin-bottom: 2rem;
+  }
+
+  // Same reason as .c-sticky-nav-template__nav's `top` above — a heading
+  // jumped to via the page menu (or a direct #anchor link) would otherwise
+  // land underneath the sticky header. Was calc(var(--site-header-height)
+  // + 1rem) — dropped: that var measured wildly wrong in testing (6494px,
+  // collapsing scrollIntoView() to the top of the page), so this uses the
+  // same fixed values as the nav's own `top` instead of a measured one.
+  //
+  // Covers every focusable element, not just headings — WCAG 2.4.11 Focus
+  // Not Obscured: without this, Tab-ing to a link/button near the top of a
+  // section relies on the browser's own focus-scroll, which has no header
+  // offset to work with and can land the focused element under the header.
+  :where(h2, h3, h4, a, button, input, textarea, select, summary, [tabindex]) {
+    scroll-margin-top: 13rem;
+
+    html.is-header-hidden & {
+      scroll-margin-top: 3rem;
+    }
+  }
+}

@@ -173,3 +173,46 @@ add_filter('gform_submit_button', function ($button, $form) {
         'label' => $matches[1] ?? __('Submit', 'sage'),
     ])->render();
 }, 10, 2);
+
+/**
+ * The Sticky Nav page template (template-sticky-nav.blade.php) builds its
+ * left-rail page menu from each top-level (H2) heading, linking to it by
+ * `id`. Gutenberg already renders a heading's `id` automatically when an
+ * editor sets its "HTML anchor" field — this only covers the headings
+ * where they haven't, auto-slugging the heading text instead so the
+ * generated link actually resolves. Scoped to the one template so other
+ * pages' H2s are untouched.
+ *
+ * The slugify logic here must match App\Support\PageMenu::anchorFor()'s
+ * fallback, which builds the same `items` array of links.
+ */
+add_filter('render_block_core/heading', function ($block_content, $block) {
+    if ((int) ($block['attrs']['level'] ?? 2) !== 2) {
+        return $block_content;
+    }
+
+    if (! is_page_template('template-sticky-nav.blade.php')) {
+        return $block_content;
+    }
+
+    $processor = new \WP_HTML_Tag_Processor($block_content);
+
+    if (! $processor->next_tag('h2')) {
+        return $block_content;
+    }
+
+    if (empty($block['attrs']['anchor'])) {
+        $anchor = Support\PageMenu::slugify(wp_strip_all_tags($block_content));
+
+        if ($anchor !== '') {
+            $processor->set_attribute('id', $anchor);
+        }
+    }
+
+    // Focusable without joining the natural tab order — resources/js/sticky-nav-template.js
+    // moves focus here after a Page Index click, so keyboard/screen-reader users land in the
+    // jumped-to section instead of staying on the nav link (WCAG 2.4.3 Focus Order).
+    $processor->set_attribute('tabindex', '-1');
+
+    return $processor->get_updated_html();
+}, 10, 2);

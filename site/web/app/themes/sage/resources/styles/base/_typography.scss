@@ -186,6 +186,12 @@ h6,
   font-weight: 400;
 }
 
+.u-stat-value {
+  font-size: var(--wp--preset--font-size--stat-value);
+  line-height: 1;
+  font-weight: 800;
+}
+
 .u-quote-citation {
   font-size: var(--wp--preset--font-size--quote-citation);
   line-height: 30px;

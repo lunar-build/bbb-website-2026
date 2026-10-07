@@ -5,6 +5,11 @@ const SCROLL_DELTA_THRESHOLD = 8; // px of movement before a direction change co
 
 const header = document.querySelector('.c-site-header');
 
+// Exposed so other modules (e.g. sticky-nav-template.js) can force the header visible
+// before a programmatic scroll, rather than letting its own scroll-direction detection
+// catch up after the fact — a no-op if there's no header on this page.
+export let setHeaderHidden = () => {};
+
 if (header) {
   // Exposes the header's real rendered height (it now includes the desktop
   // nav row, not just the logo/CTA row, and varies by breakpoint) as a CSS
@@ -24,11 +29,19 @@ if (header) {
   // tech and keyboard focus stay in sync with what's visually present
   // (WCAG 4.1.2) — a sighted keyboard user can't tab into controls that
   // are currently translated off-screen.
+  //
+  // Also toggled on <html> as .is-header-hidden — a plain state class, not
+  // a measured height or custom property — for anything elsewhere that
+  // needs to know whether the header is currently covering the top of the
+  // viewport (e.g. the sticky nav template's `top` offset).
   const setHidden = (hidden) => {
     header.classList.toggle('is-hidden', hidden);
     header.toggleAttribute('inert', hidden);
     header.setAttribute('aria-hidden', String(hidden));
+    document.documentElement.classList.toggle('is-header-hidden', hidden);
   };
+
+  setHeaderHidden = setHidden;
 
   const updateVisibility = () => {
     const currentScrollY = Math.max(window.scrollY, 0);
