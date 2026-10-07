@@ -1,0 +1,191 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+
+// Figma "Rolling stats" (node 134:481)
+.c-rolling-stats-carousel-block {
+  padding-block: 2rem;
+}
+
+.c-rolling-stats-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.c-rolling-stats-carousel__carousel {
+  --wa-form-control-height: 2.5rem;
+  // WA stretches each slide to this box — set via custom prop, not a
+  // ::part(scroll-container) override, or WA's scroll math desyncs.
+  --aspect-ratio: 5 / 2;
+
+  @include bp.respond($max: bp.$md) {
+    --aspect-ratio: 3 / 2;
+  }
+
+  // Capped, not flex: 1 1 auto, so illustrations sit close instead of at the container edges.
+  flex: 0 1 46rem;
+  min-width: 0;
+
+  // Tighter than theme.json's clamp — this slide shares width with two illustrations.
+  --wp--preset--font-size--stat-value: clamp(2.5rem, 1.2rem + 4.5vw, 8.75rem);
+}
+
+// Re-columns prev/pagination/next together, 1rem apart (default puts nav at the far edges).
+.c-rolling-stats-carousel__carousel::part(carousel) {
+  grid-template-columns: 1fr min-content max-content min-content 1fr; // max-content: dots' flex-wrap needs it
+  grid-template-areas: none;
+  gap: 1rem;
+}
+
+.c-rolling-stats-carousel__carousel::part(scroll-container) {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  height: var(--rolling-stats-carousel-height, auto); // set by rolling-stats-carousel.js
+  @include focus.ring; // WA's real tabindex="0" element — arrow keys move slides
+}
+
+.c-rolling-stats-carousel__carousel::part(navigation-button) {
+  @include focus.ring;
+}
+
+.c-rolling-stats-carousel__carousel::part(navigation-button-previous) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.c-rolling-stats-carousel__carousel::part(pagination) {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.c-rolling-stats-carousel__carousel::part(navigation-button-next) {
+  grid-column: 4;
+  grid-row: 2;
+}
+
+// Theme-blue dots — active solid, inactive a ring.
+.c-rolling-stats-carousel__carousel::part(pagination-item) {
+  width: 0.75rem;
+  height: 0.75rem;
+  box-sizing: border-box;
+  border: 2px solid var(--wp--preset--color--blue);
+  background-color: transparent;
+  @include focus.ring;
+}
+
+.c-rolling-stats-carousel__carousel::part(pagination-item-active) {
+  background-color: var(--wp--preset--color--blue);
+}
+
+.c-rolling-stats-carousel__item {
+  padding-block: 1rem;
+}
+
+.c-rolling-stats-carousel__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  @include bp.respond($min: bp.$xl) {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.c-rolling-stats-carousel__prefix,
+.c-rolling-stats-carousel__caption {
+  margin: 0;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-rolling-stats-carousel__stat {
+  margin: 1rem 0;
+  color: var(--wp--preset--color--dark-orange);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  column-gap: 1em; // gap not margin on __unit: survives wrap without adding row spacing
+
+  @include bp.respond($min: bp.$xl) {
+    justify-content: flex-start;
+  }
+}
+
+.c-rolling-stats-carousel__value {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+// One digit's "reel" window (0-9 strip x3, see component Blade view); JS translateY()s it.
+.c-rolling-stats-carousel__reel {
+  display: inline-block;
+  overflow: hidden;
+  height: 1em;
+  line-height: 1;
+  vertical-align: top;
+  font-variant-numeric: tabular-nums; // fixed-width digits, no jitter while spinning
+}
+
+.c-rolling-stats-carousel__reel-track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.c-rolling-stats-carousel__reel-digit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1em;
+}
+
+.c-rolling-stats-carousel__decimal {
+  display: inline-block;
+}
+
+// Held off until $xl — below that, both images + gaps + nav squash/wrap the number.
+.c-rolling-stats-carousel__illustration {
+  display: none;
+  flex: none;
+  height: auto;
+
+  @include bp.respond($min: bp.$xl) {
+    display: block;
+  }
+}
+
+.c-rolling-stats-carousel__illustration--left {
+  width: 10.5rem; // pump, narrower per Figma
+}
+
+.c-rolling-stats-carousel__illustration--right {
+  width: 11.5rem; // helmet
+}
+
+.c-rolling-stats-carousel__nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2.40625rem; // 38.5px
+  height: 2.0625rem; // 33px
+  color: var(--wp--preset--color--dark-orange);
+
+  svg {
+    width: 2.40625rem; // 38.5px
+    height: 2.0625rem; // 33px
+    flex: none;
+  }
+}
+
+.c-rolling-stats-carousel__nav-icon--previous {
+  transform: scaleX(-1);
+}
+
+wa-carousel-item {
+  @include focus.ring;
+}
