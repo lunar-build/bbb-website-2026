@@ -1,0 +1,123 @@
+// Figma node 19:745 — inline video with a title + transcript download row below.
+
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+
+// Container query (like Link Card) — the row's own width, not the viewport's, decides when it stacks.
+.c-video-block {
+  container-type: inline-size;
+}
+
+.c-video-block__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--light-grey);
+}
+
+// Focusables scroll clear of the sticky header (WCAG 2.4.11 Focus Not Obscured).
+$header-clearance: calc(var(--site-header-height, 6rem) + 1rem);
+
+// No overflow:hidden on the wrapper (it would clip the focus ring) — the video rounds itself instead.
+.c-video-block__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  scroll-margin-top: $header-clearance;
+
+  @include focus.ring;
+}
+
+.c-video-block__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--light-grey);
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-video-block__toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+  scroll-margin-top: $header-clearance;
+
+  @include focus.ring;
+
+  @include bp.respond($min: bp.$md) {
+    top: 2.5rem;
+    right: 2.5rem;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.c-video-block__toggle-icon {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+
+  @include bp.respond($min: bp.$md) {
+    width: 3.4rem; // 54px, the Figma glyph size
+    height: 3.4rem;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// Same card shell as Link Card's download row.
+.c-video-block__transcript {
+  display: flex;
+  margin-top: 2rem;
+  align-items: center;
+  gap: 3.3125rem;
+  padding: 1.3125rem 1.875rem 1.3125rem 2.5rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--white);
+  box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.25);
+
+  @container (max-width: #{bp.$md}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    text-align: center;
+  }
+}
+
+.c-video-block__title {
+  flex: 1 0 0;
+  min-width: 0;
+  margin: 0;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-video-block__download {
+  @container (max-width: #{bp.$md}) {
+    align-items: center;
+  }
+
+  .c-download-link__link {
+    scroll-margin-top: $header-clearance;
+  }
+}

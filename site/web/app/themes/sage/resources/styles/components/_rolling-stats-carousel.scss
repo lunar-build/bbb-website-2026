@@ -80,6 +80,7 @@
 }
 
 .c-rolling-stats-carousel__item {
+  position: relative; // contains the absolute .u-sr-only so the track clips it, not the page
   padding-block: 1rem;
 }
 
