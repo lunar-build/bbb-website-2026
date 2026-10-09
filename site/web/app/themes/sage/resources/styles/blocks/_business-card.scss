@@ -1,6 +1,7 @@
 // Figma node 58:2560. Also used as Card Grid's "Business card" style.
 @use '../base/typography';
 @use '../components/button';
+@use '../base/focus' as focus;
 
 .c-business-card {
   &__card {
@@ -61,6 +62,7 @@
 
   &__contact-link {
     text-decoration: none;
+    @include focus.ring;
 
     &:hover,
     &:focus-visible {
@@ -97,6 +99,8 @@
     border-radius: 999px;
     color: var(--wp--preset--color--charcoal);
     text-decoration: none;
+
+    @include focus.ring;
 
     &:hover,
     &:focus-visible {
