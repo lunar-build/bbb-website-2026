@@ -174,7 +174,8 @@ class Form extends Block
     public $example = [
         'layout' => 'image',
         'form_id' => 1,
-        'heading_text' => 'Stay up to date with the latest news and events in your region',
+        'heading_highlight' => 'Stay up to date',
+        'heading_text' => 'with the latest news and events in your region',
         'heading_level' => 'h2',
         'heading_style' => 'match',
         'subheading_text' => 'Subtitle…',
@@ -207,6 +208,7 @@ class Form extends Block
         return [
             'layout' => $this->layout(),
             'formId' => $this->formId(),
+            'headingHighlight' => $this->headingHighlight(),
             'heading' => $this->heading(),
             'subheading' => $this->subheading(),
             'intro' => $this->intro(),
@@ -233,6 +235,11 @@ class Form extends Block
             ],
             'default_value' => 'image',
             'ui' => true,
+        ]);
+
+        $fields->addText('heading_highlight', [
+            'label' => 'Heading (highlighted words)',
+            'instructions' => 'Optional bold lead-in shown before the heading, e.g. "Stay up to date". The rest of the heading then renders in a lighter weight.',
         ]);
 
         $fields->addPartial(Heading::class, [
@@ -352,6 +359,16 @@ class Form extends Block
             'url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'),
             'alt' => '',
         ];
+    }
+
+    /**
+     * Retrieve the optional bold lead-in words for the heading.
+     *
+     * @return string
+     */
+    public function headingHighlight()
+    {
+        return get_field('heading_highlight') ?: (shows_example($this->preview) ? ($this->example['heading_highlight'] ?? '') : '');
     }
 
     /**
