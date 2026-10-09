@@ -161,6 +161,7 @@ class CaseStudyGrid extends Block
                 'quote' => 'Wow – they\'ve thought of everything… love that there are lights in case I forget and need to borrow them to get home',
                 'name' => 'Franciska',
                 'info' => 'Cycling through The Arches, Bristol.',
+                'link' => ['title' => '', 'url' => 'https://betterbybike.info/ibikeitilikeit/franciska/', 'target' => ''],
             ],
             [
                 'image' => ['url' => '', 'alt' => ''],
@@ -227,6 +228,10 @@ class CaseStudyGrid extends Block
                 'label' => 'Additional info',
                 'instructions' => 'Shown under the name, e.g. "Cycling through The Arches, Bristol". Optional.',
                 'conditional_logic' => [[['field' => 'name', 'operator' => '!=empty']]],
+            ])
+            ->addLink('link', [
+                'label' => 'Link',
+                'instructions' => 'e.g. a "Read their story" page. Optional — leave empty for no button. Link text defaults to "Read their story".',
             ]);
 
         $cards->endRepeater();
@@ -258,6 +263,7 @@ class CaseStudyGrid extends Block
                 'quote' => $card['quote'] ?? '',
                 'name' => $card['name'] ?? '',
                 'info' => $card['info'] ?? '',
+                'link' => normalize_link($card['link'] ?? null),
             ];
         }, $cards);
     }
