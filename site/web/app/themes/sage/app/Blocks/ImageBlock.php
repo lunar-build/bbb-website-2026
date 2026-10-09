@@ -379,7 +379,7 @@ class ImageBlock extends Block
      */
     public function caption()
     {
-        return get_field('caption') ?: ($this->preview ? ($this->example['caption'] ?? '') : '');
+        return get_field('caption') ?: (shows_example($this->preview) ? ($this->example['caption'] ?? '') : '');
     }
 
     /**
@@ -401,7 +401,7 @@ class ImageBlock extends Block
      */
     public function infoBoxRowsHeading()
     {
-        return get_field('info_box_rows_heading') ?: ($this->preview ? ($this->example['info_box_rows_heading'] ?? '') : '');
+        return get_field('info_box_rows_heading') ?: (shows_example($this->preview) ? ($this->example['info_box_rows_heading'] ?? '') : '');
     }
 
     /**
@@ -423,7 +423,7 @@ class ImageBlock extends Block
      */
     public function infoBoxHeading()
     {
-        return get_field('info_box_heading') ?: ($this->preview ? ($this->example['info_box_heading'] ?? '') : '');
+        return get_field('info_box_heading') ?: (shows_example($this->preview) ? ($this->example['info_box_heading'] ?? '') : '');
     }
 
     /**

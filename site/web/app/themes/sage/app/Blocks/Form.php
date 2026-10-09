@@ -328,9 +328,9 @@ class Form extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: ($this->preview ? $this->example['heading_text'] : ''),
-            'level' => get_field('heading_level') ?: ($this->preview ? $this->example['heading_level'] : 'h2'),
-            'style' => get_field('heading_style') ?: ($this->preview ? $this->example['heading_style'] : 'match'),
+            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
+            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h2'),
+            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
         ];
     }
 
@@ -343,9 +343,9 @@ class Form extends Block
     public function subheading()
     {
         return [
-            'text' => get_field('subheading_text') ?: ($this->preview ? ($this->example['subheading_text'] ?? '') : ''),
-            'level' => get_field('subheading_level') ?: ($this->preview ? ($this->example['subheading_level'] ?? 'h3') : 'h3'),
-            'style' => get_field('subheading_style') ?: ($this->preview ? ($this->example['subheading_style'] ?? 'match') : 'match'),
+            'text' => get_field('subheading_text') ?: (shows_example($this->preview) ? ($this->example['subheading_text'] ?? '') : ''),
+            'level' => get_field('subheading_level') ?: (shows_example($this->preview) ? ($this->example['subheading_level'] ?? 'h3') : 'h3'),
+            'style' => get_field('subheading_style') ?: (shows_example($this->preview) ? ($this->example['subheading_style'] ?? 'match') : 'match'),
         ];
     }
 
@@ -364,8 +364,8 @@ class Form extends Block
         $text = get_field('intro_text');
 
         return [
-            'text' => get_field('intro_text') ?: ($this->preview ? ($this->example['intro_text'] ?? '') : ''),
-            'style' => get_field('intro_style') ?: ($this->preview ? ($this->example['intro_style'] ?? 'body') : 'body'),
+            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? ($this->example['intro_text'] ?? '') : ''),
+            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? ($this->example['intro_style'] ?? 'body') : 'body'),
         ];
     }
 
@@ -376,7 +376,7 @@ class Form extends Block
      */
     public function formId()
     {
-        return get_field('form_id') ?: ($this->preview ? $this->example['form_id'] : null);
+        return get_field('form_id') ?: (shows_example($this->preview) ? $this->example['form_id'] : null);
     }
 
     /**

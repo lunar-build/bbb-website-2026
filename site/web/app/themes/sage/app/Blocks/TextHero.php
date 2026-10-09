@@ -198,9 +198,9 @@ class TextHero extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: ($this->preview ? $this->example['heading_text'] : ''),
-            'level' => get_field('heading_level') ?: ($this->preview ? $this->example['heading_level'] : 'h1'),
-            'style' => get_field('heading_style') ?: ($this->preview ? $this->example['heading_style'] : 'match'),
+            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
+            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h1'),
+            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
         ];
     }
 
@@ -212,8 +212,8 @@ class TextHero extends Block
     public function intro()
     {
         return [
-            'text' => get_field('intro_text') ?: ($this->preview ? $this->example['intro_text'] : ''),
-            'style' => get_field('intro_style') ?: ($this->preview ? $this->example['intro_style'] : 'standfirst'),
+            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? $this->example['intro_text'] : ''),
+            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? $this->example['intro_style'] : 'standfirst'),
         ];
     }
 

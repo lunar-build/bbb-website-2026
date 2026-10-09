@@ -151,3 +151,17 @@ function theme_color_choices(): array
 
     return $choices;
 }
+
+/**
+ * Whether a block's `$example` fallback content should be shown.
+ *
+ * Only the `/pattern-library` page wants it: block preview renders there
+ * come from a normal front-end request, so `$preview` is true while
+ * `is_admin()` is false. The block editor canvas also renders with
+ * `$preview = true`, but there empty fields should read as empty rather
+ * than show fixture content the client might mistake for real.
+ */
+function shows_example(bool $preview): bool
+{
+    return $preview && ! is_admin();
+}

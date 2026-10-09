@@ -237,7 +237,7 @@ class IconLinkGrid extends Block
 
     public function items()
     {
-        return get_field('items') ?: ($this->preview ? $this->example['items'] : []);
+        return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
     }
 
     /**

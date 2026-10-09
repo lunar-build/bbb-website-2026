@@ -317,7 +317,7 @@ class CtaBanner extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: ($this->preview ? $this->example['layout'] : 'centred');
+        return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'centred');
     }
 
     /**
@@ -327,7 +327,7 @@ class CtaBanner extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: ($this->preview && $this->layout() !== 'slimline' ? $this->example['heading'] : '');
+        return get_field('heading') ?: (shows_example($this->preview) && $this->layout() !== 'slimline' ? $this->example['heading'] : '');
     }
 
     /**
@@ -337,7 +337,7 @@ class CtaBanner extends Block
      */
     public function body()
     {
-        return get_field('body') ?: ($this->preview ? $this->example['body'] : '');
+        return get_field('body') ?: (shows_example($this->preview) ? $this->example['body'] : '');
     }
 
     /**
@@ -355,7 +355,7 @@ class CtaBanner extends Block
             return $link;
         }
 
-        return $this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
+        return shows_example($this->preview) ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
     }
 
     /**
@@ -365,7 +365,7 @@ class CtaBanner extends Block
      */
     public function imageLeft()
     {
-        return $this->illustrationUrl(get_field('image_left') ?: ($this->preview && $this->layout() === 'centred' ? $this->example['image_left'] : ''));
+        return $this->illustrationUrl(get_field('image_left') ?: (shows_example($this->preview) && $this->layout() === 'centred' ? $this->example['image_left'] : ''));
     }
 
     /**
@@ -375,7 +375,7 @@ class CtaBanner extends Block
      */
     public function imageRight()
     {
-        return $this->illustrationUrl(get_field('image_right') ?: ($this->preview && $this->layout() === 'centred' ? $this->example['image_right'] : ''));
+        return $this->illustrationUrl(get_field('image_right') ?: (shows_example($this->preview) && $this->layout() === 'centred' ? $this->example['image_right'] : ''));
     }
 
     /**
@@ -387,7 +387,7 @@ class CtaBanner extends Block
     {
         $isLeftLayout = in_array($this->layout(), ['left', 'row'], true);
 
-        return $this->illustrationUrl(get_field('image') ?: ($this->preview && $isLeftLayout ? $this->example['image'] : ''));
+        return $this->illustrationUrl(get_field('image') ?: (shows_example($this->preview) && $isLeftLayout ? $this->example['image'] : ''));
     }
 
     /**
