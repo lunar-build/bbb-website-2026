@@ -317,6 +317,12 @@ class RollingStatsCarousel extends Block
     {
         $slides = get_field('slides') ?: (shows_example($this->preview) ? ($this->example['slides'] ?? []) : []);
 
+        // The repeater's min of 1 makes ACF add a blank row on insert; drop
+        // rows with nothing to show so the block still counts as empty.
+        $slides = array_filter($slides, fn ($slide) => ($slide['slide_type'] ?? 'stat') === 'statement'
+            ? trim(wp_strip_all_tags($slide['statement'] ?? '')) !== ''
+            : ($slide['value'] ?? '') !== '');
+
         return array_map(function ($slide) {
             $source = trim($slide['source'] ?? '');
 
