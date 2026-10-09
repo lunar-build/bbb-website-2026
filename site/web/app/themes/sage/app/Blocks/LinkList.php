@@ -360,7 +360,7 @@ class LinkList extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: $this->example['layout'];
+        return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'short_centred');
     }
 
     /**
@@ -381,7 +381,7 @@ class LinkList extends Block
             return '';
         }
 
-        return get_field($field) ?: $this->example['icon'];
+        return get_field($field) ?: (shows_example($this->preview) ? $this->example['icon'] : '');
     }
 
     /**
@@ -401,7 +401,7 @@ class LinkList extends Block
             default => 'short_centred_links',
         };
 
-        $rows = get_field($field) ?: $this->example['links'];
+        $rows = get_field($field) ?: (shows_example($this->preview) ? $this->example['links'] : []);
 
         return array_map(fn($row) => [
             'description' => $row['description'] ?? '',

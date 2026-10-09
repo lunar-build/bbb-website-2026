@@ -181,7 +181,7 @@ class Standfirst extends Block
 
     public function text()
     {
-        return get_field('text') ?: $this->example['text'];
+        return get_field('text') ?: (shows_example($this->preview) ? $this->example['text'] : '');
     }
 
     /**

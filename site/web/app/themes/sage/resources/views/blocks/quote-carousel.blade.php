@@ -1,5 +1,6 @@
 <section {{ $attributes->class(['c-quote-carousel', 'c-quote-carousel--'.$style, 'o-full-bleed-bg']) }}>
 
+  @if ($slides)
   <div class="o-container">
     <wa-carousel
       class="c-quote-carousel__carousel"
@@ -23,5 +24,6 @@
       </span>
     </wa-carousel>
   </div>
+  @endif
 
 </section>

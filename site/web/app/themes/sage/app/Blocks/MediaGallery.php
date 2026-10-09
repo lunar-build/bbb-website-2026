@@ -389,7 +389,7 @@ class MediaGallery extends Block
      */
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
+        return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
     }
 
     /**

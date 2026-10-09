@@ -278,7 +278,7 @@ class RollingStatsCarousel extends Block
      */
     public function slides()
     {
-        $slides = get_field('slides') ?: ($this->example['slides'] ?? []);
+        $slides = get_field('slides') ?: (shows_example($this->preview) ? ($this->example['slides'] ?? []) : []);
 
         return array_map(function ($slide) {
             $value = (float) ($slide['value'] ?? 0);
@@ -314,7 +314,7 @@ class RollingStatsCarousel extends Block
      */
     public function imageLeft()
     {
-        return $this->illustrationUrl(get_field('image_left') ?: $this->example['image_left']);
+        return $this->illustrationUrl(get_field('image_left') ?: (shows_example($this->preview) ? $this->example['image_left'] : null));
     }
 
     /**
@@ -324,7 +324,7 @@ class RollingStatsCarousel extends Block
      */
     public function imageRight()
     {
-        return $this->illustrationUrl(get_field('image_right') ?: $this->example['image_right']);
+        return $this->illustrationUrl(get_field('image_right') ?: (shows_example($this->preview) ? $this->example['image_right'] : null));
     }
 
     /**

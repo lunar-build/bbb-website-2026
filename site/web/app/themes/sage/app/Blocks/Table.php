@@ -271,7 +271,7 @@ class Table extends Block
      */
     public function caption()
     {
-        return get_field('caption') ?: $this->example['caption'];
+        return get_field('caption') ?: (shows_example($this->preview) ? $this->example['caption'] : '');
     }
 
     /**
@@ -283,7 +283,7 @@ class Table extends Block
     {
         $value = get_field('first_column_is_header');
 
-        return $value !== null ? (bool) $value : $this->example['first_column_is_header'];
+        return $value !== null ? (bool) $value : (shows_example($this->preview) ? $this->example['first_column_is_header'] : true);
     }
 
     /**

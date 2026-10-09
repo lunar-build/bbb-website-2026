@@ -288,12 +288,12 @@ class QuoteCarousel extends Block
 
     public function style()
     {
-        return get_field('style') ?: $this->example['style'];
+        return get_field('style') ?: (shows_example($this->preview) ? $this->example['style'] : 'filled');
     }
 
     public function slides()
     {
-        return get_field('slides') ?: $this->example['slides'];
+        return get_field('slides') ?: (shows_example($this->preview) ? $this->example['slides'] : []);
     }
 
     /**

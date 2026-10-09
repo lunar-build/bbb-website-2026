@@ -357,7 +357,7 @@ class ImageBlock extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return get_field('image') ?: (shows_example($this->preview) ? $this->example['image'] : null);
     }
 
     /**
@@ -367,7 +367,7 @@ class ImageBlock extends Block
      */
     public function contentType()
     {
-        return get_field('content_type') ?: $this->example['content_type'];
+        return get_field('content_type') ?: (shows_example($this->preview) ? $this->example['content_type'] : 'caption');
     }
 
     /**
@@ -389,7 +389,7 @@ class ImageBlock extends Block
      */
     public function infoBoxType()
     {
-        return get_field('info_box_type') ?: $this->example['info_box_type'];
+        return get_field('info_box_type') ?: (shows_example($this->preview) ? $this->example['info_box_type'] : 'columns');
     }
 
     /**
@@ -411,7 +411,7 @@ class ImageBlock extends Block
      */
     public function infoBoxRows()
     {
-        return get_field('info_box_rows') ?: $this->example['info_box_rows'];
+        return get_field('info_box_rows') ?: (shows_example($this->preview) ? $this->example['info_box_rows'] : []);
     }
 
     /**
@@ -433,7 +433,7 @@ class ImageBlock extends Block
      */
     public function infoBoxBullets()
     {
-        return get_field('info_box_bullets') ?: $this->example['info_box_bullets'];
+        return get_field('info_box_bullets') ?: (shows_example($this->preview) ? $this->example['info_box_bullets'] : []);
     }
 
     /**
@@ -443,7 +443,7 @@ class ImageBlock extends Block
      */
     public function infoBoxContent()
     {
-        return get_field('info_box_content') ?: $this->example['info_box_content'];
+        return get_field('info_box_content') ?: (shows_example($this->preview) ? $this->example['info_box_content'] : '');
     }
 
     /**

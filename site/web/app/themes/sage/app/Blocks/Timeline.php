@@ -273,22 +273,22 @@ class Timeline extends Block
 
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
     }
 
     public function intro()
     {
-        return get_field('intro') ?: $this->example['intro'];
+        return get_field('intro') ?: (shows_example($this->preview) ? $this->example['intro'] : '');
     }
 
     public function markerSize()
     {
-        return get_field('marker_size') ?: ($this->example['markerSize'] ?? 'number');
+        return get_field('marker_size') ?: (shows_example($this->preview) ? ($this->example['markerSize'] ?? 'number') : 'number');
     }
 
     public function steps()
     {
-        return get_field('steps') ?: $this->example['steps'];
+        return get_field('steps') ?: (shows_example($this->preview) ? $this->example['steps'] : []);
     }
 
     /**

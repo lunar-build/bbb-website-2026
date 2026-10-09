@@ -304,7 +304,7 @@ class Form extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: $this->example['layout'];
+        return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'image');
     }
 
     /**

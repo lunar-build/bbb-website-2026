@@ -312,7 +312,7 @@ class LinkCard extends Block
      */
     public function cards()
     {
-        $rows = get_field('cards') ?: $this->example['cards'];
+        $rows = get_field('cards') ?: (shows_example($this->preview) ? $this->example['cards'] : []);
 
         return array_map(fn($card) => $this->normalizeCard($card), $rows);
     }

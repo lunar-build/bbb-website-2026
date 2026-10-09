@@ -227,7 +227,7 @@ class CaseStudyGrid extends Block
     {
         $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
 
-        $cards = get_field('cards') ?: ($this->example['cards'] ?? []);
+        $cards = get_field('cards') ?: (shows_example($this->preview) ? ($this->example['cards'] ?? []) : []);
 
         return array_map(function ($card) use ($placeholder) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];

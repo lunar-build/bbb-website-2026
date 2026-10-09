@@ -499,7 +499,7 @@ class CardGrid extends Block
      */
     public function businessCards()
     {
-        $cards = get_field('business_cards') ?: ($this->example['business_cards'] ?? []);
+        $cards = get_field('business_cards') ?: (shows_example($this->preview) ? ($this->example['business_cards'] ?? []) : []);
 
         return array_map(function ($card) {
             $card['contact_info'] = $this->withBusinessCardContactHrefs($card['contact_info'] ?? []);
