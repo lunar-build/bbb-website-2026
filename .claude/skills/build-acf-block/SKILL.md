@@ -160,18 +160,22 @@ In the generated class:
   needed for these).
 - Add one accessor method per field, following the existing pattern (see
   `app/Blocks/CtaBanner.php`, `app/Blocks/VideoHero.php`):
-  - **Gate the `$example` fallback behind `$this->preview`.** `$this->preview` is
-    `true` only for the block-editor canvas preview and the `/pattern-library` page
-    (`App\View\Composers\PatternLibrary` explicitly renders with `preview = true`) —
-    `false` for every real front-end request. A real empty field must render empty,
-    not silently show fixture content: `return get_field('x') ?: ($this->preview ?
-    $this->example['x'] : '');` — the non-preview fallback is a genuine empty value for
-    that type (`''` for text, `null` for image/file, `[]` for repeaters, a blank link
-    shape `['title' => '', 'url' => '', 'target' => '']` for link fields), not
-    `$example['x']`. Previously this codebase used the unconditional
-    `get_field('x') ?: $this->example['x']`, which looked fine in the pattern library
-    but meant a client leaving a real field blank got fixture copy/images on the live
-    site instead of nothing — don't reintroduce that.
+  - **Gate the `$example` fallback behind `shows_example($this->preview)`** (helper in
+    `app/helpers.php`). It's true only for preview renders outside wp-admin — i.e. the
+    `/pattern-library` page (`App\View\Composers\PatternLibrary` renders with
+    `preview = true`). It's false on the real front end *and* in the block-editor
+    canvas, which also renders with `$this->preview = true` but is `is_admin()`: a
+    freshly inserted block must read as empty there, not as fixture copy a client could
+    mistake for real content. A real empty field must render empty: `return
+    get_field('x') ?: (shows_example($this->preview) ? $this->example['x'] : '');` — the
+    non-example fallback is a genuine empty value for that type (`''` for text, `null`
+    for image/file, `[]` for repeaters, a blank link shape `['title' => '', 'url' => '',
+    'target' => '']` for link fields), not `$example['x']`. Never use bare
+    `$this->preview` for this, and never the unconditional `get_field('x') ?:
+    $this->example['x']`. A block that renders nothing visible while empty gets a
+    "click the pencil to add content" placeholder in the editor automatically (the
+    `acf/register_block_type_args` filter in `app/filters.php`), so no per-block empty
+    state is needed unless you want a richer one.
   - Image/file/relationship fields: the preview fallback is a bundled placeholder
     asset, e.g. `$example['x']` resolving to
     `['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')]`
@@ -398,7 +402,8 @@ names, so there's no way to write a single converter that handles every case):
 ## 5. Verify
 
 - Confirm `npm run dev` (HMR) is running in `web/app/themes/sage`, or run `npm run build`.
-- Insert the block in the WP block editor and confirm the preview renders using the
+- Insert the block in the WP block editor and confirm it shows the empty placeholder
+  (not fixture content) until fields are filled; confirm `/pattern-library` shows the
   `$example` fallback data, styled the same as the front end (block preview mode loads
   `resources/css/editor.scss`, which pulls in the full front-end stylesheet — injected
   into the block-editor iframe via the `block_editor_settings_all` filter in
