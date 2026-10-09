@@ -102,6 +102,12 @@
   color: var(--wp--preset--color--blue-medium);
 }
 
+// Stat slides left-align from $xl; statements stay centred (incl. their source).
+.c-rolling-stats-carousel__content--statement {
+  align-items: center;
+  text-align: center;
+}
+
 // Statement slides — plain sentence, bold figures picked out in the stat colour.
 .c-rolling-stats-carousel__statement {
   margin: 0;

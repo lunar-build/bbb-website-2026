@@ -13,7 +13,7 @@
   <wa-carousel navigation pagination loop mouse-dragging class="c-rolling-stats-carousel__carousel">
     @foreach ($slides as $slide)
       <wa-carousel-item class="c-rolling-stats-carousel__item">
-        <div class="c-rolling-stats-carousel__content">
+        <div @class(['c-rolling-stats-carousel__content', 'c-rolling-stats-carousel__content--statement' => ($slide['type'] ?? 'stat') === 'statement'])>
           @if (($slide['type'] ?? 'stat') === 'statement')
             <p class="c-rolling-stats-carousel__statement">{!! $slide['statement'] !!}</p>
           @else
