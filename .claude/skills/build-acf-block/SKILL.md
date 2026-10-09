@@ -376,6 +376,28 @@ slug must match a `theme.json` `settings.spacing.spacingSizes` entry (`small`/`l
 Set this on every new block the same way; leaving it `null` means the block renders with
 no padding until an editor manually opens the Dimensions panel and picks one.
 
+### Block background colour: native support, not an ACF field
+
+Don't add a `background_color` ACF select. Opt the block in with
+`'color' => ['background' => true, ...]` in its `$supports` — editors then get WP's
+Background colour control in the sidebar's Styles tab (next to padding), no ACF field.
+Everything else is shared:
+
+- `theme_block_background_colors()` in `app/helpers.php` is the one list of allowed
+  colours (slug => label). Change it there and every opted-in block follows. The
+  `wp_theme_json_data_theme` filter in `app/filters.php` restricts each opted-in block's
+  picker to that list.
+- The text colour comes from contrast (`theme_text_color_for()`), emitted by
+  `theme_block_background_css()` as `--c-block-fg` on `.has-{slug}-background-color`.
+  Use `var(--c-block-fg, <default>)` for any text that should follow the background
+  (headings/body copy that set their own colour). A block with no background falls back
+  to its own default.
+- No default is saved with the block, so give it a CSS default instead:
+  `&:not(.has-background) { background: ... }`. WP adds `has-background` and
+  `has-{slug}-background-color` to the root `<section>` through `$attributes`, as with
+  padding — don't hand-write an inline `style` for the background.
+- Pick text/icon colours that still work on all four backgrounds (two dark, two light).
+
 ### Shaping WP/ACF data for structured component props
 
 Whenever a block's Blade view hands data to a component expecting a structured
