@@ -55,6 +55,8 @@ $gap: 2.5rem; // Figma's 40px; distinct from spacing.$card-gap (1.5rem)
   // Quote's own bottom padding already clears the attribution; this only
   // needs the sides and a bottom edge.
   &__cta {
+    display: flex;
+    justify-content: flex-end;
     padding: 0 1.5rem 1.5rem;
   }
 }
