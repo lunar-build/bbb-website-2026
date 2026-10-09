@@ -4,14 +4,15 @@
 
 .c-testimonial-carousel {
   // Dots and arrows default to the brand colours; the blue background below
-  // swaps them to white, where blue dots / orange arrows would disappear.
+  // swaps the dots to white and the arrows to yellow, where blue dots / orange
+  // arrows would disappear.
   --c-testimonial-carousel-dots: var(--wp--preset--color--blue);
   --c-testimonial-carousel-arrows: var(--wp--preset--color--dark-orange);
 
   &--blue {
     background: var(--wp--preset--color--blue);
     --c-testimonial-carousel-dots: var(--wp--preset--color--white);
-    --c-testimonial-carousel-arrows: var(--wp--preset--color--white);
+    --c-testimonial-carousel-arrows: var(--wp--preset--color--yellow);
   }
 
   &--blue-light {
