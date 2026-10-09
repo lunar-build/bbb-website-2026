@@ -98,6 +98,8 @@ add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
         'core/accordion-heading',
         'core/accordion-panel',
         'core/table',
+        'core/button',
+        'core/buttons',
     ];
 
     return array_values(array_diff($allowedBlockTypes, $hidden));

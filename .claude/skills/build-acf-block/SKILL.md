@@ -58,10 +58,12 @@ For every piece of UI in the new block, pick one:
   inert, undefined custom element — no console error, no network 404, just dead markup
   (this bit `CtaBanner`'s button once already).
 
-  `resources/js/components.js` holds all `<wa-*>` registrations and is imported by both
-  `resources/js/app.js` (front end) and `resources/js/editor.js` (block editor), so
-  components render as real custom elements in block preview mode too, not inert markup —
-  add new component imports there, not directly in app.js/editor.js.
+  `resources/js/components.js` holds all `<wa-*>` registrations and is imported by
+  `resources/js/app.js` (front end) and `resources/js/editor-canvas.js` (block editor). The
+  editor canvas is an iframe with its own custom-element registry, so `editor.js` (which runs
+  in the parent admin page) injects `editor-canvas.js` into the iframe — importing components
+  in `editor.js` itself would define them in the wrong window and previews would render as
+  inert markup. Add new component imports to `components.js`, not to app.js/editor.js.
 
   **Never apply a layout utility class (e.g. `.o-container`) directly to a Web Awesome
   custom element** — `display: grid`/`flex` set on a shadow-DOM host only lays out that
@@ -398,10 +400,12 @@ names, so there's no way to write a single converter that handles every case):
 - Confirm `npm run dev` (HMR) is running in `web/app/themes/sage`, or run `npm run build`.
 - Insert the block in the WP block editor and confirm the preview renders using the
   `$example` fallback data, styled the same as the front end (block preview mode loads
-  `resources/css/editor.scss`, which pulls in the full front-end stylesheet plus
-  `resources/js/components.js`'s custom elements — injected into the block-editor
-  iframe via the `block_editor_settings_all` filter in `app/setup.php`, since a normal
-  enqueue doesn't reach that iframe).
+  `resources/css/editor.scss`, which pulls in the full front-end stylesheet — injected
+  into the block-editor iframe via the `block_editor_settings_all` filter in
+  `app/setup.php`, since a normal enqueue doesn't reach that iframe. The `<wa-*>` custom
+  elements are defined in the iframe by `resources/js/editor-canvas.js`, injected by
+  `editor.js`). A `<wa-*>` tag that renders as plain unstyled text in the preview means
+  that injection isn't reaching the iframe.
 - Check the front end via the DDEV site URL and confirm real field data renders.
 - Visit `/pattern-library` while logged in and confirm the new block appears fully
   populated (no blank media, no visible `{{ }}`/`<InnerBlocks>` leftovers) — see §6.

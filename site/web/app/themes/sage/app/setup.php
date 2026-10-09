@@ -42,6 +42,12 @@ add_action('admin_head', function () {
             }
         }
     }
+
+    printf(
+        '<script>window.sageEditorCanvas = %s;</script>',
+        wp_json_encode(['componentsSrc' => Vite::asset('resources/js/editor-canvas.js')]),
+    );
+
     echo Vite::withEntryPoints([
         'resources/js/editor.js',
     ])->toHtml();
