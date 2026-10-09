@@ -1,12 +1,13 @@
 // Full-bleed-background blocks (.o-full-bleed-bg — CTA Banner, Card Grid,
-// Image Hero, Quote Carousel, Video Hero) only pad space inside their own
-// coloured area, not outside it. Margin only on the edge touching a
+// Image Hero, Quote Carousel, Video Hero — plus any block given a
+// background colour, which WP marks section.has-background) only pad space
+// inside their own coloured area, not outside it. Margin only on the edge touching a
 // paragraph, so two of these stacked back to back stay flush.
-.e-content > .wp-block-paragraph + .o-full-bleed-bg {
+.e-content > .wp-block-paragraph + :is(.o-full-bleed-bg, section.has-background) {
   margin-top: var(--wp--preset--spacing--large);
 }
 
-.e-content > .o-full-bleed-bg:has(+ .wp-block-paragraph) {
+.e-content > :is(.o-full-bleed-bg, section.has-background):has(+ .wp-block-paragraph) {
   margin-bottom: var(--wp--preset--spacing--large);
 }
 
