@@ -4,7 +4,7 @@
     <div class="c-form__panel">
       <div class="o-container">
         <div class="c-form__image">
-          <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+          <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
         </div>
 
         <div class="c-form__inner">

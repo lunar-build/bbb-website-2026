@@ -153,6 +153,20 @@ class Form extends Block
     public $styles = [];
 
     /**
+     * Image crop positions (select value => label); the value, with `_` as a
+     * space, is the CSS object-position.
+     *
+     * @var array
+     */
+    public $imagePositions = [
+        'center' => 'Center',
+        'center_top' => 'Top',
+        'center_bottom' => 'Bottom',
+        'left_center' => 'Left',
+        'right_center' => 'Right',
+    ];
+
+    /**
      * The block preview example data.
      *
      * @var array
@@ -197,6 +211,7 @@ class Form extends Block
             'subheading' => $this->subheading(),
             'intro' => $this->intro(),
             'image' => $this->image(),
+            'imagePosition' => $this->imagePosition(),
         ];
     }
 
@@ -260,6 +275,14 @@ class Form extends Block
             'required' => 1,
         ]);
 
+        $fields->addSelect('image_position', [
+            'label' => 'Image position',
+            'instructions' => 'Which part of the image stays visible when it\'s cropped to fit.',
+            'choices' => $this->imagePositions,
+            'default_value' => 'center',
+            'ui' => true,
+        ]);
+
         $fields->addTab('Form');
 
         $fields
@@ -304,6 +327,18 @@ class Form extends Block
     public function layout()
     {
         return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'image');
+    }
+
+    /**
+     * Retrieve the image's crop position as a CSS object-position value.
+     *
+     * @return string
+     */
+    public function imagePosition()
+    {
+        $position = get_field('image_position');
+
+        return isset($this->imagePositions[$position]) ? str_replace('_', ' ', $position) : 'center';
     }
 
     /**
