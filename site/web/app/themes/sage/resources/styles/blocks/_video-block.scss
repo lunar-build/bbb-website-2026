@@ -11,17 +11,23 @@
 .c-video-block__media {
   position: relative;
   aspect-ratio: 16 / 9;
-  margin-bottom: 2rem;
   border-radius: 1.25rem;
   background: var(--wp--preset--color--light-grey);
-  overflow: hidden;
 }
 
+// Focusables scroll clear of the sticky header (WCAG 2.4.11 Focus Not Obscured).
+$header-clearance: calc(var(--site-header-height, 6rem) + 1rem);
+
+// No overflow:hidden on the wrapper (it would clip the focus ring) — the video rounds itself instead.
 .c-video-block__video {
   display: block;
   width: 100%;
   height: 100%;
+  border-radius: inherit;
   object-fit: cover;
+  scroll-margin-top: $header-clearance;
+
+  @include focus.ring;
 }
 
 .c-video-block__placeholder {
@@ -29,7 +35,6 @@
   align-items: center;
   justify-content: center;
   aspect-ratio: 16 / 9;
-  margin-bottom: 2rem;
   border-radius: 1.25rem;
   background: var(--wp--preset--color--light-grey);
   color: var(--wp--preset--color--charcoal);
@@ -46,6 +51,7 @@
   background: none;
   line-height: 0;
   cursor: pointer;
+  scroll-margin-top: $header-clearance;
 
   @include focus.ring;
 
@@ -83,6 +89,7 @@
 // Same card shell as Link Card's download row.
 .c-video-block__transcript {
   display: flex;
+  margin-top: 2rem;
   align-items: center;
   gap: 3.3125rem;
   padding: 1.3125rem 1.875rem 1.3125rem 2.5rem;
@@ -108,5 +115,9 @@
 .c-video-block__download {
   @container (max-width: #{bp.$md}) {
     align-items: center;
+  }
+
+  .c-download-link__link {
+    scroll-margin-top: $header-clearance;
   }
 }

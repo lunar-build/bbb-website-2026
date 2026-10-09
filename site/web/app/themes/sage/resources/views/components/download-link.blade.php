@@ -3,6 +3,7 @@
     'label' => 'Download',
     'fileSize' => '',
     'id' => null,
+    'context' => '',
 ])
 
 <div {{ $attributes->class(['c-download-link']) }}>
@@ -14,6 +15,9 @@
     >
         <x-icon name="download" />
         {{ $label }}
+        @if ($context)
+            <span class="u-sr-only">({{ $context }})</span>
+        @endif
     </a>
 
     @if ($fileSize)

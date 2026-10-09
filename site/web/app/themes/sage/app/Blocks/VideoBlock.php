@@ -28,7 +28,7 @@ class VideoBlock extends Block
      *
      * @var string
      */
-    public $description = 'An inline video with a poster and play/pause button, and a title row with a transcript download underneath.';
+    public $description = 'An inline video with a play/pause button. The poster image is optional (the video\'s first frame shows without one), and so is the transcript — add one and a title row with a download appears underneath, leave it out and the row is hidden.';
 
     /**
      * The block category.
@@ -164,12 +164,32 @@ class VideoBlock extends Block
     ];
 
     /**
+     * Variants stacked on the pattern-library page (each is merged onto
+     * $example) — shows editors the transcript is optional.
+     *
+     * @var array
+     */
+    public $examples = [
+        'With transcript' => [],
+        'Without a transcript (optional) — the title and download row are simply left out' => [
+            'transcript' => null,
+        ],
+        'Without a poster image (optional) — the video\'s first frame is shown instead' => [
+            'poster' => null,
+        ],
+    ];
+
+    /**
      * Fixture data that can't be a constant expression (Vite::asset()).
      */
     public function example(): array
     {
         return [
-            'video' => ['url' => Vite::asset('resources/videos/placeholder/pattern-placeholder.mp4')],
+            'video' => [
+                'url' => Vite::asset('resources/videos/placeholder/pattern-placeholder.mp4'),
+                'caption' => 'A short example of what happens in the video, read to screen reader users.',
+                'description' => '',
+            ],
             'poster' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')],
             'transcript' => ['url' => '#', 'filename' => 'video-transcript.pdf'],
         ];
@@ -183,6 +203,7 @@ class VideoBlock extends Block
         return [
             'video' => $this->video(),
             'poster' => $this->poster(),
+            'description' => $this->description(),
             'heading' => $this->heading(),
             'transcript' => $this->transcript(),
         ];
@@ -198,7 +219,7 @@ class VideoBlock extends Block
         $fields
             ->addFile('video', [
                 'label' => 'Video file',
-                'instructions' => 'Upload an MP4.',
+                'instructions' => 'Upload an MP4. Fill in the Caption (short description) in the Media Library — it\'s read to screen reader users as the video\'s description. The longer Description is used if there\'s no Caption.',
                 'return_format' => 'array',
                 'library' => 'all',
                 'mime_types' => 'mp4',
@@ -214,6 +235,7 @@ class VideoBlock extends Block
         $fields->addPartial(Heading::class, [
             'name' => 'heading',
             'label' => 'Video title',
+            'instructions' => 'Names the video for screen readers. Also shown above the transcript download when a transcript is added.',
             'default_level' => 'h3',
             'default_style' => 'h4',
             'required' => true,
@@ -222,18 +244,19 @@ class VideoBlock extends Block
         $fields
             ->addFile('transcript_file', [
                 'label' => 'Transcript file',
-                'instructions' => 'The accessible alternative to the video — a document of everything spoken and shown.',
+                'instructions' => 'Optional, but recommended — the accessible alternative to the video for people who can\'t hear or see it. When added, a title and download row appears under the video.',
                 'return_format' => 'array',
-                'required' => 1,
             ])
             ->addText('transcript_label', [
                 'label' => 'Transcript button label',
                 'default_value' => 'Download transcript',
                 'required' => 1,
+                'conditional_logic' => [[['field' => 'transcript_file', 'operator' => '!=empty']]],
             ])
             ->addText('transcript_file_size', [
                 'label' => 'Transcript file size label',
                 'instructions' => 'e.g. "PDF 1.1MB".',
+                'conditional_logic' => [[['field' => 'transcript_file', 'operator' => '!=empty']]],
             ]);
 
         return $fields->build();
@@ -247,6 +270,21 @@ class VideoBlock extends Block
     public function video()
     {
         return get_field('video') ?: ($this->example['video'] ?? null);
+    }
+
+    /**
+     * Retrieve the video's accessible description from its Media Library
+     * Caption, falling back to its Description. Empty is valid.
+     *
+     * @return string
+     */
+    public function description()
+    {
+        $video = $this->video() ?: [];
+
+        $caption = trim(wp_strip_all_tags($video['caption'] ?? ''));
+
+        return $caption !== '' ? $caption : trim(wp_strip_all_tags($video['description'] ?? ''));
     }
 
     /**
@@ -288,7 +326,7 @@ class VideoBlock extends Block
     {
         if (! get_field('video')) {
             return [
-                'url' => $this->example['transcript']['url'] ?? '#',
+                'url' => $this->example['transcript']['url'] ?? null,
                 'label' => $this->example['transcript_label'],
                 'file_size' => $this->example['transcript_file_size'],
             ];
