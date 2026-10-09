@@ -8,6 +8,7 @@
           <x-testimonial-card
             :photo="$card['photo']"
             :name="$card['name']"
+            :info="$card['info']"
             :quote="$card['quote']"
             :link="$card['link']"
           />

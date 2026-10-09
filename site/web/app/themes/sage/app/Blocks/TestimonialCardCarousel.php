@@ -161,18 +161,21 @@ class TestimonialCardCarousel extends Block
             [
                 'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
                 'name' => 'Rachel',
+                'info' => 'Cycling through Portishead.',
                 'quote' => 'I ride to avoid the cost and stress of driving and parking plus getting some extra fitness in.',
                 'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
             ],
             [
                 'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
                 'name' => 'Franciska',
+                'info' => 'Cycling through The Arches, Bristol.',
                 'quote' => "It keeps me healthy. I don't feel tired like I used to. I used to get very bad headaches but I don't get them anymore since I started cycling.",
                 'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
             ],
             [
                 'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
                 'name' => 'Tom',
+                'info' => 'Cycling to work in Bath.',
                 'quote' => 'Cycling to work means I never have to worry about parking, and I arrive feeling ready for the day.',
                 'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
             ],
@@ -223,6 +226,10 @@ class TestimonialCardCarousel extends Block
             ->addText('name', [
                 'label' => 'Name',
                 'required' => 1,
+            ])
+            ->addText('info', [
+                'label' => 'Additional info',
+                'instructions' => 'Shown under the name, e.g. "Cycling through Portishead". Optional.',
             ])
             ->addTextarea('quote', [
                 'label' => 'Quote',
@@ -280,6 +287,7 @@ class TestimonialCardCarousel extends Block
                     'alt' => $photo['alt'] ?: $name,
                 ],
                 'name' => $name,
+                'info' => $card['info'] ?? '',
                 'quote' => $quote,
                 'link' => normalize_link($card['link'] ?? null),
             ];
