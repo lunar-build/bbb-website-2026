@@ -15,6 +15,7 @@ export default defineConfig({
         'resources/js/app.js',
         'resources/css/editor.scss',
         'resources/js/editor.js',
+        'resources/js/editor-canvas.js',
       ],
       refresh: true,
       assets: ['resources/images/**', 'resources/fonts/**', 'resources/videos/**'],

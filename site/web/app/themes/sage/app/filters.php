@@ -82,28 +82,6 @@ add_filter('render_block', function ($block_content, $block) {
 }, 10, 2);
 
 /**
- * Hide WordPress core blocks we've built our own ACF Composer replacement
- * for — editors have picked the core block by mistake when both sit in the
- * inserter with a similar/identical name. Add a block name here any time
- * this comes up again.
- */
-add_filter('allowed_block_types_all', function ($allowedBlockTypes, $context) {
-    if (! is_array($allowedBlockTypes)) {
-        $allowedBlockTypes = array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered());
-    }
-
-    $hidden = [
-        'core/accordion',
-        'core/accordion-item',
-        'core/accordion-heading',
-        'core/accordion-panel',
-        'core/table',
-    ];
-
-    return array_values(array_diff($allowedBlockTypes, $hidden));
-}, 10, 2);
-
-/**
  * Pre-insert the Standfirst block at the top of every new post's content,
  * so it's visible/editable in the canvas immediately. No template_lock —
  * editors can still freely add/remove/reorder blocks after.
