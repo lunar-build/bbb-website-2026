@@ -18,13 +18,15 @@ class Heading extends Partial
      *
      * @param  array  $args  'name' (field key prefix, default 'heading'),
      *                       'label' (default 'Heading'), 'default_level'
-     *                       (default 'h2'), 'required' (default false).
+     *                       (default 'h2'), 'default_style' (default 'match'),
+     *                       'required' (default false).
      */
     public function fields(array $args = []): Builder
     {
         $name = $args['name'] ?? 'heading';
         $label = $args['label'] ?? 'Heading';
         $defaultLevel = $args['default_level'] ?? 'h2';
+        $defaultStyle = $args['default_style'] ?? 'match';
         $required = $args['required'] ?? false;
 
         $fields = Builder::make($name);
@@ -60,7 +62,7 @@ class Heading extends Partial
                 'h4' => 'Heading 4 size',
                 'h5' => 'Heading 5 / 6 size',
             ],
-            'default_value' => 'match',
+            'default_value' => $defaultStyle,
             'ui' => true,
         ]);
 
