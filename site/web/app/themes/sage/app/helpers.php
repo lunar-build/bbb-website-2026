@@ -165,3 +165,17 @@ function shows_example(bool $preview): bool
 {
     return $preview && ! is_admin();
 }
+
+/**
+ * Whether a block's rendered HTML has nothing a visitor could see or click:
+ * no text, and none of the media/interactive/nested-block elements that
+ * count as content without any text.
+ */
+function block_output_is_empty(string $html): bool
+{
+    if (preg_match('/<(img|video|picture|svg|iframe|form|input|canvas|InnerBlocks|wa-[a-z-]+)\b/i', $html)) {
+        return false;
+    }
+
+    return trim(wp_strip_all_tags($html)) === '';
+}

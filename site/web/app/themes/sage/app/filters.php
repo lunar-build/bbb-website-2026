@@ -53,6 +53,36 @@ add_filter('acf/register_block_type_args', function ($block) {
 
     $block['acf_block_version'] = 3;
 
+    // Empty blocks render as nothing in the editor now that example content
+    // is pattern-library only (see shows_example()), leaving a client with
+    // an invisible block they can't find or click — show a placeholder.
+    if (is_callable($block['render_callback'] ?? null)) {
+        $render = $block['render_callback'];
+
+        $block['render_callback'] = function ($attrs, ...$args) use ($render) {
+            ob_start();
+            $render($attrs, ...$args);
+            $html = ob_get_clean();
+
+            $is_preview = $args[1] ?? false;
+
+            if (! $is_preview || ! is_admin() || ! block_output_is_empty($html)) {
+                echo $html;
+
+                return;
+            }
+
+            printf(
+                '<section class="c-block-placeholder">%s</section>',
+                esc_html(sprintf(
+                    /* translators: %s: block title */
+                    __('%s — click the pencil to add content.', 'sage'),
+                    $attrs['title'] ?? __('Block', 'sage'),
+                )),
+            );
+        };
+    }
+
     return $block;
 });
 
