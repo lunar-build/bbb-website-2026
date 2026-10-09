@@ -345,7 +345,6 @@ class CardGrid extends Block
             'name' => 'heading',
             'label' => 'Title',
             'default_level' => 'h3',
-            'required' => true,
         ]);
 
         $cards->addPartial(Copy::class, [
