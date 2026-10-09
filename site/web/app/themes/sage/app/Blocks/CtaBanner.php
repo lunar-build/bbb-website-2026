@@ -249,7 +249,6 @@ class CtaBanner extends Block
                 ])
                 ->addTextarea('body', [
                     'label' => 'Body text',
-                    'required' => true,
                     'rows' => 4,
                 ])
                 ->addLink('link', [
