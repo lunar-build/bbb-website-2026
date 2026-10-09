@@ -131,4 +131,11 @@
     position: relative;
     z-index: 1;
   }
+
+  // The widget block's default top/bottom padding is written inline by
+  // WP's spacing support, which would offset the card from the row-start
+  // the overlap above is measured against — !important is needed to beat it.
+  > .acf-innerblocks-container > .c-journey-planner-widget {
+    padding-block: 0 !important;
+  }
 }

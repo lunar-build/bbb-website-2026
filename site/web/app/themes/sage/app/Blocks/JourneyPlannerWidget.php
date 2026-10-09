@@ -183,7 +183,7 @@ class JourneyPlannerWidget extends Block
     {
         $fields = Builder::make('journey_planner_widget');
 
-        $fields->addPartial(ContainedToggle::class);
+        $fields->addPartial(ContainedToggle::class, ['default_value' => 0]);
 
         $fields
             ->addTab('Content')
@@ -251,7 +251,7 @@ class JourneyPlannerWidget extends Block
      */
     public function contained()
     {
-        return (bool) (get_field('contained') ?? $this->example['contained'] ?? true);
+        return (bool) (get_field('contained') ?? $this->example['contained'] ?? false);
     }
 
     /**
