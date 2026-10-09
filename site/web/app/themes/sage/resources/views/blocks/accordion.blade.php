@@ -2,6 +2,7 @@
   <section {{ $attributes->class(['c-accordion']) }}>
 @endunless
 
+@if ($items)
   <div class="o-container">
     @if ($heading)
       <h2 class="c-accordion__heading">{{ $heading }}</h2>
@@ -19,6 +20,7 @@
       @endforeach
     </wa-accordion>
   </div>
+@endif
 
 @unless ($block->preview)
   </section>

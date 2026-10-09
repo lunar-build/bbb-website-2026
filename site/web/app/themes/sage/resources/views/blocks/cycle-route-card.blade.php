@@ -1,5 +1,6 @@
 <section {{ $attributes->class(['c-cycle-route-card']) }}>
 
+@if ($routeName)
 <div class="o-container">
   <div class="c-cycle-route-card__card c-cycle-route-card--{{ $difficulty }}">
     <div class="c-cycle-route-card__image">
@@ -39,5 +40,6 @@
     </a>
   </div>
 </div>
+@endif
 
 </section>
