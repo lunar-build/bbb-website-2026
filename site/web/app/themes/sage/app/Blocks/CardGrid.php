@@ -284,6 +284,8 @@ class CardGrid extends Block
     {
         $fields = Builder::make('card_grid');
 
+        $fields->addTab('Content');
+
         $fields->addPartial(Heading::class, [
             'name' => 'heading',
             'label' => 'Heading',
@@ -299,13 +301,13 @@ class CardGrid extends Block
         $fields
             ->addSelect('card_style', [
                 'label' => 'Card style',
-                'instructions' => 'Applies to every card in this grid — same visual treatments as the Feature Card block.',
+                'instructions' => 'Applies to every card in this grid — same visual treatments as the Feature Card block. Changing it swaps which cards tab is shown; cards entered under another style are kept but not displayed.',
                 'choices' => [
                     'link' => 'Link with picture (arrow-only CTA, no date)',
                     'bikeability' => 'Bikeability (button CTA, no date)',
                     'event' => 'Event card (button CTA, date shown)',
                     'news' => 'News card (button CTA, date shown, no body copy)',
-                    'image_card' => 'Image card (image + linked caption bar only, no heading/body/date)',
+                    'image_card' => 'Image card (image + linked caption bar only)',
                     'business' => 'Business card (name, contact info, services, description — no image)',
                 ],
                 'default_value' => 'link',
@@ -318,20 +320,84 @@ class CardGrid extends Block
                 'ui' => true,
             ]);
 
-        $cards = $fields->addRepeater('cards', [
+        // One cards tab per set of card styles that share the same fields —
+        // an ACF sub-field can't be shown/hidden by a field outside its own
+        // repeater, so the card style swaps whole tabs instead.
+        $this->addCardsTab($fields, 'Cards', 'cards', ['link', 'bikeability'], ['body' => true, 'date' => false]);
+        $this->addCardsTab($fields, 'Event cards', 'event_cards', ['event'], ['body' => true, 'date' => true]);
+        $this->addCardsTab($fields, 'News cards', 'news_cards', ['news'], ['body' => false, 'date' => true]);
+
+        $fields->addTab('Image cards', $this->whenCardStyle(['image_card']));
+
+        $imageCards = $fields->addRepeater('image_cards', [
             'label' => 'Cards',
             'button_label' => 'Add card',
             'min' => 0,
             'layout' => 'block',
-            'conditional_logic' => [
-                [
-                    [
-                        'field' => 'card_style',
-                        'operator' => '!=',
-                        'value' => 'business',
-                    ],
-                ],
-            ],
+        ]);
+
+        $imageCards
+            ->addImage('image', [
+                'label' => 'Image',
+                'return_format' => 'array',
+                'preview_size' => 'medium',
+                'required' => 1,
+            ])
+            ->addLink('link', [
+                'label' => 'Link',
+                'instructions' => "Link's title is shown as the caption under the image.",
+                'required' => true,
+            ]);
+
+        $imageCards->endRepeater();
+
+        $fields->addTab('Business cards', $this->whenCardStyle(['business']));
+
+        $businessCards = $fields->addRepeater('business_cards', [
+            'label' => 'Business cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
+        ]);
+
+        $this->addBusinessCardFields($businessCards);
+
+        $businessCards->endRepeater();
+
+        return $fields->build();
+    }
+
+    /**
+     * ACF conditional_logic showing a field/tab only for the given card styles.
+     *
+     * @param  array  $styles
+     * @return array
+     */
+    protected function whenCardStyle(array $styles): array
+    {
+        return [
+            'conditional_logic' => array_map(
+                fn ($style) => [['field' => 'card_style', 'operator' => '==', 'value' => $style]],
+                $styles,
+            ),
+        ];
+    }
+
+    /**
+     * Add a tab + repeater of image/title/(body)/(date)/link cards, shown
+     * only for the given card styles.
+     *
+     * @param  array  $show  'body' and 'date' — whether those sub-fields apply.
+     */
+    protected function addCardsTab($fields, string $tab, string $name, array $styles, array $show): void
+    {
+        $fields->addTab($tab, $this->whenCardStyle($styles));
+
+        $cards = $fields->addRepeater($name, [
+            'label' => 'Cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
         ]);
 
         $cards->addImage('image', [
@@ -345,49 +411,31 @@ class CardGrid extends Block
             'name' => 'heading',
             'label' => 'Title',
             'default_level' => 'h3',
+            'required' => true,
         ]);
 
-        $cards->addPartial(Copy::class, [
-            'name' => 'body',
-            'label' => 'Body text',
-            'default_style' => 'body',
-        ]);
+        if ($show['body']) {
+            $cards->addPartial(Copy::class, [
+                'name' => 'body',
+                'label' => 'Body text',
+                'default_style' => 'body',
+            ]);
+        }
 
-        $cards
-            ->addDatePicker('date', [
+        if ($show['date']) {
+            $cards->addDatePicker('date', [
                 'label' => 'Date',
-                'instructions' => 'Only shown when the grid\'s Card style is Event or News.',
                 'display_format' => 'jS F Y',
                 'return_format' => 'jS F Y',
-            ])
-            ->addLink('link', [
-                'label' => 'Link',
-                'required' => true,
             ]);
+        }
 
-        $cards->endRepeater();
-
-        $businessCards = $fields->addRepeater('business_cards', [
-            'label' => 'Business cards',
-            'button_label' => 'Add card',
-            'min' => 0,
-            'layout' => 'block',
-            'conditional_logic' => [
-                [
-                    [
-                        'field' => 'card_style',
-                        'operator' => '==',
-                        'value' => 'business',
-                    ],
-                ],
-            ],
+        $cards->addLink('link', [
+            'label' => 'Link',
+            'required' => true,
         ]);
 
-        $this->addBusinessCardFields($businessCards);
-
-        $businessCards->endRepeater();
-
-        return $fields->build();
+        $cards->endRepeater();
     }
 
     /**
@@ -464,7 +512,14 @@ class CardGrid extends Block
         $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
         $showDate = in_array($this->cardStyle(), ['event', 'news'], true);
 
-        $cards = get_field('cards') ?: (shows_example($this->preview) ? ($this->example['cards'] ?? []) : []);
+        $field = match ($this->cardStyle()) {
+            'event' => 'event_cards',
+            'news' => 'news_cards',
+            'image_card' => 'image_cards',
+            default => 'cards',
+        };
+
+        $cards = get_field($field) ?: (shows_example($this->preview) ? ($this->example[$field] ?? $this->example['cards'] ?? []) : []);
 
         return array_map(function ($card) use ($placeholder, $showDate) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];
