@@ -1,5 +1,9 @@
 @use '../abstracts/breakpoints' as bp;
 
+// Each layout supplies its own default background/text colour below via the
+// fallback in `var(--c-cta-banner-bg, …)`; the block's "Background colour"
+// field overrides both inline (`--c-cta-banner-bg`/`--c-cta-banner-fg`).
+
 // overflow:hidden clips Centred's edge-bleeding illustrations so they
 // never cause horizontal scroll.
 .c-cta-banner {
@@ -64,8 +68,8 @@
 // Centred — Figma "Layout=Centred": blue bg, white centred text/CTA, two
 // optional illustrations flanking the content.
 .c-cta-banner--centred {
-  background: var(--wp--preset--color--blue);
-  color: var(--wp--preset--color--white);
+  background: var(--c-cta-banner-bg, var(--wp--preset--color--blue));
+  color: var(--c-cta-banner-fg, var(--wp--preset--color--white));
   text-align: center;
 
   .c-cta-banner__content {
@@ -76,7 +80,7 @@
 
   .c-cta-banner__heading,
   .c-cta-banner__body {
-    color: var(--wp--preset--color--white);
+    color: var(--c-cta-banner-fg, var(--wp--preset--color--white));
   }
 
   .c-cta-banner__cta {
@@ -88,8 +92,8 @@
 // optional illustration, as a real grid column (contained, not bleeding)
 // rather than overlapping/overflowing the block.
 .c-cta-banner--left {
-  background: var(--wp--preset--color--blue-light);
-  color: var(--wp--preset--color--blue-dark);
+  background: var(--c-cta-banner-bg, var(--wp--preset--color--blue-light));
+  color: var(--c-cta-banner-fg, var(--wp--preset--color--blue-dark));
 
   .c-cta-banner__grid {
     @include bp.respond($min: bp.$lg) {
@@ -106,7 +110,7 @@
 
   .c-cta-banner__heading,
   .c-cta-banner__body {
-    color: var(--wp--preset--color--blue-dark);
+    color: var(--c-cta-banner-fg, var(--wp--preset--color--blue-dark));
   }
 }
 
@@ -114,12 +118,12 @@
 // in a single row (Figma "Card grid" banner: cyclist illustration on a
 // solid blue field, image on the LEFT — opposite side from Left's own).
 .c-cta-banner--row {
-  background: var(--wp--preset--color--blue);
-  color: var(--wp--preset--color--white);
+  background: var(--c-cta-banner-bg, var(--wp--preset--color--blue));
+  color: var(--c-cta-banner-fg, var(--wp--preset--color--white));
 
   .c-cta-banner__heading,
   .c-cta-banner__body {
-    color: var(--wp--preset--color--white);
+    color: var(--c-cta-banner-fg, var(--wp--preset--color--white));
   }
 
   // Same 2rem gap as &__content's text/button row below, so image-to-text
@@ -187,8 +191,8 @@
 // Slimline — Figma "Layout=Slimline": dark bg, no heading/illustration,
 // body + CTA share a single compact row.
 .c-cta-banner--slimline {
-  background: var(--wp--preset--color--blue-dark);
-  color: var(--wp--preset--color--white);
+  background: var(--c-cta-banner-bg, var(--wp--preset--color--blue-dark));
+  color: var(--c-cta-banner-fg, var(--wp--preset--color--white));
 
   .c-cta-banner__content {
     flex-direction: column;
@@ -203,7 +207,7 @@
   }
 
   .c-cta-banner__body {
-    color: var(--wp--preset--color--white);
+    color: var(--c-cta-banner-fg, var(--wp--preset--color--white));
     max-width: 40rem;
   }
 

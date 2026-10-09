@@ -179,3 +179,61 @@ function block_output_is_empty(string $html): bool
 
     return trim(wp_strip_all_tags($html)) === '';
 }
+
+/**
+ * Hex value of a theme.json palette colour, or null if the slug is unknown.
+ */
+function theme_color_hex(string $slug): ?string
+{
+    foreach (wp_get_global_settings(['color', 'palette', 'theme']) ?: [] as $color) {
+        if ($color['slug'] === $slug) {
+            return $color['color'];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * WCAG 2.x contrast ratio between two hex colours.
+ */
+function color_contrast_ratio(string $a, string $b): float
+{
+    $luminance = function (string $hex): float {
+        $hex = ltrim($hex, '#');
+
+        if (strlen($hex) === 3) {
+            $hex = preg_replace('/(.)/', '$1$1', $hex);
+        }
+
+        return array_sum(array_map(
+            fn ($channel, $weight) => $weight * (($c = hexdec($channel) / 255) <= 0.03928
+                ? $c / 12.92
+                : (($c + 0.055) / 1.055) ** 2.4),
+            str_split($hex, 2),
+            [0.2126, 0.7152, 0.0722],
+        ));
+    };
+
+    [$lighter, $darker] = [max($luminance($a), $luminance($b)), min($luminance($a), $luminance($b))];
+
+    return ($lighter + 0.05) / ($darker + 0.05);
+}
+
+/**
+ * Text colour slug ('white' or 'blue-dark') with the better contrast
+ * against a theme.json palette background.
+ */
+function theme_text_color_for(string $backgroundSlug): string
+{
+    $background = theme_color_hex($backgroundSlug);
+
+    if (! $background) {
+        return 'white';
+    }
+
+    return color_contrast_ratio($background, theme_color_hex('white') ?? '#ffffff')
+        >= color_contrast_ratio($background, theme_color_hex('blue-dark') ?? '#003852')
+        ? 'white'
+        : 'blue-dark';
+}

@@ -212,6 +212,9 @@ class CtaBanner extends Block
             'imageLeft' => $this->imageLeft(),
             'imageRight' => $this->imageRight(),
             'image' => $this->image(),
+            'backgroundColor' => $this->backgroundColor(),
+            'textColor' => $this->backgroundColor() ? theme_text_color_for($this->backgroundColor()) : null,
+            'ctaVariant' => $this->ctaVariant(),
         ];
     }
 
@@ -254,6 +257,14 @@ class CtaBanner extends Block
                 ->addLink('link', [
                     'label' => 'Link',
                     'instructions' => 'Link text + URL for the CTA. Optional — leave empty for no button.',
+                ])
+                ->addSelect('background_color', [
+                    'label' => 'Background colour',
+                    'instructions' => 'Text colour adjusts automatically.',
+                    'choices' => array_diff_key(theme_color_choices(), ['place-holder-grey' => true]),
+                    'allow_null' => true,
+                    'placeholder' => 'Layout default',
+                    'ui' => true,
                 ])
             ->addTab('Centred layout images', [
                 'conditional_logic' => [
@@ -356,6 +367,31 @@ class CtaBanner extends Block
         }
 
         return shows_example($this->preview) ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
+    }
+
+    /**
+     * Retrieve the chosen background colour (a theme.json palette slug), or
+     * null to use the layout's own default.
+     *
+     * @return string|null
+     */
+    public function backgroundColor()
+    {
+        return get_field('background_color') ?: null;
+    }
+
+    /**
+     * The CTA button's variant. Brand is yellow, so it's swapped for the
+     * dark neutral button on warm backgrounds where yellow would vanish.
+     * (Pale backgrounds like blue light keep the yellow, per the designs.)
+     *
+     * @return string
+     */
+    public function ctaVariant()
+    {
+        return in_array($this->backgroundColor(), ['yellow', 'orange', 'dark-orange', 'leaf'], true)
+            ? 'neutral'
+            : 'brand';
     }
 
     /**
