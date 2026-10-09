@@ -159,18 +159,26 @@ class CaseStudyGrid extends Block
             [
                 'image' => ['url' => '', 'alt' => ''],
                 'quote' => 'Wow – they\'ve thought of everything… love that there are lights in case I forget and need to borrow them to get home',
+                'name' => 'Franciska',
+                'info' => 'Cycling through The Arches, Bristol.',
             ],
             [
                 'image' => ['url' => '', 'alt' => ''],
                 'quote' => 'It makes me feel much more comfortable cycling to work as I know the support is there if I need it',
+                'name' => 'Rachel',
+                'info' => 'Cycling through Portishead.',
             ],
             [
                 'image' => ['url' => '', 'alt' => ''],
                 'quote' => 'What a great idea! I\'ll be looking that out if I need it!',
+                'name' => 'Joe & Sarah',
+                'info' => 'Cycling through Weston-super-Mare.',
             ],
             [
                 'image' => ['url' => '', 'alt' => ''],
                 'quote' => 'What a great idea! I\'ll be looking that out if I need it!',
+                'name' => 'Kirris',
+                'info' => 'Cycling through Victoria Park, Bristol.',
             ],
         ],
     ];
@@ -210,6 +218,15 @@ class CaseStudyGrid extends Block
                 'label' => 'Quote',
                 'required' => 1,
                 'rows' => 3,
+            ])
+            ->addText('name', [
+                'label' => 'Name',
+                'instructions' => 'e.g. "Franciska". Optional.',
+            ])
+            ->addText('info', [
+                'label' => 'Additional info',
+                'instructions' => 'Shown under the name, e.g. "Cycling through The Arches, Bristol". Optional.',
+                'conditional_logic' => [[['field' => 'name', 'operator' => '!=empty']]],
             ]);
 
         $cards->endRepeater();
@@ -239,6 +256,8 @@ class CaseStudyGrid extends Block
             return [
                 'image' => $image,
                 'quote' => $card['quote'] ?? '',
+                'name' => $card['name'] ?? '',
+                'info' => $card['info'] ?? '',
             ];
         }, $cards);
     }

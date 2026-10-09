@@ -8,7 +8,11 @@
           @continue(($i % 2 === 0 ? 'left' : 'right') !== $column)
           <div class="c-case-study-grid__card">
             <img class="c-case-study-grid__image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
-            <x-quote class="c-case-study-grid__quote">{{ $card['quote'] }}</x-quote>
+            <x-quote
+              class="c-case-study-grid__quote"
+              :attribution-name="$card['name'] ?: null"
+              :attribution-role="$card['info'] ?: null"
+            >{{ $card['quote'] }}</x-quote>
           </div>
         @endforeach
       </div>
