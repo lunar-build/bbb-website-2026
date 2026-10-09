@@ -201,15 +201,12 @@ class IconLinkGrid extends Block
         $fields
             ->addSelect('background_color', [
                 'label' => 'Background colour',
-                'instructions' => 'Optional — matches the Figma reference\'s "Blue light" by default. Leave blank for no background.
-                    Deliberately restricted to this one option: the heading/description text colours are
-                    fixed, so only backgrounds already contrast-checked against them are offered — see
-                    theme_color_choices() in app/helpers.php for the full theme palette if this needs
-                    extending (would also need matching text-colour logic per choice).',
-                'choices' => ['blue-light' => 'Blue light'],
-                'allow_null' => true,
+                'choices' => [
+                    'blue-light' => 'Blue light',
+                    'white' => 'White',
+                ],
+                'required' => 1,
                 'ui' => 1,
-                'placeholder' => 'None',
                 'default_value' => 'blue-light',
             ])
             ->addRepeater('items', [
@@ -244,14 +241,15 @@ class IconLinkGrid extends Block
     }
 
     /**
-     * Retrieve the background colour (a theme.json palette slug, or empty
-     * for no background).
+     * Retrieve the background colour (a theme.json palette slug). Falls back
+     * to blue light, since the field's default isn't saved until the block
+     * is edited.
      *
      * @return string
      */
     public function backgroundColor()
     {
-        return get_field('background_color') ?: ($this->preview ? $this->example['background_color'] : null);
+        return get_field('background_color') ?: $this->example['background_color'];
     }
 
     /**

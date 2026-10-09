@@ -1,6 +1,6 @@
 <section
-  {{ $attributes->class(['c-icon-link-grid-block']) }}
-  @if ($backgroundColor) style="background: var(--wp--preset--color--{{ $backgroundColor }})" @endif
+  {{ $attributes->class(['c-icon-link-grid-block'])->except('style') }}
+  style="{{ $attributes->get('style') }}@if ($backgroundColor) background: var(--wp--preset--color--{{ $backgroundColor }}); @endif"
 >
 
 <div class="o-container">
