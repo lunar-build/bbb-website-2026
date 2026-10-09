@@ -224,3 +224,42 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 
     return $processor->get_updated_html();
 }, 10, 2);
+
+/**
+ * Block background colours.
+ *
+ * Any ACF block that sets `'color' => ['background' => true]` in its
+ * `$supports` gets WP's native Background colour control (in the sidebar's
+ * Styles tab, alongside padding) — limited here to
+ * theme_block_background_colors() rather than the whole theme palette. The
+ * text colour is set from contrast by theme_block_background_css().
+ */
+add_filter('wp_theme_json_data_theme', function ($theme_json) {
+    $data = $theme_json->get_data();
+    $palette = collect($data['settings']['color']['palette']['theme'] ?? [])
+        ->filter(fn ($color) => array_key_exists($color['slug'], theme_block_background_colors()))
+        ->values()
+        ->all();
+
+    $blocks = [];
+
+    foreach (\WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $type) {
+        if (str_starts_with($name, 'acf/') && ! empty($type->supports['color']['background'])) {
+            $blocks[$name] = ['color' => ['palette' => ['theme' => $palette]]];
+        }
+    }
+
+    return $blocks
+        ? $theme_json->update_with(['version' => $data['version'] ?? 3, 'settings' => ['blocks' => $blocks]])
+        : $theme_json;
+});
+
+add_action('wp_head', function () {
+    echo '<style id="theme-block-backgrounds">' . theme_block_background_css() . '</style>';
+});
+
+add_filter('block_editor_settings_all', function ($settings) {
+    $settings['styles'][] = ['css' => theme_block_background_css()];
+
+    return $settings;
+});

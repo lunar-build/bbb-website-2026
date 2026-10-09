@@ -237,3 +237,38 @@ function theme_text_color_for(string $backgroundSlug): string
         ? 'white'
         : 'blue-dark';
 }
+
+/**
+ * Background colours an editor can pick for a block (theme.json palette slug
+ * => label). Blocks opt in with `'color' => ['background' => true]` in their
+ * `$supports` — see the background-colour filters in app/filters.php, which
+ * restrict the block editor's colour picker to exactly this list and set a
+ * matching text colour. Edit here to change the choices everywhere.
+ */
+function theme_block_background_colors(): array
+{
+    return [
+        'light-grey' => 'Grey',
+        'blue-light' => 'Blue light',
+        'blue' => 'Blue',
+        'blue-dark' => 'Blue dark',
+    ];
+}
+
+/**
+ * CSS giving every `.has-{slug}-background-color` block a readable text
+ * colour, derived from contrast against that slug's palette colour. Blocks
+ * use `var(--c-block-fg, <default>)` for text that should follow it.
+ */
+function theme_block_background_css(): string
+{
+    $css = '';
+
+    foreach (array_keys(theme_block_background_colors()) as $slug) {
+        $text = theme_text_color_for($slug);
+
+        $css .= ".has-background.has-{$slug}-background-color{--c-block-fg:var(--wp--preset--color--{$text});color:var(--c-block-fg)}";
+    }
+
+    return $css;
+}
