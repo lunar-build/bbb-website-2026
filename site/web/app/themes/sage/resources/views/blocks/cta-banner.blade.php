@@ -29,7 +29,7 @@
       @if (! empty($link['url']))
         <wa-button
           class="c-cta-banner__cta"
-          variant="{{ $ctaVariant }}"
+          variant="brand"
           appearance="accent"
           pill
           with-end

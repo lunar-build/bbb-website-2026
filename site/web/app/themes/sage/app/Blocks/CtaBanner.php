@@ -167,6 +167,18 @@ class CtaBanner extends Block
     ];
 
     /**
+     * Background colour choices (theme.json slug => label). The text colour is
+     * derived from each by theme_text_color_for().
+     *
+     * @var array
+     */
+    public $backgroundColors = [
+        'blue' => 'Blue',
+        'blue-light' => 'Blue light',
+        'blue-dark' => 'Blue dark',
+    ];
+
+    /**
      * The block preview example data.
      *
      * @var array
@@ -214,7 +226,6 @@ class CtaBanner extends Block
             'image' => $this->image(),
             'backgroundColor' => $this->backgroundColor(),
             'textColor' => $this->backgroundColor() ? theme_text_color_for($this->backgroundColor()) : null,
-            'ctaVariant' => $this->ctaVariant(),
         ];
     }
 
@@ -261,7 +272,7 @@ class CtaBanner extends Block
                 ->addSelect('background_color', [
                     'label' => 'Background colour',
                     'instructions' => 'Text colour adjusts automatically.',
-                    'choices' => array_diff_key(theme_color_choices(), ['place-holder-grey' => true]),
+                    'choices' => $this->backgroundColors,
                     'allow_null' => true,
                     'placeholder' => 'Layout default',
                     'ui' => true,
@@ -377,21 +388,9 @@ class CtaBanner extends Block
      */
     public function backgroundColor()
     {
-        return get_field('background_color') ?: null;
-    }
+        $color = get_field('background_color');
 
-    /**
-     * The CTA button's variant. Brand is yellow, so it's swapped for the
-     * dark neutral button on warm backgrounds where yellow would vanish.
-     * (Pale backgrounds like blue light keep the yellow, per the designs.)
-     *
-     * @return string
-     */
-    public function ctaVariant()
-    {
-        return in_array($this->backgroundColor(), ['yellow', 'orange', 'dark-orange', 'leaf'], true)
-            ? 'neutral'
-            : 'brand';
+        return isset($this->backgroundColors[$color]) ? $color : null;
     }
 
     /**
