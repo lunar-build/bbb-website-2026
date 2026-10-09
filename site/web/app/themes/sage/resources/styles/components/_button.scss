@@ -8,7 +8,7 @@
 // pill/40px, three colour states sharing the arrow-hover animation below.
 //   - neutral/accent   → filled charcoal, white text/border
 //   - neutral/outlined → transparent, charcoal text/border
-//   - brand/accent     → filled yellow, charcoal text/border
+//   - brand/accent     → filled yellow, charcoal text; charcoal border on hover/focus only
 
 wa-button::part(label) {
   @extend .u-cta-large;
@@ -31,8 +31,14 @@ wa-button[size='small']::part(button) {
   gap: 10px;
 }
 
+// Yellow at rest (border matches the fill, so the outline is invisible but
+// the button keeps the same size), charcoal outline on hover/focus.
 wa-button[variant='brand'][appearance='accent']::part(button) {
-  border: 2px solid var(--wp--preset--color--charcoal);
+  border: 2px solid var(--wp--preset--color--yellow);
+}
+
+wa-button[variant='brand'][appearance='accent']:is(:hover, :focus-within)::part(button) {
+  border-color: var(--wp--preset--color--charcoal);
 }
 
 wa-button[size='small'][variant='neutral'][appearance='accent']::part(button) {
