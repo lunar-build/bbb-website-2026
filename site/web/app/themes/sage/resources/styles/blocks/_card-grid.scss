@@ -7,6 +7,14 @@
   text-align: center;
   background: var(--wp--preset--color--lightest-grey);
 
+  // The side image hangs past the section's bottom edge, but the next block's
+  // background paints over it (later in the DOM, same stacking level). Lift
+  // this section above its neighbours so the image sits on top. Only when
+  // there is one — and well below .c-site-header's z-index (100).
+  &:has(.c-card-grid__side-image) {
+    z-index: 1;
+  }
+
   // Reduced width + centred, matching the Figma heading (wraps to 2 lines).
   &__heading {
     max-width: 45rem;
