@@ -89,23 +89,12 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-
-  @include bp.respond($min: bp.$xl) {
-    align-items: flex-start;
-    text-align: left;
-  }
 }
 
 .c-rolling-stats-carousel__prefix,
 .c-rolling-stats-carousel__caption {
   margin: 0;
   color: var(--wp--preset--color--blue-medium);
-}
-
-// Stat slides left-align from $xl; statements stay centred (incl. their source).
-.c-rolling-stats-carousel__content--statement {
-  align-items: center;
-  text-align: center;
 }
 
 // Statement slides — plain sentence, bold figures picked out in the stat colour.
@@ -136,10 +125,6 @@
   align-items: baseline;
   justify-content: center;
   column-gap: 1em; // gap not margin on __unit: survives wrap without adding row spacing
-
-  @include bp.respond($min: bp.$xl) {
-    justify-content: flex-start;
-  }
 }
 
 .c-rolling-stats-carousel__value {
