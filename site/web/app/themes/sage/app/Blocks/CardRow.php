@@ -196,6 +196,7 @@ class CardRow extends Block
             'type' => 'route',
             'heading_highlight' => 'Discover',
             'heading' => 'our favourite local rides',
+            'intro' => 'View it on a map, learn more and download printable PDFs.',
             'route_cards' => [
                 [
                     'image' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
@@ -290,7 +291,7 @@ class CardRow extends Block
                 ])
                 ->addTextarea('intro', [
                     'label' => 'Intro text',
-                    'instructions' => 'Only shown on the Link type.',
+                    'instructions' => 'Shown on the Link and Route types.',
                     'rows' => 2,
                     'conditional_logic' => [
                         [
@@ -298,6 +299,13 @@ class CardRow extends Block
                                 'field' => 'type',
                                 'operator' => '==',
                                 'value' => 'link',
+                            ],
+                        ],
+                        [
+                            [
+                                'field' => 'type',
+                                'operator' => '==',
+                                'value' => 'route',
                             ],
                         ],
                     ],
@@ -486,13 +494,13 @@ class CardRow extends Block
     }
 
     /**
-     * Retrieve the intro text (Link type only).
+     * Retrieve the intro text (Link and Route types).
      *
      * @return string|null
      */
     public function intro()
     {
-        return $this->type() === 'link' ? (get_field('intro') ?: (shows_example($this->preview) ? ($this->example['intro'] ?? null) : null)) : null;
+        return in_array($this->type(), ['link', 'route'], true) ? (get_field('intro') ?: (shows_example($this->preview) ? ($this->example['intro'] ?? null) : null)) : null;
     }
 
     /**
