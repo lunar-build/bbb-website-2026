@@ -207,9 +207,11 @@ class Form extends Block
     {
         $fields = Builder::make('form');
 
+        $fields->addTab('Content');
+
         $fields->addSelect('layout', [
             'label' => 'Layout',
-            'instructions' => 'Image: form alongside an image. Centred: form only, no image.',
+            'instructions' => 'Image: form alongside an image. Centred: form only, no image. The heading and text below show beside/above the form in both.',
             'choices' => [
                 'image' => 'Image with form',
                 'centred' => 'Centred (no image)',
@@ -225,8 +227,6 @@ class Form extends Block
             'required' => true,
         ]);
 
-        $fields->addTab('Content');
-
         $fields->addPartial(Heading::class, [
             'name' => 'subheading',
             'label' => 'Subheading',
@@ -239,7 +239,12 @@ class Form extends Block
             'default_style' => 'body',
         ]);
 
-        $imageLayoutConditional = [
+        $fields->addImage('image', [
+            'label' => 'Image',
+            'instructions' => 'Shown alongside the form.',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'required' => 1,
             'conditional_logic' => [
                 [
                     [
@@ -249,16 +254,6 @@ class Form extends Block
                     ],
                 ],
             ],
-        ];
-
-        $fields->addTab('Image layout fields', $imageLayoutConditional);
-
-        $fields->addImage('image', [
-            'label' => 'Image',
-            'instructions' => 'Shown alongside the form.',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
-            'required' => 1,
         ]);
 
         $fields->addTab('Form');
