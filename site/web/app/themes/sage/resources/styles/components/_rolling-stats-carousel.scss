@@ -102,6 +102,26 @@
   color: var(--wp--preset--color--blue-medium);
 }
 
+// Statement slides — plain sentence, bold figures picked out in the stat colour.
+.c-rolling-stats-carousel__statement {
+  margin: 0;
+  color: var(--wp--preset--color--blue-medium);
+  font-size: var(--wp--preset--font-size--heading-1);
+  font-weight: 400;
+  line-height: 1.25;
+
+  strong,
+  b {
+    color: var(--wp--preset--color--dark-orange);
+    font-weight: 800;
+  }
+}
+
+.c-rolling-stats-carousel__source {
+  margin: 1.5rem 0 0;
+  color: var(--wp--preset--color--blue-medium);
+}
+
 .c-rolling-stats-carousel__stat {
   margin: 1rem 0;
   color: var(--wp--preset--color--dark-orange);
