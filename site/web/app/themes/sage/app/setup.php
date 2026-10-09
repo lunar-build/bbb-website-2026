@@ -72,23 +72,33 @@ add_filter('theme_file_path', function ($path, $file) {
 add_filter('should_load_separate_core_block_assets', '__return_false');
 
 /**
- * Excludes core/other-plugin blocks we've built our own ACF Composer
- * replacement for (avoids two confusingly similar options in the inserter).
- * Add a block name here any time this comes up again.
+ * Allowlist of blocks editors can insert. Everything we build is a custom
+ * ACF Composer block (`acf/*`, picked up by prefix so new blocks need no
+ * edit here), so core blocks are off by default — add a name to $core to
+ * bring one back. `core/missing` must stay so blocks saved with a
+ * since-removed type still render their "unsupported" notice.
  *
  * @link https://developer.wordpress.org/reference/hooks/allowed_block_types_all/
  */
 add_filter('allowed_block_types_all', function ($allowed_block_types, $block_editor_context) {
-    $excluded = [
-        'core/quote',
-        'core/pullquote',
+    $prefixes = [
+        'acf/',
+        'gravityforms/',
     ];
 
-    if (! is_array($allowed_block_types)) {
-        $allowed_block_types = array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered());
-    }
+    $core = [
+        'core/paragraph',
+        'core/heading',
+        'core/spacer',
+        'core/separator',
+        'core/missing',
+    ];
 
-    return array_values(array_diff($allowed_block_types, $excluded));
+    return array_values(array_filter(
+        array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered()),
+        fn ($name) => in_array($name, $core, true)
+            || array_any($prefixes, fn ($prefix) => str_starts_with($name, $prefix)),
+    ));
 }, 10, 2);
 
 /**
