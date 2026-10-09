@@ -239,12 +239,8 @@ class Form extends Block
             'default_style' => 'body',
         ]);
 
-        $fields->addImage('image', [
-            'label' => 'Image',
-            'instructions' => 'Shown alongside the form.',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
-            'required' => 1,
+        // Tab-level condition: the Image tab only exists for the image layout.
+        $fields->addTab('Image', [
             'conditional_logic' => [
                 [
                     [
@@ -254,6 +250,14 @@ class Form extends Block
                     ],
                 ],
             ],
+        ]);
+
+        $fields->addImage('image', [
+            'label' => 'Image',
+            'instructions' => 'Shown alongside the form.',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'required' => 1,
         ]);
 
         $fields->addTab('Form');
