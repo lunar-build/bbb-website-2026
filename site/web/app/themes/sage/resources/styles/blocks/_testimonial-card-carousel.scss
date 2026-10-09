@@ -4,21 +4,19 @@
 
 .c-testimonial-carousel {
   // Arrows are yellow on every background; the dots default to brand blue and
-  // the blue background below swaps them to white, where they'd disappear.
+  // go white on the dark backgrounds below, where they'd disappear.
   --c-testimonial-carousel-dots: var(--wp--preset--color--blue);
   --c-testimonial-carousel-arrows: var(--wp--preset--color--yellow);
 
-  &--blue {
+  // Blue until an editor picks another (WP's native Background colour).
+  &:not(.has-background) {
     background: var(--wp--preset--color--blue);
+  }
+
+  &:not(.has-background),
+  &.has-blue-background-color,
+  &.has-blue-dark-background-color {
     --c-testimonial-carousel-dots: var(--wp--preset--color--white);
-  }
-
-  &--blue-light {
-    background: var(--wp--preset--color--blue-light);
-  }
-
-  &--white {
-    background: var(--wp--preset--color--white);
   }
 
   &__carousel {

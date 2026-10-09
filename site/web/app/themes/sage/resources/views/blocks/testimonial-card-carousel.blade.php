@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-testimonial-carousel', 'c-testimonial-carousel--'.$backgroundColor, 'o-full-bleed-bg']) }}>
+<section {{ $attributes->class(['c-testimonial-carousel', 'o-full-bleed-bg']) }}>
 
 @if ($cards)
   <div class="o-container">

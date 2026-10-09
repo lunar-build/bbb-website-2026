@@ -133,7 +133,7 @@ class CtaBanner extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -164,18 +164,6 @@ class CtaBanner extends Block
         'mountain_biker' => 'Mountain biker',
         'instructor' => 'Cycle instructor',
         'cyclist' => 'Cyclist on bike',
-    ];
-
-    /**
-     * Background colour choices (theme.json slug => label). The text colour is
-     * derived from each by theme_text_color_for().
-     *
-     * @var array
-     */
-    public $backgroundColors = [
-        'blue' => 'Blue',
-        'blue-light' => 'Blue light',
-        'blue-dark' => 'Blue dark',
     ];
 
     /**
@@ -224,8 +212,6 @@ class CtaBanner extends Block
             'imageLeft' => $this->imageLeft(),
             'imageRight' => $this->imageRight(),
             'image' => $this->image(),
-            'backgroundColor' => $this->backgroundColor(),
-            'textColor' => $this->backgroundColor() ? theme_text_color_for($this->backgroundColor()) : null,
         ];
     }
 
@@ -268,14 +254,6 @@ class CtaBanner extends Block
                 ->addLink('link', [
                     'label' => 'Link',
                     'instructions' => 'Link text + URL for the CTA. Optional — leave empty for no button.',
-                ])
-                ->addSelect('background_color', [
-                    'label' => 'Background colour',
-                    'instructions' => 'Text colour adjusts automatically.',
-                    'choices' => $this->backgroundColors,
-                    'allow_null' => true,
-                    'placeholder' => 'Layout default',
-                    'ui' => true,
                 ])
             ->addTab('Centred layout images', [
                 'conditional_logic' => [
@@ -378,19 +356,6 @@ class CtaBanner extends Block
         }
 
         return shows_example($this->preview) ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
-    }
-
-    /**
-     * Retrieve the chosen background colour (a theme.json palette slug), or
-     * null to use the layout's own default.
-     *
-     * @return string|null
-     */
-    public function backgroundColor()
-    {
-        $color = get_field('background_color');
-
-        return isset($this->backgroundColors[$color]) ? $color : null;
     }
 
     /**

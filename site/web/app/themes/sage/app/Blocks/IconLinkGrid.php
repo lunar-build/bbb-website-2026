@@ -131,7 +131,7 @@ class IconLinkGrid extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -154,7 +154,6 @@ class IconLinkGrid extends Block
      * @var array
      */
     public $example = [
-        'background_color' => 'blue-light',
         'items' => [
             [
                 'icon' => 'cycling-route',
@@ -190,7 +189,6 @@ class IconLinkGrid extends Block
     {
         return [
             'items' => $this->items(),
-            'backgroundColor' => $this->backgroundColor(),
         ];
     }
 
@@ -199,16 +197,6 @@ class IconLinkGrid extends Block
         $fields = Builder::make('icon_link_grid');
 
         $fields
-            ->addSelect('background_color', [
-                'label' => 'Background colour',
-                'choices' => [
-                    'blue-light' => 'Blue light',
-                    'white' => 'White',
-                ],
-                'required' => 1,
-                'ui' => 1,
-                'default_value' => 'blue-light',
-            ])
             ->addRepeater('items', [
                 'label' => 'Items',
                 'button_label' => 'Add item',
@@ -238,18 +226,6 @@ class IconLinkGrid extends Block
     public function items()
     {
         return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
-    }
-
-    /**
-     * Retrieve the background colour (a theme.json palette slug). Falls back
-     * to blue light, since the field's default isn't saved until the block
-     * is edited.
-     *
-     * @return string
-     */
-    public function backgroundColor()
-    {
-        return get_field('background_color') ?: $this->example['background_color'];
     }
 
     /**

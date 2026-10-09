@@ -1,7 +1,4 @@
-<section
-  {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout, 'o-full-bleed-bg'])->except('style') }}
-  style="{{ $attributes->get('style') }}@if ($backgroundColor) --c-cta-banner-bg: var(--wp--preset--color--{{ $backgroundColor }}); --c-cta-banner-fg: var(--wp--preset--color--{{ $textColor }}); @endif"
->
+<section {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout, 'o-full-bleed-bg']) }}>
 
 @if ($layout === 'centred')
   @if ($imageLeft)

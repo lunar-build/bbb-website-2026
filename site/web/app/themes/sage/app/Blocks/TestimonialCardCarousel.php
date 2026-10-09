@@ -132,7 +132,7 @@ class TestimonialCardCarousel extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -200,25 +200,12 @@ class TestimonialCardCarousel extends Block
     {
         return [
             'cards' => $this->cards(),
-            'backgroundColor' => $this->backgroundColor(),
         ];
     }
 
     public function fields(): array
     {
         $fields = Builder::make('testimonial_card_carousel');
-
-        $fields->addSelect('background_color', [
-            'label' => 'Background colour',
-            'choices' => [
-                'blue' => 'Blue',
-                'blue-light' => 'Light blue',
-                'white' => 'White',
-            ],
-            'default_value' => 'blue',
-            'required' => 1,
-            'ui' => true,
-        ]);
 
         $cards = $fields->addRepeater('cards', [
             'label' => 'Cards',
@@ -305,17 +292,6 @@ class TestimonialCardCarousel extends Block
                 'link' => normalize_link($card['link'] ?? null),
             ];
         }, $cards);
-    }
-
-    /**
-     * Retrieve the background colour, falling back to blue (the field's
-     * default isn't saved until the block is edited).
-     *
-     * @return string
-     */
-    public function backgroundColor()
-    {
-        return get_field('background_color') ?: 'blue';
     }
 
     /**
