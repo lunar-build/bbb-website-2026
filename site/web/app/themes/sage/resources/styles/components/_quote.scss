@@ -99,12 +99,34 @@
 }
 
 .c-quote__attribution {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
   font-style: normal;
   text-align: right;
 
   @include bp.respond($min: bp.$md) {
     grid-column: 1 / -1;
+  }
+}
+
+.c-quote--centered .c-quote__attribution {
+  justify-content: center;
+}
+
+// No design yet — client asked for headshots (prod used pre-cropped circular
+// PNGs). Cropped to a circle here so rectangular uploads also work.
+.c-quote__attribution-image {
+  flex-shrink: 0;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+
+  @include bp.respond($min: bp.$md) {
+    width: 5rem;
+    height: 5rem;
   }
 }
 
