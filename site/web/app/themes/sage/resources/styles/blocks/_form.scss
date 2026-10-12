@@ -36,11 +36,6 @@
 
       @include bp.respond($min: bp.$lg) {
         padding-block: 4rem;
-        // The image fills the right half, at the panel's height. With a
-        // short form that's a wide, shallow box that crops a portrait photo
-        // hard; floor the height at the image half's own width (capped) so
-        // it stays roughly square, as in the design.
-        min-height: min(50vw, 44rem);
       }
     }
 
