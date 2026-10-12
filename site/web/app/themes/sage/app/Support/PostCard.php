@@ -9,6 +9,9 @@ class PostCard
      */
     public static function fromPost(\WP_Post $post, string $headingStyle = 'h5'): array
     {
+        // get_the_title() returns entities (&#8211;) and <x-card> escapes again.
+        $title = html_entity_decode(get_the_title($post), ENT_QUOTES);
+
         return [
             'image' => [
                 'url' => get_the_post_thumbnail_url($post, 'large') ?: '',
@@ -16,7 +19,7 @@ class PostCard
             ],
             'date' => get_the_date('jS F Y', $post),
             'heading' => [
-                'text' => get_the_title($post),
+                'text' => $title,
                 'level' => 'h3',
                 'style' => $headingStyle,
             ],
@@ -27,7 +30,7 @@ class PostCard
             // <x-card>'s aria-label falls back to the current loop post's title when blank — wrong here, since each card links elsewhere.
             'link' => [
                 'url' => get_permalink($post),
-                'title' => get_the_title($post),
+                'title' => $title,
                 'label' => __('Read more', 'sage'),
             ],
         ];
