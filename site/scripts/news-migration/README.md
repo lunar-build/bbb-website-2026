@@ -36,6 +36,7 @@ wp eval-file scripts/news-migration/migrate-news.php preview       # read-only: 
 wp eval-file scripts/news-migration/migrate-news.php categories    # create missing categories (by slug, keeps hierarchy)
 wp eval-file scripts/news-migration/migrate-news.php attachments   # copy all attachments (skips ones already copied)
 wp eval-file scripts/news-migration/migrate-news.php posts [1288,7070]  # copy posts; re-running replaces earlier imports
+wp eval-file scripts/news-migration/migrate-news.php case-studies [1019] # copy case studies (run after attachments)
 ```
 
 These environment variables can be set in front of the command, e.g. `NEWS_SOURCE_DB=old_site wp eval-file ...`:
@@ -46,6 +47,11 @@ These environment variables can be set in front of the command, e.g. `NEWS_SOURC
 | `NEWS_SOURCE_DB_USER` / `NEWS_SOURCE_DB_PASSWORD` | this site's DB credentials |
 | `NEWS_SOURCE_PREFIX` | `wp_` |
 | `NEWS_SOURCE_HOME` | `https://betterbybike.info` (rewritten to this site's URL) |
+
+`case-studies` copies the old `case_study` posts with their IDs, featured
+image, `quote` and `card_image` fields and `case_study_tag` terms. The old
+illustration fields are dropped. The quote also becomes the post excerpt, which
+the archive cards show, because the old site had no excerpts.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item

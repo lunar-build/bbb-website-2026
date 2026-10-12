@@ -13,6 +13,8 @@
  *   attachments  copy every source attachment (+ meta), keeping its ID
  *   posts        copy published posts (optionally only comma-separated ids), keeping IDs;
  *                re-running replaces posts already imported
+ *   case-studies copy published case studies (optionally only comma-separated ids), keeping IDs,
+ *                quote/card_image fields and case_study_tag terms; run after `attachments`
  *
  * Env:
  *   NEWS_SOURCE_DB        source database name (default prod_scratch)
@@ -584,6 +586,53 @@ if ($mode === 'posts') {
         echo "imported $id\n";
     }
     WP_CLI::success(count($postIds) . ' posts imported.');
+
+    return;
+}
+
+if ($mode === 'case-studies') {
+    $ids = $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='case_study' AND post_status='publish' ORDER BY ID");
+    if ($only) {
+        $ids = array_values(array_intersect($ids, $only));
+    }
+    $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'case_study' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
+    }
+
+    // Only fields App\Fields\CaseStudy keeps; the old illustration fields belonged to the old theme's layout.
+    $fieldKeys = ['quote' => 'field_case_study_quote', 'card_image' => 'field_case_study_card_image'];
+    $keepMeta = ['_thumbnail_id', '_wp_old_slug', ...array_keys($fieldKeys)];
+
+    foreach ($ids as $id) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            wp_delete_post($id, true);
+        }
+        $notes = [];
+        $row = $src->get_row($src->prepare("SELECT post_content, post_excerpt FROM {$src->posts} WHERE ID=%d", $id));
+        $quote = $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='quote'", $id));
+        news_copy_row($src, $id, $replaceUrls, [
+            'post_content' => $replaceUrls(news_transform($row->post_content, $src, $notes)),
+            // No excerpts on the old site — the quote is the case study's summary on archive cards.
+            'post_excerpt' => $row->post_excerpt ?: (string) $quote,
+        ]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => in_array($k, $keepMeta, true) || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        foreach ($fieldKeys as $name => $key) {
+            update_post_meta($id, "_$name", $key);
+        }
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+
+        $tags = $src->get_results($src->prepare("SELECT t.name, t.slug FROM {$src->term_relationships} r JOIN {$src->term_taxonomy} tt USING(term_taxonomy_id) JOIN {$src->terms} t USING(term_id) WHERE r.object_id=%d AND tt.taxonomy='case_study_tag'", $id));
+        foreach ($tags as $t) {
+            if (! term_exists($t->slug, 'case_study_tag')) {
+                wp_insert_term(html_entity_decode($t->name), 'case_study_tag', ['slug' => $t->slug]);
+            }
+        }
+        wp_set_object_terms($id, array_map(fn($t) => $t->slug, $tags), 'case_study_tag');
+        clean_post_cache($id);
+        echo "imported $id\n";
+    }
+    WP_CLI::success(count($ids) . ' case studies imported.');
 
     return;
 }
