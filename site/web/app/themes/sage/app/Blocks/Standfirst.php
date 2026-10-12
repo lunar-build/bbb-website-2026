@@ -59,7 +59,7 @@ class Standfirst extends Block
      *
      * @var array
      */
-    public $post_types = ['post'];
+    public $post_types = ['post', 'page'];
 
     /**
      * The parent block type allow list.
