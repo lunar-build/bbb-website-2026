@@ -16,6 +16,7 @@ import './video-hero.js';
 import './video-block.js';
 import './sticky-nav-template.js';
 import './filter-checkboxes.js';
+import './archive-filters.js';
 import './rolling-stats-carousel.js';
 import './media-gallery.js';
 import './testimonial-carousel.js';
