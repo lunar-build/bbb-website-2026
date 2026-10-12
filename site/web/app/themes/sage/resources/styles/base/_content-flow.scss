@@ -29,3 +29,27 @@
 .e-content > .wp-block-list {
   margin-bottom: 1.5rem;
 }
+
+// Embeds (YouTube etc.) are the one core media block left in post content.
+// The saved iframe carries fixed 500x281 attributes, so stretch it to the
+// column at 16:9. Margin rather than block padding since core embeds have no
+// spacing control here; dropped next to ACF sections, which pad themselves.
+.e-content > .wp-block-embed {
+  margin-block: var(--wp--preset--spacing--small);
+
+  &.is-type-video iframe {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.e-content > section + .wp-block-embed {
+  margin-top: 0;
+}
+
+.e-content > .wp-block-embed:has(+ section),
+.e-content > .wp-block-paragraph:has(+ .wp-block-embed) {
+  margin-bottom: 0;
+}

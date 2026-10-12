@@ -89,6 +89,7 @@ add_filter('allowed_block_types_all', function ($allowed_block_types, $block_edi
     $core = [
         'core/paragraph',
         'core/heading',
+        'core/embed', // YouTube etc. — the Video block only takes uploaded MP4s
         'core/spacer',
         'core/separator',
         'core/missing',
