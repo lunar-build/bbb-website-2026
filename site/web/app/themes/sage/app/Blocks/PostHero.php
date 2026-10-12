@@ -266,7 +266,7 @@ class PostHero extends Block
         }
 
         return array_map(fn($category) => [
-            'label' => $category->name,
+            'label' => wp_specialchars_decode($category->name),
             'url' => get_category_link($category),
         ], $categories);
     }

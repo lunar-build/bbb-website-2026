@@ -32,6 +32,7 @@ class RelatedPosts
             'link' => [
                 'url' => get_permalink($post),
                 'title' => get_the_title($post),
+                'label' => __('Read more', 'sage'),
             ],
         ], $posts);
     }

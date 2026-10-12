@@ -53,7 +53,7 @@
             tabindex="-1"
             aria-hidden="true"
           >
-            {{ $link['title'] ?: __('Find out more', 'sage') }}
+            {{ $link['label'] ?? ($link['title'] ?: __('Find out more', 'sage')) }}
             <x-icon name="arrow-right" slot="end" />
           </wa-button>
         @endif
