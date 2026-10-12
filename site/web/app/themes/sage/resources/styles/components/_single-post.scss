@@ -1,3 +1,6 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../abstracts/spacing';
+
 // Figma "Sample page -> News article": featured image + "Also read" section shell.
 
 // Full-bleed-background blocks (.o-full-bleed-bg, or any section with a
@@ -34,6 +37,16 @@
     margin-bottom: 3.5rem;
   }
 
+  &__related-cards {
+    display: grid;
+    gap: spacing.$card-gap;
+    text-align: left;
+
+    @include bp.respond($min: bp.$md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   // wa-button's host defaults to filling its container (see _cta-banner.scss's align-self:flex-start) — shrink + center instead.
   &__related-cta {
     display: block;
@@ -41,4 +54,10 @@
     margin-top: 3.5rem;
     margin-inline: auto;
   }
+}
+
+// Feature Card's fixed Figma width is for the standalone block — fill the
+// column. Two classes so it wins regardless of stylesheet order.
+.c-single-post__related-cards .c-single-post__related-card {
+  max-width: none;
 }

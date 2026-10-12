@@ -8,7 +8,7 @@ class RelatedPosts
      * Fetch the latest other posts, shaped for <x-card>, for a "Also read"
      * grid that needs no editor curation.
      */
-    public static function latest(int $excludeId, int $limit = 4): array
+    public static function latest(int $excludeId, int $limit = 3): array
     {
         $posts = get_posts([
             'post_type' => 'post',
@@ -26,7 +26,12 @@ class RelatedPosts
             'heading' => [
                 'text' => get_the_title($post),
                 'level' => 'h3',
-                'style' => 'match',
+                // Three across the narrow post column — the full h3 scale wraps to 4-5 lines.
+                'style' => 'h5',
+            ],
+            'body' => [
+                'text' => esc_html(self::summary($post)),
+                'style' => 'body',
             ],
             // <x-card>'s aria-label falls back to the current loop post's title when blank — wrong here, since each card links elsewhere.
             'link' => [
@@ -35,5 +40,28 @@ class RelatedPosts
                 'label' => __('Read more', 'sage'),
             ],
         ], $posts);
+    }
+
+    /**
+     * Hand-written excerpt, else the post's Standfirst (its intended summary,
+     * which WP's auto-excerpt skips since it's an ACF block), else the
+     * auto-excerpt from the opening paragraphs.
+     */
+    private static function summary(\WP_Post $post): string
+    {
+        $text = $post->post_excerpt;
+
+        if (! $text) {
+            foreach (parse_blocks($post->post_content) as $block) {
+                if ($block['blockName'] === 'acf/standfirst') {
+                    $text = $block['attrs']['data']['text'] ?? '';
+                    break;
+                }
+            }
+        }
+
+        $text = $text ?: get_the_excerpt($post);
+
+        return wp_trim_words(html_entity_decode(wp_strip_all_tags($text), ENT_QUOTES), 20);
     }
 }

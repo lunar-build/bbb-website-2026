@@ -33,13 +33,14 @@
     <div class="o-container c-single-post__related">
       <h2 class="c-single-post__related-heading u-heading-3">{{ __('Also read:', 'sage') }}</h2>
 
-      <div class="c-card-grid__cards">
+      <div class="c-single-post__related-cards">
         @foreach ($relatedPosts as $card)
           <x-card
             card-style="news"
             :image="$card['image']"
             :date="$card['date']"
             :heading="$card['heading']"
+            :body="$card['body']"
             :link="$card['link']"
             cta-style="button"
             class="c-single-post__related-card"
