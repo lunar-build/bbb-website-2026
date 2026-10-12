@@ -17,3 +17,15 @@
 .e-content > .wp-block-paragraph:has(+ section) {
   margin-bottom: 0;
 }
+
+// Core flow content (paragraphs, lists, tables, images) runs straight into a
+// following heading otherwise — headings only carry margin-bottom.
+.e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image) + .wp-block-heading {
+  margin-top: var(--wp--preset--spacing--small);
+}
+
+// Lists end on an li with no margin, so the gap to the next paragraph read
+// tighter than paragraph-to-paragraph — give the list itself the extra space.
+.e-content > .wp-block-list {
+  margin-bottom: 1.5rem;
+}

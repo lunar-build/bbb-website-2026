@@ -110,8 +110,8 @@ class Standfirst extends Block
      */
     public $spacing = [
         'padding' => [
-            'top' => 'var:preset|spacing|large',
-            'bottom' => 'var:preset|spacing|large',
+            'top' => 'var:preset|spacing|small',
+            'bottom' => 'var:preset|spacing|small',
         ],
         'margin' => null,
     ];
