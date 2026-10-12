@@ -288,4 +288,4 @@ add_action('init', function () {
         'has_archive' => true,
         'rewrite' => ['slug' => 'cycle-routes'],
     ]);
-});
+}, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.

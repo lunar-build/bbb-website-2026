@@ -263,3 +263,31 @@ add_filter('block_editor_settings_all', function ($settings) {
 
     return $settings;
 });
+
+/**
+ * Apply the archive template's taxonomy filters (?filter_{taxonomy}[]=slug)
+ * to the main archive query — see App\Support\ArchiveFilters.
+ */
+add_action('pre_get_posts', function (\WP_Query $query) {
+    if (is_admin() || ! $query->is_main_query()) {
+        return;
+    }
+
+    if (! ($query->is_home() || $query->is_post_type_archive() || $query->is_category() || $query->is_tax())) {
+        return;
+    }
+
+    $postType = Support\ArchiveFilters::postType();
+
+    if (! $taxQuery = Support\ArchiveFilters::taxQuery($postType)) {
+        return;
+    }
+
+    $query->set('tax_query', $taxQuery);
+    $query->set('ignore_sticky_posts', true);
+});
+
+/**
+ * Plain archive titles ("Case Studies", not "Archives: Case Studies").
+ */
+add_filter('get_the_archive_title_prefix', '__return_empty_string');

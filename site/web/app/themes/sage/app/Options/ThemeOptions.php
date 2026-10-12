@@ -109,7 +109,22 @@ class ThemeOptions extends Field
                     'label' => 'Google Maps API key',
                     'instructions' => 'Places API key, used by the Journey Planner Widget block for address autocomplete.',
                 ])
-        ;
+            ->addTab('archive_pages', [
+                'label' => 'Archive pages',
+            ])
+                ->addMessage('archive_pages_info', 'News uses the "Posts page" set in Settings → Reading. Pick a page for any other archive below — its Image Hero and intro content render above the archive\'s filters and results.', [
+                    'label' => 'Archive pages',
+                ]);
+
+        foreach (get_post_types(['has_archive' => true, '_builtin' => false], 'objects') as $postType) {
+            $fields->addPostObject("archive_page_{$postType->name}", [
+                'label' => $postType->labels->name,
+                'post_type' => ['page'],
+                'return_format' => 'id',
+                'allow_null' => true,
+                'ui' => true,
+            ]);
+        }
 
         return $fields->build();
     }
