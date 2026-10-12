@@ -12,6 +12,7 @@
         card-style="news"
         :image="$card['image']"
         :date="$card['date']"
+        :categories="$card['categories']"
         :heading="$card['heading']"
         :body="$card['body']"
         :link="$card['link']"

@@ -18,6 +18,7 @@ class PostCard
                 'alt' => get_post_meta(get_post_thumbnail_id($post), '_wp_attachment_image_alt', true),
             ],
             'date' => get_the_date('jS F Y', $post),
+            'categories' => self::categories($post),
             'heading' => [
                 'text' => $title,
                 'level' => 'h3',
@@ -34,6 +35,23 @@ class PostCard
                 'label' => __('Read more', 'sage'),
             ],
         ];
+    }
+
+    /**
+     * Category tags for <x-pill>, minus WP's default "Uncategorized" term
+     * that every uncategorised post still carries.
+     */
+    public static function categories(\WP_Post $post): array
+    {
+        $categories = array_filter(
+            get_the_category($post->ID),
+            fn($category) => $category->term_id !== (int) get_option('default_category'),
+        );
+
+        return array_values(array_map(fn($category) => [
+            'label' => wp_specialchars_decode($category->name),
+            'url' => get_category_link($category),
+        ], $categories));
     }
 
     /**

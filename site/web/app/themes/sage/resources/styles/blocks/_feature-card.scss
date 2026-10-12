@@ -54,6 +54,21 @@
     color: var(--wp--preset--color--blue);
   }
 
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  // Real links of their own — lift above __stretched-link so they stay clickable.
+  &__category {
+    position: relative;
+    z-index: 2;
+    font-size: var(--wp--preset--font-size--card-date);
+    line-height: 1.5rem;
+  }
+
   &__content {
     :where(h1, h2, h3, h4, h5, h6) {
       margin: 0;
