@@ -291,3 +291,25 @@ add_action('pre_get_posts', function (\WP_Query $query) {
  * Plain archive titles ("Case Studies", not "Archives: Case Studies").
  */
 add_filter('get_the_archive_title_prefix', '__return_empty_string');
+
+/**
+ * Posts use a /news/%postname%/ permalink structure, whose /news/ "front"
+ * WordPress otherwise prefixes onto every post type and taxonomy. Only news
+ * (posts, categories, tags) belongs under /news/ — default everything else,
+ * including plugin-registered types like events, to its own root slug.
+ */
+$withoutFront = function (array $args, string $name) {
+    $builtin = in_array($name, ['post', 'page', 'attachment', 'category', 'post_tag', 'post_format'], true);
+
+    if ($builtin || ($args['rewrite'] ?? true) === false) {
+        return $args;
+    }
+
+    $rewrite = is_array($args['rewrite'] ?? null) ? $args['rewrite'] : [];
+    $args['rewrite'] = $rewrite + ['with_front' => false];
+
+    return $args;
+};
+
+add_filter('register_post_type_args', $withoutFront, 10, 2);
+add_filter('register_taxonomy_args', $withoutFront, 10, 2);

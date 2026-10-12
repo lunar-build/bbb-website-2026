@@ -250,7 +250,9 @@ add_action('init', function () {
  * @return void
  */
 add_action('init', function () {
-    register_post_type('case-study', [
+    // Name and slug match the old site, so imported IDs/meta and live
+    // /ibikeitilikeit/{slug}/ URLs carry straight over.
+    register_post_type('case_study', [
         'labels' => [
             'name' => __('Case Studies', 'sage'),
             'singular_name' => __('Case Study', 'sage'),
@@ -260,7 +262,18 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-analytics',
         'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
         'has_archive' => true,
-        'rewrite' => ['slug' => 'case-studies'],
+        'rewrite' => ['slug' => 'ibikeitilikeit'],
+    ]);
+
+    register_taxonomy('case_study_tag', 'case_study', [
+        'labels' => [
+            'name' => __('Tags', 'sage'),
+            'singular_name' => __('Tag', 'sage'),
+        ],
+        'public' => true,
+        'show_in_rest' => true,
+        'show_admin_column' => true,
+        'rewrite' => ['slug' => 'ibikeitilikeit/tag'],
     ]);
 
     register_post_type('testimonial', [
