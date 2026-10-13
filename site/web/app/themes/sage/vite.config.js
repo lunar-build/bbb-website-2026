@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
-import laravel from 'laravel-vite-plugin'
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
 import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
 
 // Set APP_URL if it doesn't exist for Laravel Vite plugin
-if (! process.env.APP_URL) {
-  process.env.APP_URL = 'https://bbb-rebuild.test';
+if (!process.env.APP_URL) {
+  process.env.APP_URL = 'https://betterbybike.test';
 }
 
 export default defineConfig({
@@ -17,7 +17,11 @@ export default defineConfig({
         'resources/js/editor.js',
       ],
       refresh: true,
-      assets: ['resources/images/**', 'resources/fonts/**', 'resources/videos/**'],
+      assets: [
+        'resources/images/**',
+        'resources/fonts/**',
+        'resources/videos/**',
+      ],
     }),
 
     wordpressPlugin(),
@@ -41,7 +45,7 @@ export default defineConfig({
   },
   server: {
     // Respond to all network requests
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     port: 5173,
     strictPort: true,
     // Defines the origin of the generated asset URLs during development,
@@ -54,4 +58,4 @@ export default defineConfig({
       origin: /https?:\/\/([A-Za-z0-9\-\.]+)?(\.test)(?::\d+)?$/,
     },
   },
-})
+});
