@@ -88,8 +88,10 @@
     color: var(--wp--preset--color--charcoal);
   }
 
+  // Pushed to the card's foot (with the CTA under it) so regions line up
+  // across a row of equal-height cards.
   &__region {
-    margin: 0;
+    margin: auto 0 0;
     font-size: 0.75rem;
     line-height: 1.25rem;
     color: var(--wp--preset--color--charcoal);
@@ -99,6 +101,10 @@
     align-self: center;
     margin-top: auto;
     padding-top: 1rem;
+  }
+
+  &__region + &__cta {
+    margin-top: 0;
   }
 }
 
