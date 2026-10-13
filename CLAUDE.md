@@ -10,7 +10,7 @@ This repo has two levels:
 - `/site` — the actual Bedrock/WordPress project root. Almost all work happens here.
   - `/site/web/app/themes/sage` — the Sage 10 theme, where nearly all custom PHP/JS/CSS development happens.
 
-The project runs inside DDEV (Docker). The DDEV project name is `bbb-rebuild` (PHP 8.4, nginx-fpm, MariaDB 11.8), site URL `https://bbb-rebuild.test`.
+The project runs inside DDEV (Docker). The DDEV project name is `betterbybike` (PHP 8.4, nginx-fpm, MariaDB 11.8), site URL `https://betterbybike.test`.
 
 When VS Code opens the workspace, tasks auto-start Docker + `ddev start` and open two SSH terminals: one in `/site` and one in `/site/web/app/themes/sage` (see `.vscode/tasks.json`). Assume DDEV is already running unless a command fails because it isn't.
 
