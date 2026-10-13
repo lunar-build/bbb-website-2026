@@ -46,6 +46,18 @@
     padding-block: 0;
   }
 
+  // Background blocks (Card Grid, CTA Banner, any picked colour) can't run
+  // full bleed from this column — box them as a rounded panel instead. Their
+  // spacing controls still set top/bottom inline; this adds the sides.
+  &__intro :is(.o-full-bleed-bg, section.has-background) {
+    padding: var(--wp--preset--spacing--small) 1.5rem;
+    border-radius: 1.25rem;
+
+    @include bp.respond($min: bp.$md) {
+      padding-inline: 2.5rem;
+    }
+  }
+
   &__intro > * + * {
     margin-top: 2rem;
   }
