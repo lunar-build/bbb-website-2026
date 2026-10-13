@@ -16,7 +16,8 @@
  *   case-studies copy published case studies (optionally only comma-separated ids), keeping IDs,
  *                quote/card_image fields and case_study_tag terms; run after `attachments`
  *   map-pages    copy the shops/BMX/pumps pages (+ parents) onto the Map Listing template, keeping
- *                IDs and URLs; featured image becomes an Image Hero; run after `attachments`
+ *                IDs and URLs; featured image becomes an Image Hero; also rebuilds the bike pump
+ *                fault form in Gravity Forms + its page; run after `attachments`
  *
  * Env:
  *   NEWS_SOURCE_DB        source database name (default prod_scratch)
@@ -336,18 +337,35 @@ function news_replace_old_cards(array $blocks, array &$notes): array
     return $blocks;
 }
 
-/** core/image nested in other layouts swaps 1:1, so innerContent placeholders stay valid. */
-function news_nested_images(array $blocks): array
+/**
+ * Inside layouts (groups, columns): core/image swaps 1:1, core/buttons expands
+ * to one Button block each — innerContent's null placeholders are rebuilt to
+ * match so serialize_block() still lines blocks up with their wrapper markup.
+ */
+function news_nested(array $parent): array
 {
-    foreach ($blocks as &$b) {
-        if ($b['blockName'] === 'core/image') {
-            $b = news_image($b);
-        } elseif ($b['innerBlocks']) {
-            $b['innerBlocks'] = news_nested_images($b['innerBlocks']);
+    $blocks = [];
+    $content = [];
+    $i = 0;
+    foreach ($parent['innerContent'] as $chunk) {
+        if ($chunk !== null) {
+            $content[] = $chunk;
+
+            continue;
+        }
+        $b = $parent['innerBlocks'][$i++];
+        $swapped = match ($b['blockName']) {
+            'core/image' => [news_image($b)],
+            'core/buttons' => news_buttons($b),
+            default => [$b['innerBlocks'] ? news_nested($b) : $b],
+        };
+        foreach ($swapped as $block) {
+            $blocks[] = $block;
+            $content[] = null;
         }
     }
 
-    return $blocks;
+    return ['innerBlocks' => $blocks, 'innerContent' => $content] + $parent;
 }
 
 /**
@@ -403,7 +421,7 @@ function news_transform(string $content, wpdb $src, array &$notes): string
                 if (! $columns) {
                     $notes[] = 'core/columns kept as-is (not two single images)';
                 }
-                $out[] = $columns ?? ['innerBlocks' => news_nested_images($b['innerBlocks'])] + $b;
+                $out[] = $columns ?? news_nested($b);
                 break;
             case 'acf/download-link':
                 $run = [$b];
@@ -425,7 +443,7 @@ function news_transform(string $content, wpdb $src, array &$notes): string
                 if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/')) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }
-                $out[] = $b['innerBlocks'] ? ['innerBlocks' => news_nested_images($b['innerBlocks'])] + $b : $b;
+                $out[] = $b['innerBlocks'] ? news_nested($b) : $b;
         }
     }
 
@@ -506,6 +524,18 @@ function news_copy_meta(wpdb $src, int $id, array $skip, callable $filter): void
             $wpdb->insert($wpdb->postmeta, ['post_id' => $id, 'meta_key' => $m->meta_key, 'meta_value' => $value]);
         }
     }
+}
+
+/**
+ * Clear an earlier page import so it can be re-copied under the same ID.
+ * Not wp_delete_post(): that also deletes nav menu items linking to the page.
+ */
+function news_remove_page_import(int $id): void
+{
+    global $wpdb;
+    $wpdb->delete($wpdb->postmeta, ['post_id' => $id]);
+    $wpdb->delete($wpdb->posts, ['ID' => $id]);
+    clean_post_cache($id);
 }
 
 /** Local rows already using any of $ids. */
@@ -694,6 +724,75 @@ if ($mode === 'case-studies') {
     return;
 }
 
+/**
+ * Gravity Forms copy of the old Contact Form 7 "Public Bike Pumps - Report a
+ * fault" form (old ID 4444): same fields, emailed to the same inbox. Matched
+ * on title, so re-running reuses it rather than adding another.
+ */
+function news_pump_fault_form(): int
+{
+    $title = 'Public Bike Pumps - Report a fault';
+    foreach (GFAPI::get_forms() as $form) {
+        if ($form['title'] === $title) {
+            return (int) $form['id'];
+        }
+    }
+
+    $field = fn(int $id, string $type, string $label, array $extra = []) => $extra + [
+        'id' => $id,
+        'type' => $type,
+        'label' => $label,
+        'isRequired' => true,
+        'size' => 'large',
+    ];
+
+    $id = GFAPI::add_form([
+        'title' => $title,
+        'description' => '',
+        'labelPlacement' => 'top_label',
+        'descriptionPlacement' => 'above',
+        'requiredIndicator' => 'text',
+        'validationSummary' => '1',
+        'markupVersion' => 2,
+        'button' => ['type' => 'text', 'text' => 'Send'],
+        'fields' => [
+            $field(1, 'text', 'Your name', ['autocompleteAttribute' => 'name', 'enableAutocomplete' => true]),
+            $field(2, 'email', 'Your email', ['autocompleteAttribute' => 'email', 'enableAutocomplete' => true]),
+            $field(3, 'text', 'Bike pump location'),
+            $field(4, 'textarea', 'Your message'),
+        ],
+        'notifications' => [
+            'pump_fault' => [
+                'id' => 'pump_fault',
+                'name' => 'Report to Better by Bike',
+                'event' => 'form_submission',
+                'toType' => 'email',
+                'to' => 'betterbybike@bristol.gov.uk',
+                'from' => 'website@betterbybike.info',
+                'fromName' => 'Better by Bike',
+                'replyTo' => '{Your email:2}',
+                'subject' => 'Public Bike Pumps enquiry',
+                'message' => "From: {Your name:1}\nEmail: {Your email:2}\n\nLocation:\n{Bike pump location:3}\n\nMessage:\n{Your message:4}",
+                'isActive' => true,
+            ],
+        ],
+        'confirmations' => [
+            'default' => [
+                'id' => 'default',
+                'name' => 'Default Confirmation',
+                'isDefault' => true,
+                'type' => 'message',
+                'message' => 'Thank you for your message. It has been sent.',
+            ],
+        ],
+    ]);
+    if (is_wp_error($id)) {
+        WP_CLI::error('Gravity Forms: ' . $id->get_error_message());
+    }
+
+    return (int) $id;
+}
+
 if ($mode === 'map-pages') {
     // Old shops/BMX/pumps template pages → Map Listing template, keeping IDs
     // and URLs. Old site ID => [dataset, preset services]; null = parent page.
@@ -710,14 +809,14 @@ if ($mode === 'map-pages') {
         1121 => ['pumps', []],
         1292 => ['bmx', []],
     ];
-    $clash = array_filter(news_taken(array_keys($pages)), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    $clash = array_filter(news_taken([...array_keys($pages), 6669]), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
     }
 
     foreach ($pages as $id => $config) {
         if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
-            wp_delete_post($id, true);
+            news_remove_page_import($id);
         }
         $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
         $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
@@ -770,7 +869,35 @@ if ($mode === 'map-pages') {
         clean_post_cache($id);
         echo "imported $id " . ($notes ? '(' . implode('; ', $notes) . ')' : '') . "\n";
     }
-    WP_CLI::success(count($pages) . ' pages imported.');
+    // The pumps page's "report a fault" button leads here: the old CF7 form, rebuilt in Gravity Forms.
+    $faultId = 6669;
+    if (get_post_meta($faultId, NEWS_MIGRATED_META, true)) {
+        news_remove_page_import($faultId);
+    }
+    $title = $src->get_var($src->prepare("SELECT post_title FROM {$src->posts} WHERE ID=%d", $faultId));
+    $hero = news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
+        'heading_text' => html_entity_decode($title, ENT_QUOTES),
+        'heading_level' => 'h1',
+        'heading_style' => 'match',
+        'show_breadcrumbs' => '1',
+    ], 'text_hero');
+    $hero['attrs']['align'] = 'full';
+    $form = news_acf_block('acf/form', \App\Blocks\Form::class, [
+        'layout' => 'centred',
+        'heading_text' => 'Tell us which pump and what\'s wrong',
+        'heading_level' => 'h2',
+        'heading_style' => 'match',
+        'intro_text' => 'Public bike pumps are maintained by local authorities in the West of England. Let us know where the pump is and what the problem is.',
+        'intro_style' => 'body',
+        'form_id' => news_pump_fault_form(),
+    ], 'form');
+    news_copy_row($src, $faultId, $replaceUrls, ['post_content' => serialize_blocks([$hero, $form])]);
+    news_copy_meta($src, $faultId, $skipMeta, fn($k, $v) => str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+    update_post_meta($faultId, NEWS_MIGRATED_META, 1);
+    clean_post_cache($faultId);
+    echo "imported $faultId (Gravity Form " . news_pump_fault_form() . ")\n";
+
+    WP_CLI::success(count($pages) + 1 . ' pages imported.');
 
     return;
 }

@@ -59,8 +59,15 @@ the archive cards show, because the old site had no excerpts.
 three parent pages, keeping IDs and URLs. Each one moves onto the Map Listing
 template with its dataset and preset services, which were decoded from the old
 `selected_categories` field. The featured image becomes an Image Hero block.
-The parent pages are created empty, because their old Child Page Cards block
-has no equivalent yet.
+Pages without one (BMX) get a Text Hero instead. The parent pages are created
+empty, because their old Child Page Cards block has no equivalent yet.
+
+It also rebuilds the old Contact Form 7 "Public Bike Pumps - Report a fault"
+form in Gravity Forms (same fields, emailed to betterbybike@bristol.gov.uk,
+reused by title on re-runs) and copies its page,
+`/shops-and-repair/public-bike-pumps/report-a-bike-pump-fault/`, with a Text
+Hero and a Form block. Re-runs replace the pages in place, so nav menu items
+linking to them survive.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item

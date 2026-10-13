@@ -174,11 +174,15 @@ add_filter('gform_field_content', function ($content, $field) {
  * `<wa-button>` (yellow pill + arrow) so form CTAs match every other CTA.
  */
 add_filter('gform_submit_button', function ($button, $form) {
-    preg_match('/value="([^"]*)"/', $button, $matches);
+    // The form's own button text: GF 3 renders <button>Text</button>, older
+    // markup <input value='Text'> (single-quoted).
+    $label = preg_match('#<button[^>]*>(.*?)</button>#s', $button, $matches)
+        ? wp_strip_all_tags($matches[1])
+        : (preg_match('/value=([\'"])(.*?)\1/', $button, $matches) ? $matches[2] : '');
 
     return view('partials.gf-submit-button', [
         'id' => 'gform_submit_button_' . $form['id'],
-        'label' => $matches[1] ?? __('Submit', 'sage'),
+        'label' => trim(html_entity_decode($label, ENT_QUOTES)) ?: __('Submit', 'sage'),
     ])->render();
 }, 10, 2);
 
