@@ -727,6 +727,14 @@ if ($mode === 'map-pages') {
         $content = '';
         if ($config) {
             $content = news_transform($row->post_content, $src, $notes);
+            // The intro sits in the archive column, already spaced by its grid — no Standfirst padding.
+            $content = serialize_blocks(array_map(function ($b) {
+                if ($b['blockName'] === 'acf/standfirst') {
+                    $b['attrs']['style']['spacing']['padding'] = ['top' => '0', 'bottom' => '0'];
+                }
+
+                return $b;
+            }, parse_blocks($content)));
             // The old template drew its header from the featured image; here that's an Image Hero block.
             if ($thumb) {
                 $hero = news_acf_block('acf/image-hero', \App\Blocks\ImageHero::class, [
