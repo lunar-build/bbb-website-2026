@@ -189,6 +189,7 @@ class BulletList extends Block
             ])
                 ->addText('text', [
                     'label' => 'Item text',
+                    'instructions' => 'Plain text. For bold, italic or a link, wrap words in &lt;strong&gt;, &lt;em&gt; or &lt;a href="…"&gt; tags.',
                     'required' => 1,
                 ])
             ->endRepeater();

@@ -22,7 +22,15 @@ never touches the old site itself, and it only writes to this site's database.
 | `core/table` | Table (`acf/data-table`). A first row that's all bold becomes the column headings |
 | `core/columns` with one image per column | Two Column Content with an Image layout on each side |
 | Group/columns holding only `acf/card` blocks | Card Grid with "link" cards (icon or image, title, text, link) |
-| `core/embed`, paragraphs, headings, lists | Unchanged |
+| `core/list` | Bullet List. Bold, italic and links are kept; nested sub-items follow their parent (one level only) |
+| `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
+| `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
+
+Conversions apply at every nesting level, not just the top. Content should
+always use the theme's own blocks (`app/Blocks`) where one fits: `check`
+lists every old-theme block and every core block left after the transform,
+at any depth. Anything there other than paragraphs, headings and embeds
+needs a conversion added.
 
 Any ACF block that comes straight after a heading has its top padding removed,
 so it sits under that heading. The `check` mode lists anything left unmapped.

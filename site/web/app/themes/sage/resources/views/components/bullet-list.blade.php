@@ -11,7 +11,8 @@
 
   <ul class="c-bullet-list__list">
     @foreach ($items as $item)
-      <li class="c-bullet-list__item">{{ $item['text'] }}</li>
+      {{-- Bold, italic and links allowed (e.g. migrated "<strong>Arnside Road:</strong> …"); anything else is stripped. --}}
+      <li class="c-bullet-list__item">{!! wp_kses($item['text'], ['strong' => [], 'b' => [], 'em' => [], 'i' => [], 'a' => ['href' => [], 'target' => [], 'rel' => []]]) !!}</li>
     @endforeach
   </ul>
 </div>

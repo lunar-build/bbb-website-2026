@@ -221,6 +221,40 @@ function news_buttons(array $b): array
     return $out;
 }
 
+/** Inline markup a Bullet List item keeps (see components/bullet-list.blade.php). */
+const NEWS_LIST_INLINE = '<strong><b><em><i><a>';
+
+/**
+ * core/list -> Bullet List. Items keep bold/italic/links; nested sub-items
+ * follow their parent as plain items, since Bullet List has one level.
+ */
+function news_list(array $b, array &$notes): array
+{
+    $items = [];
+    $collect = function (array $list) use (&$collect, &$items, &$notes) {
+        foreach ($list['innerBlocks'] as $li) {
+            // The item's own text is the HTML before any nested list.
+            $own = preg_replace('#<(ul|ol)\b.*#s', '', $li['innerHTML']);
+            $text = trim(html_entity_decode(strip_tags($own, NEWS_LIST_INLINE), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($text !== '') {
+                $items[] = $text;
+            }
+            foreach ($li['innerBlocks'] as $sub) {
+                $notes[] = 'nested list flattened into Bullet List';
+                $collect($sub);
+            }
+        }
+    };
+    $collect($b);
+
+    $fields = ['heading' => '', 'items' => count($items)];
+    foreach ($items as $i => $text) {
+        $fields["items_{$i}_text"] = $text;
+    }
+
+    return news_acf_block('acf/bullet-list', \App\Blocks\BulletList::class, $fields, 'bullet_list');
+}
+
 /** core/table -> Table block; a first row that's all bold becomes the column headings. */
 function news_table(array $b): array
 {
@@ -338,11 +372,11 @@ function news_replace_old_cards(array $blocks, array &$notes): array
 }
 
 /**
- * Inside layouts (groups, columns): core/image swaps 1:1, core/buttons expands
- * to one Button block each — innerContent's null placeholders are rebuilt to
+ * Inside layouts (groups, columns): core/image and core/list swap 1:1,
+ * core/buttons expands to one Button block each — innerContent's null placeholders are rebuilt to
  * match so serialize_block() still lines blocks up with their wrapper markup.
  */
-function news_nested(array $parent): array
+function news_nested(array $parent, array &$notes = []): array
 {
     $blocks = [];
     $content = [];
@@ -357,7 +391,8 @@ function news_nested(array $parent): array
         $swapped = match ($b['blockName']) {
             'core/image' => [news_image($b)],
             'core/buttons' => news_buttons($b),
-            default => [$b['innerBlocks'] ? news_nested($b) : $b],
+            'core/list' => [news_list($b, $notes)],
+            default => [$b['innerBlocks'] ? news_nested($b, $notes) : $b],
         };
         foreach ($swapped as $block) {
             $blocks[] = $block;
@@ -390,13 +425,16 @@ function news_tighten_after_headings(array $blocks): array
 
 function news_transform(string $content, wpdb $src, array &$notes): string
 {
-    $in = parse_blocks($content);
+    // Old card layouts are spotted by their wrapping group, so swap those
+    // first; then lift every block out of its group so the loop below
+    // converts blocks at any depth, not just the top level.
+    $in = news_unwrap_groups(news_replace_old_cards(parse_blocks($content), $notes));
     $out = [];
     $bikes = [];
     $bikeSlot = null;
 
     for ($i = 0; $i < count($in); $i++) {
-        $b = news_replace_old_cards([$in[$i]], $notes)[0];
+        $b = $in[$i];
         switch ($b['blockName']) {
             case 'custom/lead':
                 $out[] = news_lead($b);
@@ -416,12 +454,15 @@ function news_transform(string $content, wpdb $src, array &$notes): string
             case 'core/table':
                 $out[] = news_table($b);
                 break;
+            case 'core/list':
+                $out[] = news_list($b, $notes);
+                break;
             case 'core/columns':
                 $columns = news_image_columns($b);
                 if (! $columns) {
                     $notes[] = 'core/columns kept as-is (not two single images)';
                 }
-                $out[] = $columns ?? news_nested($b);
+                $out[] = $columns ?? news_nested($b, $notes);
                 break;
             case 'acf/download-link':
                 $run = [$b];
@@ -443,7 +484,7 @@ function news_transform(string $content, wpdb $src, array &$notes): string
                 if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/')) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }
-                $out[] = $b['innerBlocks'] ? news_nested($b) : $b;
+                $out[] = $b['innerBlocks'] ? news_nested($b, $notes) : $b;
         }
     }
 
@@ -454,6 +495,26 @@ function news_transform(string $content, wpdb $src, array &$notes): string
     }
 
     return serialize_blocks(news_tighten_after_headings($out));
+}
+
+/**
+ * The old theme wrapped sections in core/group purely for its own style
+ * classes (is-style-lightblue, is-style-block-fullwidth-bg), which mean
+ * nothing here — lift their contents out (at any depth) so each block gets
+ * converted and spaces itself. Columns stay; news_nested() handles those.
+ */
+function news_unwrap_groups(array $blocks): array
+{
+    $out = [];
+    foreach ($blocks as $b) {
+        if (($b['blockName'] ?? null) === 'core/group') {
+            array_push($out, ...news_unwrap_groups($b['innerBlocks']));
+        } else {
+            $out[] = $b;
+        }
+    }
+
+    return $out;
 }
 
 /** Every ACF field key the transforms wrote, that ACF doesn't know about. */
@@ -538,6 +599,24 @@ function news_remove_page_import(int $id): void
     clean_post_cache($id);
 }
 
+/**
+ * Old shops/BMX/pumps template pages → Map Listing template, keeping IDs and
+ * URLs. Old site ID => [dataset, preset services]; null = parent page.
+ * Presets decoded from the old selected_categories field.
+ */
+const NEWS_MAP_PAGES = [
+    705 => null,
+    707 => null,
+    715 => null,
+    287 => ['shops', ['New bikes', 'Secondhand bikes', 'E-Bikes', 'Custom bikes']],
+    288 => ['shops', ['Secondhand bikes']],
+    289 => ['shops', ['Donate a bike']],
+    295 => ['shops', ['Bike hire', 'Bike tours']],
+    335 => ['shops', ['Bike servicing', 'Mobile bike repairs']],
+    1121 => ['pumps', []],
+    1292 => ['bmx', []],
+];
+
 /** Local rows already using any of $ids. */
 function news_taken(array $ids): array
 {
@@ -587,6 +666,39 @@ if ($mode === 'check') {
         }
     }
     echo "\nTransform notes:\n  " . (implode("\n  ", array_unique($notes)) ?: 'none') . "\n";
+
+    // Every core block still left after the transform, across everything this
+    // script imports. Each should be checked against the theme's own blocks
+    // (app/Blocks) — if one of ours does the job, add a conversion here.
+    // Walks every nesting level, so blocks inside groups/columns count too.
+    $core = [];
+    $unregistered = [];
+    $walk = function (array $blocks) use (&$walk, &$core, &$unregistered) {
+        foreach ($blocks as $b) {
+            $name = (string) $b['blockName'];
+            if (str_starts_with($name, 'core/')) {
+                $core[$name] = ($core[$name] ?? 0) + 1;
+            } elseif ($name && ! WP_Block_Type_Registry::get_instance()->is_registered($name)) {
+                $unregistered[$name] = ($unregistered[$name] ?? 0) + 1;
+            }
+            $walk($b['innerBlocks']);
+        }
+    };
+    $caseStudyIds = $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='case_study' AND post_status='publish'");
+    foreach ([...$postIds, ...$caseStudyIds, ...array_keys(array_filter(NEWS_MAP_PAGES))] as $id) {
+        $ignored = [];
+        $walk(parse_blocks(news_transform($src->get_var($src->prepare("SELECT post_content FROM {$src->posts} WHERE ID=%d", $id)), $src, $ignored)));
+    }
+    arsort($unregistered);
+    echo "\nOld-theme blocks left at any depth (not registered here — need a conversion):\n";
+    foreach ($unregistered ?: ['none' => ''] as $name => $count) {
+        echo "  $name $count\n";
+    }
+    arsort($core);
+    echo "\nCore blocks left after transform (check each against app/Blocks for a replacement):\n";
+    foreach ($core ?: ['none' => ''] as $name => $count) {
+        echo "  $name $count\n";
+    }
     echo "\nUnknown ACF field keys:\n  " . (implode("\n  ", array_unique($bad)) ?: 'none') . "\n";
 
     return;
@@ -794,21 +906,7 @@ function news_pump_fault_form(): int
 }
 
 if ($mode === 'map-pages') {
-    // Old shops/BMX/pumps template pages → Map Listing template, keeping IDs
-    // and URLs. Old site ID => [dataset, preset services]; null = parent page.
-    // Presets decoded from the old selected_categories field.
-    $pages = [
-        705 => null,
-        707 => null,
-        715 => null,
-        287 => ['shops', ['New bikes', 'Secondhand bikes', 'E-Bikes', 'Custom bikes']],
-        288 => ['shops', ['Secondhand bikes']],
-        289 => ['shops', ['Donate a bike']],
-        295 => ['shops', ['Bike hire', 'Bike tours']],
-        335 => ['shops', ['Bike servicing', 'Mobile bike repairs']],
-        1121 => ['pumps', []],
-        1292 => ['bmx', []],
-    ];
+    $pages = NEWS_MAP_PAGES;
     $clash = array_filter(news_taken([...array_keys($pages), 6669]), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
