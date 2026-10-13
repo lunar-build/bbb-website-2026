@@ -31,6 +31,7 @@ class MapListing extends Composer
         $active = MapListingFilters::active((array) get_field('map_listing_services'));
         $items = MapListingFilters::apply($all, $active);
         $content = ContentHero::forPost(get_the_ID());
+        $cards = array_map(fn($item) => $this->card($item), $items);
 
         return [
             'hero' => $content['hero'],
@@ -38,14 +39,14 @@ class MapListing extends Composer
             'filterGroups' => MapListingFilters::groups($all, $active),
             'resultsHeading' => get_field('map_listing_heading') ?: OpenData::DATASETS[$dataset]['label'] ?? '',
             'foundPosts' => count($items),
-            'cards' => array_map(fn($item) => $this->card($item), $items),
-            'markers' => array_values(array_filter(array_map(fn($item) => $item['lat'] === null ? null : [
-                'id' => "map-item-{$item['id']}",
+            'cards' => $cards,
+            'markers' => array_values(array_filter(array_map(fn($item, $card) => $item['lat'] === null ? null : [
                 'name' => $item['name'],
-                'address' => $item['address'],
                 'lat' => $item['lat'],
                 'lng' => $item['lng'],
-            ], $items))),
+                // The pin's popup — same details as its card, rendered here so Blade escapes it.
+                'info' => view('partials.map-listing-info', ['card' => $card])->render(),
+            ], $items, $cards))),
             'mapsKey' => get_field('google_maps_api_key', 'option'),
             'mapId' => get_field('google_maps_map_id', 'option'),
         ];

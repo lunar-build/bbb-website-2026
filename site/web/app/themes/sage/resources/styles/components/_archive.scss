@@ -58,6 +58,19 @@
     }
   }
 
+  // Back-to-back background blocks join into one panel: rounded only on the
+  // outer corners, no gap between them — as they'd sit flush full bleed.
+  &__intro :is(.o-full-bleed-bg, section.has-background) + :is(.o-full-bleed-bg, section.has-background) {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  &__intro :is(.o-full-bleed-bg, section.has-background):has(+ :is(.o-full-bleed-bg, section.has-background)) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
   &__intro > * + * {
     margin-top: 2rem;
   }
@@ -168,6 +181,43 @@
   background: var(--wp--preset--color--lightest-grey);
 }
 
-.c-map-listing__info a {
-  color: var(--wp--preset--color--blue);
+// Pin popup (partials/map-listing-info.blade.php) inside Google's InfoWindow,
+// which doesn't inherit the theme's type styles.
+.c-map-listing__info {
+  padding: 0.25rem 0.5rem 0.5rem 0.25rem;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--wp--preset--color--charcoal);
+
+  > * {
+    margin: 0 0 0.5rem;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  a {
+    color: var(--wp--preset--color--blue);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+.c-map-listing__info-name {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.c-map-listing__info-description {
+  margin-top: 0.75rem;
+}
+
+.c-map-listing__info-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-top: 1rem;
 }

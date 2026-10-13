@@ -23,9 +23,6 @@ const loadGoogleMaps = (key) =>
     document.head.append(script);
   });
 
-const escapeHtml = (text) =>
-  String(text).replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
-
 if (container) {
   // Google's global hook for a rejected key (e.g. this domain isn't in its
   // allowed referrers) — drop the map rather than show Google's error box.
@@ -39,7 +36,7 @@ if (container) {
         mapId: container.dataset.mapId || undefined,
         streetViewControl: false,
       });
-      const info = new maps.InfoWindow();
+      const info = new maps.InfoWindow({ maxWidth: 360 });
       let markers = [];
 
       const render = () => {
@@ -58,11 +55,8 @@ if (container) {
           });
 
           marker.addListener('click', () => {
-            info.setContent(
-              `<div class="c-map-listing__info"><strong>${escapeHtml(item.name)}</strong>` +
-                (item.address ? `<br>${escapeHtml(item.address)}` : '') +
-                `<br><a href="#${item.id}">View details</a></div>`,
-            );
+            // Server-rendered (partials/map-listing-info.blade.php), already escaped.
+            info.setContent(item.info);
             info.open({ map, anchor: marker });
           });
 
