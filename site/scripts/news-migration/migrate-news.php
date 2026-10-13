@@ -744,9 +744,17 @@ if ($mode === 'map-pages') {
                     'heading' => html_entity_decode($row->post_title, ENT_QUOTES),
                     'show_breadcrumbs' => '1',
                 ], 'image_hero');
-                $hero['attrs']['align'] = 'full';
-                $content = serialize_block($hero) . "\n\n" . $content;
+            } else {
+                // No featured image (BMX) — a Text Hero, so the title still gets a proper hero.
+                $hero = news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
+                    'heading_text' => html_entity_decode($row->post_title, ENT_QUOTES),
+                    'heading_level' => 'h1',
+                    'heading_style' => 'match',
+                    'show_breadcrumbs' => '1',
+                ], 'text_hero');
             }
+            $hero['attrs']['align'] = 'full';
+            $content = serialize_block($hero) . "\n\n" . $content;
         }
 
         news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);

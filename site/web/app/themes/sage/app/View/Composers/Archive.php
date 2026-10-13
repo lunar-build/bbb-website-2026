@@ -25,11 +25,14 @@ class Archive extends Composer
     {
         $postType = ArchiveFilters::postType();
         $content = $this->linkedContent($this->linkedPageId($postType));
+        $breadcrumbs = $this->breadcrumbs($postType);
 
         return [
-            'hero' => $content['hero'],
+            'hero' => $content['hero'] ?: ContentHero::fallback(
+                is_home() ? get_the_title(get_option('page_for_posts')) : get_the_archive_title(),
+                $breadcrumbs,
+            ),
             'body' => $content['body'],
-            'breadcrumbs' => $this->breadcrumbs($postType),
             'filterGroups' => ArchiveFilters::groups($postType),
             'formAction' => ArchiveFilters::baseUrl($postType),
             'resultsHeading' => get_post_type_object($postType)->labels->name ?? '',

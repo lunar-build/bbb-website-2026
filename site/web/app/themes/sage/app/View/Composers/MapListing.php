@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use App\Blocks\Concerns\HasBusinessCardFields;
+use App\Support\Breadcrumbs;
 use App\Support\ContentHero;
 use App\Support\MapListingFilters;
 use App\Support\OpenData;
@@ -34,7 +35,7 @@ class MapListing extends Composer
         $cards = array_map(fn($item) => $this->card($item), $items);
 
         return [
-            'hero' => $content['hero'],
+            'hero' => $content['hero'] ?: ContentHero::fallback(get_the_title(), Breadcrumbs::forPost()),
             'body' => $content['body'],
             'filterGroups' => MapListingFilters::groups($all, $active),
             'resultsHeading' => get_field('map_listing_heading') ?: OpenData::DATASETS[$dataset]['label'] ?? '',

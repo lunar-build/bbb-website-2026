@@ -45,12 +45,13 @@ class StickyNavTemplate extends Composer
     }
 
     /**
-     * The leading Image Hero block's rendered HTML, if the page has one as
-     * its first block — rendered full-bleed, outside the two-column grid.
+     * The leading hero block's rendered HTML (or a Text Hero fallback with
+     * the page title) — rendered full-bleed, outside the two-column grid.
      */
-    public function hero(): ?string
+    public function hero(): string
     {
-        return ContentHero::forPost()['hero'];
+        // The template shows its own breadcrumbs above the content.
+        return ContentHero::forPost()['hero'] ?: ContentHero::fallback(get_the_title(), []);
     }
 
     /**

@@ -22,7 +22,11 @@
     }
   }
 
-  &__breadcrumbs,
+  // A Text Hero already pads its own bottom — don't stack another gap on it.
+  .c-text-hero + .o-container > & {
+    padding-top: 0;
+  }
+
   &__intro,
   &__results {
     @include bp.respond($min: bp.$lg) {

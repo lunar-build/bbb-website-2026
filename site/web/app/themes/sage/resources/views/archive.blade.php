@@ -9,18 +9,11 @@
 @extends('layouts.app')
 
 @section('content')
-  @if ($hero)
-    {!! $hero !!}
-  @else
-    @include('partials.page-header')
-  @endif
+  {{-- The page's own hero block, or a Text Hero with its title (App\Support\ContentHero). --}}
+  {!! $hero !!}
 
   <div class="o-container">
     <div @class(['c-archive', 'c-archive--no-filters' => ! count($filterGroups)])>
-      @if (! $hero)
-        <x-breadcrumbs class="c-archive__breadcrumbs" :items="$breadcrumbs" />
-      @endif
-
       @if (trim($body))
         <div class="c-archive__intro">
           {!! $body !!}
