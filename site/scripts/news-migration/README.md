@@ -21,6 +21,7 @@ never touches the old site itself, and it only writes to this site's database.
 | `core/buttons` | One Button block per button (Yellow, Large, Left) |
 | `core/table` | Table (`acf/data-table`). A first row that's all bold becomes the column headings |
 | `core/columns` with one image per column | Two Column Content with an Image layout on each side |
+| Group/columns holding only `acf/card` blocks | Card Grid with "link" cards (icon or image, title, text, link) |
 | `core/embed`, paragraphs, headings, lists | Unchanged |
 
 Any ACF block that comes straight after a heading has its top padding removed,
@@ -37,6 +38,7 @@ wp eval-file scripts/news-migration/migrate-news.php categories    # create miss
 wp eval-file scripts/news-migration/migrate-news.php attachments   # copy all attachments (skips ones already copied)
 wp eval-file scripts/news-migration/migrate-news.php posts [1288,7070]  # copy posts; re-running replaces earlier imports
 wp eval-file scripts/news-migration/migrate-news.php case-studies [1019] # copy case studies (run after attachments)
+wp eval-file scripts/news-migration/migrate-news.php map-pages          # copy shops/BMX/pumps pages (run after attachments)
 ```
 
 These environment variables can be set in front of the command, e.g. `NEWS_SOURCE_DB=old_site wp eval-file ...`:
@@ -52,6 +54,13 @@ These environment variables can be set in front of the command, e.g. `NEWS_SOURC
 image, `quote` and `card_image` fields and `case_study_tag` terms. The old
 illustration fields are dropped. The quote also becomes the post excerpt, which
 the archive cards show, because the old site had no excerpts.
+
+`map-pages` copies the old site's seven shops, BMX and pumps pages, plus their
+three parent pages, keeping IDs and URLs. Each one moves onto the Map Listing
+template with its dataset and preset services, which were decoded from the old
+`selected_categories` field. The featured image becomes an Image Hero block.
+The parent pages are created empty, because their old Child Page Cards block
+has no equivalent yet.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item

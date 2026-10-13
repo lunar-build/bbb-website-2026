@@ -15,6 +15,8 @@
  *                re-running replaces posts already imported
  *   case-studies copy published case studies (optionally only comma-separated ids), keeping IDs,
  *                quote/card_image fields and case_study_tag terms; run after `attachments`
+ *   map-pages    copy the shops/BMX/pumps pages (+ parents) onto the Map Listing template, keeping
+ *                IDs and URLs; featured image becomes an Image Hero; run after `attachments`
  *
  * Env:
  *   NEWS_SOURCE_DB        source database name (default prod_scratch)
@@ -279,6 +281,61 @@ function news_image_columns(array $b): ?array
     ]);
 }
 
+/** Every block nested anywhere under $blocks, wrappers included. */
+function news_flatten(array $blocks): array
+{
+    $all = [];
+    foreach ($blocks as $b) {
+        $all[] = $b;
+        array_push($all, ...news_flatten($b['innerBlocks']));
+    }
+
+    return $all;
+}
+
+/**
+ * A group/columns layout holding only old acf/card blocks (icon or image,
+ * title, text, link) -> one Card Grid of "link" cards.
+ */
+function news_old_cards(array $b): ?array
+{
+    $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i));
+    if (! $leaves || array_filter($leaves, fn($i) => $i['blockName'] !== 'acf/card')) {
+        return null;
+    }
+
+    $fields = ['card_style' => 'link', 'cards' => count($leaves)];
+    foreach (array_values($leaves) as $n => $card) {
+        $d = $card['attrs']['data'] ?? [];
+        $fields += [
+            "cards_{$n}_image" => $d['icon'] ?? $d['image'] ?? '',
+            "cards_{$n}_heading_text" => $d['title'] ?? '',
+            "cards_{$n}_heading_level" => 'h3',
+            "cards_{$n}_heading_style" => 'match',
+            "cards_{$n}_body_text" => $d['text'] ?? '',
+            "cards_{$n}_body_style" => 'body',
+            "cards_{$n}_link" => $d['link'] ?? '',
+        ];
+    }
+
+    return news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid');
+}
+
+/** Swap each outermost all-acf/card group/columns, at any depth, 1:1 for a Card Grid. */
+function news_replace_old_cards(array $blocks, array &$notes): array
+{
+    foreach ($blocks as &$b) {
+        if (in_array($b['blockName'], ['core/group', 'core/columns'], true) && ($cards = news_old_cards($b))) {
+            $b = $cards;
+            $notes[] = 'acf/card layout -> Card Grid';
+        } elseif ($b['innerBlocks']) {
+            $b['innerBlocks'] = news_replace_old_cards($b['innerBlocks'], $notes);
+        }
+    }
+
+    return $blocks;
+}
+
 /** core/image nested in other layouts swaps 1:1, so innerContent placeholders stay valid. */
 function news_nested_images(array $blocks): array
 {
@@ -321,7 +378,7 @@ function news_transform(string $content, wpdb $src, array &$notes): string
     $bikeSlot = null;
 
     for ($i = 0; $i < count($in); $i++) {
-        $b = $in[$i];
+        $b = news_replace_old_cards([$in[$i]], $notes)[0];
         switch ($b['blockName']) {
             case 'custom/lead':
                 $out[] = news_lead($b);
@@ -633,6 +690,71 @@ if ($mode === 'case-studies') {
         echo "imported $id\n";
     }
     WP_CLI::success(count($ids) . ' case studies imported.');
+
+    return;
+}
+
+if ($mode === 'map-pages') {
+    // Old shops/BMX/pumps template pages → Map Listing template, keeping IDs
+    // and URLs. Old site ID => [dataset, preset services]; null = parent page.
+    // Presets decoded from the old selected_categories field.
+    $pages = [
+        705 => null,
+        707 => null,
+        715 => null,
+        287 => ['shops', ['New bikes', 'Secondhand bikes', 'E-Bikes', 'Custom bikes']],
+        288 => ['shops', ['Secondhand bikes']],
+        289 => ['shops', ['Donate a bike']],
+        295 => ['shops', ['Bike hire', 'Bike tours']],
+        335 => ['shops', ['Bike servicing', 'Mobile bike repairs']],
+        1121 => ['pumps', []],
+        1292 => ['bmx', []],
+    ];
+    $clash = array_filter(news_taken(array_keys($pages)), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
+    }
+
+    foreach ($pages as $id => $config) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            wp_delete_post($id, true);
+        }
+        $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
+        $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
+        $notes = [];
+
+        // Parents only held the old Child Page Cards block, which has no equivalent yet.
+        $content = '';
+        if ($config) {
+            $content = news_transform($row->post_content, $src, $notes);
+            // The old template drew its header from the featured image; here that's an Image Hero block.
+            if ($thumb) {
+                $hero = news_acf_block('acf/image-hero', \App\Blocks\ImageHero::class, [
+                    'background_image' => $thumb,
+                    'image_position' => 'center',
+                    'show_heading' => '1',
+                    'heading' => html_entity_decode($row->post_title, ENT_QUOTES),
+                    'show_breadcrumbs' => '1',
+                ], 'image_hero');
+                $hero['attrs']['align'] = 'full';
+                $content = serialize_block($hero) . "\n\n" . $content;
+            }
+        }
+
+        news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => $k === '_thumbnail_id' || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+
+        if ($config) {
+            [$dataset, $services] = $config;
+            update_post_meta($id, '_wp_page_template', 'template-map-listing.blade.php');
+            update_field('map_listing_dataset', $dataset, $id);
+            update_field('map_listing_services', $services, $id);
+        }
+        clean_post_cache($id);
+        echo "imported $id " . ($notes ? '(' . implode('; ', $notes) . ')' : '') . "\n";
+    }
+    WP_CLI::success(count($pages) . ' pages imported.');
 
     return;
 }
