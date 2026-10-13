@@ -22,7 +22,7 @@ never touches the old site itself, and it only writes to this site's database.
 | `core/table` | Table (`acf/data-table`). A first row that's all bold becomes the column headings |
 | `core/columns` with one image per column | Two Column Content with an Image layout on each side |
 | Group/columns holding only `acf/card` blocks | Card Grid with "link" cards (icon or image, title, text, link) |
-| `core/list` | Bullet List. Bold, italic and links are kept; nested sub-items follow their parent (one level only) |
+| `core/list` | Bullet List. Numbered lists stay numbered, nested lists keep their depth (up to 3 levels, via each item's Indent), and bold, italic and links are kept |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 

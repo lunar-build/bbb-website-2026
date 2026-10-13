@@ -225,31 +225,39 @@ function news_buttons(array $b): array
 const NEWS_LIST_INLINE = '<strong><b><em><i><a>';
 
 /**
- * core/list -> Bullet List. Items keep bold/italic/links; nested sub-items
- * follow their parent as plain items, since Bullet List has one level.
+ * core/list -> Bullet List. Numbered lists stay numbered; nested lists keep
+ * their depth via each item's indent level (Bullet List supports 0–2). Items
+ * keep bold/italic/links.
  */
 function news_list(array $b, array &$notes): array
 {
     $items = [];
-    $collect = function (array $list) use (&$collect, &$items, &$notes) {
+    $collect = function (array $list, int $level) use (&$collect, &$items, &$notes) {
+        if ($level > 2) {
+            $notes[] = 'list nested deeper than 3 levels — extra levels indented at 2';
+        }
         foreach ($list['innerBlocks'] as $li) {
             // The item's own text is the HTML before any nested list.
             $own = preg_replace('#<(ul|ol)\b.*#s', '', $li['innerHTML']);
             $text = trim(html_entity_decode(strip_tags($own, NEWS_LIST_INLINE), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
             if ($text !== '') {
-                $items[] = $text;
+                $items[] = ['text' => $text, 'level' => min($level, 2)];
             }
             foreach ($li['innerBlocks'] as $sub) {
-                $notes[] = 'nested list flattened into Bullet List';
-                $collect($sub);
+                $collect($sub, $level + 1);
             }
         }
     };
-    $collect($b);
+    $collect($b, 0);
 
-    $fields = ['heading' => '', 'items' => count($items)];
-    foreach ($items as $i => $text) {
-        $fields["items_{$i}_text"] = $text;
+    $fields = [
+        'heading' => '',
+        'list_style' => ! empty($b['attrs']['ordered']) ? 'numbers' : 'bullets',
+        'items' => count($items),
+    ];
+    foreach ($items as $i => $item) {
+        $fields["items_{$i}_text"] = $item['text'];
+        $fields["items_{$i}_level"] = (string) $item['level'];
     }
 
     return news_acf_block('acf/bullet-list', \App\Blocks\BulletList::class, $fields, 'bullet_list');
