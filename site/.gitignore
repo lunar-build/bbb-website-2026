@@ -35,3 +35,6 @@ phpunit.xml
 
 # WP-CLI
 wp-cli.local.yml
+
+# DDEV-generated router config and local TLS keys
+.ddev/traefik/
