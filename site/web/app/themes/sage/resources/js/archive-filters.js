@@ -25,6 +25,7 @@ if (results) {
       if (!response.ok || !next) throw new Error(`Archive fetch failed: ${response.status}`);
 
       results.innerHTML = next.innerHTML;
+      results.dispatchEvent(new CustomEvent('archive:updated', { bubbles: true }));
       history.pushState({ archive: true }, '', url);
       pushed = true;
 

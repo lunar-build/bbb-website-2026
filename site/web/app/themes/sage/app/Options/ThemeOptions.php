@@ -107,7 +107,11 @@ class ThemeOptions extends Field
             ])
                 ->addText('google_maps_api_key', [
                     'label' => 'Google Maps API key',
-                    'instructions' => 'Places API key, used by the Journey Planner Widget block for address autocomplete.',
+                    'instructions' => 'Used by the Journey Planner Widget block (Places API) and the Map Listing template (Maps JavaScript API) — enable both APIs on the key and restrict it to this site\'s domain.',
+                ])
+                ->addText('google_maps_map_id', [
+                    'label' => 'Google Maps map ID',
+                    'instructions' => 'Optional cloud-styled map ID for the Map Listing template\'s map. Leave empty for Google\'s default styling.',
                 ])
             ->addTab('archive_pages', [
                 'label' => 'Archive pages',
