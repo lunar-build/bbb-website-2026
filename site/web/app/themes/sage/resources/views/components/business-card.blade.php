@@ -1,4 +1,4 @@
-@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'link'])
+@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null])
 
 {{-- The rule directly under the name is accented (yellow, per Figma); every
      rule after it is the plain divider colour — tracked here since which
@@ -47,12 +47,20 @@
     <p class="c-business-card__description">{{ $description }}</p>
   @endif
 
-  <a
-    class="c-business-card__cta"
-    href="{{ $link['url'] }}"
-    @if (($link['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-  >
-    {{ $link['title'] }}
-    <x-icon name="arrow-right" />
-  </a>
+  @if (count($regions))
+    <p class="c-business-card__region">
+      <strong>{{ _n('Region:', 'Regions:', count($regions), 'sage') }}</strong> {{ implode(', ', $regions) }}
+    </p>
+  @endif
+
+  @if (! empty($link['url']))
+    <a
+      class="c-business-card__cta"
+      href="{{ $link['url'] }}"
+      @if (($link['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
+    >
+      {{ $link['title'] }}
+      <x-icon name="arrow-right" />
+    </a>
+  @endif
 </div>

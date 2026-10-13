@@ -135,3 +135,27 @@
 .c-archive__cards .c-archive__card {
   max-width: none;
 }
+
+// Business Card's fixed Figma width is for the standalone block — fill the column.
+.c-archive__cards .c-business-card__card {
+  max-width: none;
+}
+
+// "View details" in a map pin's info window jumps to its card.
+.c-archive__cards .c-business-card__card:target {
+  outline: 2px solid var(--wp--preset--color--blue);
+  outline-offset: 2px;
+}
+
+// Map Listing template (template-map-listing.blade.php).
+.c-map-listing__map {
+  aspect-ratio: 935 / 500;
+  margin-bottom: 3.375rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: var(--wp--preset--color--lightest-grey);
+}
+
+.c-map-listing__info a {
+  color: var(--wp--preset--color--blue);
+}

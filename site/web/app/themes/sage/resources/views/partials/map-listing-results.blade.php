@@ -8,15 +8,16 @@
 @if (count($cards))
   <div class="c-archive__cards">
     @foreach ($cards as $card)
-      <x-filter-result-card
-        tabindex="-1"
+      <x-business-card
+        class="c-archive__card"
         :id="$card['id']"
-        :title="$card['title']"
-        :details="$card['details']"
+        tabindex="-1"
+        :name="$card['name']"
+        :contact-info="$card['contactInfo']"
         :services="$card['services']"
         :description="$card['description']"
         :regions="$card['regions']"
-        :url="$card['url']"
+        :link="$card['link']"
       />
     @endforeach
   </div>
