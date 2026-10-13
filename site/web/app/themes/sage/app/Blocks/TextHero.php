@@ -192,8 +192,8 @@ class TextHero extends Block
 
         $fields->addTrueFalse('show_breadcrumbs', [
             'label' => 'Show breadcrumbs',
-            'instructions' => 'Shown above the heading, as on the Image Hero.',
-            'default_value' => 1,
+            'instructions' => 'Shown above the heading, as on the Image Hero. Off by default — the Sticky Nav template already shows its own breadcrumbs.',
+            'default_value' => 0,
             'ui' => true,
         ]);
 
