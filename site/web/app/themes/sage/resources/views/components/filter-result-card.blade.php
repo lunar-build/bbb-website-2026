@@ -5,6 +5,7 @@
     'details' => [], // [['icon' => string, 'text' => string, 'url' => string|null], ...] — address, phone...
     'services' => [], // [['icon' => string, 'label' => string], ...]
     'description' => null,
+    'regions' => [],
     'url' => null, // external site — opens in a new tab
 ])
 
@@ -39,6 +40,12 @@
 
     @if ($description)
         <p class="c-filter-result-card__description">{{ $description }}</p>
+    @endif
+
+    @if (count($regions))
+        <p class="c-filter-result-card__region">
+            <strong>{{ _n('Region:', 'Regions:', count($regions), 'sage') }}</strong> {{ implode(', ', $regions) }}
+        </p>
     @endif
 
     @if ($url)

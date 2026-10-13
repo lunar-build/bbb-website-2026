@@ -88,6 +88,13 @@
     color: var(--wp--preset--color--charcoal);
   }
 
+  &__region {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
   &__cta {
     align-self: center;
     margin-top: auto;

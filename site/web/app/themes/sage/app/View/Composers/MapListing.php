@@ -69,6 +69,7 @@ class MapListing extends Composer
             ], $item['services']),
             // Pumps have no description — who maintains them is their summary.
             'description' => $item['description'] ?: $item['maintained'],
+            'regions' => $item['regions'],
             'url' => $item['website'],
         ];
     }
