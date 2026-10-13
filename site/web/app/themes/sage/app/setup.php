@@ -302,3 +302,37 @@ add_action('init', function () {
         'rewrite' => ['slug' => 'cycle-routes'],
     ]);
 }, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.
+
+/**
+ * Keep the Map Listing template's open-data cache fresh — hourly, never
+ * on a page request. See App\Support\OpenData.
+ */
+add_action('init', function () {
+    if (! wp_next_scheduled('opendata_refresh')) {
+        wp_schedule_event(time(), 'hourly', 'opendata_refresh');
+    }
+});
+
+add_action('opendata_refresh', function () {
+    foreach (array_keys(Support\OpenData::DATASETS) as $dataset) {
+        Support\OpenData::refresh($dataset);
+    }
+});
+
+if (defined('WP_CLI') && WP_CLI) {
+    /**
+     * Refresh the cached open-data datasets.
+     *
+     * ## OPTIONS
+     *
+     * [<dataset>]
+     * : One of shops, bmx, pumps. Defaults to all.
+     */
+    \WP_CLI::add_command('opendata refresh', function ($args) {
+        foreach ($args ?: array_keys(Support\OpenData::DATASETS) as $dataset) {
+            Support\OpenData::refresh($dataset)
+                ? \WP_CLI::success(sprintf('%s: %d items', $dataset, count(Support\OpenData::items($dataset))))
+                : \WP_CLI::warning("{$dataset}: fetch failed, kept previous cache");
+        }
+    });
+}
