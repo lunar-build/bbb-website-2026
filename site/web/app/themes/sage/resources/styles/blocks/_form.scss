@@ -76,5 +76,23 @@
         text-align: center;
       }
     }
+
+    // GF stretches each choice label full width, so centred text drifts from its control; shrink-wrap the group, centre it, and left-align rows so controls line up.
+    .gfield_radio,
+    .gfield_checkbox {
+      width: fit-content;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+
+    .gchoice {
+      text-align: left;
+    }
+
+    .gform_footer,
+    .gform_page_footer {
+      justify-content: center;
+      padding-top: 1.5rem;
+    }
   }
 }
