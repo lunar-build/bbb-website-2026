@@ -1,8 +1,7 @@
 // Figma: Standalone Link Card / Download Link / Transcript Download Link
 
 @use '../abstracts/breakpoints' as bp;
-@use '../base/focus' as focus;
-@use '../components/button';
+@use '../components/download-link';
 
 // Container query, not the shared bp.respond() viewport mixin — the card's
 // own rendered width can be far narrower than the viewport (e.g. the pattern
@@ -98,27 +97,11 @@
 }
 
 .c-link-card__cta-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.625rem;
-  color: var(--wp--preset--color--blue-dark);
-  text-decoration: none;
-  white-space: nowrap;
-
-  @include focus.ring;
-
-  &:hover,
-  &:focus-visible {
-    @include button.arrow-hover;
-  }
+  @extend .c-download-link__link;
 
   // Right padding stops the focus outline overlapping the arrow as it
   // animates to the right on hover/focus.
   .c-icon--arrow-right {
     padding-right: 0.5rem;
   }
-}
-
-.c-link-card__file-size {
-  color: var(--wp--preset--color--charcoal);
 }
