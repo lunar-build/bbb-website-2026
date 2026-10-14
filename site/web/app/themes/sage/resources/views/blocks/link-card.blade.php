@@ -19,24 +19,16 @@
         @endif
       </div>
 
-      @php $fileSizeId = 'c-link-card__file-size-'.$loop->index; @endphp
-
-      <div class="c-link-card__cta">
-        @if ($card['cta_type'] === 'download')
-          <a
-            class="c-link-card__cta-link u-cta-large"
-            href="{{ $card['file']['url'] }}"
-            download
-            @if ($card['file_size']) aria-describedby="{{ $fileSizeId }}" @endif
-          >
-            <x-icon name="download" />
-            {{ $card['cta_label'] }}
-          </a>
-
-          @if ($card['file_size'])
-            <span id="{{ $fileSizeId }}" class="c-link-card__file-size u-body-regular">{{ $card['file_size'] }}</span>
-          @endif
-        @else
+      @if ($card['cta_type'] === 'download')
+        <x-download-link
+          class="c-link-card__cta"
+          :url="$card['file']['url']"
+          :label="$card['cta_label']"
+          :file-size="$card['file_size']"
+          :id="'c-link-card__file-size-'.$loop->index"
+        />
+      @else
+        <div class="c-link-card__cta">
           <a class="c-link-card__cta-link u-cta-large" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
             {{ $card['link']['title'] }}
             @if (($card['link']['target'] ?? '') === '_blank')
@@ -44,8 +36,8 @@
             @endif
             <x-icon name="arrow-right" />
           </a>
-        @endif
-      </div>
+        </div>
+      @endif
     </div>
   @endforeach
 </div>
