@@ -1,7 +1,9 @@
 <section {{ $attributes->class(['c-image-block']) }}>
 
 <div class="o-container">
-  <img class="c-image-block__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+  @if ($image['url'] ?? null)
+    <img class="c-image-block__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+  @endif
 
   @if ($contentType === 'caption')
     @if ($caption)

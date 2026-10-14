@@ -18,7 +18,9 @@
           <h2 class="c-cta-banner__heading u-heading-1">{{ $heading }}</h2>
         @endif
 
-        <p class="c-cta-banner__body u-standfirst">{{ $body }}</p>
+        @if ($body)
+          <p class="c-cta-banner__body u-standfirst">{{ $body }}</p>
+        @endif
       </div>
 
       @if (! empty($link['url']))

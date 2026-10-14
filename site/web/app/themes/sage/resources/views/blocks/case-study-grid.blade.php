@@ -2,15 +2,31 @@
 
 <div class="o-container">
   <div class="c-case-study-grid__cards">
-    @foreach (['left', 'right'] as $column)
-      <div class="c-case-study-grid__column c-case-study-grid__column--{{ $column }}">
-        @foreach ($cards as $i => $card)
-          @continue(($i % 2 === 0 ? 'left' : 'right') !== $column)
-          <div class="c-case-study-grid__card">
-            <img class="c-case-study-grid__image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
-            <x-quote class="c-case-study-grid__quote">{{ $card['quote'] }}</x-quote>
+    @foreach ($cards as $card)
+      <div class="c-case-study-grid__card">
+        <img class="c-case-study-grid__image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
+        <x-quote
+          class="c-case-study-grid__quote"
+          :attribution-name="$card['name'] ?: null"
+          :attribution-role="$card['info'] ?: null"
+        >{{ $card['quote'] }}</x-quote>
+
+        @if ($card['link']['url'])
+          <div class="c-case-study-grid__cta">
+            <wa-button
+              variant="brand"
+              appearance="accent"
+              size="small"
+              pill
+              with-end
+              href="{{ $card['link']['url'] }}"
+              @if ($card['link']['target'] === '_blank') target="_blank" rel="noopener" @endif
+            >
+              {{ $card['link']['title'] ?: __('Read their story', 'sage') }}
+              <x-icon name="arrow-right" slot="end" />
+            </wa-button>
           </div>
-        @endforeach
+        @endif
       </div>
     @endforeach
   </div>

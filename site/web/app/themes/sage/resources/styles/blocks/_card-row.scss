@@ -7,6 +7,7 @@
 @use '../base/typography';
 @use '../components/button';
 @use '../abstracts/spacing';
+@use '../base/focus' as focus;
 
 .c-card-row__heading {
   text-align: center;
@@ -44,6 +45,8 @@
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   background: var(--wp--preset--color--white);
   text-decoration: none;
+
+  @include focus.ring;
 }
 
 .c-card-row__news-image {
@@ -83,6 +86,8 @@
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   color: var(--wp--preset--color--charcoal);
+
+  @include focus.ring;
 
   &:hover,
   &:focus-visible {
@@ -140,6 +145,8 @@
   color: var(--wp--preset--color--charcoal);
   text-decoration: none;
 
+  @include focus.ring;
+
   &:hover,
   &:focus-visible {
     @include button.arrow-hover;
@@ -166,6 +173,8 @@
   color: var(--wp--preset--color--blue-dark);
   text-decoration: none;
 
+  @include focus.ring;
+
   &:hover,
   &:focus-visible {
     @include button.arrow-hover;
@@ -183,6 +192,8 @@
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   text-decoration: none;
+
+  @include focus.ring;
 
   &:hover,
   &:focus-visible {

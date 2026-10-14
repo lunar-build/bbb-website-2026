@@ -208,7 +208,7 @@ class BusinessCard extends Block
      */
     public function name()
     {
-        return get_field('name') ?: ($this->preview ? $this->example['name'] : '');
+        return get_field('name') ?: (shows_example($this->preview) ? $this->example['name'] : '');
     }
 
     /**
@@ -224,7 +224,7 @@ class BusinessCard extends Block
         $rows = get_field('contact_info');
 
         if (! $rows) {
-            $rows = $this->preview ? $this->example['contact_info'] : [];
+            $rows = shows_example($this->preview) ? $this->example['contact_info'] : [];
         }
 
         return $this->withBusinessCardContactHrefs($rows);
@@ -240,7 +240,7 @@ class BusinessCard extends Block
         $rows = get_field('services');
 
         if (! $rows) {
-            $rows = $this->preview ? $this->example['services'] : [];
+            $rows = shows_example($this->preview) ? $this->example['services'] : [];
         }
 
         return $rows;
@@ -259,7 +259,7 @@ class BusinessCard extends Block
             return $description;
         }
 
-        return $this->preview ? $this->example['description'] : null;
+        return shows_example($this->preview) ? $this->example['description'] : null;
     }
 
     /**
@@ -269,7 +269,7 @@ class BusinessCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: ($this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => '']);
+        return get_field('link') ?: (shows_example($this->preview) ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

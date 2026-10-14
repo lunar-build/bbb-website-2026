@@ -1,5 +1,6 @@
 <section {{ $attributes->class(['c-button-block']) }}>
 
+@if ($link['url'])
 <div class="o-container">
   <div class="c-button-block__inner c-button-block__inner--{{ $align }}">
     <wa-button
@@ -19,5 +20,6 @@
     </wa-button>
   </div>
 </div>
+@endif
 
 </section>

@@ -160,18 +160,22 @@ In the generated class:
   needed for these).
 - Add one accessor method per field, following the existing pattern (see
   `app/Blocks/CtaBanner.php`, `app/Blocks/VideoHero.php`):
-  - **Gate the `$example` fallback behind `$this->preview`.** `$this->preview` is
-    `true` only for the block-editor canvas preview and the `/pattern-library` page
-    (`App\View\Composers\PatternLibrary` explicitly renders with `preview = true`) —
-    `false` for every real front-end request. A real empty field must render empty,
-    not silently show fixture content: `return get_field('x') ?: ($this->preview ?
-    $this->example['x'] : '');` — the non-preview fallback is a genuine empty value for
-    that type (`''` for text, `null` for image/file, `[]` for repeaters, a blank link
-    shape `['title' => '', 'url' => '', 'target' => '']` for link fields), not
-    `$example['x']`. Previously this codebase used the unconditional
-    `get_field('x') ?: $this->example['x']`, which looked fine in the pattern library
-    but meant a client leaving a real field blank got fixture copy/images on the live
-    site instead of nothing — don't reintroduce that.
+  - **Gate the `$example` fallback behind `shows_example($this->preview)`** (helper in
+    `app/helpers.php`). It's true only for preview renders outside wp-admin — i.e. the
+    `/pattern-library` page (`App\View\Composers\PatternLibrary` renders with
+    `preview = true`). It's false on the real front end *and* in the block-editor
+    canvas, which also renders with `$this->preview = true` but is `is_admin()`: a
+    freshly inserted block must read as empty there, not as fixture copy a client could
+    mistake for real content. A real empty field must render empty: `return
+    get_field('x') ?: (shows_example($this->preview) ? $this->example['x'] : '');` — the
+    non-example fallback is a genuine empty value for that type (`''` for text, `null`
+    for image/file, `[]` for repeaters, a blank link shape `['title' => '', 'url' => '',
+    'target' => '']` for link fields), not `$example['x']`. Never use bare
+    `$this->preview` for this, and never the unconditional `get_field('x') ?:
+    $this->example['x']`. A block that renders nothing visible while empty gets a
+    "click the pencil to add content" placeholder in the editor automatically (the
+    `acf/register_block_type_args` filter in `app/filters.php`), so no per-block empty
+    state is needed unless you want a richer one.
   - Image/file/relationship fields: the preview fallback is a bundled placeholder
     asset, e.g. `$example['x']` resolving to
     `['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')]`
@@ -372,6 +376,28 @@ slug must match a `theme.json` `settings.spacing.spacingSizes` entry (`small`/`l
 Set this on every new block the same way; leaving it `null` means the block renders with
 no padding until an editor manually opens the Dimensions panel and picks one.
 
+### Block background colour: native support, not an ACF field
+
+Don't add a `background_color` ACF select. Opt the block in with
+`'color' => ['background' => true, ...]` in its `$supports` — editors then get WP's
+Background colour control in the sidebar's Styles tab (next to padding), no ACF field.
+Everything else is shared:
+
+- `theme_block_background_colors()` in `app/helpers.php` is the one list of allowed
+  colours (slug => label). Change it there and every opted-in block follows. The
+  `wp_theme_json_data_theme` filter in `app/filters.php` restricts each opted-in block's
+  picker to that list.
+- The text colour comes from contrast (`theme_text_color_for()`), emitted by
+  `theme_block_background_css()` as `--c-block-fg` on `.has-{slug}-background-color`.
+  Use `var(--c-block-fg, <default>)` for any text that should follow the background
+  (headings/body copy that set their own colour). A block with no background falls back
+  to its own default.
+- No default is saved with the block, so give it a CSS default instead:
+  `&:not(.has-background) { background: ... }`. WP adds `has-background` and
+  `has-{slug}-background-color` to the root `<section>` through `$attributes`, as with
+  padding — don't hand-write an inline `style` for the background.
+- Pick text/icon colours that still work on all four backgrounds (two dark, two light).
+
 ### Shaping WP/ACF data for structured component props
 
 Whenever a block's Blade view hands data to a component expecting a structured
@@ -398,7 +424,8 @@ names, so there's no way to write a single converter that handles every case):
 ## 5. Verify
 
 - Confirm `npm run dev` (HMR) is running in `web/app/themes/sage`, or run `npm run build`.
-- Insert the block in the WP block editor and confirm the preview renders using the
+- Insert the block in the WP block editor and confirm it shows the empty placeholder
+  (not fixture content) until fields are filled; confirm `/pattern-library` shows the
   `$example` fallback data, styled the same as the front end (block preview mode loads
   `resources/css/editor.scss`, which pulls in the full front-end stylesheet — injected
   into the block-editor iframe via the `block_editor_settings_all` filter in

@@ -269,7 +269,7 @@ class VideoBlock extends Block
      */
     public function video()
     {
-        return get_field('video') ?: ($this->example['video'] ?? null);
+        return get_field('video') ?: (shows_example($this->preview) ? ($this->example['video'] ?? null) : null);
     }
 
     /**
@@ -300,7 +300,7 @@ class VideoBlock extends Block
             return get_field('poster') ?: null;
         }
 
-        return $this->example['poster'] ?? null;
+        return shows_example($this->preview) ? ($this->example['poster'] ?? null) : null;
     }
 
     /**
@@ -311,9 +311,9 @@ class VideoBlock extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: $this->example['heading_text'],
-            'level' => get_field('heading_level') ?: $this->example['heading_level'],
-            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
+            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h2'),
+            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
         ];
     }
 
@@ -325,6 +325,10 @@ class VideoBlock extends Block
     public function transcript()
     {
         if (! get_field('video')) {
+            if (! shows_example($this->preview)) {
+                return ['url' => null, 'label' => '', 'file_size' => ''];
+            }
+
             return [
                 'url' => $this->example['transcript']['url'] ?? null,
                 'label' => $this->example['transcript_label'],

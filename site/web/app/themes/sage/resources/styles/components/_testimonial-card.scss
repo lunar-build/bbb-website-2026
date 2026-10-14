@@ -46,6 +46,13 @@
     margin-bottom: 0;
   }
 
+  // Pulled up under the name — the content column's own gap is sized for
+  // separate blocks, and this reads as part of the name.
+  &__info {
+    margin: -1rem 0 0;
+    color: var(--wp--preset--color--blue-medium);
+  }
+
   &__quote {
     max-width: none; // .c-quote's own 46rem cap isn't needed at card width
   }

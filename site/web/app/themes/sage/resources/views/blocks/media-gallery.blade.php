@@ -1,5 +1,6 @@
 <section {{ $attributes->class(['c-media-gallery']) }}>
 
+@if ($pages)
 <div class="o-container">
   <div class="c-media-gallery__wrapper" data-media-gallery>
 
@@ -44,5 +45,6 @@
 
   </div>
 </div>
+@endif
 
 </section>

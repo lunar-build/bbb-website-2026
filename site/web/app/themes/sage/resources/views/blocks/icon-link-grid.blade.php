@@ -1,7 +1,4 @@
-<section
-  {{ $attributes->class(['c-icon-link-grid-block']) }}
-  @if ($backgroundColor) style="background: var(--wp--preset--color--{{ $backgroundColor }})" @endif
->
+<section {{ $attributes->class(['c-icon-link-grid-block', 'o-full-bleed-bg']) }}>
 
 <div class="o-container">
   <x-icon-link-grid :items="$items" />

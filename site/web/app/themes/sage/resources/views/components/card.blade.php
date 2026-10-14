@@ -22,9 +22,11 @@
     @endif
 
     <div class="c-feature-card__content">
-      <x-heading :level="$heading['level']" :style="$heading['style']">
-        {{ $heading['text'] }}
-      </x-heading>
+      @if (! empty($heading['text']))
+        <x-heading :level="$heading['level']" :style="$heading['style']">
+          {{ $heading['text'] }}
+        </x-heading>
+      @endif
       @if (! empty($body['text']))
         <x-copy :style="$body['style']">
           {!! $body['text'] !!}

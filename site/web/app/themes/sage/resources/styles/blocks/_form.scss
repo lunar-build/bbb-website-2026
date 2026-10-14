@@ -6,6 +6,16 @@
     gap: 2rem;
   }
 
+  // With a highlighted lead-in the rest of the heading drops to regular
+  // weight, so the lead-in reads as the emphasised part.
+  &__heading--has-highlight {
+    font-weight: 400;
+  }
+
+  &__heading-highlight {
+    font-weight: 700;
+  }
+
   &__content {
     // Figma has this block's heading in Blue dark, not the sitewide default
     // (Charcoal, set globally in base/_typography.scss).

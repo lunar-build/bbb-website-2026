@@ -195,6 +195,15 @@ class RollingStatsCarousel extends Block
                 'unit' => 'thousand people',
                 'caption_text' => 'to ride with confidence since the scheme began',
             ],
+            [
+                'slide_type' => 'statement',
+                'statement' => '<strong>28%</strong> of Bristol residents cycle at least once a week, <strong>23%</strong> don’t cycle but would like to',
+                'source' => 'BikeLife Bristol 2019',
+            ],
+            [
+                'slide_type' => 'statement',
+                'statement' => 'Cycle training can significantly improve confidence, as well as safety.',
+            ],
         ],
     ];
 
@@ -240,26 +249,54 @@ class RollingStatsCarousel extends Block
             'layout' => 'block',
         ]);
 
+        $stat = [[['field' => 'slide_type', 'operator' => '==', 'value' => 'stat']]];
+        $statement = [[['field' => 'slide_type', 'operator' => '==', 'value' => 'statement']]];
+
         $slides
+            ->addSelect('slide_type', [
+                'label' => 'Slide type',
+                'instructions' => 'Stat: a number that counts up. Statement: a line of text, with optional bold figures.',
+                'choices' => [
+                    'stat' => 'Stat (counting number)',
+                    'statement' => 'Statement (text only)',
+                ],
+                'default_value' => 'stat',
+                'ui' => true,
+            ])
             ->addText('prefix_text', [
                 'label' => 'Intro text',
-                'instructions' => 'Shown above the number, e.g. "There are".',
-                'default_value' => 'There are',
+                'instructions' => 'Shown above the number, e.g. "There are". Optional.',
+                'conditional_logic' => $stat,
             ])
             ->addNumber('value', [
                 'label' => 'Stat value',
                 'instructions' => 'The number this stat counts up to (e.g. 7.5). Decimals are supported.',
                 'required' => 1,
+                'conditional_logic' => $stat,
             ])
             ->addText('unit', [
                 'label' => 'Unit / suffix',
-                'instructions' => 'Shown immediately after the number, e.g. "miles".',
+                'instructions' => 'Shown immediately after the number, e.g. "miles". Optional.',
+                'conditional_logic' => $stat,
             ])
             ->addTextarea('caption_text', [
                 'label' => 'Caption',
-                'instructions' => 'Shown below the number, e.g. "of cycling commuter routes in Bristol".',
+                'instructions' => 'Shown below the number, e.g. "of cycling commuter routes in Bristol". Optional.',
                 'rows' => 2,
+                'conditional_logic' => $stat,
+            ])
+            ->addWysiwyg('statement', [
+                'label' => 'Statement',
+                'instructions' => 'Select a figure and use Bold to make it stand out.',
+                'tabs' => 'visual',
+                'toolbar' => 'basic',
+                'media_upload' => 0,
                 'required' => 1,
+                'conditional_logic' => $statement,
+            ])
+            ->addText('source', [
+                'label' => 'Source',
+                'instructions' => 'e.g. "BikeLife Bristol 2019". Optional.',
             ]);
 
         $slides->endRepeater();
@@ -278,9 +315,27 @@ class RollingStatsCarousel extends Block
      */
     public function slides()
     {
-        $slides = get_field('slides') ?: ($this->example['slides'] ?? []);
+        $slides = get_field('slides') ?: (shows_example($this->preview) ? ($this->example['slides'] ?? []) : []);
+
+        // The repeater's min of 1 makes ACF add a blank row on insert; drop
+        // rows with nothing to show so the block still counts as empty.
+        $slides = array_filter($slides, fn ($slide) => ($slide['slide_type'] ?? 'stat') === 'statement'
+            ? trim(wp_strip_all_tags($slide['statement'] ?? '')) !== ''
+            : ($slide['value'] ?? '') !== '');
 
         return array_map(function ($slide) {
+            $source = trim($slide['source'] ?? '');
+
+            if (($slide['slide_type'] ?? 'stat') === 'statement') {
+                $statement = wp_kses($slide['statement'] ?? '', ['strong' => [], 'b' => [], 'em' => [], 'br' => []]);
+
+                return [
+                    'type' => 'statement',
+                    'statement' => trim(preg_replace('#</?p>#i', '', $statement)),
+                    'source' => $source,
+                ];
+            }
+
             $value = (float) ($slide['value'] ?? 0);
             $decimals = strlen(substr(strrchr((string) $value, '.'), 1) ?: '');
             $prefix = $slide['prefix_text'] ?? '';
@@ -295,6 +350,7 @@ class RollingStatsCarousel extends Block
             $accessibleText = trim(sprintf('%s %s%s %s', $prefix, $formattedValue, $unit ? ' ' . $unit : '', $caption));
 
             return [
+                'type' => 'stat',
                 'prefix' => $prefix,
                 'value' => $value,
                 'decimals' => $decimals,
@@ -303,6 +359,7 @@ class RollingStatsCarousel extends Block
                 'unit' => $unit,
                 'caption' => $caption,
                 'accessibleText' => $accessibleText,
+                'source' => $source,
             ];
         }, $slides);
     }
@@ -314,7 +371,7 @@ class RollingStatsCarousel extends Block
      */
     public function imageLeft()
     {
-        return $this->illustrationUrl(get_field('image_left') ?: $this->example['image_left']);
+        return $this->illustrationUrl(get_field('image_left') ?: (shows_example($this->preview) ? $this->example['image_left'] : null));
     }
 
     /**
@@ -324,7 +381,7 @@ class RollingStatsCarousel extends Block
      */
     public function imageRight()
     {
-        return $this->illustrationUrl(get_field('image_right') ?: $this->example['image_right']);
+        return $this->illustrationUrl(get_field('image_right') ?: (shows_example($this->preview) ? $this->example['image_right'] : null));
     }
 
     /**

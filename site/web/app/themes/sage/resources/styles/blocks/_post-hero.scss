@@ -1,3 +1,5 @@
+@use '../base/focus' as focus;
+
 .c-post-hero {
   background: var(--wp--preset--color--white);
 
@@ -47,6 +49,7 @@
   height: 2.75rem; // 44px
   margin: -0.875rem; // 14px
   color: var(--wp--preset--color--charcoal);
+  @include focus.ring;
 
   svg {
     width: 1rem; // 16px

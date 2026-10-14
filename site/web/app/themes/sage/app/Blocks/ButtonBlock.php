@@ -245,7 +245,7 @@ class ButtonBlock extends Block
      */
     public function link()
     {
-        $link = normalize_link(get_field('link') ?: $this->example['link']);
+        $link = normalize_link(get_field('link') ?: (shows_example($this->preview) ? $this->example['link'] : null));
         $link['title'] = $link['title'] ?: 'Find out more';
 
         return $link;
@@ -258,7 +258,7 @@ class ButtonBlock extends Block
      */
     public function style()
     {
-        $style = get_field('button_style') ?: $this->example['button_style'];
+        $style = get_field('button_style') ?: (shows_example($this->preview) ? $this->example['button_style'] : 'brand');
 
         return in_array($style, ['brand', 'neutral', 'outlined'], true) ? $style : 'brand';
     }
@@ -274,7 +274,7 @@ class ButtonBlock extends Block
             return 'small';
         }
 
-        $size = get_field('button_size') ?: $this->example['button_size'];
+        $size = get_field('button_size') ?: (shows_example($this->preview) ? $this->example['button_size'] : 'large');
 
         return $size === 'small' ? 'small' : 'large';
     }
@@ -286,7 +286,7 @@ class ButtonBlock extends Block
      */
     public function alignment()
     {
-        $align = get_field('button_align') ?: $this->example['button_align'];
+        $align = get_field('button_align') ?: (shows_example($this->preview) ? $this->example['button_align'] : 'left');
 
         return in_array($align, ['left', 'center', 'right'], true) ? $align : 'left';
     }

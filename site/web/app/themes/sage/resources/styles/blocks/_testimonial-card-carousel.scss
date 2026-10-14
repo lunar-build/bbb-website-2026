@@ -3,6 +3,22 @@
 @use '../base/focus' as focus;
 
 .c-testimonial-carousel {
+  // Arrows are yellow on every background; the dots default to brand blue and
+  // go white on the dark backgrounds below, where they'd disappear.
+  --c-testimonial-carousel-dots: var(--wp--preset--color--blue);
+  --c-testimonial-carousel-arrows: var(--wp--preset--color--yellow);
+
+  // Blue until an editor picks another (WP's native Background colour).
+  &:not(.has-background) {
+    background: var(--wp--preset--color--blue);
+  }
+
+  &:not(.has-background),
+  &.has-blue-background-color,
+  &.has-blue-dark-background-color {
+    --c-testimonial-carousel-dots: var(--wp--preset--color--white);
+  }
+
   &__carousel {
     // Invalid on purpose — WA's own default (16/9) gives the slides row a
     // fixed height; this makes it content-sized instead (see scroll-container below).
@@ -51,7 +67,7 @@
   &__carousel::part(pagination-item) {
     width: 0.625rem;
     height: 0.625rem;
-    border: 1px solid var(--wp--preset--color--blue);
+    border: 1px solid var(--c-testimonial-carousel-dots);
     background: transparent;
 
     @include focus.ring;
@@ -59,21 +75,21 @@
 
   // WA's real part name — single dash, not the BEM double dash used elsewhere here.
   &__carousel::part(pagination-item-active) {
-    background: var(--wp--preset--color--blue);
+    background: var(--c-testimonial-carousel-dots);
   }
 
   &__carousel::part(navigation-button) {
     grid-row: 2;
     padding: var(--wa-space-2xs);
     justify-content: center;
-    color: var(--wp--preset--color--dark-orange);
+    color: var(--c-testimonial-carousel-arrows);
     @include focus.ring;
   }
 
   &__nav-icon {
     display: inline-flex;
     flex: none; // prevent the navigation button's flex layout shrinking the icon to 0 width
-    color: var(--wp--preset--color--dark-orange);
+    color: var(--c-testimonial-carousel-arrows);
 
     svg {
       // 38.5 × 33px — Figma's arrow glyph bounding box itself (node 7:2044/7:2045).

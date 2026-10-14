@@ -4,6 +4,7 @@
 // difficulty drives the banner + badge color via a BEM modifier.
 @use '../base/typography';
 @use '../components/button';
+@use '../base/focus' as focus;
 
 .c-cycle-route-card {
   &__card {
@@ -93,6 +94,8 @@
     border-radius: 999px;
     color: var(--wp--preset--color--charcoal);
     text-decoration: none;
+
+    @include focus.ring;
 
     &:hover,
     &:focus-visible {

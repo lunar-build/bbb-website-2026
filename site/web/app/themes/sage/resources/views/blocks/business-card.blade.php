@@ -1,5 +1,6 @@
 <section {{ $attributes->class(['c-business-card']) }}>
 
+@if ($name)
 <div class="o-container">
   <x-business-card
     :name="$name"
@@ -9,5 +10,6 @@
     :link="$link"
   />
 </div>
+@endif
 
 </section>

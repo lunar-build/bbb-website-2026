@@ -135,7 +135,7 @@ class TwoColumnContent extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -311,7 +311,7 @@ class TwoColumnContent extends Block
         $row = is_array($rows) ? ($rows[0] ?? null) : null;
 
         if (! $row) {
-            $row = $this->preview ? ($this->example[$name] ?? ['type' => 'text']) : ['type' => 'text'];
+            $row = shows_example($this->preview) ? ($this->example[$name] ?? ['type' => 'text']) : ['type' => 'text'];
             $row = ['acf_fc_layout' => $row['type']] + $row;
         }
 

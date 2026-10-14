@@ -153,6 +153,20 @@ class Form extends Block
     public $styles = [];
 
     /**
+     * Image crop positions (select value => label); the value, with `_` as a
+     * space, is the CSS object-position.
+     *
+     * @var array
+     */
+    public $imagePositions = [
+        'center' => 'Center',
+        'center_top' => 'Top',
+        'center_bottom' => 'Bottom',
+        'left_center' => 'Left',
+        'right_center' => 'Right',
+    ];
+
+    /**
      * The block preview example data.
      *
      * @var array
@@ -160,7 +174,8 @@ class Form extends Block
     public $example = [
         'layout' => 'image',
         'form_id' => 1,
-        'heading_text' => 'Stay up to date with the latest news and events in your region',
+        'heading_highlight' => 'Stay up to date',
+        'heading_text' => 'with the latest news and events in your region',
         'heading_level' => 'h2',
         'heading_style' => 'match',
         'subheading_text' => 'Subtitle…',
@@ -193,10 +208,12 @@ class Form extends Block
         return [
             'layout' => $this->layout(),
             'formId' => $this->formId(),
+            'headingHighlight' => $this->headingHighlight(),
             'heading' => $this->heading(),
             'subheading' => $this->subheading(),
             'intro' => $this->intro(),
             'image' => $this->image(),
+            'imagePosition' => $this->imagePosition(),
         ];
     }
 
@@ -207,9 +224,11 @@ class Form extends Block
     {
         $fields = Builder::make('form');
 
+        $fields->addTab('Content');
+
         $fields->addSelect('layout', [
             'label' => 'Layout',
-            'instructions' => 'Image: form alongside an image. Centred: form only, no image.',
+            'instructions' => 'Image: form alongside an image. Centred: form only, no image. The heading and text below show beside/above the form in both.',
             'choices' => [
                 'image' => 'Image with form',
                 'centred' => 'Centred (no image)',
@@ -218,14 +237,17 @@ class Form extends Block
             'ui' => true,
         ]);
 
+        $fields->addText('heading_highlight', [
+            'label' => 'Heading (highlighted words)',
+            'instructions' => 'Optional bold lead-in shown before the heading, e.g. "Stay up to date". The rest of the heading then renders in a lighter weight.',
+        ]);
+
         $fields->addPartial(Heading::class, [
             'name' => 'heading',
             'label' => 'Heading',
             'default_level' => 'h2',
             'required' => true,
         ]);
-
-        $fields->addTab('Content');
 
         $fields->addPartial(Heading::class, [
             'name' => 'subheading',
@@ -239,7 +261,8 @@ class Form extends Block
             'default_style' => 'body',
         ]);
 
-        $imageLayoutConditional = [
+        // Tab-level condition: the Image tab only exists for the image layout.
+        $fields->addTab('Image', [
             'conditional_logic' => [
                 [
                     [
@@ -249,9 +272,7 @@ class Form extends Block
                     ],
                 ],
             ],
-        ];
-
-        $fields->addTab('Image layout fields', $imageLayoutConditional);
+        ]);
 
         $fields->addImage('image', [
             'label' => 'Image',
@@ -259,6 +280,14 @@ class Form extends Block
             'return_format' => 'array',
             'preview_size' => 'medium',
             'required' => 1,
+        ]);
+
+        $fields->addSelect('image_position', [
+            'label' => 'Image position',
+            'instructions' => 'Which part of the image stays visible when it\'s cropped to fit.',
+            'choices' => $this->imagePositions,
+            'default_value' => 'center',
+            'ui' => true,
         ]);
 
         $fields->addTab('Form');
@@ -304,7 +333,19 @@ class Form extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: $this->example['layout'];
+        return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'image');
+    }
+
+    /**
+     * Retrieve the image's crop position as a CSS object-position value.
+     *
+     * @return string
+     */
+    public function imagePosition()
+    {
+        $position = get_field('image_position');
+
+        return isset($this->imagePositions[$position]) ? str_replace('_', ' ', $position) : 'center';
     }
 
     /**
@@ -321,6 +362,16 @@ class Form extends Block
     }
 
     /**
+     * Retrieve the optional bold lead-in words for the heading.
+     *
+     * @return string
+     */
+    public function headingHighlight()
+    {
+        return get_field('heading_highlight') ?: (shows_example($this->preview) ? ($this->example['heading_highlight'] ?? '') : '');
+    }
+
+    /**
      * Retrieve the heading text/level/style.
      *
      * @return array
@@ -328,9 +379,9 @@ class Form extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: ($this->preview ? $this->example['heading_text'] : ''),
-            'level' => get_field('heading_level') ?: ($this->preview ? $this->example['heading_level'] : 'h2'),
-            'style' => get_field('heading_style') ?: ($this->preview ? $this->example['heading_style'] : 'match'),
+            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
+            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h2'),
+            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
         ];
     }
 
@@ -343,9 +394,9 @@ class Form extends Block
     public function subheading()
     {
         return [
-            'text' => get_field('subheading_text') ?: ($this->preview ? ($this->example['subheading_text'] ?? '') : ''),
-            'level' => get_field('subheading_level') ?: ($this->preview ? ($this->example['subheading_level'] ?? 'h3') : 'h3'),
-            'style' => get_field('subheading_style') ?: ($this->preview ? ($this->example['subheading_style'] ?? 'match') : 'match'),
+            'text' => get_field('subheading_text') ?: (shows_example($this->preview) ? ($this->example['subheading_text'] ?? '') : ''),
+            'level' => get_field('subheading_level') ?: (shows_example($this->preview) ? ($this->example['subheading_level'] ?? 'h3') : 'h3'),
+            'style' => get_field('subheading_style') ?: (shows_example($this->preview) ? ($this->example['subheading_style'] ?? 'match') : 'match'),
         ];
     }
 
@@ -364,8 +415,8 @@ class Form extends Block
         $text = get_field('intro_text');
 
         return [
-            'text' => get_field('intro_text') ?: ($this->preview ? ($this->example['intro_text'] ?? '') : ''),
-            'style' => get_field('intro_style') ?: ($this->preview ? ($this->example['intro_style'] ?? 'body') : 'body'),
+            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? ($this->example['intro_text'] ?? '') : ''),
+            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? ($this->example['intro_style'] ?? 'body') : 'body'),
         ];
     }
 
@@ -376,7 +427,7 @@ class Form extends Block
      */
     public function formId()
     {
-        return get_field('form_id') ?: ($this->preview ? $this->example['form_id'] : null);
+        return get_field('form_id') ?: (shows_example($this->preview) ? $this->example['form_id'] : null);
     }
 
     /**

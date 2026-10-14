@@ -53,6 +53,36 @@ add_filter('acf/register_block_type_args', function ($block) {
 
     $block['acf_block_version'] = 3;
 
+    // Empty blocks render as nothing in the editor now that example content
+    // is pattern-library only (see shows_example()), leaving a client with
+    // an invisible block they can't find or click — show a placeholder.
+    if (is_callable($block['render_callback'] ?? null)) {
+        $render = $block['render_callback'];
+
+        $block['render_callback'] = function ($attrs, ...$args) use ($render) {
+            ob_start();
+            $render($attrs, ...$args);
+            $html = ob_get_clean();
+
+            $is_preview = $args[1] ?? false;
+
+            if (! $is_preview || ! is_admin() || ! block_output_is_empty($html)) {
+                echo $html;
+
+                return;
+            }
+
+            printf(
+                '<section class="c-block-placeholder">%s</section>',
+                esc_html(sprintf(
+                    /* translators: %s: block title */
+                    __('%s — click the pencil to add content.', 'sage'),
+                    $attrs['title'] ?? __('Block', 'sage'),
+                )),
+            );
+        };
+    }
+
     return $block;
 });
 
@@ -194,3 +224,42 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 
     return $processor->get_updated_html();
 }, 10, 2);
+
+/**
+ * Block background colours.
+ *
+ * Any ACF block that sets `'color' => ['background' => true]` in its
+ * `$supports` gets WP's native Background colour control (in the sidebar's
+ * Styles tab, alongside padding) — limited here to
+ * theme_block_background_colors() rather than the whole theme palette. The
+ * text colour is set from contrast by theme_block_background_css().
+ */
+add_filter('wp_theme_json_data_theme', function ($theme_json) {
+    $data = $theme_json->get_data();
+    $palette = collect($data['settings']['color']['palette']['theme'] ?? [])
+        ->filter(fn ($color) => array_key_exists($color['slug'], theme_block_background_colors()))
+        ->values()
+        ->all();
+
+    $blocks = [];
+
+    foreach (\WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $type) {
+        if (str_starts_with($name, 'acf/') && ! empty($type->supports['color']['background'])) {
+            $blocks[$name] = ['color' => ['palette' => ['theme' => $palette]]];
+        }
+    }
+
+    return $blocks
+        ? $theme_json->update_with(['version' => $data['version'] ?? 3, 'settings' => ['blocks' => $blocks]])
+        : $theme_json;
+});
+
+add_action('wp_head', function () {
+    echo '<style id="theme-block-backgrounds">' . theme_block_background_css() . '</style>';
+});
+
+add_filter('block_editor_settings_all', function ($settings) {
+    $settings['styles'][] = ['css' => theme_block_background_css()];
+
+    return $settings;
+});

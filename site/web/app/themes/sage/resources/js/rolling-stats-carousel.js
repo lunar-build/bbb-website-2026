@@ -70,17 +70,21 @@ document.querySelectorAll('[data-rolling-stats-carousel]').forEach((wrapper) => 
 
   const items = carousel.querySelectorAll('wa-carousel-item');
 
-  const animateSlide = (item) => {
-    const reels = item?.querySelectorAll('[data-rolling-stats-reel]');
-    if (!reels) return;
-
-    reels.forEach((reel, index) => spinReel(reel, index));
+  const spinItem = (item) => {
+    item.querySelectorAll('[data-rolling-stats-reel]').forEach((reel, index) => spinReel(reel, index));
   };
 
-  carousel.addEventListener('wa-slide-change', (event) => {
-    const index = event.detail?.index;
-    animateSlide(typeof index === 'number' ? items[index] : null);
-  });
+  // A looping wa-carousel pads both ends with cloned slides (data-clone="<original index>")
+  // and scrolls onto a clone when wrapping, only jumping to the real slide once it settles.
+  // Spin every copy of the slide, or the wrapped-to clone just sits at its final number.
+  const animateSlide = (index) => {
+    if (typeof index !== 'number') return;
+
+    spinItem(items[index]);
+    carousel.querySelectorAll(`wa-carousel-item[data-clone="${index}"]`).forEach(spinItem);
+  };
+
+  carousel.addEventListener('wa-slide-change', (event) => animateSlide(event.detail?.index));
 
   // Spin the first slide only once it actually scrolls into view, not on page
   // load — a block below the fold used to spin off-screen and just sit at its
@@ -88,7 +92,7 @@ document.querySelectorAll('[data-rolling-stats-carousel]').forEach((wrapper) => 
   const observer = new IntersectionObserver(
     (entries) => {
       if (!entries[0].isIntersecting) return;
-      animateSlide(items[0]);
+      animateSlide(0);
       observer.disconnect();
     },
     { threshold: 0.5 }

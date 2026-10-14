@@ -249,7 +249,7 @@ class VideoHero extends Block
      */
     public function video()
     {
-        return get_field('video') ?: ($this->preview ? ($this->example['video'] ?? null) : null);
+        return get_field('video') ?: (shows_example($this->preview) ? ($this->example['video'] ?? null) : null);
     }
 
     /**
@@ -259,7 +259,7 @@ class VideoHero extends Block
      */
     public function poster()
     {
-        return get_field('poster') ?: ($this->preview ? ($this->example['poster'] ?? null) : null);
+        return get_field('poster') ?: (shows_example($this->preview) ? ($this->example['poster'] ?? null) : null);
     }
 
     /**
@@ -269,7 +269,7 @@ class VideoHero extends Block
      */
     public function videoAlt()
     {
-        return get_field('video_alt') ?: ($this->preview ? $this->example['video_alt'] : '');
+        return get_field('video_alt') ?: (shows_example($this->preview) ? $this->example['video_alt'] : '');
     }
 
     /**
@@ -279,7 +279,7 @@ class VideoHero extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: ($this->preview ? $this->example['heading'] : '');
+        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
     }
 
     /**
@@ -289,7 +289,7 @@ class VideoHero extends Block
      */
     public function intro()
     {
-        return get_field('intro') ?: ($this->preview ? $this->example['intro'] : '');
+        return get_field('intro') ?: (shows_example($this->preview) ? $this->example['intro'] : '');
     }
 
     /**

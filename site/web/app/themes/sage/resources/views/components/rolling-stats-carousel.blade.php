@@ -14,6 +14,9 @@
     @foreach ($slides as $slide)
       <wa-carousel-item class="c-rolling-stats-carousel__item">
         <div class="c-rolling-stats-carousel__content">
+          @if (($slide['type'] ?? 'stat') === 'statement')
+            <p class="c-rolling-stats-carousel__statement">{!! $slide['statement'] !!}</p>
+          @else
           @if (! empty($slide['prefix']))
             <p class="c-rolling-stats-carousel__prefix u-heading-4">{{ $slide['prefix'] }}</p>
           @endif
@@ -47,6 +50,11 @@
 
           @if (! empty($slide['caption']))
             <p class="c-rolling-stats-carousel__caption u-heading-4">{{ $slide['caption'] }}</p>
+          @endif
+          @endif
+
+          @if (! empty($slide['source']))
+            <p class="c-rolling-stats-carousel__source u-body-regular">{{ $slide['source'] }}</p>
           @endif
         </div>
       </wa-carousel-item>

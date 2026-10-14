@@ -9,6 +9,7 @@
 @props([
     'photo',
     'name',
+    'info' => null,
     'quote',
     'link' => null,
 ])
@@ -22,6 +23,10 @@
         <x-heading level="h3" style="match" class="c-testimonial-card__name">
             {{ $name }}
         </x-heading>
+
+        @if ($info)
+            <p class="c-testimonial-card__info u-body-regular">{{ $info }}</p>
+        @endif
 
         <x-quote layout="centered" size="standard" class="c-testimonial-card__quote">
             {!! $quote !!}

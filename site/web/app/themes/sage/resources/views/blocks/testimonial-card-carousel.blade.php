@@ -1,5 +1,6 @@
-<section {{ $attributes->class(['c-testimonial-carousel']) }}>
+<section {{ $attributes->class(['c-testimonial-carousel', 'o-full-bleed-bg']) }}>
 
+@if ($cards)
   <div class="o-container">
     <wa-carousel data-testimonial-carousel class="c-testimonial-carousel__carousel" navigation pagination loop mouse-dragging>
       @foreach ($cards as $card)
@@ -7,6 +8,7 @@
           <x-testimonial-card
             :photo="$card['photo']"
             :name="$card['name']"
+            :info="$card['info']"
             :quote="$card['quote']"
             :link="$card['link']"
           />
@@ -17,5 +19,6 @@
       <x-icon name="arrow-right" slot="next-icon" class="c-testimonial-carousel__nav-icon" />
     </wa-carousel>
   </div>
+@endif
 
 </section>

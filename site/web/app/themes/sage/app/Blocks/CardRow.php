@@ -196,6 +196,7 @@ class CardRow extends Block
             'type' => 'route',
             'heading_highlight' => 'Discover',
             'heading' => 'our favourite local rides',
+            'intro' => 'View it on a map, learn more and download printable PDFs.',
             'route_cards' => [
                 [
                     'image' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
@@ -290,7 +291,7 @@ class CardRow extends Block
                 ])
                 ->addTextarea('intro', [
                     'label' => 'Intro text',
-                    'instructions' => 'Only shown on the Link type.',
+                    'instructions' => 'Shown on the Link and Route types.',
                     'rows' => 2,
                     'conditional_logic' => [
                         [
@@ -298,6 +299,13 @@ class CardRow extends Block
                                 'field' => 'type',
                                 'operator' => '==',
                                 'value' => 'link',
+                            ],
+                        ],
+                        [
+                            [
+                                'field' => 'type',
+                                'operator' => '==',
+                                'value' => 'route',
                             ],
                         ],
                     ],
@@ -462,7 +470,7 @@ class CardRow extends Block
      */
     public function type()
     {
-        return get_field('type') ?: ($this->preview ? $this->example['type'] : 'news');
+        return get_field('type') ?: (shows_example($this->preview) ? $this->example['type'] : 'news');
     }
 
     /**
@@ -472,7 +480,7 @@ class CardRow extends Block
      */
     public function headingHighlight()
     {
-        return get_field('heading_highlight') ?: ($this->preview ? $this->example['heading_highlight'] : '');
+        return get_field('heading_highlight') ?: (shows_example($this->preview) ? $this->example['heading_highlight'] : '');
     }
 
     /**
@@ -482,17 +490,17 @@ class CardRow extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: ($this->preview ? $this->example['heading'] : '');
+        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
     }
 
     /**
-     * Retrieve the intro text (Link type only).
+     * Retrieve the intro text (Link and Route types).
      *
      * @return string|null
      */
     public function intro()
     {
-        return $this->type() === 'link' ? (get_field('intro') ?: ($this->preview ? ($this->example['intro'] ?? null) : null)) : null;
+        return in_array($this->type(), ['link', 'route'], true) ? (get_field('intro') ?: (shows_example($this->preview) ? ($this->example['intro'] ?? null) : null)) : null;
     }
 
     /**
@@ -502,7 +510,7 @@ class CardRow extends Block
      */
     public function newsCards()
     {
-        return $this->normalizeCards(get_field('news_cards') ?: ($this->preview ? ($this->example['news_cards'] ?? []) : []));
+        return $this->normalizeCards(get_field('news_cards') ?: (shows_example($this->preview) ? ($this->example['news_cards'] ?? []) : []));
     }
 
     /**
@@ -512,7 +520,7 @@ class CardRow extends Block
      */
     public function routeCards()
     {
-        return $this->normalizeCards(get_field('route_cards') ?: ($this->preview ? ($this->example['route_cards'] ?? []) : []));
+        return $this->normalizeCards(get_field('route_cards') ?: (shows_example($this->preview) ? ($this->example['route_cards'] ?? []) : []));
     }
 
     /**
@@ -522,7 +530,7 @@ class CardRow extends Block
      */
     public function linkCards()
     {
-        return $this->normalizeCards(get_field('link_cards') ?: ($this->preview ? ($this->example['link_cards'] ?? []) : []));
+        return $this->normalizeCards(get_field('link_cards') ?: (shows_example($this->preview) ? ($this->example['link_cards'] ?? []) : []));
     }
 
     /**
@@ -578,7 +586,7 @@ class CardRow extends Block
      */
     public function areaLinks()
     {
-        $rows = get_field('area_links') ?: ($this->preview ? ($this->example['area_links'] ?? []) : []);
+        $rows = get_field('area_links') ?: (shows_example($this->preview) ? ($this->example['area_links'] ?? []) : []);
 
         return array_map(fn($row) => ['link' => $this->normalizeLink($row['link'] ?? null)], $rows);
     }
@@ -590,7 +598,7 @@ class CardRow extends Block
      */
     public function browseAllLink()
     {
-        $link = $this->type() !== 'link' ? (get_field('browse_all_link') ?: ($this->preview ? ($this->example['browse_all_link'] ?? null) : null)) : null;
+        $link = $this->type() !== 'link' ? (get_field('browse_all_link') ?: (shows_example($this->preview) ? ($this->example['browse_all_link'] ?? null) : null)) : null;
 
         return $link ? $this->normalizeLink($link) : null;
     }
