@@ -87,6 +87,28 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
+ * Events (MEC's mec-events) are built from the same blocks as pages, so any
+ * block allowed on pages is allowed on events too. One filter here rather
+ * than adding 'mec-events' to every block class's $post_types.
+ */
+add_filter('acf/register_block_type_args', function ($block) {
+    if (in_array('page', $block['post_types'] ?? [], true)) {
+        $block['post_types'][] = 'mec-events';
+    }
+
+    return $block;
+});
+
+/**
+ * MEC switches events to the classic editor by default, which can't show or
+ * keep our ACF blocks (saving there strips them). Use the block editor like
+ * pages; MEC's own settings panels still load below it as meta boxes.
+ * Runs after MEC's filter (10).
+ */
+add_filter('use_block_editor_for_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
+add_filter('gutenberg_can_edit_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
+
+/**
  * Our own ACF Composer blocks each render their own <section>/.o-container
  * wrapper (see the build-acf-block skill's "<section> root" convention),
  * but third-party/core blocks placed directly in post content — e.g. the
