@@ -1,3 +1,6 @@
+@use '../abstracts/spacing';
+
+
 // Full-bleed-background blocks (.o-full-bleed-bg — CTA Banner, Card Grid,
 // Image Hero, Quote Carousel, Video Hero — plus any block given a
 // background colour, which WP marks section.has-background) only pad space
@@ -20,7 +23,7 @@
 
 // Core flow content (paragraphs, lists, tables, images) runs straight into a
 // following heading otherwise — headings only carry margin-bottom.
-.e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image) + .wp-block-heading {
+.e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image, .c-bullet-list-block) + .wp-block-heading {
   margin-top: var(--wp--preset--spacing--small);
 }
 
@@ -52,4 +55,15 @@
 .e-content > .wp-block-embed:has(+ section),
 .e-content > .wp-block-paragraph:has(+ .wp-block-embed) {
   margin-bottom: 0;
+}
+
+// Bullet List defaults to no padding, so it sits in running text like a
+// core list: keep the paragraph gap above it (the section rule above drops
+// it) and give it the same gap below.
+.e-content > .wp-block-paragraph:has(+ .c-bullet-list-block) {
+  margin-bottom: spacing.$base;
+}
+
+.e-content > .c-bullet-list-block {
+  margin-bottom: spacing.$base;
 }

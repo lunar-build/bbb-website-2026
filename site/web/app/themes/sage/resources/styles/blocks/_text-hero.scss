@@ -1,0 +1,17 @@
+// Text Hero (resources/views/blocks/text-hero.blade.php) — also the fallback
+// page title on templates whose content doesn't start with a hero block
+// (App\Support\ContentHero::fallback()).
+
+.c-text-hero {
+  &__breadcrumbs {
+    margin-bottom: 1.75rem;
+  }
+
+  &__heading {
+    margin: 0;
+  }
+
+  &__intro {
+    margin-top: 1.5rem;
+  }
+}

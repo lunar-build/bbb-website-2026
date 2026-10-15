@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Support\PostCard;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -256,19 +257,7 @@ class PostHero extends Block
             return $this->example['categories'];
         }
 
-        $categories = get_the_category();
-
-        // Every uncategorised post still carries WP's default "Uncategorized" term — filter it out.
-        $categories = array_filter($categories, fn($category) => $category->term_id !== (int) get_option('default_category'));
-
-        if (empty($categories)) {
-            return [];
-        }
-
-        return array_map(fn($category) => [
-            'label' => wp_specialchars_decode($category->name),
-            'url' => get_category_link($category),
-        ], $categories);
+        return PostCard::categories(get_post());
     }
 
     /**

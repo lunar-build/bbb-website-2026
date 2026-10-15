@@ -88,8 +88,18 @@
     color: var(--wp--preset--color--charcoal);
   }
 
+  // Pushed to the card's foot (with the CTA under it) so regions line up
+  // across a row of equal-height cards.
+  &__region {
+    margin: auto 0 0;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
   &__cta {
     @extend .u-cta-small;
+    margin-top: auto;
     display: inline-flex;
     align-self: center;
     align-items: center;
@@ -106,5 +116,9 @@
     &:focus-visible {
       @include button.arrow-hover;
     }
+  }
+
+  &__region + &__cta {
+    margin-top: 0;
   }
 }
