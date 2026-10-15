@@ -241,7 +241,7 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 add_filter('wp_theme_json_data_theme', function ($theme_json) {
     $data = $theme_json->get_data();
     $palette = collect($data['settings']['color']['palette']['theme'] ?? [])
-        ->filter(fn ($color) => array_key_exists($color['slug'], theme_block_background_colors()))
+        ->filter(fn($color) => array_key_exists($color['slug'], theme_block_background_colors()))
         ->values()
         ->all();
 
@@ -317,3 +317,28 @@ $withoutFront = function (array $args, string $name) {
 
 add_filter('register_post_type_args', $withoutFront, 10, 2);
 add_filter('register_taxonomy_args', $withoutFront, 10, 2);
+
+/**
+ * Cycling Centre sessions are MEC events, but the live site has them at
+ * /cycling-centres/bristol-cycling-centre/whats-on/{slug}/ rather than MEC's
+ * /events/{slug}/. Keep that URL for events in the Bristol Cycling Centre
+ * category so no redirects are needed. Needs a permalink flush after deploy.
+ */
+const CYCLING_CENTRE_EVENTS_PATH = 'cycling-centres/bristol-cycling-centre/whats-on';
+const CYCLING_CENTRE_EVENTS_CATEGORY = 'bristol-cycling-centre';
+
+add_action('init', function () {
+    add_rewrite_rule(
+        '^' . CYCLING_CENTRE_EVENTS_PATH . '/([^/]+)/?$',
+        'index.php?post_type=mec-events&name=$matches[1]',
+        'top',
+    );
+});
+
+add_filter('post_type_link', function (string $link, \WP_Post $post) {
+    if ($post->post_type !== 'mec-events' || ! has_term(CYCLING_CENTRE_EVENTS_CATEGORY, 'mec_category', $post)) {
+        return $link;
+    }
+
+    return home_url(user_trailingslashit(CYCLING_CENTRE_EVENTS_PATH . '/' . $post->post_name));
+}, 10, 2);
