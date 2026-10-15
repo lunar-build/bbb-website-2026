@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Blocks\Concerns\HasBusinessCardFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
@@ -12,6 +13,7 @@ use Log1x\AcfComposer\Builder;
 class CardGrid extends Block
 {
     use HasBusinessCardFields;
+    use ResolvesFields;
 
     /**
      * The block name.
@@ -446,9 +448,9 @@ class CardGrid extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? ($this->example['heading_text'] ?? '') : ''),
-            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? ($this->example['heading_level'] ?? 'h2') : 'h2'),
-            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? ($this->example['heading_style'] ?? 'match') : 'match'),
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h2'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
     }
 
@@ -460,8 +462,8 @@ class CardGrid extends Block
     public function intro()
     {
         return [
-            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? ($this->example['intro_text'] ?? '') : ''),
-            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? ($this->example['intro_style'] ?? 'body') : 'body'),
+            'text' => $this->resolveField('intro_text', ''),
+            'style' => $this->resolveField('intro_style', 'body'),
         ];
     }
 
@@ -472,7 +474,7 @@ class CardGrid extends Block
      */
     public function cardStyle()
     {
-        return get_field('card_style') ?: (shows_example($this->preview) ? ($this->example['card_style'] ?? 'link') : 'link');
+        return $this->resolveField('card_style', 'link');
     }
 
     /**
@@ -495,8 +497,7 @@ class CardGrid extends Block
      */
     public function sideImage()
     {
-        $show = get_field('show_side_image');
-        $show = $show !== null ? (bool) $show : (shows_example($this->preview) ? (bool) ($this->example['show_side_image'] ?? false) : false);
+        $show = $this->resolveBoolField('show_side_image');
 
         return $show ? Vite::asset('resources/images/illustrations/instructor.png') : null;
     }
@@ -519,7 +520,7 @@ class CardGrid extends Block
             default => 'cards',
         };
 
-        $cards = get_field($field) ?: (shows_example($this->preview) ? ($this->example[$field] ?? $this->example['cards'] ?? []) : []);
+        $cards = get_field($field) ?: $this->exampleField($field, $this->exampleField('cards', []));
 
         return array_map(function ($card) use ($placeholder, $showDate) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];
@@ -553,7 +554,7 @@ class CardGrid extends Block
      */
     public function businessCards()
     {
-        $cards = get_field('business_cards') ?: (shows_example($this->preview) ? ($this->example['business_cards'] ?? []) : []);
+        $cards = $this->resolveField('business_cards', []);
 
         return array_map(function ($card) {
             $card['contact_info'] = $this->withBusinessCardContactHrefs($card['contact_info'] ?? []);

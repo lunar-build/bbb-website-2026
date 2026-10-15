@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class CalloutText extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -199,7 +202,7 @@ class CalloutText extends Block
 
     public function text()
     {
-        return get_field('text') ?: (shows_example($this->preview) ? $this->example['text'] : '');
+        return $this->resolveField('text', '');
     }
 
     /**

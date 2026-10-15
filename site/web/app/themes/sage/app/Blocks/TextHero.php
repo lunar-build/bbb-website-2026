@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
@@ -9,6 +10,8 @@ use Log1x\AcfComposer\Builder;
 
 class TextHero extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -198,9 +201,9 @@ class TextHero extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
-            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h1'),
-            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h1'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
     }
 
@@ -212,8 +215,8 @@ class TextHero extends Block
     public function intro()
     {
         return [
-            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? $this->example['intro_text'] : ''),
-            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? $this->example['intro_style'] : 'standfirst'),
+            'text' => $this->resolveField('intro_text', ''),
+            'style' => $this->resolveField('intro_style', 'standfirst'),
         ];
     }
 
