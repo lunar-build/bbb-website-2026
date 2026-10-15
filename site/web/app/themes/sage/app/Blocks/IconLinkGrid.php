@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class IconLinkGrid extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -225,7 +228,7 @@ class IconLinkGrid extends Block
 
     public function items()
     {
-        return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
+        return $this->resolveField('items', []);
     }
 
     /**

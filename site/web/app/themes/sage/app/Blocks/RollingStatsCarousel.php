@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class RollingStatsCarousel extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -315,7 +318,7 @@ class RollingStatsCarousel extends Block
      */
     public function slides()
     {
-        $slides = get_field('slides') ?: (shows_example($this->preview) ? ($this->example['slides'] ?? []) : []);
+        $slides = $this->resolveField('slides', []);
 
         // The repeater's min of 1 makes ACF add a blank row on insert; drop
         // rows with nothing to show so the block still counts as empty.
@@ -371,7 +374,7 @@ class RollingStatsCarousel extends Block
      */
     public function imageLeft()
     {
-        return $this->illustrationUrl(get_field('image_left') ?: (shows_example($this->preview) ? $this->example['image_left'] : null));
+        return $this->illustrationUrl($this->resolveField('image_left'));
     }
 
     /**
@@ -381,7 +384,7 @@ class RollingStatsCarousel extends Block
      */
     public function imageRight()
     {
-        return $this->illustrationUrl(get_field('image_right') ?: (shows_example($this->preview) ? $this->example['image_right'] : null));
+        return $this->illustrationUrl($this->resolveField('image_right'));
     }
 
     /**

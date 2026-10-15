@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Blocks\Concerns\HasBusinessCardFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
@@ -9,6 +10,7 @@ use Log1x\AcfComposer\Builder;
 class BusinessCard extends Block
 {
     use HasBusinessCardFields;
+    use ResolvesFields;
 
     /**
      * The block name.
@@ -208,7 +210,7 @@ class BusinessCard extends Block
      */
     public function name()
     {
-        return get_field('name') ?: (shows_example($this->preview) ? $this->example['name'] : '');
+        return $this->resolveField('name', '');
     }
 
     /**
@@ -221,13 +223,7 @@ class BusinessCard extends Block
      */
     public function contactInfo()
     {
-        $rows = get_field('contact_info');
-
-        if (! $rows) {
-            $rows = shows_example($this->preview) ? $this->example['contact_info'] : [];
-        }
-
-        return $this->withBusinessCardContactHrefs($rows);
+        return $this->withBusinessCardContactHrefs($this->resolveField('contact_info', []));
     }
 
     /**
@@ -237,13 +233,7 @@ class BusinessCard extends Block
      */
     public function services()
     {
-        $rows = get_field('services');
-
-        if (! $rows) {
-            $rows = shows_example($this->preview) ? $this->example['services'] : [];
-        }
-
-        return $rows;
+        return $this->resolveField('services', []);
     }
 
     /**
@@ -253,13 +243,7 @@ class BusinessCard extends Block
      */
     public function description()
     {
-        $description = get_field('description');
-
-        if ($description) {
-            return $description;
-        }
-
-        return shows_example($this->preview) ? $this->example['description'] : null;
+        return $this->resolveField('description');
     }
 
     /**
@@ -269,7 +253,7 @@ class BusinessCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: (shows_example($this->preview) ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => '']);
+        return $this->resolveField('link', ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

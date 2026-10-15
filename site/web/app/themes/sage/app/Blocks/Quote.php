@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Quote extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -252,7 +255,7 @@ class Quote extends Block
 
     public function quoteSize()
     {
-        return get_field('quote_size') ?: (shows_example($this->preview) ? $this->example['quote_size'] : 'large');
+        return $this->resolveField('quote_size', 'large');
     }
 
     /**
@@ -263,22 +266,22 @@ class Quote extends Block
      */
     public function quote()
     {
-        return get_field('quote') ?: (shows_example($this->preview) ? wpautop($this->example['quote']) : '');
+        return get_field('quote') ?: wpautop($this->exampleField('quote', ''));
     }
 
     public function attributionName()
     {
-        return get_field('attribution_name') ?: (shows_example($this->preview) ? $this->example['attribution_name'] : '');
+        return $this->resolveField('attribution_name', '');
     }
 
     public function attributionRole()
     {
-        return get_field('attribution_role') ?: (shows_example($this->preview) ? $this->example['attribution_role'] : '');
+        return $this->resolveField('attribution_role', '');
     }
 
     public function image()
     {
-        return get_field('image') ?: (shows_example($this->preview) ? $this->example['image'] : null);
+        return $this->resolveField('image');
     }
 
     /**
