@@ -1008,4 +1008,272 @@ if ($mode === 'map-pages') {
     return;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Bristol Cycling Centre sessions -> Modern Events Calendar
+|--------------------------------------------------------------------------
+*/
+
+/** Old cycling_centre_event posts that only filled gaps in the timetable grid. */
+const CC_TIMETABLE_FILLERS = [800, 804, 2097];
+
+/**
+ * The old timetable lived in an ACF options repeater: one row per term
+ * (start/end date, title), each with weekday rows of start/end/event ID.
+ * Returns every term that hasn't ended yet.
+ */
+function cc_terms(wpdb $src): array
+{
+    $opts = $src->get_results("SELECT option_name, option_value FROM {$src->options} WHERE option_name LIKE 'options\_schedule\_%'", OBJECT_K);
+    $get = fn(string $key) => isset($opts["options_schedule_$key"]) ? $opts["options_schedule_$key"]->option_value : '';
+    $today = current_time('Ymd');
+    $terms = [];
+
+    for ($t = 0; $get("{$t}_start_date") !== ''; $t++) {
+        if ($get("{$t}_end_date") < $today) {
+            continue;
+        }
+        $slots = [];
+        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
+            for ($i = 0; $i < (int) $get("{$t}_sessions_$day"); $i++) {
+                $slots[] = [
+                    'day' => $day,
+                    'start' => $get("{$t}_sessions_{$day}_{$i}_start"),
+                    'end' => $get("{$t}_sessions_{$day}_{$i}_end"),
+                    'event' => (int) $get("{$t}_sessions_{$day}_{$i}_event"),
+                ];
+            }
+        }
+        $terms[] = [
+            'title' => trim(preg_replace('/\s+/', ' ', $get("{$t}_schedule_title"))),
+            'start' => $get("{$t}_start_date"),
+            'end' => $get("{$t}_end_date"),
+            'slots' => $slots,
+        ];
+    }
+
+    return $terms;
+}
+
+/** Each term's weekday slots expanded into dated sessions, keyed by old event ID and sorted. */
+function cc_dated_sessions(array $terms): array
+{
+    $sessions = [];
+    foreach ($terms as $term) {
+        $last = DateTimeImmutable::createFromFormat('Ymd', $term['end']);
+        for ($date = DateTimeImmutable::createFromFormat('Ymd', $term['start']); $date <= $last; $date = $date->modify('+1 day')) {
+            foreach ($term['slots'] as $slot) {
+                if ($slot['day'] === strtolower($date->format('l'))) {
+                    $sessions[$slot['event']][] = ['date' => $date->format('Y-m-d'), 'start' => $slot['start'], 'end' => $slot['end']];
+                }
+            }
+        }
+    }
+    foreach ($sessions as &$list) {
+        usort($list, fn($a, $b) => strcmp($a['date'] . $a['start'], $b['date'] . $b['start']));
+    }
+
+    return $sessions;
+}
+
+/** '13:15:00' -> ['01', '15', 'PM'], the 12-hour parts MEC stores times as. */
+function cc_time_parts(string $time): array
+{
+    $t = DateTimeImmutable::createFromFormat('H:i:s', $time);
+
+    return [$t->format('h'), $t->format('i'), $t->format('A')];
+}
+
+function cc_term(string $taxonomy, string $name, string $slug, array $meta = []): int
+{
+    $term = get_term_by('slug', $slug, $taxonomy) ?: (object) wp_insert_term($name, $taxonomy, ['slug' => $slug]);
+    foreach ($meta as $key => $value) {
+        update_term_meta($term->term_id, $key, $value);
+    }
+
+    return (int) $term->term_id;
+}
+
+/**
+ * Drop old session-page blocks with no place on an MEC event page, at any
+ * depth. innerContent's null placeholders are dropped alongside, so
+ * serialize_block() still lines blocks up with their wrapper markup.
+ */
+function cc_strip_blocks(array $blocks, array &$notes): array
+{
+    $out = [];
+    foreach ($blocks as $b) {
+        $name = (string) $b['blockName'];
+        // Next session + price now come from the single event template.
+        if ($name === 'acf/upcoming-sessions') {
+            continue;
+        }
+        // The old CF7 "Bristol Cycling Centre Contact" form needs rebuilding in Gravity Forms.
+        if (in_array($name, ['acf/form', 'contact-form-7/contact-form-selector'], true)) {
+            $notes[] = "dropped $name (CF7 contact form, rebuild in Gravity Forms)";
+
+            continue;
+        }
+        if ($name === 'core-embed/youtube') {
+            $b['blockName'] = 'core/embed';
+        }
+        if ($b['innerBlocks']) {
+            $kept = [];
+            $content = [];
+            $i = 0;
+            foreach ($b['innerContent'] as $chunk) {
+                if ($chunk !== null) {
+                    $content[] = $chunk;
+                } elseif ($inner = cc_strip_blocks([$b['innerBlocks'][$i++]], $notes)) {
+                    $kept[] = $inner[0];
+                    $content[] = null;
+                }
+            }
+            $b['innerBlocks'] = $kept;
+            $b['innerContent'] = $content;
+        }
+        $out[] = $b;
+    }
+
+    return $out;
+}
+
+/** acf/image-slider -> Media Gallery of the same images. */
+function cc_image_slider(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $fields = ['items' => (int) ($d['slides'] ?? 0)];
+    for ($i = 0; $i < $fields['items']; $i++) {
+        $fields += [
+            "items_{$i}_media_type" => 'image',
+            "items_{$i}_image" => $d["slides_{$i}_image"] ?? '',
+            "items_{$i}_video" => '',
+            "items_{$i}_video_poster" => '',
+            "items_{$i}_alt" => $d["slides_{$i}_image_caption"] ?? '',
+            "items_{$i}_video_alt" => '',
+            "items_{$i}_column_span" => '1 column (square)',
+        ];
+    }
+
+    return news_acf_block('acf/media-gallery', \App\Blocks\MediaGallery::class, $fields, 'media_gallery');
+}
+
+if ($mode === 'cycling-centre') {
+    if (! class_exists('MEC')) {
+        WP_CLI::error('Modern Events Calendar must be active.');
+    }
+    $mec = MEC::getInstance('app.libraries.main');
+
+    $ids = array_values(array_diff(
+        $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='cycling_centre_event' AND post_status='publish' ORDER BY ID"),
+        CC_TIMETABLE_FILLERS,
+    ));
+    if ($only) {
+        $ids = array_values(array_intersect($ids, $only));
+    }
+    $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'mec-events' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
+    }
+
+    $category = cc_term('mec_category', 'Bristol Cycling Centre', 'bristol-cycling-centre');
+    // The old site's one-off event categories, ready for new events.
+    foreach (['cycle-training' => 'Cycle training', 'free-bike-check' => 'Free bike check', 'mass-participation' => 'Mass participation', 'roadshow-event' => 'Roadshow event'] as $slug => $name) {
+        cc_term('mec_category', $name, $slug);
+    }
+    $location = cc_term('mec_location', 'Bristol Cycling Centre', 'bristol-cycling-centre', [
+        'address' => 'Old Whitchurch Athletics Track, Bamfield, Bristol BS14 0XA',
+    ]);
+
+    $terms = cc_terms($src);
+    $sessions = cc_dated_sessions($terms);
+
+    foreach ($ids as $id) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            wp_delete_post($id, true);
+        }
+        $row = $src->get_row($src->prepare("SELECT post_name, post_date, post_date_gmt, post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
+        $notes = [];
+        $content = serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes));
+        $content = serialize_blocks(array_map(
+            fn($b) => $b['blockName'] === 'acf/image-slider' ? cc_image_slider($b) : $b,
+            parse_blocks(news_transform($content, $src, $notes)),
+        ));
+        $notes = array_filter($notes, fn($n) => $n !== 'UNMAPPED acf/image-slider');
+
+        // Reserve the old ID; save_event() then fills it in as an MEC event.
+        news_copy_row($src, $id, $replaceUrls, ['post_type' => 'mec-events', 'post_content' => '']);
+        clean_post_cache($id);
+
+        $dates = $sessions[$id] ?? [];
+        $first = $dates ? array_shift($dates) : null;
+        // No sessions this term: a dateless one-off on its old publish date, so the page still exists.
+        $start = $first['date'] ?? substr($row->post_date, 0, 10);
+        [$sh, $sm, $sa] = cc_time_parts($first['start'] ?? '00:00:00');
+        [$eh, $em, $ea] = cc_time_parts($first['end'] ?? '00:00:00');
+
+        // MEC's custom-days format: Y-m-d:Y-m-d:hh-mm-AM:hh-mm-PM, comma-separated.
+        $days = implode(',', array_map(function ($d) {
+            return $d['date'] . ':' . $d['date'] . ':' . implode('-', cc_time_parts($d['start'])) . ':' . implode('-', cc_time_parts($d['end']));
+        }, $dates));
+
+        $price = (string) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='price'", $id));
+
+        $saved = $mec->save_event([
+            'title' => html_entity_decode($row->post_title, ENT_QUOTES),
+            'content' => $replaceUrls($content),
+            'status' => 'publish',
+            'author' => 1,
+            'start' => $start,
+            'end' => $start,
+            'start_time_hour' => $sh,
+            'start_time_minutes' => $sm,
+            'start_time_ampm' => $sa,
+            'end_time_hour' => $eh,
+            'end_time_minutes' => $em,
+            'end_time_ampm' => $ea,
+            'allday' => 0,
+            'date' => ['hide_time' => $first ? 0 : 1],
+            'repeat_status' => $days ? 1 : 0,
+            'repeat_type' => $days ? 'custom_days' : '',
+            'interval' => null,
+            'days' => $days,
+            // As MEC's own editor saves custom-days events: the repeat "ends" with the first date.
+            'finish' => $days ? $start : '',
+            'location_id' => $location,
+            'meta' => [
+                'mec_in_days' => $days,
+                'mec_cost' => $price,
+            ],
+        ], $id);
+        if (is_wp_error($saved)) {
+            WP_CLI::warning("$id: " . $saved->get_error_message());
+
+            continue;
+        }
+
+        // wp_insert_post() regenerates the slug and dates from the title; put the old ones back.
+        $wpdb->update($wpdb->posts, [
+            'post_name' => $row->post_name,
+            'post_date' => $row->post_date,
+            'post_date_gmt' => $row->post_date_gmt,
+        ], ['ID' => $id]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => in_array($k, ['_thumbnail_id', '_wp_old_slug'], true) || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        wp_set_object_terms($id, [$category], 'mec_category');
+        wp_set_object_terms($id, [$location], 'mec_location');
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+        clean_post_cache($id);
+
+        echo "imported $id {$row->post_name}: " . ($first ? count($dates) + 1 : 0) . ' sessions' . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
+    }
+
+    echo "\nTimetable periods for the Events Timetable block:\n";
+    foreach ($terms as $term) {
+        echo "  {$term['title']} ({$term['start']} - {$term['end']})\n";
+    }
+    WP_CLI::success(count($ids) . ' Cycling Centre sessions imported into MEC.');
+
+    return;
+}
+
 WP_CLI::error("Unknown mode: $mode");

@@ -47,6 +47,7 @@ wp eval-file scripts/news-migration/migrate-news.php attachments   # copy all at
 wp eval-file scripts/news-migration/migrate-news.php posts [1288,7070]  # copy posts; re-running replaces earlier imports
 wp eval-file scripts/news-migration/migrate-news.php case-studies [1019] # copy case studies (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php map-pages          # copy shops/BMX/pumps pages (run after attachments)
+wp eval-file scripts/news-migration/migrate-news.php cycling-centre [753] # Cycling Centre sessions -> MEC events (run after attachments)
 ```
 
 These environment variables can be set in front of the command, e.g. `NEWS_SOURCE_DB=old_site wp eval-file ...`:
@@ -76,6 +77,24 @@ reused by title on re-runs) and copies its page,
 `/shops-and-repair/public-bike-pumps/report-a-bike-pump-fault/`, with a Text
 Hero and a Form block. Re-runs replace the pages in place, so nav menu items
 linking to them survive.
+
+`cycling-centre` copies the old Bristol Cycling Centre sessions
+(`cycling_centre_event`) into Modern Events Calendar as `mec-events`, keeping
+IDs, slugs, featured images and Yoast meta. MEC must be active. The old site
+kept session times in a separate timetable (the `options_schedule` ACF options
+repeater, one row per term). Every term that hasn't ended yet is expanded into
+dated sessions, which are saved as MEC "custom days" so each date keeps its own
+time. Sessions with no slots in those terms are kept as undated pages so their
+URLs still work. The timetable fillers (Break, Closed, No sessions) are skipped,
+as are the old site's one-off `event` posts, which have all expired. Each event
+gets the Bristol Cycling Centre category, which keeps its live
+`/cycling-centres/bristol-cycling-centre/whats-on/{slug}/` URL (see
+`app/filters.php`). The old "upcoming sessions" block is dropped (the event
+template shows the next session), as is the old CF7 contact form on Schools and
+Private Hire, which still needs rebuilding in Gravity Forms. The run ends by
+listing the terms it found, ready to add to the What's On page's Events
+Timetable block. MEC stores session times as wall-clock time in UTC timestamps,
+so format them with `gmdate()`, not `wp_date()`.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item
