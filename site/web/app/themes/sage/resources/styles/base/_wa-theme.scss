@@ -56,3 +56,16 @@ wa-checkbox,
 wa-checkbox-group {
   --wa-focus-ring: 2px solid var(--focus-color);
 }
+
+// WA collapses an accordion item by animating its panel to height: 0 with
+// overflow hidden, so the content is invisible but still in the tab order
+// and the accessibility tree: keyboard users could Tab onto links inside a
+// closed item with nothing visibly focused (WCAG 2.4.3 / 2.4.7 / 2.4.11).
+// visibility: hidden removes it from both. It switches after the close
+// animation (--hide-duration) and straight away on open. Only `hidden` is
+// ever set (never `visible`), so an expanded item nested inside a
+// collapsed one stays hidden with its parent.
+wa-accordion-item:not([expanded])::part(panel) {
+  visibility: hidden;
+  transition: visibility 0s linear var(--hide-duration, 200ms);
+}

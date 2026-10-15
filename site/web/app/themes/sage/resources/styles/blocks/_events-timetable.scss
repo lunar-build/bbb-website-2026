@@ -104,14 +104,30 @@
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 0.5rem;
+    padding: 0.25rem;
   }
 
   &::part(scroll-button) {
     display: none;
   }
 
+  // WA's tab strip sits in an unexposed scroller (.nav, overflow: auto)
+  // that clipped the focus ring. Pad the strip by the ring's reach (2px +
+  // 2px offset) so it fits inside, and pull the outer `nav` part back by
+  // the same amount so the pills still line up with the title and rows.
+  &::part(nav) {
+    margin: -0.25rem;
+  }
+
   &::part(body) {
     margin-top: 0.75rem;
+  }
+
+  // Focus lands on the wa-tab host (role="tab") but the pill is its `tab`
+  // part, so ring the part — this also replaces WA's own inset ring, which
+  // sat inside the pill's border (WCAG 2.4.7).
+  wa-tab:focus-visible::part(tab) {
+    @include focus.ring-styles;
   }
 
   wa-tab::part(tab) {
