@@ -209,13 +209,15 @@ add_filter('gform_submit_button', function ($button, $form) {
 }, 10, 2);
 
 /**
- * The Sticky Nav page template (template-sticky-nav.blade.php) builds its
- * left-rail page menu from each top-level (H2) heading, linking to it by
- * `id`. Gutenberg already renders a heading's `id` automatically when an
- * editor sets its "HTML anchor" field — this only covers the headings
+ * The sticky page menu (Sticky Nav pages, single events — any template
+ * showing <x-sticky-page-menu>) is built from each top-level (H2) heading,
+ * linking to it by `id`. Gutenberg already renders a heading's `id`
+ * automatically when an editor sets its "HTML anchor" field — this only
+ * covers the headings
  * where they haven't, auto-slugging the heading text instead so the
- * generated link actually resolves. Scoped to the templates with that menu
- * (Sticky Nav pages, single events) so other pages' H2s are untouched.
+ * generated link actually resolves. Only runs for a post whose page menu
+ * has been built (App\Support\PageMenu::shownFor()), so other pages' H2s
+ * are untouched and no list of templates needs keeping in sync.
  *
  * The slugify logic here must match App\Support\PageMenu::anchorFor()'s
  * fallback, which builds the same `items` array of links.
@@ -225,8 +227,7 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         return $block_content;
     }
 
-    // Single events (single-mec-events.blade.php) use the same page menu.
-    if (! is_page_template('template-sticky-nav.blade.php') && ! is_singular('mec-events')) {
+    if (! Support\PageMenu::shownFor((int) get_the_ID())) {
         return $block_content;
     }
 
