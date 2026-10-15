@@ -360,3 +360,33 @@ add_filter('template_include', function (string $template) {
 
     return $template;
 }, 99);
+
+/**
+ * The /events/ archive uses the theme's archive view (no design of its own
+ * yet). MEC's query parsing forces 1 post per page there; restore the site
+ * setting, and list events by their next session, undated ones last.
+ */
+add_action('pre_get_posts', function (\WP_Query $query) {
+    if (is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive('mec-events')) {
+        return;
+    }
+
+    $query->set('posts_per_page', (int) get_option('posts_per_page'));
+
+    add_filter('posts_clauses', function (array $clauses, \WP_Query $q) use ($query) {
+        if ($q !== $query) {
+            return $clauses;
+        }
+        global $wpdb;
+
+        // MEC stores wall-clock times as UTC timestamps; see App\Support\EventSessions.
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $clauses['join'] .= $wpdb->prepare(
+            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tstart >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
+            $now,
+        );
+        $clauses['orderby'] = "mec_next.next_session IS NULL, mec_next.next_session ASC, {$wpdb->posts}.post_title ASC";
+
+        return $clauses;
+    }, 10, 2);
+}, 20);

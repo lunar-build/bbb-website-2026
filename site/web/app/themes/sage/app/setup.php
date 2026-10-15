@@ -336,3 +336,24 @@ if (defined('WP_CLI') && WP_CLI) {
         }
     });
 }
+
+/**
+ * MEC enqueues ~20 styles/scripts (plus a Typekit script) on every page, but
+ * the theme renders events itself (Events Timetable block, single-mec-events
+ * view), so none of it is used. Keep it only where an editor has placed an
+ * MEC shortcode.
+ */
+add_action('wp_enqueue_scripts', function () {
+    if (is_singular() && has_shortcode((string) get_post_field('post_content'), 'MEC')) {
+        return;
+    }
+
+    $isMec = fn(string $handle) => str_starts_with($handle, 'mec-') || $handle === 'featherlight';
+
+    foreach (array_filter(wp_styles()->queue, $isMec) as $handle) {
+        wp_dequeue_style($handle);
+    }
+    foreach (array_filter(wp_scripts()->queue, $isMec) as $handle) {
+        wp_dequeue_script($handle);
+    }
+}, 100);
