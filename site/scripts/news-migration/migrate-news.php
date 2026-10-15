@@ -913,6 +913,33 @@ function news_pump_fault_form(): int
     return (int) $id;
 }
 
+/**
+ * The old page template drew its header from the featured image; here that's
+ * an Image Hero block, or a Text Hero when there's no image (e.g. BMX), so the
+ * title still gets a proper hero.
+ */
+function news_page_hero(string $title, int $thumb): array
+{
+    $title = html_entity_decode($title, ENT_QUOTES);
+    $hero = $thumb
+        ? news_acf_block('acf/image-hero', \App\Blocks\ImageHero::class, [
+            'background_image' => $thumb,
+            'image_position' => 'center',
+            'show_heading' => '1',
+            'heading' => $title,
+            'show_breadcrumbs' => '1',
+        ], 'image_hero')
+        : news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
+            'heading_text' => $title,
+            'heading_level' => 'h1',
+            'heading_style' => 'match',
+            'show_breadcrumbs' => '1',
+        ], 'text_hero');
+    $hero['attrs']['align'] = 'full';
+
+    return $hero;
+}
+
 if ($mode === 'map-pages') {
     $pages = NEWS_MAP_PAGES;
     $clash = array_filter(news_taken([...array_keys($pages), 6669]), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
@@ -940,26 +967,7 @@ if ($mode === 'map-pages') {
 
                 return $b;
             }, parse_blocks($content)));
-            // The old template drew its header from the featured image; here that's an Image Hero block.
-            if ($thumb) {
-                $hero = news_acf_block('acf/image-hero', \App\Blocks\ImageHero::class, [
-                    'background_image' => $thumb,
-                    'image_position' => 'center',
-                    'show_heading' => '1',
-                    'heading' => html_entity_decode($row->post_title, ENT_QUOTES),
-                    'show_breadcrumbs' => '1',
-                ], 'image_hero');
-            } else {
-                // No featured image (BMX) — a Text Hero, so the title still gets a proper hero.
-                $hero = news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
-                    'heading_text' => html_entity_decode($row->post_title, ENT_QUOTES),
-                    'heading_level' => 'h1',
-                    'heading_style' => 'match',
-                    'show_breadcrumbs' => '1',
-                ], 'text_hero');
-            }
-            $hero['attrs']['align'] = 'full';
-            $content = serialize_block($hero) . "\n\n" . $content;
+            $content = serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n" . $content;
         }
 
         news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);
@@ -1017,12 +1025,19 @@ if ($mode === 'map-pages') {
 /** Old cycling_centre_event posts that only filled gaps in the timetable grid. */
 const CC_TIMETABLE_FILLERS = [800, 804, 2097];
 
+/** Cycling centres > Bristol Cycling Centre > What's on, copied with their IDs and URLs. */
+const CC_PAGES = [308, 309, 796];
+
+/** Session dot colours from the Figma accordion timetable, handed out in turn (MEC stores them without the #). */
+const CC_COLORS = ['ffbf47', 'f77ba0', '67dd00', '76dbe8', '1eacdb'];
+
 /**
  * The old timetable lived in an ACF options repeater: one row per term
  * (start/end date, title), each with weekday rows of start/end/event ID.
- * Returns every term that hasn't ended yet.
+ * Returns the terms keyed by their repeater index, skipping ended ones
+ * unless $includeEnded.
  */
-function cc_terms(wpdb $src): array
+function cc_terms(wpdb $src, bool $includeEnded = false): array
 {
     $opts = $src->get_results("SELECT option_name, option_value FROM {$src->options} WHERE option_name LIKE 'options\_schedule\_%'", OBJECT_K);
     $get = fn(string $key) => isset($opts["options_schedule_$key"]) ? $opts["options_schedule_$key"]->option_value : '';
@@ -1030,7 +1045,7 @@ function cc_terms(wpdb $src): array
     $terms = [];
 
     for ($t = 0; $get("{$t}_start_date") !== ''; $t++) {
-        if ($get("{$t}_end_date") < $today) {
+        if (! $includeEnded && $get("{$t}_end_date") < $today) {
             continue;
         }
         $slots = [];
@@ -1044,7 +1059,7 @@ function cc_terms(wpdb $src): array
                 ];
             }
         }
-        $terms[] = [
+        $terms[$t] = [
             'title' => trim(preg_replace('/\s+/', ' ', $get("{$t}_schedule_title"))),
             'start' => $get("{$t}_start_date"),
             'end' => $get("{$t}_end_date"),
@@ -1104,8 +1119,9 @@ function cc_strip_blocks(array $blocks, array &$notes): array
     $out = [];
     foreach ($blocks as $b) {
         $name = (string) $b['blockName'];
-        // Next session + price now come from the single event template.
-        if ($name === 'acf/upcoming-sessions') {
+        // Next session + price now come from the single event template; the
+        // old theme's decorative illustrations have no place in this one.
+        if (in_array($name, ['acf/upcoming-sessions', 'acf/illustration'], true)) {
             continue;
         }
         // The old CF7 "Bristol Cycling Centre Contact" form needs rebuilding in Gravity Forms.
@@ -1171,7 +1187,7 @@ if ($mode === 'cycling-centre') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
-    $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'mec-events' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    $clash = array_filter(news_taken([...$ids, ...CC_PAGES]), fn($r) => ! (in_array($r->post_type, ['mec-events', 'page'], true) && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
     }
@@ -1188,7 +1204,7 @@ if ($mode === 'cycling-centre') {
     $terms = cc_terms($src);
     $sessions = cc_dated_sessions($terms);
 
-    foreach ($ids as $id) {
+    foreach ($ids as $n => $id) {
         if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
             wp_delete_post($id, true);
         }
@@ -1244,6 +1260,7 @@ if ($mode === 'cycling-centre') {
             'meta' => [
                 'mec_in_days' => $days,
                 'mec_cost' => $price,
+                'mec_color' => CC_COLORS[$n % count(CC_COLORS)],
             ],
         ], $id);
         if (is_wp_error($saved)) {
@@ -1267,11 +1284,50 @@ if ($mode === 'cycling-centre') {
         echo "imported $id {$row->post_name}: " . ($first ? count($dates) + 1 : 0) . ' sessions' . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
     }
 
-    echo "\nTimetable periods for the Events Timetable block:\n";
-    foreach ($terms as $term) {
-        echo "  {$term['title']} ({$term['start']} - {$term['end']})\n";
+    // The pages above the sessions. What's on's old acf/calendar blocks (one
+    // per term) become Events Timetable blocks covering the same term.
+    $allTerms = cc_terms($src, true);
+    foreach (CC_PAGES as $id) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            news_remove_page_import($id);
+        }
+        $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
+        $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
+        $notes = [];
+        $blocks = array_map(function ($b) use ($allTerms, $category, &$notes) {
+            if ($b['blockName'] !== 'acf/calendar') {
+                return $b;
+            }
+            $term = $allTerms[(int) ($b['attrs']['data']['schedule_choice'] ?? 0)] ?? null;
+            $notes[] = 'acf/calendar -> Events Timetable' . ($term ? '' : ' (term not found, left empty)');
+
+            return news_acf_block('acf/events-timetable', \App\Blocks\EventsTimetable::class, [
+                'layout' => 'tabs',
+                'category' => $category,
+                'periods' => $term ? 1 : 0,
+            ] + ($term ? [
+                'periods_0_title' => $term['title'],
+                'periods_0_start_date' => $term['start'],
+                'periods_0_end_date' => $term['end'],
+            ] : []), 'events_timetable');
+        }, parse_blocks(news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes)));
+        $notes = array_filter($notes, fn($n) => $n !== 'UNMAPPED acf/calendar');
+
+        // What's on uses the Sticky Nav template (Figma 14:800: page index beside the
+        // content), which supplies its own Text Hero and breadcrumbs, so no hero block.
+        $stickyNav = $id === 796;
+        $content = ($stickyNav ? '' : serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n") . serialize_blocks($blocks);
+        news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => $k === '_thumbnail_id' || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+        if ($stickyNav) {
+            update_post_meta($id, '_wp_page_template', 'template-sticky-nav.blade.php');
+        }
+        clean_post_cache($id);
+        echo "imported page $id " . ($notes ? '(' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
     }
-    WP_CLI::success(count($ids) . ' Cycling Centre sessions imported into MEC.');
+
+    WP_CLI::success(count($ids) . ' Cycling Centre sessions and ' . count(CC_PAGES) . ' pages imported.');
 
     return;
 }
