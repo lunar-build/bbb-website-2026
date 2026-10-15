@@ -1,0 +1,227 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus';
+
+// Figma "Sample page -> Filter page": intro over the results column, then a
+// filter sidebar beside the results. Markup: resources/views/archive.blade.php.
+
+.c-archive {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: 3.5rem 5rem;
+
+  @include bp.respond($min: bp.$lg) {
+    grid-template-columns: 16.875rem minmax(0, 1fr);
+    column-gap: 4.1875rem;
+    row-gap: 4rem;
+    padding-top: 5rem;
+  }
+
+  &--no-filters {
+    @include bp.respond($min: bp.$lg) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  // A Text Hero already pads its own bottom — don't stack another gap on it.
+  .c-text-hero + .o-container > & {
+    padding-top: 0;
+  }
+
+  &__intro,
+  &__results {
+    @include bp.respond($min: bp.$lg) {
+      grid-column: -2 / -1;
+    }
+  }
+
+  &__filters {
+    @include bp.respond($min: bp.$lg) {
+      grid-column: 1;
+    }
+  }
+
+  // Blocks in the linked page's intro wrap themselves in .o-container —
+  // already narrowed by the archive column, so flatten that inner grid.
+  &__intro .o-container {
+    grid-template-columns: [full-start content-start] 100% [content-end full-end];
+  }
+
+  &__intro > section {
+    padding-block: 0;
+  }
+
+  // Background blocks (Card Grid, CTA Banner, any picked colour) can't run
+  // full bleed from this column — box them as a rounded panel instead. Their
+  // spacing controls still set top/bottom inline; this adds the sides.
+  &__intro :is(.o-full-bleed-bg, section.has-background) {
+    padding: var(--wp--preset--spacing--small) 1.5rem;
+    border-radius: 1.25rem;
+
+    @include bp.respond($min: bp.$md) {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  // Back-to-back background blocks join into one panel: rounded only on the
+  // outer corners, no gap between them — as they'd sit flush full bleed.
+  &__intro :is(.o-full-bleed-bg, section.has-background) + :is(.o-full-bleed-bg, section.has-background) {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  &__intro :is(.o-full-bleed-bg, section.has-background):has(+ :is(.o-full-bleed-bg, section.has-background)) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &__intro > * + * {
+    margin-top: 2rem;
+  }
+
+  &__results-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 2.6875rem;
+  }
+
+  &__results-heading {
+    margin-bottom: 0;
+    color: var(--wp--preset--color--blue-dark);
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__count {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  &__cards {
+    display: grid;
+    gap: 2.125rem;
+
+    @include bp.respond($min: bp.$sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__pagination ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 3.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__pagination :is(a, span) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding-inline: 0.75rem;
+    border: 2px solid var(--wp--preset--color--charcoal);
+    border-radius: 999px;
+    color: var(--wp--preset--color--charcoal);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  &__pagination a {
+    @include focus.ring;
+
+    &:hover {
+      background: var(--wp--preset--color--charcoal);
+      color: var(--wp--preset--color--white);
+    }
+  }
+
+  &__pagination .current {
+    background: var(--wp--preset--color--charcoal);
+    color: var(--wp--preset--color--white);
+  }
+
+  &__pagination .dots {
+    border-color: transparent;
+  }
+
+  &.is-loading &__results {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+}
+
+// Feature Card's fixed Figma width is for the standalone block — fill the
+// column. Two classes so it wins regardless of stylesheet order.
+.c-archive__cards .c-archive__card {
+  max-width: none;
+}
+
+// Business Card's fixed Figma width is for the standalone block — fill the column.
+.c-archive__cards .c-business-card__card {
+  max-width: none;
+}
+
+// "View details" in a map pin's info window jumps to its card.
+.c-archive__cards .c-business-card__card:target {
+  outline: 2px solid var(--wp--preset--color--blue);
+  outline-offset: 2px;
+}
+
+// Map Listing template (template-map-listing.blade.php).
+.c-map-listing__map {
+  aspect-ratio: 935 / 500;
+  margin-bottom: 3.375rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: var(--wp--preset--color--lightest-grey);
+}
+
+// Pin popup (partials/map-listing-info.blade.php) inside Google's InfoWindow,
+// which doesn't inherit the theme's type styles.
+.c-map-listing__info {
+  padding: 0.25rem 0.5rem 0.5rem 0.25rem;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--wp--preset--color--charcoal);
+
+  > * {
+    margin: 0 0 0.5rem;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  a {
+    color: var(--wp--preset--color--blue);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+.c-map-listing__info-name {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.c-map-listing__info-description {
+  margin-top: 0.75rem;
+}
+
+.c-map-listing__info-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-top: 1rem;
+}

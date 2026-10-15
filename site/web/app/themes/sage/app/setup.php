@@ -250,7 +250,9 @@ add_action('init', function () {
  * @return void
  */
 add_action('init', function () {
-    register_post_type('case-study', [
+    // Name and slug match the old site, so imported IDs/meta and live
+    // /ibikeitilikeit/{slug}/ URLs carry straight over.
+    register_post_type('case_study', [
         'labels' => [
             'name' => __('Case Studies', 'sage'),
             'singular_name' => __('Case Study', 'sage'),
@@ -260,7 +262,18 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-analytics',
         'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
         'has_archive' => true,
-        'rewrite' => ['slug' => 'case-studies'],
+        'rewrite' => ['slug' => 'ibikeitilikeit'],
+    ]);
+
+    register_taxonomy('case_study_tag', 'case_study', [
+        'labels' => [
+            'name' => __('Tags', 'sage'),
+            'singular_name' => __('Tag', 'sage'),
+        ],
+        'public' => true,
+        'show_in_rest' => true,
+        'show_admin_column' => true,
+        'rewrite' => ['slug' => 'ibikeitilikeit/tag'],
     ]);
 
     register_post_type('testimonial', [
@@ -288,4 +301,38 @@ add_action('init', function () {
         'has_archive' => true,
         'rewrite' => ['slug' => 'cycle-routes'],
     ]);
+}, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.
+
+/**
+ * Keep the Map Listing template's open-data cache fresh — hourly, never
+ * on a page request. See App\Support\OpenData.
+ */
+add_action('init', function () {
+    if (! wp_next_scheduled('opendata_refresh')) {
+        wp_schedule_event(time(), 'hourly', 'opendata_refresh');
+    }
 });
+
+add_action('opendata_refresh', function () {
+    foreach (array_keys(Support\OpenData::DATASETS) as $dataset) {
+        Support\OpenData::refresh($dataset);
+    }
+});
+
+if (defined('WP_CLI') && WP_CLI) {
+    /**
+     * Refresh the cached open-data datasets.
+     *
+     * ## OPTIONS
+     *
+     * [<dataset>]
+     * : One of shops, bmx, pumps. Defaults to all.
+     */
+    \WP_CLI::add_command('opendata refresh', function ($args) {
+        foreach ($args ?: array_keys(Support\OpenData::DATASETS) as $dataset) {
+            Support\OpenData::refresh($dataset)
+                ? \WP_CLI::success(sprintf('%s: %d items', $dataset, count(Support\OpenData::items($dataset))))
+                : \WP_CLI::warning("{$dataset}: fetch failed, kept previous cache");
+        }
+    });
+}

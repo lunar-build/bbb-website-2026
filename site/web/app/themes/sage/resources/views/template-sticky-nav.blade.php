@@ -49,13 +49,8 @@
 
 @section('content')
   @while(have_posts()) @php(the_post())
-    @if ($hero)
-      {!! $hero !!}
-    @else
-      {{-- No Image Hero block at the top of the content — fall back to a
-      plain <h1>, same as template-custom, so the page still has one. --}}
-      @include('partials.page-header')
-    @endif
+    {{-- The page's own hero block, or a Text Hero with its title (App\Support\ContentHero). --}}
+    {!! $hero !!}
 
     <div class="o-container">
       {{-- No H2 headings means no page-menu items (App\Support\PageMenu returns

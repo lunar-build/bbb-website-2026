@@ -13,6 +13,11 @@
  *   attachments  copy every source attachment (+ meta), keeping its ID
  *   posts        copy published posts (optionally only comma-separated ids), keeping IDs;
  *                re-running replaces posts already imported
+ *   case-studies copy published case studies (optionally only comma-separated ids), keeping IDs,
+ *                quote/card_image fields and case_study_tag terms; run after `attachments`
+ *   map-pages    copy the shops/BMX/pumps pages (+ parents) onto the Map Listing template, keeping
+ *                IDs and URLs; featured image becomes an Image Hero; also rebuilds the bike pump
+ *                fault form in Gravity Forms + its page; run after `attachments`
  *
  * Env:
  *   NEWS_SOURCE_DB        source database name (default prod_scratch)
@@ -216,6 +221,48 @@ function news_buttons(array $b): array
     return $out;
 }
 
+/** Inline markup a Bullet List item keeps (see components/bullet-list.blade.php). */
+const NEWS_LIST_INLINE = '<strong><b><em><i><a>';
+
+/**
+ * core/list -> Bullet List. Numbered lists stay numbered; nested lists keep
+ * their depth via each item's indent level (Bullet List supports 0–2). Items
+ * keep bold/italic/links.
+ */
+function news_list(array $b, array &$notes): array
+{
+    $items = [];
+    $collect = function (array $list, int $level) use (&$collect, &$items, &$notes) {
+        if ($level > 2) {
+            $notes[] = 'list nested deeper than 3 levels — extra levels indented at 2';
+        }
+        foreach ($list['innerBlocks'] as $li) {
+            // The item's own text is the HTML before any nested list.
+            $own = preg_replace('#<(ul|ol)\b.*#s', '', $li['innerHTML']);
+            $text = trim(html_entity_decode(strip_tags($own, NEWS_LIST_INLINE), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($text !== '') {
+                $items[] = ['text' => $text, 'level' => min($level, 2)];
+            }
+            foreach ($li['innerBlocks'] as $sub) {
+                $collect($sub, $level + 1);
+            }
+        }
+    };
+    $collect($b, 0);
+
+    $fields = [
+        'heading' => '',
+        'list_style' => ! empty($b['attrs']['ordered']) ? 'numbers' : 'bullets',
+        'items' => count($items),
+    ];
+    foreach ($items as $i => $item) {
+        $fields["items_{$i}_text"] = $item['text'];
+        $fields["items_{$i}_level"] = (string) $item['level'];
+    }
+
+    return news_acf_block('acf/bullet-list', \App\Blocks\BulletList::class, $fields, 'bullet_list');
+}
+
 /** core/table -> Table block; a first row that's all bold becomes the column headings. */
 function news_table(array $b): array
 {
@@ -277,18 +324,91 @@ function news_image_columns(array $b): ?array
     ]);
 }
 
-/** core/image nested in other layouts swaps 1:1, so innerContent placeholders stay valid. */
-function news_nested_images(array $blocks): array
+/** Every block nested anywhere under $blocks, wrappers included. */
+function news_flatten(array $blocks): array
+{
+    $all = [];
+    foreach ($blocks as $b) {
+        $all[] = $b;
+        array_push($all, ...news_flatten($b['innerBlocks']));
+    }
+
+    return $all;
+}
+
+/**
+ * A group/columns layout holding only old acf/card blocks (icon or image,
+ * title, text, link) -> one Card Grid of "link" cards.
+ */
+function news_old_cards(array $b): ?array
+{
+    $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i));
+    if (! $leaves || array_filter($leaves, fn($i) => $i['blockName'] !== 'acf/card')) {
+        return null;
+    }
+
+    $fields = ['card_style' => 'link', 'cards' => count($leaves)];
+    foreach (array_values($leaves) as $n => $card) {
+        $d = $card['attrs']['data'] ?? [];
+        $fields += [
+            "cards_{$n}_image" => $d['icon'] ?? $d['image'] ?? '',
+            "cards_{$n}_heading_text" => $d['title'] ?? '',
+            "cards_{$n}_heading_level" => 'h3',
+            "cards_{$n}_heading_style" => 'match',
+            "cards_{$n}_body_text" => $d['text'] ?? '',
+            "cards_{$n}_body_style" => 'body',
+            "cards_{$n}_link" => $d['link'] ?? '',
+        ];
+    }
+
+    return news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid');
+}
+
+/** Swap each outermost all-acf/card group/columns, at any depth, 1:1 for a Card Grid. */
+function news_replace_old_cards(array $blocks, array &$notes): array
 {
     foreach ($blocks as &$b) {
-        if ($b['blockName'] === 'core/image') {
-            $b = news_image($b);
+        if (in_array($b['blockName'], ['core/group', 'core/columns'], true) && ($cards = news_old_cards($b))) {
+            $b = $cards;
+            $notes[] = 'acf/card layout -> Card Grid';
         } elseif ($b['innerBlocks']) {
-            $b['innerBlocks'] = news_nested_images($b['innerBlocks']);
+            $b['innerBlocks'] = news_replace_old_cards($b['innerBlocks'], $notes);
         }
     }
 
     return $blocks;
+}
+
+/**
+ * Inside layouts (groups, columns): core/image and core/list swap 1:1,
+ * core/buttons expands to one Button block each — innerContent's null placeholders are rebuilt to
+ * match so serialize_block() still lines blocks up with their wrapper markup.
+ */
+function news_nested(array $parent, array &$notes = []): array
+{
+    $blocks = [];
+    $content = [];
+    $i = 0;
+    foreach ($parent['innerContent'] as $chunk) {
+        if ($chunk !== null) {
+            $content[] = $chunk;
+
+            continue;
+        }
+        $b = $parent['innerBlocks'][$i++];
+        $swapped = match ($b['blockName']) {
+            'core/image' => [news_image($b)],
+            'core/buttons' => news_buttons($b),
+            'core/list' => [news_list($b, $notes)],
+            default => [$b['innerBlocks'] ? news_nested($b, $notes) : $b],
+        };
+        foreach ($swapped as $block) {
+            $blocks[] = $block;
+            $content[] = null;
+        }
+    }
+
+    return ['innerBlocks' => $blocks, 'innerContent' => $content] + $parent;
 }
 
 /**
@@ -313,7 +433,10 @@ function news_tighten_after_headings(array $blocks): array
 
 function news_transform(string $content, wpdb $src, array &$notes): string
 {
-    $in = parse_blocks($content);
+    // Old card layouts are spotted by their wrapping group, so swap those
+    // first; then lift every block out of its group so the loop below
+    // converts blocks at any depth, not just the top level.
+    $in = news_unwrap_groups(news_replace_old_cards(parse_blocks($content), $notes));
     $out = [];
     $bikes = [];
     $bikeSlot = null;
@@ -339,12 +462,15 @@ function news_transform(string $content, wpdb $src, array &$notes): string
             case 'core/table':
                 $out[] = news_table($b);
                 break;
+            case 'core/list':
+                $out[] = news_list($b, $notes);
+                break;
             case 'core/columns':
                 $columns = news_image_columns($b);
                 if (! $columns) {
                     $notes[] = 'core/columns kept as-is (not two single images)';
                 }
-                $out[] = $columns ?? ['innerBlocks' => news_nested_images($b['innerBlocks'])] + $b;
+                $out[] = $columns ?? news_nested($b, $notes);
                 break;
             case 'acf/download-link':
                 $run = [$b];
@@ -366,7 +492,7 @@ function news_transform(string $content, wpdb $src, array &$notes): string
                 if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/')) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }
-                $out[] = $b['innerBlocks'] ? ['innerBlocks' => news_nested_images($b['innerBlocks'])] + $b : $b;
+                $out[] = $b['innerBlocks'] ? news_nested($b, $notes) : $b;
         }
     }
 
@@ -377,6 +503,26 @@ function news_transform(string $content, wpdb $src, array &$notes): string
     }
 
     return serialize_blocks(news_tighten_after_headings($out));
+}
+
+/**
+ * The old theme wrapped sections in core/group purely for its own style
+ * classes (is-style-lightblue, is-style-block-fullwidth-bg), which mean
+ * nothing here — lift their contents out (at any depth) so each block gets
+ * converted and spaces itself. Columns stay; news_nested() handles those.
+ */
+function news_unwrap_groups(array $blocks): array
+{
+    $out = [];
+    foreach ($blocks as $b) {
+        if (($b['blockName'] ?? null) === 'core/group') {
+            array_push($out, ...news_unwrap_groups($b['innerBlocks']));
+        } else {
+            $out[] = $b;
+        }
+    }
+
+    return $out;
 }
 
 /** Every ACF field key the transforms wrote, that ACF doesn't know about. */
@@ -449,6 +595,36 @@ function news_copy_meta(wpdb $src, int $id, array $skip, callable $filter): void
     }
 }
 
+/**
+ * Clear an earlier page import so it can be re-copied under the same ID.
+ * Not wp_delete_post(): that also deletes nav menu items linking to the page.
+ */
+function news_remove_page_import(int $id): void
+{
+    global $wpdb;
+    $wpdb->delete($wpdb->postmeta, ['post_id' => $id]);
+    $wpdb->delete($wpdb->posts, ['ID' => $id]);
+    clean_post_cache($id);
+}
+
+/**
+ * Old shops/BMX/pumps template pages → Map Listing template, keeping IDs and
+ * URLs. Old site ID => [dataset, preset services]; null = parent page.
+ * Presets decoded from the old selected_categories field.
+ */
+const NEWS_MAP_PAGES = [
+    705 => null,
+    707 => null,
+    715 => null,
+    287 => ['shops', ['New bikes', 'Secondhand bikes', 'E-Bikes', 'Custom bikes']],
+    288 => ['shops', ['Secondhand bikes']],
+    289 => ['shops', ['Donate a bike']],
+    295 => ['shops', ['Bike hire', 'Bike tours']],
+    335 => ['shops', ['Bike servicing', 'Mobile bike repairs']],
+    1121 => ['pumps', []],
+    1292 => ['bmx', []],
+];
+
 /** Local rows already using any of $ids. */
 function news_taken(array $ids): array
 {
@@ -498,6 +674,39 @@ if ($mode === 'check') {
         }
     }
     echo "\nTransform notes:\n  " . (implode("\n  ", array_unique($notes)) ?: 'none') . "\n";
+
+    // Every core block still left after the transform, across everything this
+    // script imports. Each should be checked against the theme's own blocks
+    // (app/Blocks) — if one of ours does the job, add a conversion here.
+    // Walks every nesting level, so blocks inside groups/columns count too.
+    $core = [];
+    $unregistered = [];
+    $walk = function (array $blocks) use (&$walk, &$core, &$unregistered) {
+        foreach ($blocks as $b) {
+            $name = (string) $b['blockName'];
+            if (str_starts_with($name, 'core/')) {
+                $core[$name] = ($core[$name] ?? 0) + 1;
+            } elseif ($name && ! WP_Block_Type_Registry::get_instance()->is_registered($name)) {
+                $unregistered[$name] = ($unregistered[$name] ?? 0) + 1;
+            }
+            $walk($b['innerBlocks']);
+        }
+    };
+    $caseStudyIds = $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='case_study' AND post_status='publish'");
+    foreach ([...$postIds, ...$caseStudyIds, ...array_keys(array_filter(NEWS_MAP_PAGES))] as $id) {
+        $ignored = [];
+        $walk(parse_blocks(news_transform($src->get_var($src->prepare("SELECT post_content FROM {$src->posts} WHERE ID=%d", $id)), $src, $ignored)));
+    }
+    arsort($unregistered);
+    echo "\nOld-theme blocks left at any depth (not registered here — need a conversion):\n";
+    foreach ($unregistered ?: ['none' => ''] as $name => $count) {
+        echo "  $name $count\n";
+    }
+    arsort($core);
+    echo "\nCore blocks left after transform (check each against app/Blocks for a replacement):\n";
+    foreach ($core ?: ['none' => ''] as $name => $count) {
+        echo "  $name $count\n";
+    }
     echo "\nUnknown ACF field keys:\n  " . (implode("\n  ", array_unique($bad)) ?: 'none') . "\n";
 
     return;
@@ -584,6 +793,217 @@ if ($mode === 'posts') {
         echo "imported $id\n";
     }
     WP_CLI::success(count($postIds) . ' posts imported.');
+
+    return;
+}
+
+if ($mode === 'case-studies') {
+    $ids = $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='case_study' AND post_status='publish' ORDER BY ID");
+    if ($only) {
+        $ids = array_values(array_intersect($ids, $only));
+    }
+    $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'case_study' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
+    }
+
+    // Only fields App\Fields\CaseStudy keeps; the old illustration fields belonged to the old theme's layout.
+    $fieldKeys = ['quote' => 'field_case_study_quote', 'card_image' => 'field_case_study_card_image'];
+    $keepMeta = ['_thumbnail_id', '_wp_old_slug', ...array_keys($fieldKeys)];
+
+    foreach ($ids as $id) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            wp_delete_post($id, true);
+        }
+        $notes = [];
+        $row = $src->get_row($src->prepare("SELECT post_content, post_excerpt FROM {$src->posts} WHERE ID=%d", $id));
+        $quote = $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='quote'", $id));
+        news_copy_row($src, $id, $replaceUrls, [
+            'post_content' => $replaceUrls(news_transform($row->post_content, $src, $notes)),
+            // No excerpts on the old site — the quote is the case study's summary on archive cards.
+            'post_excerpt' => $row->post_excerpt ?: (string) $quote,
+        ]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => in_array($k, $keepMeta, true) || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        foreach ($fieldKeys as $name => $key) {
+            update_post_meta($id, "_$name", $key);
+        }
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+
+        $tags = $src->get_results($src->prepare("SELECT t.name, t.slug FROM {$src->term_relationships} r JOIN {$src->term_taxonomy} tt USING(term_taxonomy_id) JOIN {$src->terms} t USING(term_id) WHERE r.object_id=%d AND tt.taxonomy='case_study_tag'", $id));
+        foreach ($tags as $t) {
+            if (! term_exists($t->slug, 'case_study_tag')) {
+                wp_insert_term(html_entity_decode($t->name), 'case_study_tag', ['slug' => $t->slug]);
+            }
+        }
+        wp_set_object_terms($id, array_map(fn($t) => $t->slug, $tags), 'case_study_tag');
+        clean_post_cache($id);
+        echo "imported $id\n";
+    }
+    WP_CLI::success(count($ids) . ' case studies imported.');
+
+    return;
+}
+
+/**
+ * Gravity Forms copy of the old Contact Form 7 "Public Bike Pumps - Report a
+ * fault" form (old ID 4444): same fields, emailed to the same inbox. Matched
+ * on title, so re-running reuses it rather than adding another.
+ */
+function news_pump_fault_form(): int
+{
+    $title = 'Public Bike Pumps - Report a fault';
+    foreach (GFAPI::get_forms() as $form) {
+        if ($form['title'] === $title) {
+            return (int) $form['id'];
+        }
+    }
+
+    $field = fn(int $id, string $type, string $label, array $extra = []) => $extra + [
+        'id' => $id,
+        'type' => $type,
+        'label' => $label,
+        'isRequired' => true,
+        'size' => 'large',
+    ];
+
+    $id = GFAPI::add_form([
+        'title' => $title,
+        'description' => '',
+        'labelPlacement' => 'top_label',
+        'descriptionPlacement' => 'above',
+        'requiredIndicator' => 'text',
+        'validationSummary' => '1',
+        'markupVersion' => 2,
+        'button' => ['type' => 'text', 'text' => 'Send'],
+        'fields' => [
+            $field(1, 'text', 'Your name', ['autocompleteAttribute' => 'name', 'enableAutocomplete' => true]),
+            $field(2, 'email', 'Your email', ['autocompleteAttribute' => 'email', 'enableAutocomplete' => true]),
+            $field(3, 'text', 'Bike pump location'),
+            $field(4, 'textarea', 'Your message'),
+        ],
+        'notifications' => [
+            'pump_fault' => [
+                'id' => 'pump_fault',
+                'name' => 'Report to Better by Bike',
+                'event' => 'form_submission',
+                'toType' => 'email',
+                'to' => 'betterbybike@bristol.gov.uk',
+                'from' => 'website@betterbybike.info',
+                'fromName' => 'Better by Bike',
+                'replyTo' => '{Your email:2}',
+                'subject' => 'Public Bike Pumps enquiry',
+                'message' => "From: {Your name:1}\nEmail: {Your email:2}\n\nLocation:\n{Bike pump location:3}\n\nMessage:\n{Your message:4}",
+                'isActive' => true,
+            ],
+        ],
+        'confirmations' => [
+            'default' => [
+                'id' => 'default',
+                'name' => 'Default Confirmation',
+                'isDefault' => true,
+                'type' => 'message',
+                'message' => 'Thank you for your message. It has been sent.',
+            ],
+        ],
+    ]);
+    if (is_wp_error($id)) {
+        WP_CLI::error('Gravity Forms: ' . $id->get_error_message());
+    }
+
+    return (int) $id;
+}
+
+if ($mode === 'map-pages') {
+    $pages = NEWS_MAP_PAGES;
+    $clash = array_filter(news_taken([...array_keys($pages), 6669]), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
+    }
+
+    foreach ($pages as $id => $config) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            news_remove_page_import($id);
+        }
+        $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
+        $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
+        $notes = [];
+
+        // Parents only held the old Child Page Cards block, which has no equivalent yet.
+        $content = '';
+        if ($config) {
+            $content = news_transform($row->post_content, $src, $notes);
+            // The intro sits in the archive column, already spaced by its grid — no Standfirst padding.
+            $content = serialize_blocks(array_map(function ($b) {
+                if ($b['blockName'] === 'acf/standfirst') {
+                    $b['attrs']['style']['spacing']['padding'] = ['top' => '0', 'bottom' => '0'];
+                }
+
+                return $b;
+            }, parse_blocks($content)));
+            // The old template drew its header from the featured image; here that's an Image Hero block.
+            if ($thumb) {
+                $hero = news_acf_block('acf/image-hero', \App\Blocks\ImageHero::class, [
+                    'background_image' => $thumb,
+                    'image_position' => 'center',
+                    'show_heading' => '1',
+                    'heading' => html_entity_decode($row->post_title, ENT_QUOTES),
+                    'show_breadcrumbs' => '1',
+                ], 'image_hero');
+            } else {
+                // No featured image (BMX) — a Text Hero, so the title still gets a proper hero.
+                $hero = news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
+                    'heading_text' => html_entity_decode($row->post_title, ENT_QUOTES),
+                    'heading_level' => 'h1',
+                    'heading_style' => 'match',
+                    'show_breadcrumbs' => '1',
+                ], 'text_hero');
+            }
+            $hero['attrs']['align'] = 'full';
+            $content = serialize_block($hero) . "\n\n" . $content;
+        }
+
+        news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => $k === '_thumbnail_id' || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+
+        if ($config) {
+            [$dataset, $services] = $config;
+            update_post_meta($id, '_wp_page_template', 'template-map-listing.blade.php');
+            update_field('map_listing_dataset', $dataset, $id);
+            update_field('map_listing_services', $services, $id);
+        }
+        clean_post_cache($id);
+        echo "imported $id " . ($notes ? '(' . implode('; ', $notes) . ')' : '') . "\n";
+    }
+    // The pumps page's "report a fault" button leads here: the old CF7 form, rebuilt in Gravity Forms.
+    $faultId = 6669;
+    if (get_post_meta($faultId, NEWS_MIGRATED_META, true)) {
+        news_remove_page_import($faultId);
+    }
+    $title = $src->get_var($src->prepare("SELECT post_title FROM {$src->posts} WHERE ID=%d", $faultId));
+    $hero = news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
+        'heading_text' => html_entity_decode($title, ENT_QUOTES),
+        'heading_level' => 'h1',
+        'heading_style' => 'match',
+        'show_breadcrumbs' => '1',
+    ], 'text_hero');
+    $hero['attrs']['align'] = 'full';
+    $form = news_acf_block('acf/form', \App\Blocks\Form::class, [
+        'layout' => 'centred',
+        'heading_text' => 'Tell us which pump and what\'s wrong',
+        'heading_level' => 'h2',
+        'heading_style' => 'match',
+        'intro_text' => 'Public bike pumps are maintained by local authorities in the West of England. Let us know where the pump is and what the problem is.',
+        'intro_style' => 'body',
+        'form_id' => news_pump_fault_form(),
+    ], 'form');
+    news_copy_row($src, $faultId, $replaceUrls, ['post_content' => serialize_blocks([$hero, $form])]);
+    news_copy_meta($src, $faultId, $skipMeta, fn($k, $v) => str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+    update_post_meta($faultId, NEWS_MIGRATED_META, 1);
+    clean_post_cache($faultId);
+    echo "imported $faultId (Gravity Form " . news_pump_fault_form() . ")\n";
+
+    WP_CLI::success(count($pages) + 1 . ' pages imported.');
 
     return;
 }
