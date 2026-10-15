@@ -214,8 +214,8 @@ add_filter('gform_submit_button', function ($button, $form) {
  * `id`. Gutenberg already renders a heading's `id` automatically when an
  * editor sets its "HTML anchor" field — this only covers the headings
  * where they haven't, auto-slugging the heading text instead so the
- * generated link actually resolves. Scoped to the one template so other
- * pages' H2s are untouched.
+ * generated link actually resolves. Scoped to the templates with that menu
+ * (Sticky Nav pages, single events) so other pages' H2s are untouched.
  *
  * The slugify logic here must match App\Support\PageMenu::anchorFor()'s
  * fallback, which builds the same `items` array of links.
@@ -225,7 +225,8 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         return $block_content;
     }
 
-    if (! is_page_template('template-sticky-nav.blade.php')) {
+    // Single events (single-mec-events.blade.php) use the same page menu.
+    if (! is_page_template('template-sticky-nav.blade.php') && ! is_singular('mec-events')) {
         return $block_content;
     }
 
