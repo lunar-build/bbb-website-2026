@@ -155,8 +155,8 @@ class EventsTimetable extends Block
     protected const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     /**
-     * The block preview example data, already in the shape with() hands the
-     * view, since the real data comes from MEC rather than ACF fields.
+     * Pattern-library fixture. Only the layout is a field; the sessions come
+     * from MEC, so examplePeriods() supplies them already shaped.
      *
      * @var array
      */
@@ -165,12 +165,22 @@ class EventsTimetable extends Block
     ];
 
     /**
+     * Both layouts on the pattern library (see build-acf-block skill §6).
+     *
+     * @var array
+     */
+    public $examples = [
+        'Weekday tabs' => ['layout' => 'tabs'],
+        'Day-by-day accordion (alt)' => ['layout' => 'accordion'],
+    ];
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
         return [
-            'layout' => get_field('layout') ?: 'tabs',
+            'layout' => get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'tabs'),
             'periods' => $this->periods(),
         ];
     }
@@ -284,7 +294,7 @@ class EventsTimetable extends Block
     }
 
     /**
-     * Pattern-library fixture: one week shaped like the Figma timetable.
+     * Pattern-library fixture: two holiday weeks, as in the Figma timetables.
      */
     protected function examplePeriods(): array
     {
@@ -296,17 +306,21 @@ class EventsTimetable extends Block
             ['time' => '14:15 — 15:00', 'title' => 'Learn to Ride: Next Steps', 'url' => '#', 'color' => '#76DBE8'],
             ['time' => '15:15 — 16:00', 'title' => 'Rock Up and Ride', 'url' => '#', 'color' => '#FFBF47'],
         ];
-        $dates = [];
-        foreach (self::WEEKDAYS as $i => $day) {
-            $dates[] = ['label' => gmdate('l jS F', strtotime("2026-08-17 +$i days UTC")), 'sessions' => $sessions];
-        }
+        $week = function (string $monday) use ($sessions) {
+            $dates = [];
+            foreach (self::WEEKDAYS as $i => $day) {
+                $dates[] = ['label' => gmdate('l jS F', strtotime("$monday +$i days UTC")), 'sessions' => $sessions];
+            }
 
-        return [[
-            'id' => 'events-timetable-example',
-            'title' => 'Summer Holidays: Monday 17th August – Sunday 23rd August',
-            'weekdays' => array_fill_keys(self::WEEKDAYS, $sessions),
-            'dates' => $dates,
-        ]];
+            return [
+                'id' => wp_unique_id('events-timetable-example-'),
+                'title' => 'Summer Holidays: ' . $dates[0]['label'] . ' – ' . $dates[6]['label'],
+                'weekdays' => array_fill_keys(self::WEEKDAYS, $sessions),
+                'dates' => $dates,
+            ];
+        };
+
+        return [$week('2026-08-17'), $week('2026-08-24')];
     }
 
     /**

@@ -33,10 +33,11 @@
             <h2 class="c-events-timetable__title u-heading-5">{{ $period['title'] }}</h2>
             <wa-tab-group class="c-events-timetable__tabs" active="{{ strtolower($active) }}">
               @foreach ($period['weekdays'] as $day => $sessions)
-                <wa-tab slot="nav" panel="{{ strtolower($day) }}">{{ $day }}</wa-tab>
+                {{-- `active` set in markup too: wa-tab-group only applies its own `active` once scrolled into view. --}}
+                <wa-tab slot="nav" panel="{{ strtolower($day) }}" @if ($day === $active) active @endif>{{ $day }}</wa-tab>
               @endforeach
               @foreach ($period['weekdays'] as $day => $sessions)
-                <wa-tab-panel name="{{ strtolower($day) }}">
+                <wa-tab-panel name="{{ strtolower($day) }}" @if ($day === $active) active @endif>
                   @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'dots' => false])
                 </wa-tab-panel>
               @endforeach
