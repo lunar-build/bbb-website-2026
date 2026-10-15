@@ -87,6 +87,20 @@ Once WP install screen has run (site loads, DB set up):
 2. Activate ACF Pro, Gravity Forms, and Modern Events Calendar Pro plugins in WP admin (Plugins)
 3. Confirm active theme is **Sage** (`web/app/themes/sage`) — WP admin > Appearance > Themes
 
+# Events (Modern Events Calendar)
+
+MEC is used as the **data and admin layer only**: editors add and edit events under **Events** in WP admin, and MEC keeps a table of every dated session (`{prefix}mec_dates`). None of MEC's own templates, skins, CSS or JS are used on the front end (its assets are dequeued in `app/setup.php` unless a page contains an `[MEC]` shortcode). The theme renders everything itself:
+
+- **Events Timetable block** (`app/Blocks/EventsTimetable.php`): goes on a page like Bristol Cycling Centre → What's on. Editors add **periods** (title plus start/end date, e.g. "Half Term: Monday 26th October – Sunday 1st November"), and the block lists the sessions in that range as weekday tabs or a day-by-day accordion. To change the timetable, edit the events' dates in MEC; to add a new term, add a period to the block.
+- **Single event** (`resources/views/single-mec-events.blade.php` + `app/View/Composers/SingleMecEvent.php`): breadcrumbs, title, featured image, a "Next session / Price" card (from MEC's next date and Cost field, with the cost split into bullets on `|`), then the event's own blocks.
+- **`/events/` archive**: the theme's standard archive view, ordered by next session. It's an interim layout until the archive has a design.
+
+Sessions that run at different times on different days use MEC's **Custom Days** repeat (Event details → Repeat → Custom Days), where each date has its own times. Give each event a **Color** in MEC: it's the dot in the accordion timetable.
+
+Events in the **Bristol Cycling Centre** category are served at `/cycling-centres/bristol-cycling-centre/whats-on/{slug}/`, matching the old site (`app/filters.php`), and all other events at `/events/{slug}/`. After deploying, flush permalinks (`wp rewrite flush`).
+
+`App\Support\EventSessions` is the one place that reads MEC's session data. Note that MEC stores times as wall-clock time in UTC timestamps, so format them with `gmdate()`, not `wp_date()`.
+
 # [ACF Composer](https://github.com/log1x/acf-composer)
 
 Provides an artisan-like CLI for managing ACF fields and blocks in a WordPress project. Checkout the link above for example usage and documentation. See the below example.
