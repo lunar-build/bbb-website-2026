@@ -59,6 +59,15 @@
     margin-bottom: 2rem;
   }
 
+  // Blocks wrap their content in their own .o-container, whose side gutter
+  // is right on a full-width page but indents them a second time inside
+  // this column (past the breadcrumbs/title). Flatten it to a 100%-width
+  // passthrough, as components/_single-post.scss does for articles. Blocks
+  // with a background keep their gutter as padding inside the colour.
+  > section:not(.o-full-bleed-bg, .has-background) .o-container {
+    grid-template-columns: [full-start content-start] 100% [content-end full-end];
+  }
+
   // Same reason as .c-sticky-nav-template__nav's `top` above — a heading
   // jumped to via the page menu (or a direct #anchor link) would otherwise
   // land underneath the sticky header. Was calc(var(--site-header-height)

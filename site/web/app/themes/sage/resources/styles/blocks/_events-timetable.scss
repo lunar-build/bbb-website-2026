@@ -10,12 +10,6 @@
   color: var(--wp--preset--color--blue-dark);
 }
 
-// The Sticky Nav template's content column already sits in a container, so
-// drop this block's own gutter there or the panels indent past the headings.
-.c-sticky-nav-template__content .c-events-timetable > .o-container {
-  --o-container-gutter: 0rem;
-}
-
 /* Session rows (both layouts) */
 
 // Doubled class to beat the content-list bullets (.e-content ul) when the
