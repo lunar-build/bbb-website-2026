@@ -1,0 +1,101 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+
+.c-quote-carousel {
+  position: relative;
+  overflow: hidden; // full-bleed bg; .o-container below keeps content contained
+
+  &--filled,
+  &--blue {
+    --c-quote-color: var(--wp--preset--color--white);
+    --c-quote-attribution-color: var(--wp--preset--color--white);
+    --c-quote-mark-color: var(--wp--preset--color--yellow);
+
+    // ::part() must target the custom element directly, hence the ancestor
+    // combinator here rather than nesting under &--filled/&--blue.
+    .c-quote-carousel__carousel::part(pagination-item) {
+      background: transparent;
+      border: 0.125rem solid var(--wp--preset--color--white);
+    }
+
+    .c-quote-carousel__carousel::part(pagination-item-active) {
+      background: var(--wp--preset--color--white);
+    }
+
+    .c-quote-carousel__carousel::part(navigation-button),
+    .c-quote-carousel__carousel::part(pagination-item),
+    .c-quote-carousel__carousel::part(scroll-container) {
+      @include focus.ring($color: var(--wp--preset--color--white));
+    }
+  }
+
+  &--filled {
+    background: var(--wp--preset--color--blue-dark);
+  }
+
+  &--blue {
+    background: var(--wp--preset--color--blue);
+  }
+
+  &--white {
+    background: var(--wp--preset--color--white);
+    --c-quote-color: var(--wp--preset--color--blue-dark);
+    --c-quote-attribution-color: var(--wp--preset--color--blue-dark);
+    --c-quote-mark-color: var(--wp--preset--color--dark-orange);
+
+    .c-quote-carousel__carousel::part(pagination-item) {
+      background: transparent;
+      border: 0.125rem solid var(--wp--preset--color--blue);
+    }
+
+    .c-quote-carousel__carousel::part(pagination-item-active) {
+      background: var(--wp--preset--color--blue);
+    }
+
+    .c-quote-carousel__carousel::part(navigation-button),
+    .c-quote-carousel__carousel::part(pagination-item),
+    .c-quote-carousel__carousel::part(scroll-container) {
+      @include focus.ring;
+    }
+  }
+}
+
+.c-quote-carousel__carousel {
+  --aspect-ratio: auto; // let height vary with slide content instead of clipping
+
+  display: block;
+  max-width: 53rem; // keeps nav arrows close to the (46rem max) quote text instead of pinned to .o-container's full width
+  margin-inline: auto;
+}
+
+.c-quote-carousel__item {
+  display: flex;
+  align-items: center;
+}
+
+.c-quote-carousel__stat {
+  color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
+}
+
+// Explicit size, not auto: slotted content under wa-carousel's
+// display:contents wrapper collapses to 0 width in some browsers otherwise.
+.c-quote-carousel__nav-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.375rem; // 38px
+  height: 2.0625rem; // 33px
+  color: var(--c-quote-mark-color, var(--wp--preset--color--yellow));
+
+  .c-icon,
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.c-quote-carousel__nav-icon--previous svg {
+  transform: rotate(180deg);
+}

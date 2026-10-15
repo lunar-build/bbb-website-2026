@@ -11,3 +11,14 @@
     padding-block: 3rem;
   }
 }
+
+// Editor-only: stands in for a block that renders no visible content (see
+// the acf/register_block_type_args filter in app/filters.php).
+.c-block-placeholder {
+  padding: 2rem 1.5rem;
+  border: 2px dashed currentcolor;
+  border-radius: 0.5rem;
+  color: var(--wp--preset--color--charcoal);
+  text-align: center;
+  opacity: 0.6;
+}

@@ -225,12 +225,12 @@ class Accordion extends Block
 
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
     }
 
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
+        return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
     }
 
     /**

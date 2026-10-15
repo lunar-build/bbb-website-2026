@@ -1,0 +1,89 @@
+@use '../base/focus' as focus;
+
+// Figma "Table" (node 10:4095). Column count is author-defined, not fixed
+// to 2 — min-width + horizontal scroll (not squeeze) keeps columns legible
+// per WCAG 1.4.10.
+.c-table__scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid var(--wp--preset--color--blue-dark);
+  scrollbar-width: thin;
+  scrollbar-color: var(--wp--preset--color--blue-dark) transparent;
+
+  &::-webkit-scrollbar {
+    height: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--wp--preset--color--blue-dark);
+    border-radius: 999px;
+  }
+
+  @include focus.ring;
+}
+
+.c-table__table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    min-width: 10rem;
+    border-right: 1px solid var(--wp--preset--color--blue-dark);
+
+    &:last-child {
+      border-right: 0;
+    }
+  }
+
+  thead th {
+    background: var(--wp--preset--color--blue-dark);
+    color: var(--wp--preset--color--white);
+    text-align: left;
+    padding: 0.8125rem 1.625rem;
+  }
+
+  tbody tr:nth-child(odd) {
+    background: var(--wp--preset--color--blue-light);
+  }
+
+  tbody tr:nth-child(even) {
+    background: var(--wp--preset--color--white);
+  }
+
+  tbody th,
+  tbody td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.8125rem 1.875rem 1.125rem 1.8125rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  tbody th {
+    font-weight: 700;
+  }
+
+  tbody td p:last-child {
+    margin-bottom: 0;
+  }
+
+  tbody a {
+    color: var(--wp--preset--color--charcoal);
+
+    @include focus.ring;
+  }
+}
+
+.c-table__icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.625rem;
+  vertical-align: middle;
+  color: var(--wp--preset--color--charcoal);
+}

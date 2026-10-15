@@ -1,4 +1,4 @@
-name: bbb-rebuild
+name: betterbybike
 type: wp-bedrock
 docroot: web
 php_version: "8.4"

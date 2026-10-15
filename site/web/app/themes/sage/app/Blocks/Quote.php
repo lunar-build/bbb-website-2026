@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -26,7 +27,7 @@ class Quote extends Block
      *
      * @var string
      */
-    public $description = 'A pull quote with optional attribution name and role.';
+    public $description = 'A pull quote with optional attribution name, role and headshot.';
 
     /**
      * The block category.
@@ -170,6 +171,16 @@ class Quote extends Block
     ];
 
     /**
+     * Fallback example data requiring a non-constant expression (Vite::asset).
+     */
+    public function example(): array
+    {
+        return [
+            'image' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''],
+        ];
+    }
+
+    /**
      * @var array
      */
     public $examples = [
@@ -194,6 +205,7 @@ class Quote extends Block
             'quote' => $this->quote(),
             'attributionName' => $this->attributionName(),
             'attributionRole' => $this->attributionRole(),
+            'image' => $this->image(),
         ];
     }
 
@@ -226,6 +238,13 @@ class Quote extends Block
                 'label' => 'Attribution role',
                 'required' => 0,
                 'instructions' => 'e.g. "Cabinet Member for Sustainable Transport Delivery". Leave blank to hide.',
+            ])
+            ->addImage('image', [
+                'label' => 'Attribution image',
+                'instructions' => 'Optional headshot of the person quoted. Shown as a circle, so a square, face-centred crop works best.',
+                'return_format' => 'array',
+                'preview_size' => 'thumbnail',
+                'required' => 0,
             ]);
 
         return $fields->build();
@@ -233,7 +252,7 @@ class Quote extends Block
 
     public function quoteSize()
     {
-        return get_field('quote_size') ?: $this->example['quote_size'];
+        return get_field('quote_size') ?: (shows_example($this->preview) ? $this->example['quote_size'] : 'large');
     }
 
     /**
@@ -244,17 +263,22 @@ class Quote extends Block
      */
     public function quote()
     {
-        return get_field('quote') ?: wpautop($this->example['quote']);
+        return get_field('quote') ?: (shows_example($this->preview) ? wpautop($this->example['quote']) : '');
     }
 
     public function attributionName()
     {
-        return get_field('attribution_name') ?: $this->example['attribution_name'];
+        return get_field('attribution_name') ?: (shows_example($this->preview) ? $this->example['attribution_name'] : '');
     }
 
     public function attributionRole()
     {
-        return get_field('attribution_role') ?: $this->example['attribution_role'];
+        return get_field('attribution_role') ?: (shows_example($this->preview) ? $this->example['attribution_role'] : '');
+    }
+
+    public function image()
+    {
+        return get_field('image') ?: (shows_example($this->preview) ? $this->example['image'] : null);
     }
 
     /**

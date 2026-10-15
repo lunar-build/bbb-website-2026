@@ -10,7 +10,7 @@ This repo has two levels:
 - `/site` — the actual Bedrock/WordPress project root. Almost all work happens here.
   - `/site/web/app/themes/sage` — the Sage 10 theme, where nearly all custom PHP/JS/CSS development happens.
 
-The project runs inside DDEV (Docker). The DDEV project name is `bbb-rebuild` (PHP 8.4, nginx-fpm, MariaDB 11.8), site URL `https://bbb-rebuild.test`.
+The project runs inside DDEV (Docker). The DDEV project name is `betterbybike` (PHP 8.4, nginx-fpm, MariaDB 11.8), site URL `https://betterbybike.test`.
 
 When VS Code opens the workspace, tasks auto-start Docker + `ddev start` and open two SSH terminals: one in `/site` and one in `/site/web/app/themes/sage` (see `.vscode/tasks.json`). Assume DDEV is already running unless a command fails because it isn't.
 
@@ -62,7 +62,7 @@ Theme translations (from `/site/web/app/themes/sage`): `npm run translate` (pot 
 
 **ACF Composer** (`log1x/acf-composer`) provides an Artisan-like CLI for defining ACF field groups and Gutenberg blocks in PHP instead of the ACF UI. Blocks live in `app/Blocks/*.php` with a matching Blade view at `resources/views/blocks/<kebab-block-name>.blade.php` (auto-discovered, no manual registration). Standalone field groups go in `app/Fields/`; global options pages go in `app/Options/*.php` extending `Log1x\AcfComposer\Options` (see `app/Options/ThemeOptions.php`, read via `get_field('field_name', 'option')`). **For the full block-building workflow** — scaffolding, `fields()`/`with()`, ACF fields vs. `InnerBlocks`, the `<section>` root convention, `$mode`/cache gotchas, Web Awesome usage, and the WP/ACF-data-shaping convention — see the `build-acf-block` skill (`.claude/skills/build-acf-block/SKILL.md`); that skill is the source of truth for block work, not this file.
 
-**Web Awesome** (`@awesome.me/webawesome`) is a framework-agnostic web component library; its component registrations live in `resources/js/components.js`, which is imported by both `resources/js/app.js` and `resources/js/editor.js`. Full usage details and import gotchas are in the `build-acf-block` skill, not duplicated here.
+**Web Awesome** (`@awesome.me/webawesome`) is a framework-agnostic web component library; its component registrations live in `resources/js/components.js`, which is imported by `resources/js/app.js` (front end) and `resources/js/editor-canvas.js` (injected into the block-editor iframe by `resources/js/editor.js`, since the iframe has its own custom-element registry). Full usage details and import gotchas are in the `build-acf-block` skill, not duplicated here.
 
 ## Notes
 

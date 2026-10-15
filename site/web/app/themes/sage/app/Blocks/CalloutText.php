@@ -109,7 +109,10 @@ class CalloutText extends Block
      * @var array
      */
     public $spacing = [
-        'padding' => null,
+        'padding' => [
+            'top' => 'var:preset|spacing|small',
+            'bottom' => 'var:preset|spacing|small',
+        ],
         'margin' => null,
     ];
 
@@ -133,7 +136,7 @@ class CalloutText extends Block
             'gradients' => false,
         ],
         'spacing' => [
-            'padding' => false,
+            'padding' => ['top', 'bottom'],
             'margin' => false,
         ],
     ];
@@ -196,7 +199,7 @@ class CalloutText extends Block
 
     public function text()
     {
-        return get_field('text') ?: $this->example['text'];
+        return get_field('text') ?: (shows_example($this->preview) ? $this->example['text'] : '');
     }
 
     /**

@@ -183,7 +183,7 @@ class JourneyPlannerWidget extends Block
     {
         $fields = Builder::make('journey_planner_widget');
 
-        $fields->addPartial(ContainedToggle::class);
+        $fields->addPartial(ContainedToggle::class, ['default_value' => 0]);
 
         $fields
             ->addTab('Content')
@@ -251,7 +251,7 @@ class JourneyPlannerWidget extends Block
      */
     public function contained()
     {
-        return (bool) (get_field('contained') ?? $this->example['contained'] ?? true);
+        return (bool) (get_field('contained') ?? $this->example['contained'] ?? false);
     }
 
     /**
@@ -261,7 +261,7 @@ class JourneyPlannerWidget extends Block
      */
     public function variant()
     {
-        return get_field('variant') ?: $this->example['variant'];
+        return get_field('variant') ?: (shows_example($this->preview) ? $this->example['variant'] : 'plan_route');
     }
 
     /**
@@ -273,7 +273,7 @@ class JourneyPlannerWidget extends Block
     {
         return get_field('heading') ?: ($this->variant() === 'find_nearby'
             ? "What's near you…"
-            : $this->example['heading']);
+            : (shows_example($this->preview) ? $this->example['heading'] : ''));
     }
 
     /**
@@ -285,7 +285,7 @@ class JourneyPlannerWidget extends Block
     {
         return get_field('cta_label') ?: ($this->variant() === 'find_nearby'
             ? 'Search near here'
-            : $this->example['cta_label']);
+            : (shows_example($this->preview) ? $this->example['cta_label'] : ''));
     }
 
     /**
@@ -295,7 +295,7 @@ class JourneyPlannerWidget extends Block
      */
     public function journeyPlannerUrl()
     {
-        return get_field('journey_planner_url') ?: $this->example['journey_planner_url'];
+        return get_field('journey_planner_url') ?: (shows_example($this->preview) ? $this->example['journey_planner_url'] : '');
     }
 
     /**
@@ -305,7 +305,7 @@ class JourneyPlannerWidget extends Block
      */
     public function nearbyOptions()
     {
-        return get_field('nearby_options') ?: $this->example['nearby_options'];
+        return get_field('nearby_options') ?: (shows_example($this->preview) ? $this->example['nearby_options'] : []);
     }
 
     /**

@@ -56,12 +56,14 @@ For every piece of UI in the new block, pick one:
   `<script src="webawesome.js">` tag to compute a base path; bundled through Vite there's
   no such tag, so it silently fails to find any component and every `<wa-*>` tag stays an
   inert, undefined custom element — no console error, no network 404, just dead markup
-  (this bit `CtaStrip`'s button once already).
+  (this bit `CtaBanner`'s button once already).
 
-  `resources/js/components.js` holds all `<wa-*>` registrations and is imported by both
-  `resources/js/app.js` (front end) and `resources/js/editor.js` (block editor), so
-  components render as real custom elements in block preview mode too, not inert markup —
-  add new component imports there, not directly in app.js/editor.js.
+  `resources/js/components.js` holds all `<wa-*>` registrations and is imported by
+  `resources/js/app.js` (front end) and `resources/js/editor-canvas.js` (block editor). The
+  editor canvas is an iframe with its own custom-element registry, so `editor.js` (which runs
+  in the parent admin page) injects `editor-canvas.js` into the iframe — importing components
+  in `editor.js` itself would define them in the wrong window and previews would render as
+  inert markup. Add new component imports to `components.js`, not to app.js/editor.js.
 
   **Never apply a layout utility class (e.g. `.o-container`) directly to a Web Awesome
   custom element** — `display: grid`/`flex` set on a shadow-DOM host only lays out that
@@ -144,8 +146,8 @@ PHP, won't autoload. **After running the command, always open the generated
 `app/Blocks/*.php` file and confirm**: the filename has no spaces and matches
 `{BlockName}.php` in PascalCase, and the `class` declaration uses that same PascalCase
 name (`class BlockName extends Block`). If either is wrong, delete both generated files
-and hand-write them following the structure of an existing block (`CtaStrip.php` /
-`cta-strip.blade.php` is the cleanest reference) instead of trying to patch the broken
+and hand-write them following the structure of an existing block (`CtaBanner.php` /
+`cta-banner.blade.php` is the cleanest reference) instead of trying to patch the broken
 output in place.
 
 ## 3. Wire fields
@@ -157,42 +159,58 @@ In the generated class:
 - `with()` returns the array exposed to the Blade view as variables (no `$block->` prefix
   needed for these).
 - Add one accessor method per field, following the existing pattern (see
-  `app/Blocks/CtaStrip.php`, `app/Blocks/VideoHero.php`):
-  - Text/textarea fields: `return get_field('x') ?: $this->example['x'];`
-  - Link fields: fallback is a hand-built array matching ACF's link shape —
-    `['title' => ..., 'url' => ..., 'target' => '']`.
-  - Image/file/relationship fields: fallback to a bundled placeholder asset, e.g.
-    `return get_field('x') ?: $this->example['x'];` where `$example['x']` is
+  `app/Blocks/CtaBanner.php`, `app/Blocks/VideoHero.php`):
+  - **Gate the `$example` fallback behind `shows_example($this->preview)`** (helper in
+    `app/helpers.php`). It's true only for preview renders outside wp-admin — i.e. the
+    `/pattern-library` page (`App\View\Composers\PatternLibrary` renders with
+    `preview = true`). It's false on the real front end *and* in the block-editor
+    canvas, which also renders with `$this->preview = true` but is `is_admin()`: a
+    freshly inserted block must read as empty there, not as fixture copy a client could
+    mistake for real content. A real empty field must render empty: `return
+    get_field('x') ?: (shows_example($this->preview) ? $this->example['x'] : '');` — the
+    non-example fallback is a genuine empty value for that type (`''` for text, `null`
+    for image/file, `[]` for repeaters, a blank link shape `['title' => '', 'url' => '',
+    'target' => '']` for link fields), not `$example['x']`. Never use bare
+    `$this->preview` for this, and never the unconditional `get_field('x') ?:
+    $this->example['x']`. A block that renders nothing visible while empty gets a
+    "click the pencil to add content" placeholder in the editor automatically (the
+    `acf/register_block_type_args` filter in `app/filters.php`), so no per-block empty
+    state is needed unless you want a richer one.
+  - Image/file/relationship fields: the preview fallback is a bundled placeholder
+    asset, e.g. `$example['x']` resolving to
     `['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg')]`
     (or `resources/videos/placeholder/pattern-placeholder.mp4` for video — see
-    `app/Blocks/VideoHero.php`). Every field needs a real fallback, not just text
-    fields — this is what makes the block render fully populated on `/pattern-library`
-    (see §6) with zero extra work.
+    `app/Blocks/VideoHero.php`). Every field needs a real preview fallback, not just
+    text fields — this is what makes the block render fully populated on
+    `/pattern-library` (see §6) with zero extra work; it just must not also fire on
+    the real front end.
 - `$example` on the class supplies the block-editor preview/empty-state data used by
-  every accessor's fallback. If a fallback value needs to be computed (e.g. calling
-  `Vite::asset()`, which isn't a constant expression so can't live in the property
-  default), override the `example(): array` method instead — ACF Composer merges its
-  return value into `$example` automatically before the block is registered (see
-  `VideoHero::example()`).
+  every accessor's gated fallback above. If a fallback value needs to be computed (e.g.
+  calling `Vite::asset()`, which isn't a constant expression so can't live in the
+  property default), override the `example(): array` method instead — ACF Composer
+  merges its return value into `$example` automatically before the block is registered
+  (see `VideoHero::example()`).
 
 **ACF fields vs. `InnerBlocks` for freeform copy:** a block's editable content can come
 from either ACF fields (`addText`/`addTextarea`, `get_field()`-backed, as above) or
 native `InnerBlocks` (empty `fields()`, a `$template` property, `<InnerBlocks
-template="{{ $block->template }}" />` in Blade — see `app/Blocks/TextHero.php`). Prefer
-`InnerBlocks` for a block's heading/body copy: it gives real, document-outline-correct
-HTML elements (`core/heading` with a CMS-editable H1–H6 level, `core/paragraph`) for
-free, whereas ACF text/textarea fields require you to hand-build that semantics
-yourself (see `app/Blocks/FeatureCard.php`/`CtaStrip.php`, which use `InnerBlocks` for
-this reason). A block can mix both: keep an ACF field for anything `InnerBlocks` has no
-native equivalent for (e.g. a CTA button's `link` field, which stays ACF in both of
-those blocks since there's no core block for a styled `wa-button`). `InnerBlocks`
+template="{{ $block->template }}" />` in Blade). Prefer `InnerBlocks` for a block's
+heading/body copy: it gives real, document-outline-correct HTML elements (`core/heading`
+with a CMS-editable H1–H6 level, `core/paragraph`) for free, whereas ACF text/textarea
+fields require you to hand-build that semantics yourself. A block can mix both: keep an
+ACF field for anything `InnerBlocks` has no native equivalent for (e.g. a CTA button's
+`link` field, since there's no core block for a styled `wa-button`). `InnerBlocks`
 content isn't real ACF field data, so it isn't covered by `$example`/`get_field()`
 fallbacks — instead, give the block a `$exampleContent` string property containing
 hand-written HTML matching its `$template` (e.g. `'<h3>...</h3><p>...</p>'` for a
-heading + paragraph template — see `app/Blocks/TextHero.php`/`CtaStrip.php`/
-`FeatureCard.php`). This is what the pattern library (§6) substitutes into the
-`<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
-block's library entry just shows an empty content area.
+heading + paragraph template). This is what the pattern library (§6) substitutes into
+the `<InnerBlocks />` placeholder when rendering the block standalone; skip it and that
+block's library entry just shows an empty content area. No current block demonstrates
+this simple heading/paragraph case — blocks that needed freeform copy ended up using
+plain ACF text/textarea fields instead. `app/Blocks/VideoHero.php` is the one live
+`InnerBlocks` user, but as a nested-block slot (letting editors insert a Journey Planner
+Widget inside the hero), not freeform copy, so it's a reference for the mechanics
+(`$template`, `allowedBlocks`) but not a worked example of `$exampleContent`.
 
 **Never hardcode `font-size`/`line-height`/`font-weight`/`margin-bottom`.** Every text style used
 anywhere in the site's Figma design has a matching rule in
@@ -293,6 +311,40 @@ When copying a px value straight from a Figma spec, convert it before it lands i
 don't paste `20px` and fix it later. See `resources/styles/components/_header.scss` and
 `_primary-nav.scss` for worked examples of icon/logo/spacing values converted this way.
 
+### Breakpoints: never write raw `@media`, always use the `respond()` mixin
+
+Every responsive rule in a block's SCSS must go through
+`resources/styles/abstracts/_breakpoints.scss`'s `respond()` mixin, never a hand-written
+`@media (...)` query:
+
+```scss
+@use '../abstracts/breakpoints' as bp;
+
+.c-block-name__thing {
+  @include bp.respond($max: bp.$md) { ... }              // max-width only
+  @include bp.respond($min: bp.$sm) { ... }               // min-width only
+  @include bp.respond($min: bp.$sm, $max: bp.$lg) { ... } // range
+}
+```
+
+Pick the nearest of the 5 shared breakpoints (`$sm` 640px, `$md` 768px, `$lg` 1024px,
+`$xl` 1280px, `$xxl` 1536px) rather than inventing a one-off value to match a Figma
+spec exactly — these are shared across every block so the site's stack/reflow points
+stay consistent. The only exception is `prefers-reduced-motion`/`prefers-color-scheme`
+media features, which aren't breakpoints and stay as raw `@media` (see
+`base/_reset.scss`, `components/_header.scss`).
+
+### Comment the work as it develops, at key stages
+
+Leave a short comment at each meaningful stage of a block's build, not just a single
+comment at the end — e.g. one at the top of the SCSS partial naming the Figma pattern
+it implements (see the top of `_link-card-list.scss`), one wherever a rule exists for a
+non-obvious reason (a workaround, a fix for a specific bug, a convention the file itself
+doesn't make clear), and one at any point a later change might look accidental without
+it (e.g. why a breakpoint value was picked, why a wrapper element isn't guarded by
+`$block->preview`). Keep each comment to the *why*, not the *what* — skip anything a
+well-named class or property already explains on its own.
+
 ### Block padding: 2rem / 4rem only, top/bottom
 
 Every block's vertical spacing (space between one block and the next) is controlled by
@@ -324,6 +376,28 @@ slug must match a `theme.json` `settings.spacing.spacingSizes` entry (`small`/`l
 Set this on every new block the same way; leaving it `null` means the block renders with
 no padding until an editor manually opens the Dimensions panel and picks one.
 
+### Block background colour: native support, not an ACF field
+
+Don't add a `background_color` ACF select. Opt the block in with
+`'color' => ['background' => true, ...]` in its `$supports` — editors then get WP's
+Background colour control in the sidebar's Styles tab (next to padding), no ACF field.
+Everything else is shared:
+
+- `theme_block_background_colors()` in `app/helpers.php` is the one list of allowed
+  colours (slug => label). Change it there and every opted-in block follows. The
+  `wp_theme_json_data_theme` filter in `app/filters.php` restricts each opted-in block's
+  picker to that list.
+- The text colour comes from contrast (`theme_text_color_for()`), emitted by
+  `theme_block_background_css()` as `--c-block-fg` on `.has-{slug}-background-color`.
+  Use `var(--c-block-fg, <default>)` for any text that should follow the background
+  (headings/body copy that set their own colour). A block with no background falls back
+  to its own default.
+- No default is saved with the block, so give it a CSS default instead:
+  `&:not(.has-background) { background: ... }`. WP adds `has-background` and
+  `has-{slug}-background-color` to the root `<section>` through `$attributes`, as with
+  padding — don't hand-write an inline `style` for the background.
+- Pick text/icon colours that still work on all four backgrounds (two dark, two light).
+
 ### Shaping WP/ACF data for structured component props
 
 Whenever a block's Blade view hands data to a component expecting a structured
@@ -350,12 +424,15 @@ names, so there's no way to write a single converter that handles every case):
 ## 5. Verify
 
 - Confirm `npm run dev` (HMR) is running in `web/app/themes/sage`, or run `npm run build`.
-- Insert the block in the WP block editor and confirm the preview renders using the
+- Insert the block in the WP block editor and confirm it shows the empty placeholder
+  (not fixture content) until fields are filled; confirm `/pattern-library` shows the
   `$example` fallback data, styled the same as the front end (block preview mode loads
-  `resources/css/editor.scss`, which pulls in the full front-end stylesheet plus
-  `resources/js/components.js`'s custom elements — injected into the block-editor
-  iframe via the `block_editor_settings_all` filter in `app/setup.php`, since a normal
-  enqueue doesn't reach that iframe).
+  `resources/css/editor.scss`, which pulls in the full front-end stylesheet — injected
+  into the block-editor iframe via the `block_editor_settings_all` filter in
+  `app/setup.php`, since a normal enqueue doesn't reach that iframe. The `<wa-*>` custom
+  elements are defined in the iframe by `resources/js/editor-canvas.js`, injected by
+  `editor.js`). A `<wa-*>` tag that renders as plain unstyled text in the preview means
+  that injection isn't reaching the iframe.
 - Check the front end via the DDEV site URL and confirm real field data renders.
 - Visit `/pattern-library` while logged in and confirm the new block appears fully
   populated (no blank media, no visible `{{ }}`/`<InnerBlocks>` leftovers) — see §6.

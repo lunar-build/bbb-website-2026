@@ -22,8 +22,11 @@ window.initJourneyPlannerPlaces = () => {
       '.c-journey-planner-widget__form[data-variant="plan_route"]',
     )
     .forEach((form) => {
-      const fromInput = form.querySelector('[name="from"]');
-      const toInput = form.querySelector('[name="to"]');
+      // wa-input is a custom element — `[name="from"]` would match the host,
+      // not a real <input>. Google Places needs the real native control,
+      // exposed via wa-input's public `.input` property.
+      const fromInput = form.querySelector('wa-input[name="from"]')?.input;
+      const toInput = form.querySelector('wa-input[name="to"]')?.input;
 
       [fromInput, toInput].forEach((input) => {
         if (!input) return;

@@ -108,9 +108,11 @@ class BulletList extends Block
      * @var array
      */
     public $spacing = [
+        // Lists usually sit within running text — no gap by default; editors
+        // can add one with the spacing controls.
         'padding' => [
-            'top' => 'var:preset|spacing|large',
-            'bottom' => 'var:preset|spacing|large',
+            'top' => '0',
+            'bottom' => '0',
         ],
         'margin' => null,
     ];
@@ -154,12 +156,33 @@ class BulletList extends Block
      */
     public $example = [
         'heading' => 'Example of non-urgent',
+        'list_style' => 'bullets',
         'items' => [
-            ['text' => 'Missing cycle signage'],
-            ['text' => 'Road markings'],
-            ['text' => 'Potholes'],
-            ['text' => 'Cycle lane needs resurfacing'],
-            ['text' => 'Cutting back brambles'],
+            ['text' => 'Missing cycle signage', 'level' => 0],
+            ['text' => 'Road markings', 'level' => 0],
+            ['text' => 'Potholes', 'level' => 0],
+            ['text' => 'Cycle lane needs resurfacing', 'level' => 0],
+            ['text' => 'Cutting back brambles', 'level' => 0],
+        ],
+    ];
+
+    /**
+     * Component combinations to render stacked on the pattern-library page.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Bullets' => [],
+        'Numbers, nested' => [
+            'heading' => 'How to report a fault',
+            'list_style' => 'numbers',
+            'items' => [
+                ['text' => 'Find the pump on the map', 'level' => 0],
+                ['text' => 'Note its <strong>location</strong>', 'level' => 0],
+                ['text' => 'Street name', 'level' => 1],
+                ['text' => 'Nearest landmark', 'level' => 1],
+                ['text' => 'Fill in the fault form', 'level' => 0],
+            ],
         ],
     ];
 
@@ -167,6 +190,7 @@ class BulletList extends Block
     {
         return [
             'heading' => $this->heading(),
+            'ordered' => $this->listStyle() === 'numbers',
             'items' => $this->items(),
         ];
     }
@@ -181,6 +205,14 @@ class BulletList extends Block
                 'instructions' => 'Optional heading shown above the list.',
                 'required' => 0,
             ])
+            ->addButtonGroup('list_style', [
+                'label' => 'List style',
+                'choices' => [
+                    'bullets' => 'Bullets',
+                    'numbers' => 'Numbers',
+                ],
+                'default_value' => 'bullets',
+            ])
             ->addRepeater('items', [
                 'label' => 'List items',
                 'button_label' => 'Add item',
@@ -189,7 +221,19 @@ class BulletList extends Block
             ])
                 ->addText('text', [
                     'label' => 'Item text',
+                    'instructions' => 'Plain text. For bold, italic or a link, wrap words in &lt;strong&gt;, &lt;em&gt; or &lt;a href="…"&gt; tags.',
                     'required' => 1,
+                ])
+                ->addSelect('level', [
+                    'label' => 'Indent',
+                    'instructions' => 'Indented items nest under the item above.',
+                    'choices' => [
+                        0 => 'None',
+                        1 => '1 level',
+                        2 => '2 levels',
+                    ],
+                    'default_value' => 0,
+                    'wrapper' => ['width' => '20'],
                 ])
             ->endRepeater();
 
@@ -198,12 +242,17 @@ class BulletList extends Block
 
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
+    }
+
+    public function listStyle()
+    {
+        return get_field('list_style') ?: (shows_example($this->preview) ? $this->example['list_style'] : 'bullets');
     }
 
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
+        return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
     }
 
     /**

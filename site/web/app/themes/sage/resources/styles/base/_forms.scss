@@ -1,23 +1,10 @@
 @use '../base/focus' as focus;
 
-// Base styling for every native form control site-wide — plain element
-// selectors, not component classes, so this also styles markup our Blade
-// components never touch (Gravity Forms' own rendered fields, any other
-// plugin/embed). Component-specific extras that only our own `<x-input>`/
-// `<x-radio>`/`<x-checkbox>` need (icon overlay, label typography, layout
-// wrapper) live in components/_input.scss and components/_choice.scss on
-// top of this — this file only covers the control itself.
-//
-// `!important` is back, confirmed necessary (not pre-emptive) by testing
-// against a real Gravity Forms field: GF's Orbital theme wraps every form
-// in `.gform-theme--framework` and targets
-// `.gform-theme--framework input[type]:where(...)` — a class-level
-// selector, genuinely higher specificity than our bare `input[type=...]`,
-// so it wins regardless of load order. `:where()` keeps GF's OWN nested
-// conditions at zero specificity (their deliberate override-friendly
-// design), but the `.gform-theme--framework` part outside it still counts.
-// Matching or escalating specificity per-plugin isn't sustainable long
-// term, so `!important` here instead.
+// Base styling for every native form control — plain element selectors so
+// this also covers Gravity Forms' own rendered fields. `!important` is
+// needed: GF's Orbital theme targets `.gform-theme--framework
+// input[type]:where(...)`, genuinely higher specificity than a bare
+// `input[type=...]`.
 
 input[type='text'],
 input[type='email'],
@@ -61,8 +48,7 @@ input[type='checkbox'] {
   height: 1.125rem !important;
   margin: 0 !important;
 
-  // Also target plain `:focus` — GF's own blue focus ring fires on `:focus`,
-  // which unlike `:focus-visible` also matches a mouse click here.
+  // Plain `:focus` too — GF's own blue ring fires there, not just `:focus-visible`.
   &:focus,
   &:focus-visible {
     outline: 2px solid var(--focus-color) !important;
@@ -82,22 +68,11 @@ input[type='radio'] {
     --checked-icon-scale: 1;
   }
 
-  // `::before`, not `::after` — Gravity Forms renders its own checked-state
-  // dot via `::before` on the same input. Using `::after` meant ours was a
-  // second, independent pseudo-element stacking on top rather than
-  // actually overriding GF's, so `!important` had nothing of theirs to
-  // beat. Targeting `::before` puts us on the exact same pseudo-element GF
-  // does, so each property below overrides theirs directly.
-  //
-  // Fixed px, not a percentage — `<input>` is a replaced element, so a
-  // percentage `width` on its ::before has no reliable containing block and
-  // resolves to 0 in every browser tested.
-  //
-  // `color` set explicitly here too, not just above — GF sets `color`
-  // directly on its own `::before` rule, and an explicit declaration on
-  // the pseudo-element itself always beats an inherited value regardless
-  // of `!important` on the ancestor, so `currentColor` below was resolving
-  // to GF's blue until this was added.
+  // `::before`, not `::after` — GF draws its own checked dot on `::before`;
+  // targeting the same pseudo-element lets `!important` actually override
+  // it. Fixed px, not %, since `<input>` is a replaced element (% width on
+  // ::before resolves to 0). `color` set explicitly — an inherited value
+  // here still lost to GF's own explicit `::before` color declaration.
   &::before {
     content: '' !important;
     width: 0.625rem !important;
@@ -110,13 +85,9 @@ input[type='radio'] {
   }
 }
 
-// Checkbox swaps its whole box (border + fill + tick) between two exported
-// images rather than drawing the box in CSS and toggling a tick glyph —
-// GF's own checkbox ::before turned out to layer its own background-image
-// on top of any mask/background-color approach we used regardless of
-// !important (background-image isn't overridden by overriding
-// background-color), so owning the entire box as a single background-image
-// per state sidesteps that rather than fighting it property-by-property.
+// Whole box (border+fill+tick) swaps between two exported images — GF's
+// own ::before layers its own background-image regardless of !important,
+// so overriding background-color property-by-property doesn't work.
 input[type='checkbox'] {
   border: none !important;
   background-color: transparent !important;
@@ -129,9 +100,53 @@ input[type='checkbox'] {
     background-image: url('../../svg/checkbox-checked.svg') !important;
   }
 
-  // GF layers its own blue tick glyph on this same ::before — hide it so
-  // only our svg's charcoal tick shows.
+  // Hides GF's own blue tick glyph so only our svg's charcoal tick shows.
   &::before {
     content: none !important;
   }
+}
+
+// GF's Orbital theme ships its own label/required/consent/submit-button
+// styling — none matches brand tokens, same !important treatment as above.
+.gfield_label,
+.gfield_consent_label {
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 500 !important;
+  font-size: var(--wp--preset--font-size--input-label) !important;
+  line-height: 1.625rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+.gfield_label {
+  margin-bottom: 0.375rem !important;
+}
+
+.gfield_required {
+  color: var(--wp--preset--color--dark-orange) !important;
+}
+
+.gfield_description {
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 400 !important;
+  font-size: var(--wp--preset--font-size--body-regular) !important;
+  line-height: 1.5rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+.gform_button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.875rem !important;
+  padding: 0.625rem 1.625rem !important;
+  background: var(--wp--preset--color--yellow) !important;
+  border: 2px solid var(--wp--preset--color--charcoal) !important;
+  border-radius: 999px !important;
+  font-family: var(--wp--preset--font-family--anonymous-pro) !important;
+  font-weight: 700 !important;
+  font-size: var(--wp--preset--font-size--button-label) !important;
+  line-height: 1.875rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+  cursor: pointer !important;
+
+  @include focus.ring;
 }

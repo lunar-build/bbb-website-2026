@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasBusinessCardFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
@@ -10,6 +11,8 @@ use Log1x\AcfComposer\Builder;
 
 class CardGrid extends Block
 {
+    use HasBusinessCardFields;
+
     /**
      * The block name.
      *
@@ -29,7 +32,7 @@ class CardGrid extends Block
      *
      * @var string
      */
-    public $description = 'A section heading with a grid of cards (FeatureCard\'s Link/Bikeability/Event/News styles, or a plain Image card), with an optional decorative image beside the grid on large screens.';
+    public $description = 'A section heading with a grid of cards (FeatureCard\'s Link/Bikeability/Event/News styles, a plain Image card, or a Business card listing), with an optional decorative image beside the grid on large screens.';
 
     /**
      * The block category.
@@ -224,6 +227,38 @@ class CardGrid extends Block
         'Link (with side image)' => [
             'show_side_image' => true,
         ],
+        'Business card' => [
+            'card_style' => 'business',
+            'business_cards' => [
+                [
+                    'name' => 'Weston Bicycle Works',
+                    'contact_info' => [
+                        ['icon' => 'location-dot', 'text' => '143 Locking Road, Weston-Super-Mare, BS23 3ER'],
+                        ['icon' => 'phone', 'text' => '01934 629989'],
+                    ],
+                    'services' => [
+                        ['icon' => 'recycle', 'text' => 'Secondhand bikes'],
+                        ['icon' => 'wrench', 'text' => 'Bike servicing'],
+                        ['icon' => 'hand-holding-heart', 'text' => 'Donate a bike'],
+                    ],
+                    'description' => 'A community enterprise selling quality refurbished bikes and welcome bike donations.',
+                    'link' => ['title' => 'Learn more', 'url' => '#', 'target' => '_blank'],
+                ],
+                [
+                    'name' => 'Bristol Bike Project',
+                    'contact_info' => [
+                        ['icon' => 'location-dot', 'text' => '18 Wade Street, St Jude\'s, Bristol, BS2 9UD'],
+                        ['icon' => 'phone', 'text' => '0117 123 4567'],
+                    ],
+                    'services' => [
+                        ['icon' => 'bicycle', 'text' => 'New bikes'],
+                        ['icon' => 'wrench', 'text' => 'Bike servicing'],
+                    ],
+                    'description' => 'A social enterprise bike shop and workshop, running earn-a-bike schemes.',
+                    'link' => ['title' => 'Learn more', 'url' => '#', 'target' => '_blank'],
+                ],
+            ],
+        ],
     ];
 
     /**
@@ -237,6 +272,7 @@ class CardGrid extends Block
             'cardStyle' => $this->cardStyle(),
             'ctaStyle' => $this->ctaStyle(),
             'cards' => $this->cards(),
+            'businessCards' => $this->businessCards(),
             'sideImage' => $this->sideImage(),
         ];
     }
@@ -247,6 +283,8 @@ class CardGrid extends Block
     public function fields(): array
     {
         $fields = Builder::make('card_grid');
+
+        $fields->addTab('Content');
 
         $fields->addPartial(Heading::class, [
             'name' => 'heading',
@@ -263,13 +301,14 @@ class CardGrid extends Block
         $fields
             ->addSelect('card_style', [
                 'label' => 'Card style',
-                'instructions' => 'Applies to every card in this grid — same visual treatments as the Feature Card block.',
+                'instructions' => 'Applies to every card in this grid — same visual treatments as the Feature Card block. Changing it swaps which cards tab is shown; cards entered under another style are kept but not displayed.',
                 'choices' => [
                     'link' => 'Link with picture (arrow-only CTA, no date)',
                     'bikeability' => 'Bikeability (button CTA, no date)',
                     'event' => 'Event card (button CTA, date shown)',
                     'news' => 'News card (button CTA, date shown, no body copy)',
-                    'image_card' => 'Image card (image + linked caption bar only, no heading/body/date)',
+                    'image_card' => 'Image card (image + linked caption bar only)',
+                    'business' => 'Business card (name, contact info, services, description — no image)',
                 ],
                 'default_value' => 'link',
                 'ui' => true,
@@ -281,7 +320,80 @@ class CardGrid extends Block
                 'ui' => true,
             ]);
 
-        $cards = $fields->addRepeater('cards', [
+        // One cards tab per set of card styles that share the same fields —
+        // an ACF sub-field can't be shown/hidden by a field outside its own
+        // repeater, so the card style swaps whole tabs instead.
+        $this->addCardsTab($fields, 'Cards', 'cards', ['link', 'bikeability'], ['body' => true, 'date' => false]);
+        $this->addCardsTab($fields, 'Event cards', 'event_cards', ['event'], ['body' => true, 'date' => true]);
+        $this->addCardsTab($fields, 'News cards', 'news_cards', ['news'], ['body' => false, 'date' => true]);
+
+        $fields->addTab('Image cards', $this->whenCardStyle(['image_card']));
+
+        $imageCards = $fields->addRepeater('image_cards', [
+            'label' => 'Cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
+        ]);
+
+        $imageCards
+            ->addImage('image', [
+                'label' => 'Image',
+                'return_format' => 'array',
+                'preview_size' => 'medium',
+                'required' => 1,
+            ])
+            ->addLink('link', [
+                'label' => 'Link',
+                'instructions' => "Link's title is shown as the caption under the image.",
+                'required' => true,
+            ]);
+
+        $imageCards->endRepeater();
+
+        $fields->addTab('Business cards', $this->whenCardStyle(['business']));
+
+        $businessCards = $fields->addRepeater('business_cards', [
+            'label' => 'Business cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
+        ]);
+
+        $this->addBusinessCardFields($businessCards);
+
+        $businessCards->endRepeater();
+
+        return $fields->build();
+    }
+
+    /**
+     * ACF conditional_logic showing a field/tab only for the given card styles.
+     *
+     * @param  array  $styles
+     * @return array
+     */
+    protected function whenCardStyle(array $styles): array
+    {
+        return [
+            'conditional_logic' => array_map(
+                fn ($style) => [['field' => 'card_style', 'operator' => '==', 'value' => $style]],
+                $styles,
+            ),
+        ];
+    }
+
+    /**
+     * Add a tab + repeater of image/title/(body)/(date)/link cards, shown
+     * only for the given card styles.
+     *
+     * @param  array  $show  'body' and 'date' — whether those sub-fields apply.
+     */
+    protected function addCardsTab($fields, string $tab, string $name, array $styles, array $show): void
+    {
+        $fields->addTab($tab, $this->whenCardStyle($styles));
+
+        $cards = $fields->addRepeater($name, [
             'label' => 'Cards',
             'button_label' => 'Add card',
             'min' => 0,
@@ -302,27 +414,28 @@ class CardGrid extends Block
             'required' => true,
         ]);
 
-        $cards->addPartial(Copy::class, [
-            'name' => 'body',
-            'label' => 'Body text',
-            'default_style' => 'body',
-        ]);
+        if ($show['body']) {
+            $cards->addPartial(Copy::class, [
+                'name' => 'body',
+                'label' => 'Body text',
+                'default_style' => 'body',
+            ]);
+        }
 
-        $cards
-            ->addDatePicker('date', [
+        if ($show['date']) {
+            $cards->addDatePicker('date', [
                 'label' => 'Date',
-                'instructions' => 'Only shown when the grid\'s Card style is Event or News.',
                 'display_format' => 'jS F Y',
                 'return_format' => 'jS F Y',
-            ])
-            ->addLink('link', [
-                'label' => 'Link',
-                'required' => true,
             ]);
+        }
+
+        $cards->addLink('link', [
+            'label' => 'Link',
+            'required' => true,
+        ]);
 
         $cards->endRepeater();
-
-        return $fields->build();
     }
 
     /**
@@ -333,9 +446,9 @@ class CardGrid extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: ($this->example['heading_text'] ?? ''),
-            'level' => get_field('heading_level') ?: ($this->example['heading_level'] ?? 'h2'),
-            'style' => get_field('heading_style') ?: ($this->example['heading_style'] ?? 'match'),
+            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? ($this->example['heading_text'] ?? '') : ''),
+            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? ($this->example['heading_level'] ?? 'h2') : 'h2'),
+            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? ($this->example['heading_style'] ?? 'match') : 'match'),
         ];
     }
 
@@ -347,8 +460,8 @@ class CardGrid extends Block
     public function intro()
     {
         return [
-            'text' => get_field('intro_text') ?: ($this->example['intro_text'] ?? ''),
-            'style' => get_field('intro_style') ?: ($this->example['intro_style'] ?? 'body'),
+            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? ($this->example['intro_text'] ?? '') : ''),
+            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? ($this->example['intro_style'] ?? 'body') : 'body'),
         ];
     }
 
@@ -359,7 +472,7 @@ class CardGrid extends Block
      */
     public function cardStyle()
     {
-        return get_field('card_style') ?: ($this->example['card_style'] ?? 'link');
+        return get_field('card_style') ?: (shows_example($this->preview) ? ($this->example['card_style'] ?? 'link') : 'link');
     }
 
     /**
@@ -383,7 +496,7 @@ class CardGrid extends Block
     public function sideImage()
     {
         $show = get_field('show_side_image');
-        $show = $show !== null ? (bool) $show : (bool) ($this->example['show_side_image'] ?? false);
+        $show = $show !== null ? (bool) $show : (shows_example($this->preview) ? (bool) ($this->example['show_side_image'] ?? false) : false);
 
         return $show ? Vite::asset('resources/images/illustrations/instructor.png') : null;
     }
@@ -399,7 +512,14 @@ class CardGrid extends Block
         $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
         $showDate = in_array($this->cardStyle(), ['event', 'news'], true);
 
-        $cards = get_field('cards') ?: ($this->example['cards'] ?? []);
+        $field = match ($this->cardStyle()) {
+            'event' => 'event_cards',
+            'news' => 'news_cards',
+            'image_card' => 'image_cards',
+            default => 'cards',
+        };
+
+        $cards = get_field($field) ?: (shows_example($this->preview) ? ($this->example[$field] ?? $this->example['cards'] ?? []) : []);
 
         return array_map(function ($card) use ($placeholder, $showDate) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];
@@ -422,6 +542,23 @@ class CardGrid extends Block
                 'date' => $showDate ? ($card['date'] ?? null) : null,
                 'link' => normalize_link($card['link'] ?? null),
             ];
+        }, $cards);
+    }
+
+    /**
+     * Retrieve the Business card style's cards, each augmented with
+     * contact-info tap/click-through hrefs (see HasBusinessCardFields).
+     *
+     * @return array
+     */
+    public function businessCards()
+    {
+        $cards = get_field('business_cards') ?: (shows_example($this->preview) ? ($this->example['business_cards'] ?? []) : []);
+
+        return array_map(function ($card) {
+            $card['contact_info'] = $this->withBusinessCardContactHrefs($card['contact_info'] ?? []);
+
+            return $card;
         }, $cards);
     }
 

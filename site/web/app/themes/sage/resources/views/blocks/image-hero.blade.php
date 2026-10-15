@@ -1,10 +1,10 @@
-<section {{ $attributes->class(['c-image-hero']) }}>
+<section {{ $attributes->class(['c-image-hero', 'o-full-bleed-bg']) }}>
 
 @if ($backgroundImage['url'] ?? null)
-  <img class="c-image-hero__background" src="{{ $backgroundImage['url'] }}" alt="">
+  <img class="c-image-hero__background" src="{{ $backgroundImage['url'] }}" alt="" style="object-position: center {{ $imagePosition }};">
 @endif
 
-@if ($showText)
+@if ($showHeading || $showBreadcrumbs)
   <div class="c-image-hero__overlay"></div>
 
   <div class="o-container">
@@ -16,7 +16,9 @@
         />
       @endif
 
-      <h1 class="c-image-hero__heading">{{ $heading }}</h1>
+      @if ($showHeading)
+        <h1 class="c-image-hero__heading">{{ $heading }}</h1>
+      @endif
     </div>
   </div>
 @endif
