@@ -1237,7 +1237,8 @@ if ($mode === 'cycling-centre') {
 
         $saved = $mec->save_event([
             'title' => html_entity_decode($row->post_title, ENT_QUOTES),
-            'content' => $replaceUrls($content),
+            // wp_insert_post() unslashes, which would eat the \u003c escapes in block JSON.
+            'content' => wp_slash($replaceUrls($content)),
             'status' => 'publish',
             'author' => 1,
             'start' => $start,

@@ -1,0 +1,75 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/typography';
+
+// Figma "Single events page" (node 14:1043): title, featured image and the
+// Next session / Price card ("Image block" instance 21:1416) above the
+// event's own content. Layout around it comes from the Sticky Nav template.
+
+// Without a page index the template grid is skipped; keep its vertical rhythm.
+.c-event {
+  padding-block: 3rem;
+}
+
+.c-event__title {
+  margin-bottom: 2rem;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-event__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.c-event__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1.25rem;
+}
+
+.c-event__info {
+  display: grid;
+  gap: 2rem;
+  padding: 1.375rem 2rem 2rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--white);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+  }
+
+  @include bp.respond($max: bp.$md) {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.c-event__info-heading {
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid var(--wp--preset--color--blue-dark);
+  color: var(--wp--preset--color--blue-dark);
+}
+
+.c-event__info-line {
+  @extend .u-body-large;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.375rem;
+  color: var(--wp--preset--color--charcoal);
+
+  .c-icon svg {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--wp--preset--color--blue-dark);
+  }
+}
+
+.c-event__price {
+  color: var(--wp--preset--color--charcoal);
+}

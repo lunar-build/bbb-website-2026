@@ -342,3 +342,21 @@ add_filter('post_type_link', function (string $link, \WP_Post $post) {
 
     return home_url(user_trailingslashit(CYCLING_CENTRE_EVENTS_PATH . '/' . $post->post_name));
 }, 10, 2);
+
+/**
+ * MEC swaps in its own single/archive templates on template_include (99)
+ * unless the theme has a plain `single-mec-events.php`, which a Blade theme
+ * never does. Hand WordPress's own template lookup back, so Sage resolves
+ * our Blade views (single-mec-events.blade.php etc.) before Acorn renders
+ * them at 100. Registered after MEC's filter, so it runs after it.
+ */
+add_filter('template_include', function (string $template) {
+    if (is_singular('mec-events')) {
+        return get_single_template() ?: $template;
+    }
+    if (is_post_type_archive('mec-events')) {
+        return get_post_type_archive_template() ?: $template;
+    }
+
+    return $template;
+}, 99);
