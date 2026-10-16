@@ -43,6 +43,11 @@
     column-gap: 2rem;
   }
 
+  // No price: the date column takes the full width, not half the card.
+  > :only-child {
+    grid-column: 1 / -1;
+  }
+
   @include bp.respond($max: bp.$md) {
     padding: 1.25rem 1rem;
   }

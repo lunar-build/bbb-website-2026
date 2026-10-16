@@ -74,17 +74,25 @@ class SingleMecEvent extends Composer
             return null;
         }
         $session = $shown['session'];
-        $date = gmdate('l jS F Y', $session->tstart);
-        // Multi-day events show their range.
-        if (gmdate('Y-m-d', $session->tend) !== gmdate('Y-m-d', $session->tstart)) {
-            $date .= ' – ' . gmdate('l jS F Y', $session->tend);
-        }
         $allDay = get_post_meta(get_the_ID(), 'mec_allday', true) || get_post_meta(get_the_ID(), 'mec_hide_time', true);
+        $time = $allDay ? __('All day', 'sage') : gmdate('g.ia', $session->tstart);
+        $date = gmdate('l jS F Y', $session->tstart);
+
+        if (gmdate('Y-m-d', $session->tend) !== gmdate('Y-m-d', $session->tstart)) {
+            if (! $allDay && $session->tend - $session->tstart < DAY_IN_SECONDS) {
+                // Overnight (e.g. 9pm–1am): one date, with the end time so it doesn't read as two days.
+                $time .= ' – ' . gmdate('g.ia', $session->tend);
+            } else {
+                // Multi-day: a range, the year only once when both ends share it.
+                $sameYear = gmdate('Y', $session->tend) === gmdate('Y', $session->tstart);
+                $date = gmdate($sameYear ? 'l jS F' : 'l jS F Y', $session->tstart) . ' – ' . gmdate('l jS F Y', $session->tend);
+            }
+        }
 
         return [
             'heading' => $shown['upcoming'] ? __('Next session', 'sage') : __('Date', 'sage'),
             'date' => $date,
-            'time' => $allDay ? __('All day', 'sage') : gmdate('g.ia', $session->tstart),
+            'time' => $time,
             'finished' => ! $shown['upcoming'],
         ];
     }
@@ -128,7 +136,8 @@ class SingleMecEvent extends Composer
         }
 
         return array_map(
-            fn($line) => ['text' => $line],
+            // A bare amount ("5", "7.50") gets a £ sign.
+            fn($line) => ['text' => is_numeric($line) ? '£' . $line : $line],
             // strlen, not a bare array_filter(), which would also drop a "0" part.
             array_values(array_filter(array_map('trim', explode('|', $cost)), 'strlen')),
         );

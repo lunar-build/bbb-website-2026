@@ -17,6 +17,7 @@ class EventSessions
     /**
      * Published sessions starting between two dates (inclusive, Y-m-d),
      * optionally limited to one mec_category term, ordered by start time.
+     * Events set to MEC's "Hide from calendars & lists" are left out.
      *
      * @return array<int, object{post_id: int, title: string, tstart: int, tend: int}>
      */
@@ -37,6 +38,7 @@ class EventSessions
             JOIN {$wpdb->posts} p ON p.ID = d.post_id
             WHERE p.post_type = 'mec-events' AND p.post_status = 'publish'
                 AND d.dstart BETWEEN %s AND %s {$category}
+                AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} v WHERE v.post_id = p.ID AND v.meta_key = 'mec_public' AND v.meta_value = '0')
             ORDER BY d.tstart, p.post_title",
             $from,
             $to,

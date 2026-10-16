@@ -29,6 +29,10 @@
     border-radius: 12px 12px 0 0;
   }
 
+  &__image--empty {
+    background: var(--wp--preset--color--blue-light);
+  }
+
   &__stretched-link {
     position: absolute;
     inset: 0;

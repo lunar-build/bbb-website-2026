@@ -286,6 +286,7 @@ class EventsTimetable extends Block
 
             return [
                 'id' => wp_unique_id('events-timetable-'),
+                'empty' => ! array_filter($weekdays),
                 'title' => $row['title'],
                 'weekdays' => array_map('array_values', $weekdays),
                 'dates' => array_values($dates),
