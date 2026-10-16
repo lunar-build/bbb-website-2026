@@ -87,6 +87,26 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
+ * Any block allowed on pages is allowed on events (mec-events) — one filter
+ * rather than adding 'mec-events' to every block class's $post_types.
+ */
+add_filter('acf/register_block_type_args', function ($block) {
+    if (in_array('page', $block['post_types'] ?? [], true)) {
+        $block['post_types'][] = 'mec-events';
+    }
+
+    return $block;
+});
+
+/**
+ * MEC forces the classic editor on events, which can't show our ACF blocks
+ * and strips them on save. Use the block editor (MEC's panels still load as
+ * meta boxes) — priority 20, after MEC's filter.
+ */
+add_filter('use_block_editor_for_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
+add_filter('gutenberg_can_edit_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
+
+/**
  * Our own ACF Composer blocks each render their own <section>/.o-container
  * wrapper (see the build-acf-block skill's "<section> root" convention),
  * but third-party/core blocks placed directly in post content — e.g. the
@@ -187,13 +207,10 @@ add_filter('gform_submit_button', function ($button, $form) {
 }, 10, 2);
 
 /**
- * The Sticky Nav page template (template-sticky-nav.blade.php) builds its
- * left-rail page menu from each top-level (H2) heading, linking to it by
- * `id`. Gutenberg already renders a heading's `id` automatically when an
- * editor sets its "HTML anchor" field — this only covers the headings
- * where they haven't, auto-slugging the heading text instead so the
- * generated link actually resolves. Scoped to the one template so other
- * pages' H2s are untouched.
+ * The sticky page menu links to each H2 by `id`. Gutenberg only renders an
+ * `id` when an editor sets the heading's "HTML anchor", so give the rest an
+ * auto-slug. Only for posts whose menu was built
+ * (App\Support\PageMenu::shownFor()), so other pages' H2s are untouched.
  *
  * The slugify logic here must match App\Support\PageMenu::anchorFor()'s
  * fallback, which builds the same `items` array of links.
@@ -203,7 +220,7 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         return $block_content;
     }
 
-    if (! is_page_template('template-sticky-nav.blade.php')) {
+    if (! Support\PageMenu::shownFor((int) get_the_ID())) {
         return $block_content;
     }
 
@@ -241,7 +258,7 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 add_filter('wp_theme_json_data_theme', function ($theme_json) {
     $data = $theme_json->get_data();
     $palette = collect($data['settings']['color']['palette']['theme'] ?? [])
-        ->filter(fn ($color) => array_key_exists($color['slug'], theme_block_background_colors()))
+        ->filter(fn($color) => array_key_exists($color['slug'], theme_block_background_colors()))
         ->values()
         ->all();
 
@@ -317,3 +334,111 @@ $withoutFront = function (array $args, string $name) {
 
 add_filter('register_post_type_args', $withoutFront, 10, 2);
 add_filter('register_taxonomy_args', $withoutFront, 10, 2);
+
+/**
+ * Cycling Centre sessions are MEC events, but the live site has them at
+ * /cycling-centres/bristol-cycling-centre/whats-on/{slug}/ rather than MEC's
+ * /events/{slug}/. Keep that URL for events in the Bristol Cycling Centre
+ * category so no redirects are needed. Needs a permalink flush after deploy.
+ */
+const CYCLING_CENTRE_EVENTS_PATH = 'cycling-centres/bristol-cycling-centre/whats-on';
+const CYCLING_CENTRE_EVENTS_CATEGORY = 'bristol-cycling-centre';
+
+add_action('init', function () {
+    add_rewrite_rule(
+        '^' . CYCLING_CENTRE_EVENTS_PATH . '/([^/]+)/?$',
+        'index.php?post_type=mec-events&name=$matches[1]',
+        'top',
+    );
+});
+
+add_filter('post_type_link', function (string $link, \WP_Post $post) {
+    if ($post->post_type !== 'mec-events' || ! has_term(CYCLING_CENTRE_EVENTS_CATEGORY, 'mec_category', $post)) {
+        return $link;
+    }
+
+    return home_url(user_trailingslashit(CYCLING_CENTRE_EVENTS_PATH . '/' . $post->post_name));
+}, 10, 2);
+
+/**
+ * MEC swaps in its own templates on template_include (99) unless the theme
+ * has a plain `single-mec-events.php`, which a Blade theme never has. Redo
+ * WordPress's lookup so Sage finds our Blade views before Acorn renders at
+ * 100. Same priority as MEC's, registered later, so it runs after it.
+ */
+add_filter('template_include', function (string $template) {
+    if (is_singular('mec-events')) {
+        return get_single_template() ?: $template;
+    }
+    if (is_post_type_archive('mec-events')) {
+        return get_post_type_archive_template() ?: $template;
+    }
+
+    return $template;
+}, 99);
+
+/**
+ * Multi-line Cost box in MEC's event editor, one price per line. Saved in
+ * the `|`-separated format SingleMecEvent::priceLines() splits into bullets;
+ * keeps the #mec_cost id that MEC's "This event is free" script targets.
+ */
+add_filter('mec_event_cost_custom_field_status', '__return_true');
+
+add_action('mec_event_cost_custom_field', function ($cost, $type, $name) {
+    $lines = array_filter(array_map('trim', explode('|', (string) $cost)), 'strlen');
+    printf(
+        '<textarea name="%s" id="mec_cost" rows="4" class="large-text" aria-describedby="mec_cost_lines_help">%s</textarea>'
+        . '<p class="mec-field__help" id="mec_cost_lines_help">%s</p>',
+        esc_attr($name),
+        esc_textarea(implode("\n", $lines)),
+        esc_html__('One price per line — each line shows as its own bullet, e.g. "£5 per child" then "£7 per solo adult". A plain number like 5 shows as £5.', 'sage'),
+    );
+}, 10, 3);
+
+// MEC's save runs the cost through sanitize_text_field(), which flattens line
+// breaks — join the lines with `|` first (save_post_{type} fires before
+// MEC's save_post handler).
+add_action('save_post_mec-events', function () {
+    if (! isset($_POST['mec']['cost']) || ! is_string($_POST['mec']['cost'])) {
+        return;
+    }
+    $lines = preg_split('/\R/', wp_unslash($_POST['mec']['cost']));
+    $_POST['mec']['cost'] = wp_slash(implode(' | ', array_filter(array_map('trim', $lines), 'strlen')));
+}, 9);
+
+/**
+ * The /events/ archive uses the theme's archive view (no design of its own
+ * yet). MEC's query parsing forces 1 post per page there; restore the site
+ * setting, and list events by their next session, undated ones last.
+ */
+add_action('pre_get_posts', function (\WP_Query $query) {
+    if (is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive('mec-events')) {
+        return;
+    }
+
+    $query->set('posts_per_page', (int) get_option('posts_per_page'));
+
+    // MEC's "Hide from calendars & lists" visibility (mec_public = 0).
+    $query->set('meta_query', [[
+        'relation' => 'OR',
+        ['key' => 'mec_public', 'compare' => 'NOT EXISTS'],
+        ['key' => 'mec_public', 'value' => '0', 'compare' => '!='],
+    ]]);
+
+    add_filter('posts_clauses', function (array $clauses, \WP_Query $q) use ($query) {
+        if ($q !== $query) {
+            return $clauses;
+        }
+        global $wpdb;
+
+        // MEC stores wall-clock times as UTC timestamps; see App\Support\EventSessions.
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $clauses['join'] .= $wpdb->prepare(
+            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tstart >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
+            $now,
+        );
+        $clauses['orderby'] = "mec_next.next_session IS NULL, mec_next.next_session ASC, {$wpdb->posts}.post_title ASC";
+
+        return $clauses;
+    }, 10, 2);
+}, 20);

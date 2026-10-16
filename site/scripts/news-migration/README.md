@@ -22,7 +22,7 @@ never touches the old site itself, and it only writes to this site's database.
 | `core/table` | Table (`acf/data-table`). A first row that's all bold becomes the column headings |
 | `core/columns` with one image per column | Two Column Content with an Image layout on each side |
 | Group/columns holding only `acf/card` blocks | Card Grid with "link" cards (icon or image, title, text, link) |
-| `core/list` | Bullet List. Numbered lists stay numbered, nested lists keep their depth (up to 3 levels, via each item's Indent), and bold, italic and links are kept |
+| `core/list` | Bullet List with no top padding and Small bottom padding (the block's own default is none). Numbered lists stay numbered, nested lists keep their depth (up to 3 levels, via each item's Indent), and bold, italic and links are kept |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 
@@ -47,6 +47,8 @@ wp eval-file scripts/news-migration/migrate-news.php attachments   # copy all at
 wp eval-file scripts/news-migration/migrate-news.php posts [1288,7070]  # copy posts; re-running replaces earlier imports
 wp eval-file scripts/news-migration/migrate-news.php case-studies [1019] # copy case studies (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php map-pages          # copy shops/BMX/pumps pages (run after attachments)
+wp eval-file scripts/news-migration/migrate-news.php cycling-centre [753] # Cycling Centre sessions -> MEC events (run after attachments)
+wp eval-file scripts/news-migration/migrate-news.php events [7065,7040,7042] # one-off events -> MEC events (run after cycling-centre)
 ```
 
 These environment variables can be set in front of the command, e.g. `NEWS_SOURCE_DB=old_site wp eval-file ...`:
@@ -76,6 +78,37 @@ reused by title on re-runs) and copies its page,
 `/shops-and-repair/public-bike-pumps/report-a-bike-pump-fault/`, with a Text
 Hero and a Form block. Re-runs replace the pages in place, so nav menu items
 linking to them survive.
+
+`cycling-centre` copies the old Bristol Cycling Centre sessions
+(`cycling_centre_event`) into Modern Events Calendar as `mec-events`, keeping
+IDs, slugs, featured images and Yoast meta. MEC must be active. The old site
+kept session times in a separate timetable (the `options_schedule` ACF options
+repeater, one row per term). Every term that hasn't ended yet is expanded into
+dated sessions, which are saved as MEC "custom days" so each date keeps its own
+time. Sessions with no slots in those terms are kept as undated pages so their
+URLs still work. The timetable fillers (Break, Closed, No sessions) are skipped,
+as are the old site's one-off `event` posts, which have all expired. Each event
+gets the Bristol Cycling Centre category, which keeps its live
+`/cycling-centres/bristol-cycling-centre/whats-on/{slug}/` URL (see
+`app/filters.php`). The old "upcoming sessions" block is dropped (the event
+template shows the next session), as is the old CF7 contact form on Schools and
+Private Hire, which still needs rebuilding in Gravity Forms. The run ends by
+listing the terms it found, ready to add to the What's On page's Events
+Timetable block. MEC stores session times as wall-clock time in UTC timestamps,
+so format them with `gmdate()`, not `wp_date()`.
+
+`events` copies the old site's one-off `event` posts into MEC, keeping IDs,
+slugs (`/events/{slug}/`, as on the live site), featured images and Yoast
+meta. The old `start_date`/`end_date`/`end_time` fields become the MEC date,
+and a midnight start with no end time becomes "all day". `cost` becomes MEC's
+Cost (a plain "Free" becomes `0`, the same as ticking MEC's "This event is
+free", in both this and the `cycling-centre` mode), and `event_category` terms become `mec_category` terms with the same
+slugs. `location` becomes an MEC location, named by the part before the first
+comma, so "Bristol Cycling Centre, Old Whitchurch…" reuses the existing
+Bristol Cycling Centre location. With no ids it imports every event, newest
+first. Finished events still show their date ("Date … This event has
+finished"). Sessions that `cycling-centre` imports without timetable slots
+are flagged `_event_undated`, so their placeholder date is never shown.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item

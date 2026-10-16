@@ -22,7 +22,13 @@
 
 @mixin ring($color: var(--focus-color)) {
   &:focus-visible {
-    outline: 2px solid $color;
-    outline-offset: 2px;
+    @include ring-styles($color);
   }
+}
+
+// The declarations alone, for selectors ring() can't build:
+//   wa-tab:focus-visible::part(tab) { @include focus.ring-styles; }
+@mixin ring-styles($color: var(--focus-color)) {
+  outline: 2px solid $color;
+  outline-offset: 2px;
 }

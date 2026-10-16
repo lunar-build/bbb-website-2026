@@ -1,7 +1,12 @@
 @props(['cardStyle', 'image', 'date' => null, 'categories' => [], 'heading', 'body' => null, 'link' => null, 'ctaStyle' => 'button'])
 
 <div {{ $attributes->class(['c-feature-card__card', 'c-feature-card--'.$cardStyle]) }}>
-  <img class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+  @if (! empty($image['url']))
+    <img class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+  @else
+    {{-- No image: a placeholder panel, not a broken <img>. --}}
+    <div class="c-feature-card__image c-feature-card__image--empty" aria-hidden="true"></div>
+  @endif
 
   {{-- Stretched-link overlay: makes the whole card clickable without nesting an
        anchor around the visible CTA below (invalid HTML). The CTA below is

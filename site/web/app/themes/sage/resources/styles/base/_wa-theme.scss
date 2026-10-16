@@ -56,3 +56,12 @@ wa-checkbox,
 wa-checkbox-group {
   --wa-focus-ring: 2px solid var(--focus-color);
 }
+
+// WA collapses accordion items to height 0 but leaves the content focusable
+// and in the accessibility tree (WCAG 2.4.3 / 2.4.7). Hide it after the close
+// animation. Never set `visible`, or an open item nested in a closed one
+// would show through.
+wa-accordion-item:not([expanded])::part(panel) {
+  visibility: hidden;
+  transition: visibility 0s linear var(--hide-duration, 200ms);
+}
