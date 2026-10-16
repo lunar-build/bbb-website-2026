@@ -140,7 +140,7 @@ const PANELS = {
             Weeks that differ (half term, an alternate-week class) need their <strong>own term</strong>, or use extras and cancellations.
           </li>
           <li>Sessions can’t run past midnight.</li>
-          <li>Sessions added by hand on a class in the events calendar are kept when you update a term.</li>
+          <li>Sessions added by hand on a class in the events calendar are kept when you update a term. Change a class’s <em>weekly</em> times here, not on the class’s own page; if that page was already open when you updated a term, reload it before saving.</li>
           <li>A class set to repeat by itself in the events calendar (daily, weekly…) isn’t changed here.</li>
           <li>What’s on lists every current and upcoming published term automatically.</li>
         </ul>

@@ -24,7 +24,7 @@ export default function ExceptionsPanel({ schedule, classes, classesById, proble
         <h2 id="bbb-tt-closures">Closures</h2>
         <p className="bbb-tt-hint">Dates the centre is shut (bank holidays, breaks). No sessions run on them.</p>
         {schedule.closures.map((row) => (
-          <div key={row.id} className="bbb-tt-row">
+          <div key={row.id} className="bbb-tt-row" data-ref={row.id}>
             <TextControl __nextHasNoMarginBottom label="From" type="date" value={row.from} onChange={(from) => update('closures', row.id, { from, to: row.to < from ? from : row.to })} />
             <TextControl __nextHasNoMarginBottom label="To" type="date" value={row.to} min={row.from} onChange={(to) => update('closures', row.id, { to })} />
             <TextControl __nextHasNoMarginBottom label="Reason (optional)" value={row.label} onChange={(label) => update('closures', row.id, { label })} />
@@ -43,7 +43,7 @@ export default function ExceptionsPanel({ schedule, classes, classesById, proble
         <h2 id="bbb-tt-cancellations">Cancelled sessions</h2>
         <p className="bbb-tt-hint">One session off on one date; the rest of the week runs as normal.</p>
         {schedule.cancellations.map((row) => (
-          <div key={row.id} className="bbb-tt-row">
+          <div key={row.id} className="bbb-tt-row" data-ref={row.id}>
             <SelectControl __nextHasNoMarginBottom label="Session" value={row.session} options={[{ value: '', label: 'Choose…' }, ...sessionOptions]} onChange={(session) => update('cancellations', row.id, { session })} />
             <TextControl __nextHasNoMarginBottom label="Date" type="date" value={row.date} min={schedule.start} max={schedule.end} onChange={(date) => update('cancellations', row.id, { date })} />
             <Button variant="tertiary" isDestructive onClick={() => remove('cancellations', row.id)}>
@@ -61,7 +61,7 @@ export default function ExceptionsPanel({ schedule, classes, classesById, proble
         <h2 id="bbb-tt-extras">Extra sessions</h2>
         <p className="bbb-tt-hint">One-off sessions on top of the weekly pattern.</p>
         {schedule.extras.map((row) => (
-          <div key={row.id} className="bbb-tt-row">
+          <div key={row.id} className="bbb-tt-row" data-ref={row.id}>
             <SelectControl __nextHasNoMarginBottom label="Class" value={row.event || ''} options={[{ value: '', label: 'Choose…' }, ...classes.map((c) => ({ value: c.id, label: c.title }))]} onChange={(event) => update('extras', row.id, { event: Number(event) })} />
             <TextControl __nextHasNoMarginBottom label="Date" type="date" value={row.date} onChange={(date) => update('extras', row.id, { date })} />
             <TextControl __nextHasNoMarginBottom label="Starts" type="time" step={300} value={row.start} onChange={(start) => update('extras', row.id, { start })} />

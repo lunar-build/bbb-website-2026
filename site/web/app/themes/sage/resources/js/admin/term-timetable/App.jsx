@@ -86,6 +86,21 @@ export default function App() {
   const problemsFor = (id) => problems.filter((p) => p.ref === id);
   const termProblems = problems.filter((p) => p.ref === 'dates' || String(p.ref).startsWith('event:'));
   const hasErrors = (preview?.errors ?? []).length > 0;
+  const warningCount = (preview?.warnings ?? []).length;
+
+  // Scroll to, focus and briefly highlight the first error (or warning).
+  const showFirstProblem = () => {
+    const first = problems.find((p) => p.level === 'error') ?? problems[0];
+    if (!first) return;
+    const ref = String(first.ref).startsWith('event:') ? null : first.ref;
+    const el = (ref && document.querySelector(`[data-ref="${CSS.escape(ref)}"]`)) || document.querySelector('.bbb-tt-summary');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    (el.querySelector('button, input, select') ?? el).focus({ preventScroll: true });
+    el.classList.add('is-flagged');
+    setTimeout(() => el.classList.remove('is-flagged'), 2000);
+    speak(first.message);
+  };
+  const errorCount = (preview?.errors ?? []).length;
 
   const save = async (nextStatus) => {
     setSaving(true);
@@ -186,7 +201,7 @@ export default function App() {
           </a>
           <span className={`bbb-tt-status is-${status}`}>{status === 'publish' ? 'Published' : 'Draft'}</span>
         </div>
-        <div className="bbb-tt-header__fields">
+        <div className="bbb-tt-header__fields" data-ref="dates">
           <TextControl __nextHasNoMarginBottom label="Term name" placeholder="e.g. Spring term 2027" value={title} onChange={(v) => (setTitle(v), setDirty(true))} />
           <TextControl __nextHasNoMarginBottom label="First day" type="date" value={schedule.start} onChange={(start) => change({ start, end: schedule.end && schedule.end < start ? start : schedule.end })} />
           <TextControl __nextHasNoMarginBottom label="Last day" type="date" value={schedule.end} min={schedule.start} onChange={(end) => change({ end })} />
@@ -273,6 +288,16 @@ export default function App() {
           </Button>
         )}
         {dirty && <span className="bbb-tt-unsaved">Unsaved changes</span>}
+        {(errorCount > 0 || warningCount > 0) && (
+          <span className={`bbb-tt-outstanding is-${errorCount ? 'error' : 'warning'}`} role="status">
+            {errorCount
+              ? `Can’t ${status === 'publish' ? 'update' : 'publish'} yet — ${errorCount} problem${errorCount === 1 ? '' : 's'} to fix.`
+              : `${warningCount} warning${warningCount === 1 ? '' : 's'} to check — you can still ${status === 'publish' ? 'update' : 'publish'}.`}
+            <Button variant="link" onClick={showFirstProblem}>
+              Show me
+            </Button>
+          </span>
+        )}
       </footer>
 
       {modal && (

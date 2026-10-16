@@ -437,6 +437,36 @@
   color: #757575;
 }
 
+.bbb-tt-outstanding {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+
+  &.is-error {
+    background: #fcf0f1;
+    color: #8a2424;
+  }
+
+  &.is-warning {
+    background: #fcf9e8;
+    color: #614200;
+  }
+
+  .components-button.is-link {
+    font-weight: 600;
+  }
+}
+
+// Brief highlight on whatever "Show me" jumped to.
+.is-flagged {
+  outline: 3px solid #dba617 !important;
+  outline-offset: 2px;
+  transition: outline-color 0.3s;
+}
+
 .bbb-tt-modal {
   width: min(28rem, 100%);
 

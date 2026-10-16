@@ -20,6 +20,9 @@ class MecSync
     /** On the term: problems the last sync hit (skipped classes), shown in the editor. */
     public const TERM_NOTICES = '_term_sync_notices';
 
+    /** On the class: when a term last rewrote its dates (ClassEditGuard compares it). */
+    public const SYNCED_AT = '_term_synced_at';
+
     public static function boot(): void
     {
         add_action('rest_after_insert_' . TermTimetable::POST_TYPE, fn(WP_Post $post) => static::sync($post->ID));
@@ -199,6 +202,13 @@ class MecSync
             }
         }
 
+        update_post_meta($event, static::SYNCED_AT, (string) microtime(true));
+        static::reschedule($event);
+    }
+
+    /** Rebuild an event's wp_mec_dates rows from its current MEC fields. */
+    public static function reschedule(int $event): void
+    {
         clean_post_cache($event);
         // MEC caches each event's data twice — in the object cache (12h) and its meta
         // per request (MEC_cache) — so its reschedule would otherwise read the old dates.
@@ -206,7 +216,7 @@ class MecSync
         \MEC_cache::delete("meta-$event-0");
         \MEC_cache::delete("meta-$event-1");
         $schedule = \MEC::getInstance('app.libraries.main')->getSchedule();
-        $schedule->reschedule($event, $schedule->get_reschedule_maximum($first ? 'custom_days' : '', $event));
+        $schedule->reschedule($event, $schedule->get_reschedule_maximum((string) get_post_meta($event, 'mec_repeat_type', true), $event));
     }
 
     /** "2027-01-02:…:01-15-PM:…" → "2027-01-02 13:15", for chronological sorting. */

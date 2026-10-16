@@ -28,6 +28,7 @@ class TermTimetable
         add_action('admin_post_bbb_duplicate_term', [static::class, 'duplicate']);
 
         MecSync::boot();
+        ClassEditGuard::boot();
         RestController::boot();
         AdminPage::boot();
     }

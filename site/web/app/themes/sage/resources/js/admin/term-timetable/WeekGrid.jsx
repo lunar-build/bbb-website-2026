@@ -66,6 +66,7 @@ function SessionCard({ session, cls, problems, onEdit }) {
   return (
     <li
       ref={setNodeRef}
+      data-ref={session.id}
       className={`bbb-tt-card${isDragging ? ' is-dragging' : ''}${problems.length ? ' has-problem' : ''}${cls ? '' : ' is-missing'}`}
       style={{ '--chip': cls?.color ?? '#757575', transform: CSS.Translate.toString(transform) }}
     >
