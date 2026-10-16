@@ -120,11 +120,17 @@ class SingleMecEvent extends Composer
      */
     public function priceLines(): array
     {
-        $cost = (string) get_post_meta(get_the_ID(), 'mec_cost', true);
+        $cost = trim((string) get_post_meta(get_the_ID(), 'mec_cost', true));
+
+        // MEC's "This event is free" tick box saves the cost as 0.
+        if ($cost === '0') {
+            return [['text' => __('Free', 'sage')]];
+        }
 
         return array_map(
             fn($line) => ['text' => $line],
-            array_values(array_filter(array_map('trim', explode('|', $cost)))),
+            // strlen, not a bare array_filter(), which would also drop a "0" part.
+            array_values(array_filter(array_map('trim', explode('|', $cost)), 'strlen')),
         );
     }
 }
