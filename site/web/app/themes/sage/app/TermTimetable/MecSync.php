@@ -200,6 +200,11 @@ class MecSync
         }
 
         clean_post_cache($event);
+        // MEC caches each event's data twice — in the object cache (12h) and its meta
+        // per request (MEC_cache) — so its reschedule would otherwise read the old dates.
+        wp_cache_delete($event, 'mec-events-data');
+        \MEC_cache::delete("meta-$event-0");
+        \MEC_cache::delete("meta-$event-1");
         $schedule = \MEC::getInstance('app.libraries.main')->getSchedule();
         $schedule->reschedule($event, $schedule->get_reschedule_maximum($first ? 'custom_days' : '', $event));
     }

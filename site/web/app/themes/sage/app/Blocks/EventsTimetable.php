@@ -3,6 +3,8 @@
 namespace App\Blocks;
 
 use App\Support\EventSessions;
+use App\TermTimetable\Schedule;
+use App\TermTimetable\TermTimetable;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -155,6 +157,40 @@ class EventsTimetable extends Block
     protected const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     /**
+     * Blocks saved before the "source" field existed have periods typed in,
+     * so they stay on those rather than switching to terms.
+     */
+    protected function source(): string
+    {
+        return get_field('source') ?: (get_field('periods') ? 'manual' : 'terms');
+    }
+
+    /**
+     * Published term timetables (App\TermTimetable) that haven't ended, in
+     * date order, as period rows — limited to the block's category if set.
+     */
+    protected function termRows(?int $category): array
+    {
+        $today = current_time('Y-m-d');
+        $rows = [];
+        foreach (get_posts(['post_type' => TermTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1]) as $term) {
+            $s = Schedule::normalise(get_post_meta($term->ID, TermTimetable::META, true));
+            if (! $s['start'] || $s['end'] < $today || ($category && (int) $s['category'] !== (int) $category)) {
+                continue;
+            }
+            $rows[] = [
+                'title' => html_entity_decode(get_the_title($term), ENT_QUOTES) . ': '
+                    . gmdate('l jS F', strtotime($s['start'] . ' UTC')) . ' – ' . gmdate('l jS F', strtotime($s['end'] . ' UTC')),
+                'start_date' => $s['start'],
+                'end_date' => $s['end'],
+            ];
+        }
+        usort($rows, fn($a, $b) => strcmp($a['start_date'], $b['start_date']));
+
+        return $rows;
+    }
+
+    /**
      * Pattern-library fixture. Only the layout is a field; the sessions come
      * from MEC, so examplePeriods() supplies them already shaped.
      *
@@ -202,6 +238,15 @@ class EventsTimetable extends Block
                 'default_value' => 'tabs',
                 'instructions' => 'Weekday tabs show each period\'s weekly pattern. The accordion lists every date in the period.',
             ])
+            ->addButtonGroup('source', [
+                'label' => 'Periods',
+                'choices' => [
+                    'terms' => 'Term timetables (automatic)',
+                    'manual' => 'Set dates here',
+                ],
+                'default_value' => 'terms',
+                'instructions' => 'Automatic shows every current and upcoming published term from Events → Term timetables, so new terms appear here by themselves.',
+            ])
             ->addTaxonomy('category', [
                 'label' => 'Event category',
                 'instructions' => 'Only show sessions from this category. Leave empty for all events.',
@@ -215,6 +260,7 @@ class EventsTimetable extends Block
             ])
             ->addRepeater('periods', [
                 'label' => 'Periods',
+                'conditional_logic' => [[['field' => 'source', 'operator' => '==', 'value' => 'manual']]],
                 'instructions' => 'One panel per period, e.g. "Half Term: Monday 26th October – Sunday 1st November". Sessions are pulled from the Events calendar between the two dates.',
                 'button_label' => 'Add period',
                 'min' => 1,
@@ -254,11 +300,11 @@ class EventsTimetable extends Block
      */
     public function periods(): array
     {
-        $rows = get_field('periods') ?: [];
+        $category = get_field('category') ?: null;
+        $rows = $this->source() === 'terms' ? $this->termRows($category) : (get_field('periods') ?: []);
         if (! $rows) {
             return shows_example($this->preview) ? $this->examplePeriods() : [];
         }
-        $category = get_field('category') ?: null;
 
         return array_map(function (array $row) use ($category) {
             $weekdays = array_fill_keys(self::WEEKDAYS, []);
