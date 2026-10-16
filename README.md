@@ -91,11 +91,34 @@ Once WP install screen has run (site loads, DB set up):
 
 MEC is used as the **data and admin layer only**: editors add and edit events under **Events** in WP admin, and MEC keeps a table of every dated session (`{prefix}mec_dates`). None of MEC's own templates, skins, CSS or JS are used on the front end (its assets are dequeued in `app/setup.php` unless a page contains an `[MEC]` shortcode). The theme renders everything itself:
 
-- **Events Timetable block** (`app/Blocks/EventsTimetable.php`): goes on a page like Bristol Cycling Centre → What's on. Editors add **periods** (title plus start/end date, e.g. "Half Term: Monday 26th October – Sunday 1st November"), and the block lists the sessions in that range as weekday tabs or a day-by-day accordion. To change the timetable, edit the events' dates in MEC; to add a new term, add a period to the block.
+- **Events Timetable block** (`app/Blocks/EventsTimetable.php`): goes on a page like Bristol Cycling Centre → What's on, and lists sessions as weekday tabs or a day-by-day accordion. Its **Periods** setting is either **Term timetables (automatic)**, the default, which shows every current and upcoming published term, or **Set dates here** for typed-in periods.
 - **Single event** (`resources/views/single-mec-events.blade.php` + `app/View/Composers/SingleMecEvent.php`): breadcrumbs, title, featured image, a "Next session / Price" card (from MEC's next date and Cost field, with the cost split into bullets on `|`), then the event's own blocks.
 - **`/events/` archive**: the theme's standard archive view, ordered by next session. It's an interim layout until the archive has a design.
 
-Sessions that run at different times on different days use MEC's **Custom Days** repeat (Event details → Repeat → Custom Days), where each date has its own times. Give each event a **Color** in MEC: it's the dot in the accordion timetable.
+Give each event a **Color** in MEC: it's the dot in the accordion timetable and the chip colour in the term editor.
+
+## Term timetables (class schedules)
+
+Termly classes (Cycling Centre sessions) aren't typed into MEC date by date. A term's **weekly pattern** is drawn once in **M.E. Calendar → Term timetables**, and publishing it writes every dated session into each class's MEC Custom Days.
+
+**Adding a new term (for clients):**
+1. **M.E. Calendar → Term timetables → Add New.** Optionally pick **Start from an existing term** to copy its weekly sessions.
+2. Enter the **Term name** (e.g. "Spring term 2027") and the **First day** and **Last day**.
+3. Build the week: **drag a class** from the list onto a day, or press **Add** / **+ Add session**, then set the times. Click a session to change its class, day or times, or to duplicate or delete it. Drag a session to another day to move it, or hold Alt (Option on a Mac) while dropping to copy it.
+4. Under the grid, add **Closures** (bank holidays, breaks), **Cancelled sessions** (one session off on one date) and **Extra sessions** (one-offs).
+5. The summary shows how many sessions publishing will create. Fix anything outlined in red, then **Publish**. What's on updates straight away.
+
+**Changing a term:**
+- Edit it and press **Update**; the dates it created are replaced.
+- **Switch to draft** (or trash it) to take its sessions off the calendar.
+
+**Hand edits:** sessions added by hand on a class in MEC are kept when a term is re-saved. A term only replaces the dates it created.
+
+How it works:
+- **Code:** `app/TermTimetable/`. `Schedule` (plain PHP, unit-tested in `site/tests/Feature/TermScheduleTest.php`) expands the pattern. `MecSync` writes MEC's fields on publish, update, unpublish, trash and delete, keeping hand-added dates via each term's `_term_generated_days`. `RestController` serves the editor and refuses to publish a schedule with errors.
+- **Editor:** a React app in `resources/js/admin/term-timetable/`, built by Vite. `@dnd-kit` uses WordPress's React through `resources/js/admin/shims/`.
+- **Classes with their own repeat:** a class that uses MEC's daily or weekly repeat is left alone, with a notice.
+- **Re-syncing:** `wp term-timetable sync [id]` re-syncs one term, or all of them, for example after a deploy.
 
 Events in the **Bristol Cycling Centre** category are served at `/cycling-centres/bristol-cycling-centre/whats-on/{slug}/`, matching the old site (`app/filters.php`), and all other events at `/events/{slug}/`. After deploying, flush permalinks (`wp rewrite flush`).
 
