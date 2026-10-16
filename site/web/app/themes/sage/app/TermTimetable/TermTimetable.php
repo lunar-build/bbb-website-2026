@@ -24,6 +24,8 @@ class TermTimetable
         add_action('load-post-new.php', [static::class, 'redirectNewScreen']);
         add_filter('manage_' . static::POST_TYPE . '_posts_columns', [static::class, 'columns']);
         add_action('manage_' . static::POST_TYPE . '_posts_custom_column', [static::class, 'column'], 10, 2);
+        add_filter('post_row_actions', [static::class, 'rowActions'], 10, 2);
+        add_action('admin_post_bbb_duplicate_term', [static::class, 'duplicate']);
 
         MecSync::boot();
         RestController::boot();
@@ -89,6 +91,37 @@ class TermTimetable
             wp_safe_redirect(static::editUrl());
             exit;
         }
+    }
+
+    public static function rowActions(array $actions, \WP_Post $post): array
+    {
+        if ($post->post_type === static::POST_TYPE && current_user_can('edit_posts')) {
+            $url = wp_nonce_url(admin_url('admin-post.php?action=bbb_duplicate_term&term=' . $post->ID), 'bbb_duplicate_term_' . $post->ID);
+            $actions['duplicate'] = sprintf('<a href="%s">%s</a>', esc_url($url), esc_html__('Duplicate', 'sage'));
+        }
+
+        return $actions;
+    }
+
+    /** A draft copy of a term (same week and exceptions), opened in the editor for new dates. */
+    public static function duplicate(): void
+    {
+        $source = (int) ($_GET['term'] ?? 0);
+        check_admin_referer('bbb_duplicate_term_' . $source);
+        if (get_post_type($source) !== static::POST_TYPE || ! current_user_can('edit_posts')) {
+            wp_die(esc_html__('You can\'t copy this term.', 'sage'));
+        }
+
+        $copy = wp_insert_post([
+            'post_type' => static::POST_TYPE,
+            'post_status' => 'draft',
+            /* translators: %s: term name */
+            'post_title' => sprintf(__('%s (copy)', 'sage'), get_the_title($source)),
+        ]);
+        update_post_meta($copy, static::META, Schedule::normalise(get_post_meta($source, static::META, true)));
+
+        wp_safe_redirect(static::editUrl($copy));
+        exit;
     }
 
     public static function columns(array $columns): array

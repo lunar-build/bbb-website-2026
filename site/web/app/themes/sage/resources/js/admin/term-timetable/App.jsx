@@ -3,6 +3,7 @@ import { Button, Notice, SelectControl, Spinner, TextControl } from '@wordpress/
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import ExceptionsPanel from './ExceptionsPanel';
+import HelpPanel from './HelpPanel';
 import SessionModal from './SessionModal';
 import { Palette, WeekGrid } from './WeekGrid';
 import { addMinutes, api, dayLabel, DEFAULT_LENGTH, emptySchedule, friendlyDate, META, nextFreeStart, uid, weeksIn } from './utils';
@@ -177,6 +178,7 @@ export default function App() {
 
   return (
     <div className="bbb-tt">
+      <HelpPanel isNew={!config.termId} />
       <header className="bbb-tt-header">
         <div className="bbb-tt-header__top">
           <a href={config.listUrl} className="bbb-tt-back">
