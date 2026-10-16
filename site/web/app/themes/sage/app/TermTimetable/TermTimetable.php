@@ -44,7 +44,8 @@ class TermTimetable
             'show_ui' => true,
             'show_in_menu' => 'mec-intro',
             'show_in_rest' => true,
-            'supports' => ['title'],
+            // custom-fields: without it, REST neither returns nor saves the schedule meta.
+            'supports' => ['title', 'custom-fields'],
             'map_meta_cap' => true,
         ]);
 
