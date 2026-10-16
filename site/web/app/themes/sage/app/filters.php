@@ -386,21 +386,6 @@ add_filter('template_include', function (string $template) {
 }, 99);
 
 /**
- * MEC's Cost field is a number input by default ("Numeric" cost type), which
- * can't hold the prices we use — "£5 per child | £7 per solo adult", one
- * bullet per "|" — and loads them as empty, so saving an event wiped its
- * price. Always use MEC's text ("Alphabetic") cost type. "This event is free"
- * still saves 0, which the event template shows as "Free".
- */
-add_filter('option_mec_options', function ($options) {
-    if (is_array($options)) {
-        $options['settings']['single_cost_type'] = 'alphabetic';
-    }
-
-    return $options;
-});
-
-/**
  * The /events/ archive uses the theme's archive view (no design of its own
  * yet). MEC's query parsing forces 1 post per page there; restore the site
  * setting, and list events by their next session, undated ones last.
