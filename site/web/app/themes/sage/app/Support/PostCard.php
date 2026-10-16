@@ -78,12 +78,13 @@ class PostCard
     }
 
     /**
-     * An event card shows its next session, not when it was published.
+     * An event card shows its next session (or, once finished, when it
+     * ran), not when it was published.
      */
     protected static function eventDate(\WP_Post $post): string
     {
-        $next = EventSessions::next($post->ID);
+        $shown = EventSessions::forDisplay($post->ID);
 
-        return $next ? gmdate('jS F Y', $next->tstart) : '';
+        return $shown ? gmdate('jS F Y', $shown['session']->tstart) : '';
     }
 }

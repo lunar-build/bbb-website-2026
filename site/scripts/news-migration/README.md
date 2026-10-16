@@ -48,6 +48,7 @@ wp eval-file scripts/news-migration/migrate-news.php posts [1288,7070]  # copy p
 wp eval-file scripts/news-migration/migrate-news.php case-studies [1019] # copy case studies (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php map-pages          # copy shops/BMX/pumps pages (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php cycling-centre [753] # Cycling Centre sessions -> MEC events (run after attachments)
+wp eval-file scripts/news-migration/migrate-news.php events [7065,7040,7042] # one-off events -> MEC events (run after cycling-centre)
 ```
 
 These environment variables can be set in front of the command, e.g. `NEWS_SOURCE_DB=old_site wp eval-file ...`:
@@ -95,6 +96,18 @@ Private Hire, which still needs rebuilding in Gravity Forms. The run ends by
 listing the terms it found, ready to add to the What's On page's Events
 Timetable block. MEC stores session times as wall-clock time in UTC timestamps,
 so format them with `gmdate()`, not `wp_date()`.
+
+`events` copies the old site's one-off `event` posts into MEC, keeping IDs,
+slugs (`/events/{slug}/`, as on the live site), featured images and Yoast
+meta. The old `start_date`/`end_date`/`end_time` fields become the MEC date,
+and a midnight start with no end time becomes "all day". `cost` becomes MEC's
+Cost, and `event_category` terms become `mec_category` terms with the same
+slugs. `location` becomes an MEC location, named by the part before the first
+comma, so "Bristol Cycling Centre, Old Whitchurch…" reuses the existing
+Bristol Cycling Centre location. With no ids it imports every event, newest
+first. Finished events still show their date ("Date … This event has
+finished"). Sessions that `cycling-centre` imports without timetable slots
+are flagged `_event_undated`, so their placeholder date is never shown.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item

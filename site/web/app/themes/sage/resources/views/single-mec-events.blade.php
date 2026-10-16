@@ -32,7 +32,7 @@
 
             <div class="c-event__info">
               <div class="c-event__info-column">
-                <h2 class="c-event__info-heading u-heading-5">{{ __('Next session', 'sage') }}</h2>
+                <h2 class="c-event__info-heading u-heading-5">{{ $nextSession['heading'] ?? __('Next session', 'sage') }}</h2>
                 @if ($nextSession)
                   <p class="c-event__info-line">
                     <x-icon name="calendar" />
@@ -43,6 +43,9 @@
                       <x-icon name="clock" />
                       {{ $nextSession['time'] }}
                     </p>
+                  @endif
+                  @if ($nextSession['finished'])
+                    <p class="c-event__info-line">{{ __('This event has finished.', 'sage') }}</p>
                   @endif
                 @else
                   <p class="c-event__info-line">{{ __('No sessions are scheduled at the moment.', 'sage') }}</p>

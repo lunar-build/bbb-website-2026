@@ -64,6 +64,45 @@ class EventSessions
     }
 
     /**
+     * An event's most recent session before now, or null.
+     *
+     * @return object{tstart: int, tend: int}|null
+     */
+    public static function last(int $postId): ?object
+    {
+        global $wpdb;
+
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
+            WHERE post_id = %d AND tstart < %d ORDER BY tstart DESC LIMIT 1",
+            $postId,
+            $now,
+        ));
+    }
+
+    /**
+     * The session to show for an event: the next one, or for an event that
+     * has finished, its last one, so a past one-off event still shows when
+     * it ran. Events flagged `_event_undated` (sessions with no timetable
+     * slots, imported on a placeholder date) never show a past date.
+     *
+     * @return array{session: object{tstart: int, tend: int}, upcoming: bool}|null
+     */
+    public static function forDisplay(int $postId): ?array
+    {
+        if ($next = static::next($postId)) {
+            return ['session' => $next, 'upcoming' => true];
+        }
+        if (get_post_meta($postId, '_event_undated', true) || ! ($last = static::last($postId))) {
+            return null;
+        }
+
+        return ['session' => $last, 'upcoming' => false];
+    }
+
+    /**
      * "09:45 — 10:30", as the timetable designs show session times.
      */
     public static function timeRange(int $start, int $end): string

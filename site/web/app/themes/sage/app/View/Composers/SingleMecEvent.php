@@ -40,7 +40,7 @@ class SingleMecEvent extends Composer
 
     /**
      * Cycling Centre sessions sit under What's on, matching their URL;
-     * other events under Home only, until an events listing page exists.
+     * other events under the /events/ archive.
      */
     public function breadcrumbs(): array
     {
@@ -48,6 +48,7 @@ class SingleMecEvent extends Composer
         if (! $whatsOn || ! has_term(CYCLING_CENTRE_EVENTS_CATEGORY, 'mec_category')) {
             return [
                 ['label' => __('Home', 'sage'), 'url' => home_url('/')],
+                ['label' => __('Events', 'sage'), 'url' => get_post_type_archive_link('mec-events')],
                 ['label' => html_entity_decode(get_the_title(), ENT_QUOTES)],
             ];
         }
@@ -61,20 +62,29 @@ class SingleMecEvent extends Composer
 
     /**
      * "Wednesday 19th August 2026" / "9.45am", as on the Figma event page.
+     * A finished one-off event shows when it ran, under "Date" instead.
      *
-     * @return array{date: string, time: string}|null
+     * @return array{heading: string, date: string, time: string, finished: bool}|null
      */
     public function nextSession(): ?array
     {
-        $next = EventSessions::next(get_the_ID());
-        if (! $next) {
+        $shown = EventSessions::forDisplay(get_the_ID());
+        if (! $shown) {
             return null;
         }
-        $hideTime = (bool) get_post_meta(get_the_ID(), 'mec_hide_time', true);
+        $session = $shown['session'];
+        $date = gmdate('l jS F Y', $session->tstart);
+        // Multi-day events show their range.
+        if (gmdate('Y-m-d', $session->tend) !== gmdate('Y-m-d', $session->tstart)) {
+            $date .= ' – ' . gmdate('l jS F Y', $session->tend);
+        }
+        $allDay = get_post_meta(get_the_ID(), 'mec_allday', true) || get_post_meta(get_the_ID(), 'mec_hide_time', true);
 
         return [
-            'date' => gmdate('l jS F Y', $next->tstart),
-            'time' => $hideTime ? '' : gmdate('g.ia', $next->tstart),
+            'heading' => $shown['upcoming'] ? __('Next session', 'sage') : __('Date', 'sage'),
+            'date' => $date,
+            'time' => $allDay ? __('All day', 'sage') : gmdate('g.ia', $session->tstart),
+            'finished' => ! $shown['upcoming'],
         ];
     }
 

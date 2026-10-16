@@ -1124,9 +1124,9 @@ function cc_strip_blocks(array $blocks, array &$notes): array
         if (in_array($name, ['acf/upcoming-sessions', 'acf/illustration'], true)) {
             continue;
         }
-        // The old CF7 "Bristol Cycling Centre Contact" form needs rebuilding in Gravity Forms.
+        // Old CF7 forms (Bristol Cycling Centre contact/newsletter) need rebuilding in Gravity Forms.
         if (in_array($name, ['acf/form', 'contact-form-7/contact-form-selector'], true)) {
-            $notes[] = "dropped $name (CF7 contact form, rebuild in Gravity Forms)";
+            $notes[] = "dropped $name (CF7 form, rebuild in Gravity Forms)";
 
             continue;
         }
@@ -1280,6 +1280,10 @@ if ($mode === 'cycling-centre') {
         wp_set_object_terms($id, [$category], 'mec_category');
         wp_set_object_terms($id, [$location], 'mec_location');
         update_post_meta($id, NEWS_MIGRATED_META, 1);
+        // Its date is only a placeholder, so templates never show it (App\Support\EventSessions::forDisplay()).
+        if (! $first) {
+            update_post_meta($id, '_event_undated', 1);
+        }
         clean_post_cache($id);
 
         echo "imported $id {$row->post_name}: " . ($first ? count($dates) + 1 : 0) . ' sessions' . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
@@ -1329,6 +1333,106 @@ if ($mode === 'cycling-centre') {
     }
 
     WP_CLI::success(count($ids) . ' Cycling Centre sessions and ' . count(CC_PAGES) . ' pages imported.');
+
+    return;
+}
+
+/*
+|--------------------------------------------------------------------------
+| One-off events -> Modern Events Calendar
+|--------------------------------------------------------------------------
+*/
+
+if ($mode === 'events') {
+    if (! class_exists('MEC')) {
+        WP_CLI::error('Modern Events Calendar must be active.');
+    }
+    $mec = MEC::getInstance('app.libraries.main');
+
+    // Newest first, by event date, so `events` with no ids still has a sensible order.
+    $ids = $src->get_col("SELECT p.ID FROM {$src->posts} p JOIN {$src->postmeta} m ON m.post_id = p.ID AND m.meta_key = 'start_date' WHERE p.post_type = 'event' AND p.post_status = 'publish' ORDER BY m.meta_value DESC");
+    if ($only) {
+        $ids = array_values(array_intersect($ids, $only));
+    }
+    $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'mec-events' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
+    }
+
+    foreach ($ids as $id) {
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            wp_delete_post($id, true);
+        }
+        $row = $src->get_row($src->prepare("SELECT post_name, post_date, post_date_gmt, post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
+        $meta = fn(string $key) => trim((string) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key=%s", $id, $key)));
+        $notes = [];
+        $content = news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes);
+
+        // Old ACF fields: start_date "Y-m-d H:i:s", end_date "Ymd" (optional), end_time "H:i:s" (optional).
+        [$startDate, $startTime] = explode(' ', $meta('start_date')) + [1 => '00:00:00'];
+        $endDate = $meta('end_date') ? DateTimeImmutable::createFromFormat('Ymd', $meta('end_date'))->format('Y-m-d') : $startDate;
+        $endTime = $meta('end_time');
+        // A midnight start with no end time was the old site's "all day".
+        $allDay = $startTime === '00:00:00' && $endTime === '';
+        [$sh, $sm, $sa] = cc_time_parts($startTime);
+        [$eh, $em, $ea] = cc_time_parts($endTime ?: '23:59:00');
+
+        $location = $meta('location');
+        // Named by the part before the first comma ("Bristol Cycling Centre, Old
+        // Whitchurch…" -> the existing Bristol Cycling Centre location); the
+        // full text stays as a new location's address.
+        $locationName = trim(strtok($location, ','));
+        $locationId = $location ? cc_term('mec_location', $locationName, sanitize_title($locationName), get_term_by('slug', sanitize_title($locationName), 'mec_location') ? [] : ['address' => $location]) : 1;
+
+        news_copy_row($src, $id, $replaceUrls, ['post_type' => 'mec-events', 'post_content' => '']);
+        clean_post_cache($id);
+
+        $saved = $mec->save_event([
+            'title' => html_entity_decode($row->post_title, ENT_QUOTES),
+            // wp_insert_post() unslashes, which would eat the \u003c escapes in block JSON.
+            'content' => wp_slash($replaceUrls($content)),
+            'status' => 'publish',
+            'author' => 1,
+            'start' => $startDate,
+            'end' => $endDate,
+            'start_time_hour' => $sh,
+            'start_time_minutes' => $sm,
+            'start_time_ampm' => $sa,
+            'end_time_hour' => $eh,
+            'end_time_minutes' => $em,
+            'end_time_ampm' => $ea,
+            'allday' => $allDay ? 1 : 0,
+            'repeat_status' => 0,
+            'repeat_type' => '',
+            'interval' => null,
+            'location_id' => $locationId,
+            'meta' => ['mec_cost' => $meta('cost')],
+        ], $id);
+        if (is_wp_error($saved)) {
+            WP_CLI::warning("$id: " . $saved->get_error_message());
+
+            continue;
+        }
+
+        $wpdb->update($wpdb->posts, [
+            'post_name' => $row->post_name,
+            'post_date' => $row->post_date,
+            'post_date_gmt' => $row->post_date_gmt,
+        ], ['ID' => $id]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => in_array($k, ['_thumbnail_id', '_wp_old_slug'], true) || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+
+        // Same category slugs as the old event_category terms (created by `cycling-centre`, or here).
+        $cats = $src->get_results($src->prepare("SELECT t.name, t.slug FROM {$src->term_relationships} r JOIN {$src->term_taxonomy} tt USING(term_taxonomy_id) JOIN {$src->terms} t USING(term_id) WHERE r.object_id=%d AND tt.taxonomy='event_category'", $id));
+        wp_set_object_terms($id, array_map(fn($t) => cc_term('mec_category', html_entity_decode($t->name), $t->slug), $cats), 'mec_category');
+        if ($locationId !== 1) {
+            wp_set_object_terms($id, [$locationId], 'mec_location');
+        }
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+        clean_post_cache($id);
+
+        echo "imported $id {$row->post_name}: $startDate" . ($allDay ? ' all day' : " $startTime-" . ($endTime ?: '?')) . ($endDate !== $startDate ? " to $endDate" : '') . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
+    }
+    WP_CLI::success(count($ids) . ' one-off events imported into MEC.');
 
     return;
 }
