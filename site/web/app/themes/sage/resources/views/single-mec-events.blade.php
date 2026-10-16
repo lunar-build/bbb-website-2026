@@ -62,7 +62,7 @@
                 @endif
 
                 @if ($nextSession['finished'] ?? false)
-                  <p class="c-event__info-line">{{ __('This event has finished.', 'sage') }}</p>
+                  <x-callout-text class="c-event__finished">{{ __('This event has finished.', 'sage') }}</x-callout-text>
                 @endif
               </div>
 
