@@ -2,7 +2,7 @@
   @if ($periods)
     <div class="o-container">
       @if ($layout === 'accordion')
-        {{-- Figma "Events timetable (alt)" (node 63:2406): one card per period, then one row per date. --}}
+        {{-- Figma "Events timetable (alt)" (node 63:2406) --}}
         <wa-accordion class="c-events-timetable__periods" appearance="plain" multiple>
           @foreach ($periods as $period)
             <wa-accordion-item class="c-events-timetable__period" label="{{ $period['title'] }}" heading-level="3" @if ($loop->first) expanded @endif>
@@ -28,7 +28,7 @@
           @endforeach
         </wa-accordion>
       @else
-        {{-- Figma "Events timetable" (node 26:1172): one panel per period, weekday pill tabs. --}}
+        {{-- Figma "Events timetable" (node 26:1172) --}}
         @foreach ($periods as $period)
           @php
             // Open on the first day that has sessions, so a panel never starts empty.
@@ -41,7 +41,7 @@
             @else
             <wa-tab-group class="c-events-timetable__tabs" active="{{ strtolower($active) }}">
               @foreach ($period['weekdays'] as $day => $sessions)
-                {{-- `active` set in markup too: wa-tab-group only applies its own `active` once scrolled into view. --}}
+                {{-- wa-tab-group only applies `active` once scrolled into view, so set it in markup too. --}}
                 <wa-tab slot="nav" panel="{{ strtolower($day) }}" @if ($day === $active) active @endif>{{ $day }}</wa-tab>
               @endforeach
               @foreach ($period['weekdays'] as $day => $sessions)

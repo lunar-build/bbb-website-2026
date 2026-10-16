@@ -261,9 +261,7 @@ function news_list(array $b, array &$notes): array
     }
 
     $block = news_acf_block('acf/bullet-list', \App\Blocks\BulletList::class, $fields, 'bullet_list');
-    // The block defaults to no padding (lists sit inside running text), but
-    // migrated lists were followed by more content in their own right: keep
-    // them tight to the text above, with a Small gap below.
+    // The block defaults to no padding; migrated lists get a Small gap below.
     $block['attrs']['style']['spacing']['padding'] = ['top' => '0', 'bottom' => 'var:preset|spacing|small'];
 
     return $block;
@@ -920,9 +918,8 @@ function news_pump_fault_form(): int
 }
 
 /**
- * The old page template drew its header from the featured image; here that's
- * an Image Hero block, or a Text Hero when there's no image (e.g. BMX), so the
- * title still gets a proper hero.
+ * The old template's featured-image header as an Image Hero, or a Text Hero
+ * when there's no image (e.g. BMX).
  */
 function news_page_hero(string $title, int $thumb): array
 {
@@ -1098,9 +1095,8 @@ function cc_dated_sessions(array $terms): array
 }
 
 /**
- * MEC's Cost for an old price: a plain "Free"/"FREE" becomes 0, which is
- * what ticking MEC's "This event is free" box saves (the event template
- * shows it as "Free"), so every free event is set up the same way.
+ * A plain "Free"/"FREE" price becomes 0, what MEC's "This event is free"
+ * box saves, so every free event is set up the same way.
  */
 function cc_cost(string $price): string
 {
@@ -1336,8 +1332,7 @@ if ($mode === 'cycling-centre') {
         }, parse_blocks(news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes)));
         $notes = array_filter($notes, fn($n) => $n !== 'UNMAPPED acf/calendar');
 
-        // What's on uses the Sticky Nav template (Figma 14:800: page index beside the
-        // content), which supplies its own Text Hero and breadcrumbs, so no hero block.
+        // What's on uses the Sticky Nav template, which supplies its own hero and breadcrumbs.
         $stickyNav = $id === 796;
         $content = ($stickyNav ? '' : serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n") . serialize_blocks($blocks);
         news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);
@@ -1396,9 +1391,8 @@ if ($mode === 'events') {
         [$eh, $em, $ea] = cc_time_parts($endTime ?: '23:59:00');
 
         $location = $meta('location');
-        // Named by the part before the first comma ("Bristol Cycling Centre, Old
-        // Whitchurch…" -> the existing Bristol Cycling Centre location); the
-        // full text stays as a new location's address.
+        // Named by the part before the first comma, so "Bristol Cycling Centre, Old
+        // Whitchurch…" reuses that location; the full text is a new location's address.
         $locationName = trim(strtok($location, ','));
         $locationId = $location ? cc_term('mec_location', $locationName, sanitize_title($locationName), get_term_by('slug', sanitize_title($locationName), 'mec_location') ? [] : ['address' => $location]) : 1;
 

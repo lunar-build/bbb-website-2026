@@ -4,7 +4,7 @@
   @if (! empty($image['url']))
     <img class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
   @else
-    {{-- No image (e.g. an event without a featured image): an empty panel the image's size, not a broken <img>. --}}
+    {{-- No image: a placeholder panel, not a broken <img>. --}}
     <div class="c-feature-card__image c-feature-card__image--empty" aria-hidden="true"></div>
   @endif
 

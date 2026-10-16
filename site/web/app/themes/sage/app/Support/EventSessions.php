@@ -3,14 +3,11 @@
 namespace App\Support;
 
 /**
- * Reads event sessions straight from MEC's own occurrence table
- * (`{prefix}mec_dates`, one row per dated session), which MEC rebuilds
- * whenever an event is saved. We use MEC as the data layer only; every
- * template that lists sessions goes through here instead of MEC's skins.
+ * Event sessions from MEC's occurrence table (`{prefix}mec_dates`, one row
+ * per dated session, rebuilt by MEC on save).
  *
- * MEC stores each session's wall-clock time as if it were UTC (13:15 is
- * saved as 13:15 UTC whatever the site timezone), so times are formatted
- * with gmdate(), never wp_date().
+ * MEC stores wall-clock times as if they were UTC (13:15 is 13:15 UTC
+ * whatever the site timezone), so format them with gmdate(), never wp_date().
  */
 class EventSessions
 {
@@ -85,10 +82,9 @@ class EventSessions
     }
 
     /**
-     * The session to show for an event: the next one, or for an event that
-     * has finished, its last one, so a past one-off event still shows when
-     * it ran. Events flagged `_event_undated` (sessions with no timetable
-     * slots, imported on a placeholder date) never show a past date.
+     * The next session, or once an event has finished its last one, so a
+     * past one-off still shows when it ran. `_event_undated` events (imported
+     * on a placeholder date) never show a past date.
      *
      * @return array{session: object{tstart: int, tend: int}, upcoming: bool}|null
      */
@@ -105,7 +101,7 @@ class EventSessions
     }
 
     /**
-     * "09:45 — 10:30", as the timetable designs show session times.
+     * "09:45 — 10:30", the timetable designs' format.
      */
     public static function timeRange(int $start, int $end): string
     {

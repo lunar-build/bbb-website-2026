@@ -87,9 +87,8 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
- * Events (MEC's mec-events) are built from the same blocks as pages, so any
- * block allowed on pages is allowed on events too. One filter here rather
- * than adding 'mec-events' to every block class's $post_types.
+ * Any block allowed on pages is allowed on events (mec-events) — one filter
+ * rather than adding 'mec-events' to every block class's $post_types.
  */
 add_filter('acf/register_block_type_args', function ($block) {
     if (in_array('page', $block['post_types'] ?? [], true)) {
@@ -100,10 +99,9 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
- * MEC switches events to the classic editor by default, which can't show or
- * keep our ACF blocks (saving there strips them). Use the block editor like
- * pages; MEC's own settings panels still load below it as meta boxes.
- * Runs after MEC's filter (10).
+ * MEC forces the classic editor on events, which can't show our ACF blocks
+ * and strips them on save. Use the block editor (MEC's panels still load as
+ * meta boxes) — priority 20, after MEC's filter.
  */
 add_filter('use_block_editor_for_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
 add_filter('gutenberg_can_edit_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
@@ -209,15 +207,10 @@ add_filter('gform_submit_button', function ($button, $form) {
 }, 10, 2);
 
 /**
- * The sticky page menu (Sticky Nav pages, single events — any template
- * showing <x-sticky-page-menu>) is built from each top-level (H2) heading,
- * linking to it by `id`. Gutenberg already renders a heading's `id`
- * automatically when an editor sets its "HTML anchor" field — this only
- * covers the headings
- * where they haven't, auto-slugging the heading text instead so the
- * generated link actually resolves. Only runs for a post whose page menu
- * has been built (App\Support\PageMenu::shownFor()), so other pages' H2s
- * are untouched and no list of templates needs keeping in sync.
+ * The sticky page menu links to each H2 by `id`. Gutenberg only renders an
+ * `id` when an editor sets the heading's "HTML anchor", so give the rest an
+ * auto-slug. Only for posts whose menu was built
+ * (App\Support\PageMenu::shownFor()), so other pages' H2s are untouched.
  *
  * The slugify logic here must match App\Support\PageMenu::anchorFor()'s
  * fallback, which builds the same `items` array of links.
@@ -368,11 +361,10 @@ add_filter('post_type_link', function (string $link, \WP_Post $post) {
 }, 10, 2);
 
 /**
- * MEC swaps in its own single/archive templates on template_include (99)
- * unless the theme has a plain `single-mec-events.php`, which a Blade theme
- * never does. Hand WordPress's own template lookup back, so Sage resolves
- * our Blade views (single-mec-events.blade.php etc.) before Acorn renders
- * them at 100. Registered after MEC's filter, so it runs after it.
+ * MEC swaps in its own templates on template_include (99) unless the theme
+ * has a plain `single-mec-events.php`, which a Blade theme never has. Redo
+ * WordPress's lookup so Sage finds our Blade views before Acorn renders at
+ * 100. Same priority as MEC's, registered later, so it runs after it.
  */
 add_filter('template_include', function (string $template) {
     if (is_singular('mec-events')) {
@@ -386,12 +378,9 @@ add_filter('template_include', function (string $template) {
 }, 99);
 
 /**
- * MEC event editor: a multi-line Cost box, one price per line, since our
- * prices are usually several lines of text ("£5 per child", "£7 per solo
- * adult"…). It's stored in the existing `|`-separated format that the event
- * template splits into bullets (App\View\Composers\SingleMecEvent), so
- * imported prices and the "This event is free" box (which targets #mec_cost
- * and saves 0) work unchanged.
+ * Multi-line Cost box in MEC's event editor, one price per line. Saved in
+ * the `|`-separated format SingleMecEvent::priceLines() splits into bullets;
+ * keeps the #mec_cost id that MEC's "This event is free" script targets.
  */
 add_filter('mec_event_cost_custom_field_status', '__return_true');
 
@@ -406,8 +395,9 @@ add_action('mec_event_cost_custom_field', function ($cost, $type, $name) {
     );
 }, 10, 3);
 
-// MEC saves the cost through sanitize_text_field(), which would turn the
-// line breaks into spaces — join the lines with `|` first (MEC saves at 10).
+// MEC's save runs the cost through sanitize_text_field(), which flattens line
+// breaks — join the lines with `|` first (save_post_{type} fires before
+// MEC's save_post handler).
 add_action('save_post_mec-events', function () {
     if (! isset($_POST['mec']['cost']) || ! is_string($_POST['mec']['cost'])) {
         return;

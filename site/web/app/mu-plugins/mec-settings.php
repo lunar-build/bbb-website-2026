@@ -6,19 +6,15 @@
  */
 
 /*
- * MEC's Cost field is a number input by default ("Numeric" cost type), which
- * can't hold the prices we use — "£5 per child | £7 per solo adult", one
- * bullet per "|" — and loads them as empty, so saving an event wiped its
- * price. Always use MEC's text ("Alphabetic") cost type. "This event is free"
- * still saves 0, which the event template shows as "Free".
+ * Text ("Alphabetic") cost type: the default number input loads our text
+ * prices ("£5 per child | £7 per adult") as empty, so saving wiped them.
  */
 add_filter('option_mec_options', function ($options) {
     if (is_array($options)) {
         $options['settings']['single_cost_type'] = 'alphabetic';
 
-        // Settings MEC's own settings screens read without checking they
-        // exist — until MEC's settings are first saved, each one is a PHP
-        // warning, which Acorn turns into a 500 in debug mode.
+        // MEC's settings screens read these unchecked; until its settings are
+        // first saved, each is a warning that Acorn turns into a 500.
         $options['settings'] += [
             'breadcrumbs_events_page' => '',
             'fes_event_link_target' => '',

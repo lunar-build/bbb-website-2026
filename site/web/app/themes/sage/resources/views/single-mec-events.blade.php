@@ -1,10 +1,4 @@
-{{--
-  Single MEC event (Figma "Single events page", node 14:1043). Same shape as
-  the Sticky Nav template: optional hero block, page index from the content's
-  H2s, then breadcrumbs, title, the featured image with the Next session /
-  Price card, and the editor's own blocks. MEC only supplies the data
-  (App\View\Composers\SingleMecEvent); none of its templates are used.
---}}
+{{-- Figma "Single events page" (node 14:1043), on the Sticky Nav template's layout. Data: App\View\Composers\SingleMecEvent. --}}
 
 @extends('layouts.app')
 

@@ -1,4 +1,4 @@
-{{-- Session rows shared by both Events Timetable layouts; the accordion adds a colour dot and puts the time last. --}}
+{{-- Rows for both Events Timetable layouts; $dots adds the accordion's colour dot. --}}
 @if ($sessions)
   <ul class="c-events-timetable__sessions" role="list">
     @foreach ($sessions as $session)

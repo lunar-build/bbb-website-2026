@@ -2,9 +2,7 @@
 @use '../base/typography';
 @use '../base/focus' as focus;
 
-// Figma "Events timetable" (node 26:1172, weekday tabs) and
-// "Events timetable (alt)" (node 63:2406, day-by-day accordion).
-// Sessions come from MEC's data; none of MEC's own skin CSS is used.
+// Figma "Events timetable" (node 26:1172) and "Events timetable (alt)" (node 63:2406)
 
 .c-events-timetable {
   color: var(--wp--preset--color--blue-dark);
@@ -12,8 +10,7 @@
 
 /* Session rows (both layouts) */
 
-// Doubled class to beat the content-list bullets (.e-content ul) when the
-// block sits inside page content.
+// Doubled class to beat .e-content ul's bullets in page content.
 .c-events-timetable__sessions.c-events-timetable__sessions {
   margin: 0;
   padding: 0;
@@ -99,8 +96,7 @@
   --indicator-color: transparent;
 
   &::part(tabs) {
-    // Figma spreads the seven pills across the panel; on narrow screens they
-    // wrap rather than scroll, so every day stays visible (WCAG 1.4.10).
+    // Wrap, not scroll, so every day stays visible (WCAG 1.4.10).
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 0.5rem;
@@ -111,10 +107,8 @@
     display: none;
   }
 
-  // WA's tab strip sits in an unexposed scroller (.nav, overflow: auto)
-  // that clipped the focus ring. Pad the strip by the ring's reach (2px +
-  // 2px offset) so it fits inside, and pull the outer `nav` part back by
-  // the same amount so the pills still line up with the title and rows.
+  // WA's unexposed scroller (.nav) clips the focus ring: pad the strip by the
+  // ring's reach (2px + 2px offset), pull `nav` back so the pills stay aligned.
   &::part(nav) {
     margin: -0.25rem;
   }
@@ -123,9 +117,8 @@
     margin-top: 0.75rem;
   }
 
-  // Focus lands on the wa-tab host (role="tab") but the pill is its `tab`
-  // part, so ring the part — this also replaces WA's own inset ring, which
-  // sat inside the pill's border (WCAG 2.4.7).
+  // Focus is on the host but the pill is the `tab` part; ring that (replaces
+  // WA's inset ring).
   wa-tab:focus-visible::part(tab) {
     @include focus.ring-styles;
   }
@@ -244,7 +237,6 @@
     padding: 0;
   }
 
-  // Accordion rows: dot, linked title, then the time on the right.
   .c-events-timetable__session {
     grid-template-columns: auto 1fr auto;
     grid-template-areas: 'dot link time';

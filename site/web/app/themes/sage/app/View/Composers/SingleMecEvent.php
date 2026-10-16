@@ -123,8 +123,8 @@ class SingleMecEvent extends Composer
     }
 
     /**
-     * MEC's cost field, one bullet per "|"-separated part (the format the
-     * old site's price field used), shaped for <x-bullet-list>.
+     * MEC's Cost, one <x-bullet-list> item per "|"-separated part — the
+     * format the editor's multi-line Cost box saves (app/filters.php).
      */
     public function priceLines(): array
     {
@@ -136,7 +136,6 @@ class SingleMecEvent extends Composer
         }
 
         return array_map(
-            // A bare amount ("5", "7.50") gets a £ sign.
             fn($line) => ['text' => is_numeric($line) ? '£' . $line : $line],
             // strlen, not a bare array_filter(), which would also drop a "0" part.
             array_values(array_filter(array_map('trim', explode('|', $cost)), 'strlen')),

@@ -20,9 +20,7 @@
 
 wa-breadcrumb-item {
   @extend .u-cta-large;
-  // WA keeps each item on one line (white-space: nowrap) at its full width,
-  // so a long page title ran off the side of the page (WCAG 1.4.10 Reflow).
-  // Let items shrink and wrap instead.
+  // WA's nowrap pushed long titles off the page (WCAG 1.4.10).
   min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;

@@ -165,7 +165,7 @@ class EventsTimetable extends Block
     ];
 
     /**
-     * Both layouts on the pattern library (see build-acf-block skill §6).
+     * Both layouts on the pattern library.
      *
      * @var array
      */
@@ -247,9 +247,10 @@ class EventsTimetable extends Block
      * Each period's sessions, grouped two ways:
      * - `weekdays`: Monday–Sunday, each weekly slot once (a term repeats the
      *   same week, so the tabs show the pattern, not every date);
-     * - `dates`: every date in the period with its sessions, for the accordion.
+     * - `dates`: every date in the period, for the accordion.
+     * `empty` is true when the period has no sessions at all.
      *
-     * @return array<int, array{id: string, title: string, weekdays: array, dates: array}>
+     * @return array<int, array{id: string, title: string, empty: bool, weekdays: array, dates: array}>
      */
     public function periods(): array
     {

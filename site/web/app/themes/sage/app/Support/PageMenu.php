@@ -5,10 +5,7 @@ namespace App\Support;
 class PageMenu
 {
     /**
-     * IDs of posts a page menu has been built for on this request — see
-     * shownFor().
-     *
-     * @var array<int, true>
+     * @var array<int, true> Post IDs a menu was built for this request.
      */
     protected static array $shown = [];
 
@@ -23,9 +20,9 @@ class PageMenu
      * filter in app/filters.php, which injects that same fallback slug as
      * the rendered heading's `id` so the links here actually resolve.
      *
-     * Building the menu also marks the post (shownFor()), which is what
-     * switches that filter on — so call this before rendering the content,
-     * as the composers do (pageMenuItems before body in with()).
+     * Also marks the post for shownFor(), which switches that filter on —
+     * so call this before rendering the content (composers list
+     * pageMenuItems before body in with()).
      */
     public static function forPost(?int $postId = null): array
     {
@@ -63,10 +60,8 @@ class PageMenu
     }
 
     /**
-     * Whether a page menu linking to this post's headings is on the page,
-     * so its H2s need `id`s for the links to land on. Tied to the menu
-     * itself rather than a list of templates, so any template that shows
-     * <x-sticky-page-menu> gets working links without extra wiring.
+     * Whether this post's H2s need `id`s for a page menu's links. Tied to
+     * the menu, not a template list, so any template using it just works.
      */
     public static function shownFor(int $postId): bool
     {

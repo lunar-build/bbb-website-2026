@@ -26,8 +26,7 @@
   }
 }
 
-// The ring's declarations alone, for selectors ring() can't build — e.g. a
-// web component that's focused on its host but styled through a part:
+// The declarations alone, for selectors ring() can't build:
 //   wa-tab:focus-visible::part(tab) { @include focus.ring-styles; }
 @mixin ring-styles($color: var(--focus-color)) {
   outline: 2px solid $color;

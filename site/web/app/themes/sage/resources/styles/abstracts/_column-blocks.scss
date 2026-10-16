@@ -1,22 +1,15 @@
 @use 'breakpoints' as bp;
 
-// Blocks placed in a template's narrow content column rather than full
-// width: the archive intro (components/_archive.scss) and the Sticky Nav /
-// single event column (base/_sticky-nav-template.scss).
-//
-// Usage, on the column element:
-//   @use '../abstracts/column-blocks';
-//   .c-archive__intro { @include column-blocks.blocks; }
+// Blocks in a narrow template column rather than full width — used by the
+// archive intro and the Sticky Nav column. Include on the column element.
 @mixin blocks {
-  // Blocks wrap themselves in .o-container — already narrowed by the
-  // column, so its gutter would indent them a second time. Flatten it.
+  // The column already narrows blocks; their own .o-container gutter would indent them twice.
   .o-container {
     grid-template-columns: [full-start content-start] 100% [content-end full-end];
   }
 
-  // Background blocks (Card Grid, CTA Banner, any picked colour) can't run
-  // full bleed from a column — box them as a rounded panel instead. Their
-  // spacing controls still set top/bottom inline; this adds the sides.
+  // Background blocks can't bleed from a column, so box them as rounded
+  // panels. Their spacing controls still set top/bottom inline.
   :is(.o-full-bleed-bg, section.has-background) {
     padding: var(--wp--preset--spacing--small) 1.5rem;
     border-radius: 1.25rem;
@@ -26,8 +19,7 @@
     }
   }
 
-  // Back-to-back background blocks join into one panel: rounded only on the
-  // outer corners, no gap between them — as they'd sit flush full bleed.
+  // Stacked background blocks join into one panel, as they would full bleed.
   :is(.o-full-bleed-bg, section.has-background) + :is(.o-full-bleed-bg, section.has-background) {
     margin-top: 0;
     border-top-left-radius: 0;

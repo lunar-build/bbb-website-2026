@@ -338,10 +338,8 @@ if (defined('WP_CLI') && WP_CLI) {
 }
 
 /**
- * MEC enqueues ~20 styles/scripts (plus a Typekit script) on every page, but
- * the theme renders events itself (Events Timetable block, single-mec-events
- * view), so none of it is used. Keep it only where an editor has placed an
- * MEC shortcode.
+ * MEC enqueues ~20 styles/scripts (and Typekit) on every page, unused since
+ * the theme renders events itself. Keep them only where an [MEC] shortcode is.
  */
 add_action('wp_enqueue_scripts', function () {
     if (is_singular() && has_shortcode((string) get_post_field('post_content'), 'MEC')) {

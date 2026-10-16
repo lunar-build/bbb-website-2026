@@ -78,8 +78,7 @@ class PostCard
     }
 
     /**
-     * An event card shows its next session (or, once finished, when it
-     * ran), not when it was published.
+     * Events show their next (or last) session, not their publish date.
      */
     protected static function eventDate(\WP_Post $post): string
     {

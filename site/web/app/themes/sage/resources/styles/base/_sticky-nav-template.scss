@@ -60,9 +60,6 @@
     margin-bottom: 2rem;
   }
 
-  // Blocks in this column: flattened containers (so they line up with the
-  // breadcrumbs and title) and background blocks as rounded panels, as in
-  // the archive intro.
   @include column-blocks.blocks;
 
   // Same reason as .c-sticky-nav-template__nav's `top` above — a heading
