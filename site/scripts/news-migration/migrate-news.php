@@ -1073,25 +1073,37 @@ function cc_terms(wpdb $src, bool $includeEnded = false): array
     return $terms;
 }
 
-/** Each term's weekday slots expanded into dated sessions, keyed by old event ID and sorted. */
-function cc_dated_sessions(array $terms): array
+/**
+ * An old term as a term timetable schedule (App\TermTimetable\Schedule):
+ * the weekly slots become sessions, skipping the timetable fillers.
+ */
+function cc_term_schedule(array $term, int $category): array
 {
+    $weekdays = array_flip(['', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
     $sessions = [];
-    foreach ($terms as $term) {
-        $last = DateTimeImmutable::createFromFormat('Ymd', $term['end']);
-        for ($date = DateTimeImmutable::createFromFormat('Ymd', $term['start']); $date <= $last; $date = $date->modify('+1 day')) {
-            foreach ($term['slots'] as $slot) {
-                if ($slot['day'] === strtolower($date->format('l'))) {
-                    $sessions[$slot['event']][] = ['date' => $date->format('Y-m-d'), 'start' => $slot['start'], 'end' => $slot['end']];
-                }
-            }
+    foreach ($term['slots'] as $slot) {
+        if (in_array($slot['event'], CC_TIMETABLE_FILLERS, true) || ! $slot['start'] || ! $slot['end']) {
+            continue;
         }
+        $sessions[] = [
+            'id' => wp_generate_uuid4(),
+            'event' => $slot['event'],
+            'weekday' => $weekdays[$slot['day']],
+            'start' => substr($slot['start'], 0, 5),
+            'end' => substr($slot['end'], 0, 5),
+        ];
     }
-    foreach ($sessions as &$list) {
-        usort($list, fn($a, $b) => strcmp($a['date'] . $a['start'], $b['date'] . $b['start']));
-    }
+    $ymd = fn(string $d) => DateTimeImmutable::createFromFormat('Ymd', $d)->format('Y-m-d');
 
-    return $sessions;
+    return [
+        'start' => $ymd($term['start']),
+        'end' => $ymd($term['end']),
+        'category' => $category,
+        'sessions' => $sessions,
+        'closures' => [],
+        'cancellations' => [],
+        'extras' => [],
+    ];
 }
 
 /**
@@ -1215,8 +1227,10 @@ if ($mode === 'cycling-centre') {
         'address' => 'Old Whitchurch Athletics Track, Bamfield, Bristol BS14 0XA',
     ]);
 
-    $terms = cc_terms($src);
-    $sessions = cc_dated_sessions($terms);
+    // Earlier runs' terms go first: deleting one removes the dates it generated.
+    foreach (get_posts(['post_type' => \App\TermTimetable\TermTimetable::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'meta_key' => NEWS_MIGRATED_META, 'fields' => 'ids']) as $termId) {
+        wp_delete_post($termId, true);
+    }
 
     foreach ($ids as $n => $id) {
         if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
@@ -1235,18 +1249,8 @@ if ($mode === 'cycling-centre') {
         news_copy_row($src, $id, $replaceUrls, ['post_type' => 'mec-events', 'post_content' => '']);
         clean_post_cache($id);
 
-        $dates = $sessions[$id] ?? [];
-        $first = $dates ? array_shift($dates) : null;
-        // No sessions this term: a dateless one-off on its old publish date, so the page still exists.
-        $start = $first['date'] ?? substr($row->post_date, 0, 10);
-        [$sh, $sm, $sa] = cc_time_parts($first['start'] ?? '00:00:00');
-        [$eh, $em, $ea] = cc_time_parts($first['end'] ?? '00:00:00');
-
-        // MEC's custom-days format: Y-m-d:Y-m-d:hh-mm-AM:hh-mm-PM, comma-separated.
-        $days = implode(',', array_map(function ($d) {
-            return $d['date'] . ':' . $d['date'] . ':' . implode('-', cc_time_parts($d['start'])) . ':' . implode('-', cc_time_parts($d['end']));
-        }, $dates));
-
+        // Saved undated, on its old publish date: the term timetables below add the sessions.
+        $start = substr($row->post_date, 0, 10);
         $price = (string) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='price'", $id));
 
         $saved = $mec->save_event([
@@ -1257,23 +1261,19 @@ if ($mode === 'cycling-centre') {
             'author' => 1,
             'start' => $start,
             'end' => $start,
-            'start_time_hour' => $sh,
-            'start_time_minutes' => $sm,
-            'start_time_ampm' => $sa,
-            'end_time_hour' => $eh,
-            'end_time_minutes' => $em,
-            'end_time_ampm' => $ea,
+            'start_time_hour' => '12',
+            'start_time_minutes' => '00',
+            'start_time_ampm' => 'AM',
+            'end_time_hour' => '12',
+            'end_time_minutes' => '00',
+            'end_time_ampm' => 'AM',
             'allday' => 0,
-            'date' => ['hide_time' => $first ? 0 : 1],
-            'repeat_status' => $days ? 1 : 0,
-            'repeat_type' => $days ? 'custom_days' : '',
+            'date' => ['hide_time' => 1],
+            'repeat_status' => 0,
+            'repeat_type' => '',
             'interval' => null,
-            'days' => $days,
-            // As MEC's own editor saves custom-days events: the repeat "ends" with the first date.
-            'finish' => $days ? $start : '',
             'location_id' => $location,
             'meta' => [
-                'mec_in_days' => $days,
                 'mec_cost' => cc_cost($price),
                 'mec_color' => CC_COLORS[$n % count(CC_COLORS)],
             ],
@@ -1294,18 +1294,38 @@ if ($mode === 'cycling-centre') {
         wp_set_object_terms($id, [$category], 'mec_category');
         wp_set_object_terms($id, [$location], 'mec_location');
         update_post_meta($id, NEWS_MIGRATED_META, 1);
-        // Its date is only a placeholder, so templates never show it (App\Support\EventSessions::forDisplay()).
-        if (! $first) {
-            update_post_meta($id, '_event_undated', 1);
-        }
+        // Placeholder date until a term adds sessions (App\Support\EventSessions::forDisplay()).
+        update_post_meta($id, '_event_undated', 1);
         clean_post_cache($id);
 
-        echo "imported $id {$row->post_name}: " . ($first ? count($dates) + 1 : 0) . ' sessions' . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
+        echo "imported $id {$row->post_name}" . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
     }
 
-    // The pages above the sessions. What's on's old acf/calendar blocks (one
-    // per term) become Events Timetable blocks covering the same term.
-    $allTerms = cc_terms($src, true);
+    // The old schedule's current terms, as published term timetables; publishing syncs their sessions into MEC.
+    foreach (cc_terms($src) as $term) {
+        $name = trim(strtok($term['title'], ':')) ?: 'Term';
+        $termId = wp_insert_post(['post_type' => \App\TermTimetable\TermTimetable::POST_TYPE, 'post_title' => $name, 'post_status' => 'publish']);
+        update_post_meta($termId, \App\TermTimetable\TermTimetable::META, cc_term_schedule($term, $category));
+        update_post_meta($termId, NEWS_MIGRATED_META, 1);
+        $notices = \App\TermTimetable\MecSync::sync($termId);
+        echo "term timetable $termId \"$name\": " . count(cc_term_schedule($term, $category)['sessions']) . ' weekly sessions' . ($notices ? ' (' . implode('; ', $notices) . ')' : '') . "\n";
+        // Bad old data (e.g. a slot ending before it starts) is skipped by the sync; say which, to fix in the editor.
+        $schedule = get_post_meta($termId, \App\TermTimetable\TermTimetable::META, true);
+        foreach (\App\TermTimetable\Schedule::validate($schedule)['errors'] as $error) {
+            $session = current(array_filter($schedule['sessions'], fn($x) => $x['id'] === $error['ref']));
+            WP_CLI::warning("\"$name\": {$error['message']}" . ($session ? ' ' . get_the_title($session['event']) . ", day {$session['weekday']} {$session['start']}–{$session['end']}" : ''));
+        }
+    }
+    foreach ($ids as $id) {
+        $count = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}mec_dates WHERE post_id=%d", $id));
+        if (! get_post_meta($id, '_event_undated', true)) {
+            echo "  $id " . get_post_field('post_name', $id) . ": $count sessions\n";
+        }
+    }
+
+    // The pages above the sessions. What's on had one acf/calendar block per
+    // term, each under a "… Timetable" heading; they become a single Events
+    // Timetable showing every current term timetable.
     foreach (CC_PAGES as $id) {
         if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
             news_remove_page_import($id);
@@ -1313,23 +1333,31 @@ if ($mode === 'cycling-centre') {
         $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
         $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
         $notes = [];
-        $blocks = array_map(function ($b) use ($allTerms, $category, &$notes) {
+        $blocks = [];
+        $timetableAdded = false;
+        foreach (parse_blocks(news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes)) as $b) {
             if ($b['blockName'] !== 'acf/calendar') {
-                return $b;
-            }
-            $term = $allTerms[(int) ($b['attrs']['data']['schedule_choice'] ?? 0)] ?? null;
-            $notes[] = 'acf/calendar -> Events Timetable' . ($term ? '' : ' (term not found, left empty)');
+                $blocks[] = $b;
 
-            return news_acf_block('acf/events-timetable', \App\Blocks\EventsTimetable::class, [
+                continue;
+            }
+            // Drop the per-term heading above it (skipping parse_blocks' whitespace blocks).
+            for ($i = count($blocks) - 1; $i >= 0 && news_is_blank($blocks[$i]); $i--);
+            if ($i >= 0 && $blocks[$i]['blockName'] === 'core/heading' && str_contains(strtolower($blocks[$i]['innerHTML']), 'timetable')) {
+                array_splice($blocks, $i, 1);
+            }
+            if ($timetableAdded) {
+                continue;
+            }
+            $blocks[] = parse_blocks("<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Timetable</h2>\n<!-- /wp:heading -->")[0];
+            $blocks[] = news_acf_block('acf/events-timetable', \App\Blocks\EventsTimetable::class, [
+                'source' => 'terms',
                 'layout' => 'tabs',
                 'category' => $category,
-                'periods' => $term ? 1 : 0,
-            ] + ($term ? [
-                'periods_0_title' => $term['title'],
-                'periods_0_start_date' => $term['start'],
-                'periods_0_end_date' => $term['end'],
-            ] : []), 'events_timetable');
-        }, parse_blocks(news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes)));
+            ], 'events_timetable');
+            $timetableAdded = true;
+            $notes[] = 'acf/calendar blocks -> one Events Timetable (term timetables)';
+        }
         $notes = array_filter($notes, fn($n) => $n !== 'UNMAPPED acf/calendar');
 
         // What's on uses the Sticky Nav template, which supplies its own hero and breadcrumbs.
