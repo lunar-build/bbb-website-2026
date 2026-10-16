@@ -101,7 +101,8 @@ so format them with `gmdate()`, not `wp_date()`.
 slugs (`/events/{slug}/`, as on the live site), featured images and Yoast
 meta. The old `start_date`/`end_date`/`end_time` fields become the MEC date,
 and a midnight start with no end time becomes "all day". `cost` becomes MEC's
-Cost, and `event_category` terms become `mec_category` terms with the same
+Cost (a plain "Free" becomes `0`, the same as ticking MEC's "This event is
+free", in both this and the `cycling-centre` mode), and `event_category` terms become `mec_category` terms with the same
 slugs. `location` becomes an MEC location, named by the part before the first
 comma, so "Bristol Cycling Centre, Old Whitchurch…" reuses the existing
 Bristol Cycling Centre location. With no ids it imports every event, newest

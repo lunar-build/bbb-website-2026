@@ -1097,6 +1097,18 @@ function cc_dated_sessions(array $terms): array
     return $sessions;
 }
 
+/**
+ * MEC's Cost for an old price: a plain "Free"/"FREE" becomes 0, which is
+ * what ticking MEC's "This event is free" box saves (the event template
+ * shows it as "Free"), so every free event is set up the same way.
+ */
+function cc_cost(string $price): string
+{
+    $price = trim($price);
+
+    return strcasecmp($price, 'free') === 0 ? '0' : $price;
+}
+
 /** '13:15:00' -> ['01', '15', 'PM'], the 12-hour parts MEC stores times as. */
 function cc_time_parts(string $time): array
 {
@@ -1266,7 +1278,7 @@ if ($mode === 'cycling-centre') {
             'location_id' => $location,
             'meta' => [
                 'mec_in_days' => $days,
-                'mec_cost' => $price,
+                'mec_cost' => cc_cost($price),
                 'mec_color' => CC_COLORS[$n % count(CC_COLORS)],
             ],
         ], $id);
@@ -1412,7 +1424,7 @@ if ($mode === 'events') {
             'repeat_type' => '',
             'interval' => null,
             'location_id' => $locationId,
-            'meta' => ['mec_cost' => $meta('cost')],
+            'meta' => ['mec_cost' => cc_cost($meta('cost'))],
         ], $id);
         if (is_wp_error($saved)) {
             WP_CLI::warning("$id: " . $saved->get_error_message());
