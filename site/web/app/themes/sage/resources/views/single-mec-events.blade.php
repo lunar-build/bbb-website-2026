@@ -44,11 +44,25 @@
                       {{ $nextSession['time'] }}
                     </p>
                   @endif
-                  @if ($nextSession['finished'])
-                    <p class="c-event__info-line">{{ __('This event has finished.', 'sage') }}</p>
-                  @endif
                 @else
                   <p class="c-event__info-line">{{ __('No sessions are scheduled at the moment.', 'sage') }}</p>
+                @endif
+
+                @if ($venue)
+                  <div class="c-event__info-line c-event__venue">
+                    <x-icon name="map-pin" />
+                    <p>
+                      {{ $venue['name'] }}@if ($venue['address']), {{ $venue['address'] }}@endif
+                      <br>
+                      <a href="{{ $venue['map'] }}" target="_blank" rel="noopener">
+                        {{ __('View on map', 'sage') }}<span class="u-sr-only"> {{ __('(opens in a new tab)', 'sage') }}</span>
+                      </a>
+                    </p>
+                  </div>
+                @endif
+
+                @if ($nextSession['finished'] ?? false)
+                  <p class="c-event__info-line">{{ __('This event has finished.', 'sage') }}</p>
                 @endif
               </div>
 

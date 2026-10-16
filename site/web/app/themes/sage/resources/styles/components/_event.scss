@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
+@use '../base/focus';
 
 // Figma "Single events page" (node 14:1043): title, featured image and the
 // Next session / Price card ("Image block" instance 21:1416) above the
@@ -62,6 +63,11 @@
   margin: 0 0 0.375rem;
   color: var(--wp--preset--color--charcoal);
 
+  // Fixed size: a wrapping line (e.g. a long venue address) mustn't squash it.
+  .c-icon {
+    flex-shrink: 0;
+  }
+
   .c-icon svg {
     display: block;
     width: 1.25rem;
@@ -72,4 +78,23 @@
 
 .c-event__price {
   color: var(--wp--preset--color--charcoal);
+}
+
+// Venue sits under the date/time, aligned to the first line of its text.
+.c-event__venue {
+  align-items: flex-start;
+
+  .c-icon {
+    margin-top: 0.1875rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: var(--wp--preset--color--blue);
+
+    @include focus.ring;
+  }
 }

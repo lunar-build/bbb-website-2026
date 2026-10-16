@@ -35,6 +35,7 @@ class SingleMecEvent extends Composer
             'breadcrumbs' => $this->breadcrumbs(),
             'nextSession' => $this->nextSession(),
             'priceLines' => $this->priceLines(),
+            'venue' => $this->venue(),
         ];
     }
 
@@ -85,6 +86,31 @@ class SingleMecEvent extends Composer
             'date' => $date,
             'time' => $allDay ? __('All day', 'sage') : gmdate('g.ia', $session->tstart),
             'finished' => ! $shown['upcoming'],
+        ];
+    }
+
+    /**
+     * The event's MEC location: its name, address (when it adds anything to
+     * the name) and a map search link. Null for MEC's "hide location" (1).
+     *
+     * @return array{name: string, address: string, map: string}|null
+     */
+    public function venue(): ?array
+    {
+        $term = wp_get_post_terms(get_the_ID(), 'mec_location')[0] ?? null;
+        if (! $term || is_wp_error($term)) {
+            return null;
+        }
+        $address = trim((string) get_term_meta($term->term_id, 'address', true));
+        // Old one-off events stored the whole venue line as the address.
+        if ($address === $term->name || str_starts_with($address, $term->name . ',')) {
+            $address = ltrim(substr($address, strlen($term->name)), ', ');
+        }
+
+        return [
+            'name' => html_entity_decode($term->name, ENT_QUOTES),
+            'address' => $address,
+            'map' => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode(trim($term->name . ', ' . $address, ', ')),
         ];
     }
 
