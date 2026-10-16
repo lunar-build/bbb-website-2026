@@ -260,7 +260,13 @@ function news_list(array $b, array &$notes): array
         $fields["items_{$i}_level"] = (string) $item['level'];
     }
 
-    return news_acf_block('acf/bullet-list', \App\Blocks\BulletList::class, $fields, 'bullet_list');
+    $block = news_acf_block('acf/bullet-list', \App\Blocks\BulletList::class, $fields, 'bullet_list');
+    // The block defaults to no padding (lists sit inside running text), but
+    // migrated lists were followed by more content in their own right: keep
+    // them tight to the text above, with a Small gap below.
+    $block['attrs']['style']['spacing']['padding'] = ['top' => '0', 'bottom' => 'var:preset|spacing|small'];
+
+    return $block;
 }
 
 /** core/table -> Table block; a first row that's all bold becomes the column headings. */
