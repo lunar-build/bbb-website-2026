@@ -15,6 +15,14 @@
 add_filter('option_mec_options', function ($options) {
     if (is_array($options)) {
         $options['settings']['single_cost_type'] = 'alphabetic';
+
+        // Settings MEC's own settings screens read without checking they
+        // exist — until MEC's settings are first saved, each one is a PHP
+        // warning, which Acorn turns into a 500 in debug mode.
+        $options['settings'] += [
+            'breadcrumbs_events_page' => '',
+            'fes_event_link_target' => '',
+        ];
     }
 
     return $options;

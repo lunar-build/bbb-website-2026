@@ -386,6 +386,37 @@ add_filter('template_include', function (string $template) {
 }, 99);
 
 /**
+ * MEC event editor: a multi-line Cost box, one price per line, since our
+ * prices are usually several lines of text ("£5 per child", "£7 per solo
+ * adult"…). It's stored in the existing `|`-separated format that the event
+ * template splits into bullets (App\View\Composers\SingleMecEvent), so
+ * imported prices and the "This event is free" box (which targets #mec_cost
+ * and saves 0) work unchanged.
+ */
+add_filter('mec_event_cost_custom_field_status', '__return_true');
+
+add_action('mec_event_cost_custom_field', function ($cost, $type, $name) {
+    $lines = array_filter(array_map('trim', explode('|', (string) $cost)), 'strlen');
+    printf(
+        '<textarea name="%s" id="mec_cost" rows="4" class="large-text" aria-describedby="mec_cost_lines_help">%s</textarea>'
+        . '<p class="mec-field__help" id="mec_cost_lines_help">%s</p>',
+        esc_attr($name),
+        esc_textarea(implode("\n", $lines)),
+        esc_html__('One price per line — each line shows as its own bullet, e.g. "£5 per child" then "£7 per solo adult". A plain number like 5 shows as £5.', 'sage'),
+    );
+}, 10, 3);
+
+// MEC saves the cost through sanitize_text_field(), which would turn the
+// line breaks into spaces — join the lines with `|` first (MEC saves at 10).
+add_action('save_post_mec-events', function () {
+    if (! isset($_POST['mec']['cost']) || ! is_string($_POST['mec']['cost'])) {
+        return;
+    }
+    $lines = preg_split('/\R/', wp_unslash($_POST['mec']['cost']));
+    $_POST['mec']['cost'] = wp_slash(implode(' | ', array_filter(array_map('trim', $lines), 'strlen')));
+}, 9);
+
+/**
  * The /events/ archive uses the theme's archive view (no design of its own
  * yet). MEC's query parsing forces 1 post per page there; restore the site
  * setting, and list events by their next session, undated ones last.
