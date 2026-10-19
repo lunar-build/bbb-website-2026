@@ -194,13 +194,17 @@ class SingleMecEvent extends Composer
 
     /**
      * Sessions after the one the info card shows, as "Wednesday 21st October,
-     * 9.45am – 10.30am" lines. Only for events with more than one coming up.
+     * 9.45am – 10.30am" lines. Only for events with more than one coming up, and not when
+     * the editor unticked "Page options" on the event.
      *
      * @return list<string>
      */
     public function upcoming(): array
     {
         $id = get_the_ID();
+        if (get_post_meta($id, 'bbb_hide_upcoming', true)) {
+            return [];
+        }
         if (get_post_meta($id, 'mec_hide_time', true)) {
             $time = fn($s) => '';
         } elseif (get_post_meta($id, 'mec_allday', true)) {
