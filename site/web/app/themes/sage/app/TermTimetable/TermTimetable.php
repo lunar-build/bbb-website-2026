@@ -29,6 +29,7 @@ class TermTimetable
 
         MecSync::boot();
         ClassEditGuard::boot();
+        ClassDeletionWarnings::boot();
         RestController::boot();
         AdminPage::boot();
     }

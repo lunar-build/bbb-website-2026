@@ -43,12 +43,19 @@ class ClassEditGuard
         ]));
     }
 
-    /** Published terms that generated sessions for this class. */
+    /**
+     * Published terms that schedule this class (a weekly or extra session),
+     * whether or not any dates came of it — e.g. every session closed.
+     */
     public static function termsFor(int $event): array
     {
         return array_values(array_filter(
             get_posts(['post_type' => TermTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1]),
-            fn(WP_Post $term) => ! empty(((array) get_post_meta($term->ID, MecSync::TERM_GENERATED, true))[$event]),
+            function (WP_Post $term) use ($event) {
+                $s = Schedule::normalise(get_post_meta($term->ID, TermTimetable::META, true));
+
+                return in_array($event, array_map('intval', [...array_column($s['sessions'], 'event'), ...array_column($s['extras'], 'event')]), true);
+            },
         ));
     }
 
@@ -79,7 +86,7 @@ class ClassEditGuard
         if ($terms = static::termsFor($post->ID)) {
             $notices[] = ['info', sprintf(
                 /* translators: %s: term names */
-                __('This class\'s sessions are set by the term timetable%s %s. Change its weekly times there, not under Event Repeating. If a term is updated while this page is open, reload this page before saving.', 'sage'),
+                __('This class\'s sessions are set by the term timetable%s %s. Change its weekly times there, not under Event Repeating. If a term is updated while this page is open, reload this page before saving. Moving this class to the Trash takes its sessions off the What\'s on timetable until it\'s restored.', 'sage'),
                 count($terms) > 1 ? 's' : '',
                 implode(', ', array_map(fn($t) => '“' . get_the_title($t) . '”', $terms)),
             )];
