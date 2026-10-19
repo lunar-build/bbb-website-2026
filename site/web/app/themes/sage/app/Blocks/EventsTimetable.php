@@ -169,6 +169,21 @@ class EventsTimetable extends Block
      * Published term timetables (App\TermTimetable) that haven't ended, in
      * date order, as period rows — limited to the block's category if set.
      */
+    /**
+     * Closure date ranges as ['Y-m-d' => reason]; "Closed" when no reason was given.
+     */
+    protected static function closedDates(array $closures): array
+    {
+        $days = [];
+        foreach ($closures as $closure) {
+            for ($day = strtotime($closure['from'] . ' UTC'); $day <= strtotime($closure['to'] . ' UTC'); $day += DAY_IN_SECONDS) {
+                $days[gmdate('Y-m-d', $day)] = trim($closure['label'] ?? '') ?: __('Closed', 'sage');
+            }
+        }
+
+        return $days;
+    }
+
     protected function termRows(?int $category): array
     {
         $today = current_time('Y-m-d');
@@ -183,6 +198,7 @@ class EventsTimetable extends Block
                     . gmdate('l jS F', strtotime($s['start'] . ' UTC')) . ' – ' . gmdate('l jS F', strtotime($s['end'] . ' UTC')),
                 'start_date' => $s['start'],
                 'end_date' => $s['end'],
+                'closed' => static::closedDates($s['closures']),
                 'weekly' => array_map(fn($x) => $x['weekday'] . '|' . $x['start'] . '|' . $x['end'] . '|' . $x['event'], $s['sessions']),
             ];
         }
@@ -318,6 +334,7 @@ class EventsTimetable extends Block
                     'label' => gmdate('l jS F', $day),
                     'today' => gmdate('Y-m-d', $day) === current_time('Y-m-d'),
                     'sessions' => [],
+                    'closed' => $row['closed'][gmdate('Y-m-d', $day)] ?? null,
                 ];
             }
 

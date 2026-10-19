@@ -38,6 +38,9 @@
                       {{ $nextSession['time'] }}
                     </p>
                   @endif
+                  @if ($nextSession['note'])
+                    <p class="c-event__note">{{ $nextSession['note'] }}</p>
+                  @endif
                 @else
                   <p class="c-event__info-line">{{ __('No sessions are scheduled at the moment.', 'sage') }}</p>
                 @endif
@@ -51,6 +54,18 @@
                       <a href="{{ $venue['map'] }}" target="_blank" rel="noopener">
                         {{ __('View on map', 'sage') }}<span class="u-sr-only"> {{ __('(opens in a new tab)', 'sage') }}</span>
                       </a>
+                    </p>
+                  </div>
+                @endif
+
+                @if ($organizer)
+                  <div class="c-event__info-line c-event__venue">
+                    <x-icon name="info" />
+                    <p>
+                      {{ $organizer['name'] }}
+                      @if ($organizer['tel'])<br><a href="tel:{{ preg_replace('/[^+\d]/', '', $organizer['tel']) }}">{{ $organizer['tel'] }}</a>@endif
+                      @if ($organizer['email'])<br><a href="mailto:{{ $organizer['email'] }}">{{ $organizer['email'] }}</a>@endif
+                      @if ($organizer['url'])<br><a href="{{ $organizer['url'] }}">{{ __('Website', 'sage') }}</a>@endif
                     </p>
                   </div>
                 @endif
@@ -73,7 +88,18 @@
             </div>
           </div>
 
+          @if ($upcoming)
+            <section class="c-event__upcoming" aria-labelledby="c-event-upcoming">
+              <h2 id="c-event-upcoming" class="u-heading-5">{{ __('More upcoming sessions', 'sage') }}</h2>
+              <x-bullet-list :items="array_map(fn($line) => ['text' => $line], $upcoming)" />
+            </section>
+          @endif
+
           {!! $body !!}
+
+          @if ($jsonLd)
+            <script type="application/ld+json">{!! $jsonLd !!}</script>
+          @endif
         </div>
       </div>
     </div>

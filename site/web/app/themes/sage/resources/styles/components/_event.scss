@@ -104,3 +104,17 @@
 .c-event__finished {
   margin-top: 1rem;
 }
+
+.c-event__note {
+  margin: 0 0 0.375rem 2rem;
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-event__upcoming {
+  margin-bottom: 3rem;
+
+  h2 {
+    margin-bottom: 0.875rem;
+    color: var(--wp--preset--color--blue-dark);
+  }
+}

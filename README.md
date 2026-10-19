@@ -124,6 +124,8 @@ Events in the **Bristol Cycling Centre** category are served at `/cycling-centre
 
 **Event Status** (MEC's SEO Schema tab): *Cancelled* and *Postponed* classes drop off the What's on timetable, and their page shows a notice (the cancellation reason too, if "display" is ticked). *Rescheduled* shows a notice only. **Hide Event Time** hides the time line on a class page; it no longer reads "All day". A term's weekday tabs show only its weekly pattern, so one-off extras appear in the by-date view only.
 
+**Class page extras:** times show start and end (unless MEC's *Hide End Time* is on), MEC's *Time comment* appears under the time, the organizer's name, phone, email and website show in the info card when an Organizer is picked, "More upcoming sessions" lists the following sessions, and schema.org `Event` JSON-LD is added for search engines. A closure's reason shows on What's on (accordion layout) instead of "No sessions".
+
 `App\Support\EventSessions` is the one place that reads MEC's session data. Note that MEC stores times as wall-clock time in UTC timestamps, so format them with `gmdate()`, not `wp_date()`.
 
 # [ACF Composer](https://github.com/log1x/acf-composer)

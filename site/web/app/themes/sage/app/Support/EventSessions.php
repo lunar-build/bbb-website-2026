@@ -67,6 +67,26 @@ class EventSessions
     }
 
     /**
+     * An event's next sessions from now (the first included), soonest first.
+     *
+     * @return array<int, object{tstart: int, tend: int}>
+     */
+    public static function upcoming(int $postId, int $limit = 8): array
+    {
+        global $wpdb;
+
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
+            WHERE post_id = %d AND tstart >= %d ORDER BY tstart LIMIT %d",
+            $postId,
+            $now,
+            $limit,
+        ));
+    }
+
+    /**
      * An event's most recent session before now, or null.
      *
      * @return object{tstart: int, tend: int}|null

@@ -15,5 +15,5 @@
     @endforeach
   </ul>
 @else
-  <p class="c-events-timetable__empty">{{ __('No sessions on this day.', 'sage') }}</p>
+  <p class="c-events-timetable__empty">{{ ($closed ?? null) ? sprintf(__('Closed: %s', 'sage'), $closed) : __('No sessions on this day.', 'sage') }}</p>
 @endif

@@ -19,7 +19,7 @@
                 @foreach ($period['dates'] as $date)
                   <wa-accordion-item class="c-events-timetable__day" label="{{ $date['label'] }}" heading-level="4" @if ($loop->index === $open) expanded @endif>
                     <x-icon name="chevron" slot="icon" class="c-events-timetable__chevron" />
-                    @include('partials.events-timetable-sessions', ['sessions' => $date['sessions'], 'dots' => true])
+                    @include('partials.events-timetable-sessions', ['sessions' => $date['sessions'], 'closed' => $date['closed'] ?? null, 'dots' => true])
                   </wa-accordion-item>
                 @endforeach
               </wa-accordion>
