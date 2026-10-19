@@ -114,6 +114,7 @@
 
 .c-card-row__link-title {
   @extend .u-heading-5;
+  margin-bottom: 0; // the card's flex gap already spaces it
   color: var(--wp--preset--color--blue-medium);
   padding-inline: 13px;
 }
