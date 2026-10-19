@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class CaseStudyGrid extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -249,7 +252,7 @@ class CaseStudyGrid extends Block
     {
         $placeholder = Vite::asset('resources/images/placeholder/pattern-placeholder.svg');
 
-        $cards = get_field('cards') ?: (shows_example($this->preview) ? ($this->example['cards'] ?? []) : []);
+        $cards = $this->resolveField('cards', []);
 
         return array_map(function ($card) use ($placeholder) {
             $image = is_array($card['image'] ?? null) ? $card['image'] : [];

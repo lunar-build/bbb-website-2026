@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class LinkCard extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -312,7 +315,7 @@ class LinkCard extends Block
      */
     public function cards()
     {
-        $rows = get_field('cards') ?: (shows_example($this->preview) ? $this->example['cards'] : []);
+        $rows = $this->resolveField('cards', []);
 
         return array_map(fn($card) => $this->normalizeCard($card), $rows);
     }

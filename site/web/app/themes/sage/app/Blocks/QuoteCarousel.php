@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class QuoteCarousel extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -288,12 +291,12 @@ class QuoteCarousel extends Block
 
     public function style()
     {
-        return get_field('style') ?: (shows_example($this->preview) ? $this->example['style'] : 'filled');
+        return $this->resolveField('style', 'filled');
     }
 
     public function slides()
     {
-        return get_field('slides') ?: (shows_example($this->preview) ? $this->example['slides'] : []);
+        return $this->resolveField('slides', []);
     }
 
     /**
