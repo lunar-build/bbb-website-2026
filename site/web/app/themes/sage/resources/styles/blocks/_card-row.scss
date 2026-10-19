@@ -160,6 +160,14 @@
   margin-bottom: 2rem;
 }
 
+// The margins only space what follows inside the block; last, they'd stack on the section padding.
+.c-card-row__cards,
+.c-card-row__area-links {
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
 .c-card-row__area-link {
   @extend .u-short-form-link;
   display: inline-flex;
