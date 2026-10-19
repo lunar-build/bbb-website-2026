@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class BulletList extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -242,7 +245,7 @@ class BulletList extends Block
 
     public function heading()
     {
-        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
+        return $this->resolveField('heading', '');
     }
 
     public function listStyle()
@@ -252,7 +255,7 @@ class BulletList extends Block
 
     public function items()
     {
-        return get_field('items') ?: (shows_example($this->preview) ? $this->example['items'] : []);
+        return $this->resolveField('items', []);
     }
 
     /**

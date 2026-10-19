@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Standfirst extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -181,7 +184,7 @@ class Standfirst extends Block
 
     public function text()
     {
-        return get_field('text') ?: (shows_example($this->preview) ? $this->example['text'] : '');
+        return $this->resolveField('text', '');
     }
 
     /**

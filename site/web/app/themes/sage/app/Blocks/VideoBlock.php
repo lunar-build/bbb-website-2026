@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
@@ -9,6 +10,8 @@ use Log1x\AcfComposer\Builder;
 
 class VideoBlock extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -269,7 +272,7 @@ class VideoBlock extends Block
      */
     public function video()
     {
-        return get_field('video') ?: (shows_example($this->preview) ? ($this->example['video'] ?? null) : null);
+        return $this->resolveField('video');
     }
 
     /**
@@ -300,7 +303,7 @@ class VideoBlock extends Block
             return get_field('poster') ?: null;
         }
 
-        return shows_example($this->preview) ? ($this->example['poster'] ?? null) : null;
+        return $this->exampleField('poster');
     }
 
     /**
@@ -311,9 +314,9 @@ class VideoBlock extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
-            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h2'),
-            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h2'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
     }
 
@@ -325,14 +328,10 @@ class VideoBlock extends Block
     public function transcript()
     {
         if (! get_field('video')) {
-            if (! shows_example($this->preview)) {
-                return ['url' => null, 'label' => '', 'file_size' => ''];
-            }
-
             return [
-                'url' => $this->example['transcript']['url'] ?? null,
-                'label' => $this->example['transcript_label'],
-                'file_size' => $this->example['transcript_file_size'],
+                'url' => $this->exampleField('transcript')['url'] ?? null,
+                'label' => $this->exampleField('transcript_label', ''),
+                'file_size' => $this->exampleField('transcript_file_size', ''),
             ];
         }
 

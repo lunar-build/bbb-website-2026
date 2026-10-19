@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class ImageHero extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -239,7 +242,7 @@ class ImageHero extends Block
      */
     public function backgroundImage()
     {
-        return get_field('background_image') ?: (shows_example($this->preview) ? ($this->example['background_image'] ?? null) : null);
+        return $this->resolveField('background_image');
     }
 
     /**
@@ -259,7 +262,7 @@ class ImageHero extends Block
      */
     public function showHeading()
     {
-        return (bool) (get_field('show_heading') ?? (shows_example($this->preview) ? $this->example['show_heading'] : false));
+        return $this->resolveBoolField('show_heading');
     }
 
     /**
@@ -269,7 +272,7 @@ class ImageHero extends Block
      */
     public function showBreadcrumbs()
     {
-        return (bool) (get_field('show_breadcrumbs') ?? (shows_example($this->preview) ? $this->example['show_breadcrumbs'] : false));
+        return $this->resolveBoolField('show_breadcrumbs');
     }
 
     /**
@@ -279,7 +282,7 @@ class ImageHero extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
+        return $this->resolveField('heading', '');
     }
 
     /**

@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class ButtonBlock extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -245,7 +248,7 @@ class ButtonBlock extends Block
      */
     public function link()
     {
-        $link = normalize_link(get_field('link') ?: (shows_example($this->preview) ? $this->example['link'] : null));
+        $link = normalize_link($this->resolveField('link'));
         $link['title'] = $link['title'] ?: 'Find out more';
 
         return $link;
@@ -258,7 +261,7 @@ class ButtonBlock extends Block
      */
     public function style()
     {
-        $style = get_field('button_style') ?: (shows_example($this->preview) ? $this->example['button_style'] : 'brand');
+        $style = $this->resolveField('button_style', 'brand');
 
         return in_array($style, ['brand', 'neutral', 'outlined'], true) ? $style : 'brand';
     }
@@ -274,7 +277,7 @@ class ButtonBlock extends Block
             return 'small';
         }
 
-        $size = get_field('button_size') ?: (shows_example($this->preview) ? $this->example['button_size'] : 'large');
+        $size = $this->resolveField('button_size', 'large');
 
         return $size === 'small' ? 'small' : 'large';
     }
@@ -286,7 +289,7 @@ class ButtonBlock extends Block
      */
     public function alignment()
     {
-        $align = get_field('button_align') ?: (shows_example($this->preview) ? $this->example['button_align'] : 'left');
+        $align = $this->resolveField('button_align', 'left');
 
         return in_array($align, ['left', 'center', 'right'], true) ? $align : 'left';
     }
