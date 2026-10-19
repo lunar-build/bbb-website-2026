@@ -1,5 +1,20 @@
 import domReady from '@wordpress/dom-ready';
+import { addFilter } from '@wordpress/hooks';
 import './video-background.js';
+
+// New Heading blocks start in Blue medium; editors can pick another colour.
+// Existing headings keep whatever they were saved with.
+addFilter('blocks.registerBlockType', 'sage/heading-default-colour', (settings, name) => {
+  if (name !== 'core/heading') return settings;
+
+  return {
+    ...settings,
+    attributes: {
+      ...settings.attributes,
+      textColor: { ...settings.attributes?.textColor, type: 'string', default: 'blue-medium' },
+    },
+  };
+});
 
 // The editor canvas is an iframe with its own custom-element registry, so the
 // <wa-*> components must be defined inside it, not just in this parent window.

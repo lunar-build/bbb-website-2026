@@ -16,8 +16,17 @@
   gap: 3rem;
   align-items: start;
   padding-block: 3rem;
+  grid-template-areas:
+    'crumbs'
+    'nav'
+    'content';
 
   @include bp.respond($min: bp.$lg) {
+    grid-template-areas:
+      'nav crumbs'
+      'nav content';
+    // Crumbs/content spacing comes from the crumbs' own margin, not the gap.
+    row-gap: 0;
     // max-content, not a hardcoded width, so this always matches
     // .c-sticky-page-menu's own width (16.875rem) — see
     // resources/styles/components/_sticky-page-menu.scss.
@@ -25,7 +34,27 @@
   }
 }
 
+.c-sticky-nav-template__crumbs {
+  grid-area: crumbs;
+  min-width: 0;
+
+  // components/_breadcrumbs.scss has no spacing of its own — inside the Image
+  // Hero overlay it relies on that block's flex `gap`.
+  margin-bottom: 2rem;
+
+  // Inside the grid on mobile the row gap does the spacing instead.
+  .c-sticky-nav-template > & {
+    margin-bottom: 0;
+
+    @include bp.respond($min: bp.$lg) {
+      margin-bottom: 2rem;
+    }
+  }
+}
+
 .c-sticky-nav-template__nav {
+  grid-area: nav;
+
   @include bp.respond($min: bp.$lg) {
     position: sticky;
     // 2rem once the header's scrolled out of the way (html.is-header-hidden,
@@ -51,14 +80,8 @@
 }
 
 .c-sticky-nav-template__content {
+  grid-area: content;
   min-width: 0;
-
-  // components/_breadcrumbs.scss has no spacing of its own — inside the Image
-  // Hero overlay it relies on that block's flex `gap`, but here it's a
-  // standalone first child.
-  > .c-breadcrumbs {
-    margin-bottom: 2rem;
-  }
 
   @include column-blocks.blocks;
 

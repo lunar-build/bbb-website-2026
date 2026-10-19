@@ -30,9 +30,10 @@
   the content column, inline with the sticky nav's top, not inside the
   hero overlay.
 
-  Breadcrumbs: hardcoded here (not editor-driven) as the first element in
-  the content column, so its top edge lines up with the sticky nav's —
-  both are sibling grid items starting on the same row.
+  Breadcrumbs: hardcoded here (not editor-driven). On mobile they sit above
+  the page menu; from lg up they sit at the top of the content column, on
+  the same row the sticky nav starts — see the grid-template-areas in
+  base/_sticky-nav-template.scss.
 
   Page menu: items are generated from this page's top-level (H2) headings
   by App\Support\PageMenu (see app/View/Composers/StickyNavTemplate.php),
@@ -58,6 +59,10 @@
       collapsed nav column with its grid gap still showing as a stray gap
       with nothing in it. --}}
       <div @if (count($pageMenuItems)) class="c-sticky-nav-template" @endif>
+        <div class="c-sticky-nav-template__crumbs">
+          <x-breadcrumbs :items="App\Support\Breadcrumbs::forPost()" />
+        </div>
+
         @if (count($pageMenuItems))
           <div class="c-sticky-nav-template__nav">
             <x-sticky-page-menu :items="$pageMenuItems" data-sticky-nav-menu />
@@ -65,8 +70,6 @@
         @endif
 
         <div class="c-sticky-nav-template__content">
-          <x-breadcrumbs :items="App\Support\Breadcrumbs::forPost()" />
-
           {!! $body !!}
 
           @if ($pagination)
