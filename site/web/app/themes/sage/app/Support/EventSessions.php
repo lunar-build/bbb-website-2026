@@ -14,8 +14,9 @@ class EventSessions
     /**
      * Published sessions starting between two dates (inclusive, Y-m-d),
      * optionally limited to one mec_category term, ordered by start time.
-     * Events set to MEC's "Hide from calendars & lists", and undated ones
-     * (whose only date is a placeholder), are left out.
+     * Events set to MEC's "Hide from calendars & lists", cancelled or
+     * postponed ones (Event Status), and undated ones (whose only date is a
+     * placeholder), are left out.
      *
      * @return array<int, object{post_id: int, title: string, tstart: int, tend: int}>
      */
@@ -38,6 +39,7 @@ class EventSessions
                 AND d.dstart BETWEEN %s AND %s {$category}
                 AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} v WHERE v.post_id = p.ID AND v.meta_key = 'mec_public' AND v.meta_value = '0')
                 AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} u WHERE u.post_id = p.ID AND u.meta_key = '_event_undated')
+                AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} c WHERE c.post_id = p.ID AND c.meta_key = 'mec_event_status' AND c.meta_value IN ('EventCancelled', 'EventPostponed'))
             ORDER BY d.tstart, p.post_title",
             $from,
             $to,

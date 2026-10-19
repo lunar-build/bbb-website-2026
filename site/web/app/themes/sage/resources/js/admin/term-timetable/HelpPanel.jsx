@@ -123,6 +123,7 @@ const PANELS = {
           <li>a session before 6am or after 11pm</li>
           <li>a closure outside the term, or a cancellation on the wrong day</li>
           <li>a class that’s no longer published (it’s skipped)</li>
+          <li>a class with its own repeat rule in the events calendar (this term won’t change it)</li>
           <li>dates overlapping another published term (both run)</li>
         </ul>
       </section>

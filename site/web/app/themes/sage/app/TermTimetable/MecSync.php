@@ -109,7 +109,7 @@ class MecSync
     }
 
     /** Daily/weekly/etc. repeats can't be merged with dated sessions, so those classes are left alone. */
-    protected static function hasOtherRepeat(int $event): bool
+    public static function hasOtherRepeat(int $event): bool
     {
         return get_post_meta($event, 'mec_repeat_status', true)
             && ! in_array(get_post_meta($event, 'mec_repeat_type', true), ['', 'custom_days'], true);

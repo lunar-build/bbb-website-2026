@@ -183,6 +183,7 @@ class EventsTimetable extends Block
                     . gmdate('l jS F', strtotime($s['start'] . ' UTC')) . ' – ' . gmdate('l jS F', strtotime($s['end'] . ' UTC')),
                 'start_date' => $s['start'],
                 'end_date' => $s['end'],
+                'weekly' => array_map(fn($x) => $x['weekday'] . '|' . $x['start'] . '|' . $x['end'] . '|' . $x['event'], $s['sessions']),
             ];
         }
         usort($rows, fn($a, $b) => strcmp($a['start_date'], $b['start_date']));
@@ -327,7 +328,10 @@ class EventsTimetable extends Block
                     'url' => get_permalink($s->post_id),
                     'color' => EventSessions::color($s->post_id),
                 ];
-                $weekdays[gmdate('l', $s->tstart)][$session['time'] . $s->post_id] = $session;
+                // A term's weekday tabs show its weekly pattern; one-off extras only appear by date.
+                if (! isset($row['weekly']) || in_array(gmdate('N', $s->tstart) . '|' . gmdate('H:i', $s->tstart) . '|' . gmdate('H:i', $s->tend) . '|' . $s->post_id, $row['weekly'], true)) {
+                    $weekdays[gmdate('l', $s->tstart)][$session['time'] . $s->post_id] = $session;
+                }
                 $dates[gmdate('Y-m-d', $s->tstart)]['sessions'][] = $session;
             }
 

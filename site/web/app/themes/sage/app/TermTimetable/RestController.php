@@ -83,6 +83,8 @@ class RestController
         foreach (array_keys($counts) as $event) {
             if (get_post_type($event) !== 'mec-events' || get_post_status($event) !== 'publish') {
                 $check['warnings'][] = ['message' => sprintf(__('Class #%d isn\'t published any more, so its sessions will be skipped.', 'sage'), $event), 'ref' => "event:$event"];
+            } elseif (MecSync::hasOtherRepeat($event)) {
+                $check['warnings'][] = ['message' => sprintf(__('“%s” repeats by its own rule in the events calendar, so this term won\'t change it. Set its repeat to Custom Days there to schedule it here.', 'sage'), html_entity_decode(get_the_title($event), ENT_QUOTES)), 'ref' => "event:$event"];
             }
         }
 

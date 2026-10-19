@@ -55,6 +55,10 @@
                   </div>
                 @endif
 
+                @if ($status)
+                  <x-callout-text class="c-event__finished">{{ $status }}</x-callout-text>
+                @endif
+
                 @if ($nextSession['finished'] ?? false)
                   <x-callout-text class="c-event__finished">{{ __('This event has finished.', 'sage') }}</x-callout-text>
                 @endif

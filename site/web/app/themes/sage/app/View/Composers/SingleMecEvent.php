@@ -36,6 +36,7 @@ class SingleMecEvent extends Composer
             'nextSession' => $this->nextSession(),
             'priceLines' => $this->priceLines(),
             'venue' => $this->venue(),
+            'status' => $this->status(),
         ];
     }
 
@@ -74,12 +75,13 @@ class SingleMecEvent extends Composer
             return null;
         }
         $session = $shown['session'];
-        $allDay = get_post_meta(get_the_ID(), 'mec_allday', true) || get_post_meta(get_the_ID(), 'mec_hide_time', true);
-        $time = $allDay ? __('All day', 'sage') : gmdate('g.ia', $session->tstart);
+        $allDay = (bool) get_post_meta(get_the_ID(), 'mec_allday', true);
+        // MEC's "Hide Event Time" means no time line at all, not "All day".
+        $time = get_post_meta(get_the_ID(), 'mec_hide_time', true) ? '' : ($allDay ? __('All day', 'sage') : gmdate('g.ia', $session->tstart));
         $date = gmdate('l jS F Y', $session->tstart);
 
         if (gmdate('Y-m-d', $session->tend) !== gmdate('Y-m-d', $session->tstart)) {
-            if (! $allDay && $session->tend - $session->tstart < DAY_IN_SECONDS) {
+            if (! $allDay && $time && $session->tend - $session->tstart < DAY_IN_SECONDS) {
                 // Overnight (e.g. 9pm–1am): one date, with the end time so it doesn't read as two days.
                 $time .= ' – ' . gmdate('g.ia', $session->tend);
             } else {
@@ -95,6 +97,24 @@ class SingleMecEvent extends Composer
             'time' => $time,
             'finished' => ! $shown['upcoming'],
         ];
+    }
+
+    /**
+     * MEC's Event Status when it isn't going ahead as planned, as a message
+     * (plus the cancellation reason when the editor ticked "display").
+     */
+    public function status(): ?string
+    {
+        $id = get_the_ID();
+        $reason = trim((string) get_post_meta($id, 'mec_cancelled_reason', true));
+        $showReason = $reason && get_post_meta($id, 'mec_display_cancellation_reason_in_single_page', true);
+
+        return match (get_post_meta($id, 'mec_event_status', true)) {
+            'EventCancelled' => __('This event has been cancelled.', 'sage') . ($showReason ? ' ' . $reason : ''),
+            'EventPostponed' => __('This event has been postponed.', 'sage'),
+            'EventRescheduled' => __('This event has been rescheduled.', 'sage'),
+            default => null,
+        };
     }
 
     /**

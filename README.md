@@ -117,10 +117,12 @@ Termly classes (Cycling Centre sessions) aren't typed into MEC date by date. A t
 How it works:
 - **Code:** `app/TermTimetable/`. `Schedule` (plain PHP, unit-tested in `site/tests/Feature/TermScheduleTest.php`) expands the pattern. `MecSync` writes MEC's fields on publish, update, unpublish, trash and delete, keeping hand-added dates via each term's `_term_generated_days`. `RestController` serves the editor and refuses to publish a schedule with errors.
 - **Editor:** a React app in `resources/js/admin/term-timetable/`, built by Vite. `@dnd-kit` uses WordPress's React through `resources/js/admin/shims/`.
-- **Classes with their own repeat:** a class that uses MEC's daily or weekly repeat is left alone, with a notice.
+- **Classes with their own repeat:** a class that uses MEC's daily or weekly repeat is left alone; the term editor warns about it (amber) before you publish.
 - **Re-syncing:** `wp term-timetable sync [id]` re-syncs one term, or all of them, for example after a deploy.
 
 Events in the **Bristol Cycling Centre** category are served at `/cycling-centres/bristol-cycling-centre/whats-on/{slug}/`, matching the old site (`app/filters.php`), and all other events at `/events/{slug}/`. After deploying, flush permalinks (`wp rewrite flush`).
+
+**Event Status** (MEC's SEO Schema tab): *Cancelled* and *Postponed* classes drop off the What's on timetable, and their page shows a notice (the cancellation reason too, if "display" is ticked). *Rescheduled* shows a notice only. **Hide Event Time** hides the time line on a class page; it no longer reads "All day". A term's weekday tabs show only its weekly pattern, so one-off extras appear in the by-date view only.
 
 `App\Support\EventSessions` is the one place that reads MEC's session data. Note that MEC stores times as wall-clock time in UTC timestamps, so format them with `gmdate()`, not `wp_date()`.
 
