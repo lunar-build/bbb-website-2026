@@ -133,6 +133,33 @@ class EventSessions
     }
 
     /**
+     * The MEC labels (Events → Labels) on an event, each with its picked
+     * colour and a readable text colour to sit on it.
+     *
+     * @return list<array{name: string, bg: string, fg: string}>
+     */
+    public static function labels(int $postId): array
+    {
+        $terms = get_the_terms($postId, 'mec_label');
+        if (! $terms || is_wp_error($terms)) {
+            return [];
+        }
+
+        return array_map(function ($term) {
+            $hex = ltrim((string) get_term_meta($term->term_id, 'color', true), '#');
+            $hex = preg_match('/^[0-9a-f]{6}$/i', $hex) ? $hex : '1EACDB';
+            [$r, $g, $b] = array_map('hexdec', str_split($hex, 2));
+
+            return [
+                'name' => html_entity_decode($term->name, ENT_QUOTES),
+                'bg' => '#' . $hex,
+                // Dark text on light labels, white on dark (perceived brightness).
+                'fg' => ($r * 299 + $g * 587 + $b * 114) / 1000 > 150 ? '#1a1a1a' : '#ffffff',
+            ];
+        }, $terms);
+    }
+
+    /**
      * The colour editors pick per event in MEC (stored without the #).
      */
     public static function color(int $postId): string

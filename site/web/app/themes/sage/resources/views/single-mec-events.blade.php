@@ -19,6 +19,14 @@
 
           <h1 class="c-event__title">{!! get_the_title() !!}</h1>
 
+          @if ($labels)
+            <ul class="c-label-list c-event__labels" role="list" aria-label="{{ __('Labels', 'sage') }}">
+              @foreach ($labels as $label)
+                <li class="c-label" style="--label-bg: {{ $label['bg'] }}; --label-fg: {{ $label['fg'] }}">{{ $label['name'] }}</li>
+              @endforeach
+            </ul>
+          @endif
+
           <div class="c-event__summary">
             @if (has_post_thumbnail())
               {!! get_the_post_thumbnail(null, 'large', ['class' => 'c-event__image']) !!}

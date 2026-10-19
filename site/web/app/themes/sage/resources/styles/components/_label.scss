@@ -1,0 +1,28 @@
+@use '../base/typography';
+
+// MEC labels (Events → Labels): a pill in the editor's chosen colour.
+.c-label-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.c-label {
+  @extend .u-business-service-label;
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  line-height: 1.5rem;
+  border-radius: 999px;
+  background: var(--label-bg);
+  color: var(--label-fg);
+}
+
+.c-label--small {
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}

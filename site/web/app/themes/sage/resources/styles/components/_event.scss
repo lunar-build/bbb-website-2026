@@ -14,6 +14,10 @@
   color: var(--wp--preset--color--blue-medium);
 }
 
+.c-event__labels {
+  margin-top: -1rem;
+}
+
 .c-event__summary {
   display: flex;
   flex-direction: column;

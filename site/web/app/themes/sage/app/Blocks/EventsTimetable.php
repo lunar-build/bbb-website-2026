@@ -344,6 +344,7 @@ class EventsTimetable extends Block
                     'title' => $s->title,
                     'url' => get_permalink($s->post_id),
                     'color' => EventSessions::color($s->post_id),
+                    'labels' => EventSessions::labels($s->post_id),
                 ];
                 // A term's weekday tabs show its weekly pattern; one-off extras only appear by date.
                 if (! isset($row['weekly']) || in_array(gmdate('N', $s->tstart) . '|' . gmdate('H:i', $s->tstart) . '|' . gmdate('H:i', $s->tend) . '|' . $s->post_id, $row['weekly'], true)) {

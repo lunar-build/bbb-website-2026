@@ -37,6 +37,7 @@ class SingleMecEvent extends Composer
             'priceLines' => $this->priceLines(),
             'venue' => $this->venue(),
             'status' => $this->status(),
+            'labels' => EventSessions::labels(get_the_ID()),
             'organizer' => $this->organizer(),
             'upcoming' => $this->upcoming(),
             'jsonLd' => $this->jsonLd(),

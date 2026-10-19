@@ -9,6 +9,9 @@
         <span class="c-events-timetable__time">{{ $session['time'] }}</span>
         <a class="c-events-timetable__link" href="{{ $session['url'] }}">
           {{ $session['title'] }}
+          @foreach ($session['labels'] ?? [] as $label)
+            <span class="c-label c-label--small" style="--label-bg: {{ $label['bg'] }}; --label-fg: {{ $label['fg'] }}">{{ $label['name'] }}</span>
+          @endforeach
           <x-icon name="arrow-right" />
         </a>
       </li>
