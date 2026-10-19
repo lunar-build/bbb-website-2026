@@ -2,7 +2,13 @@
 
 <div {{ $attributes->class(['c-feature-card__card', 'c-feature-card--'.$cardStyle]) }}>
   @if (! empty($image['url']))
-    <img class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+    {{-- onerror: the URL exists but the file doesn't (e.g. uploads missing after a DB import) — swap in the placeholder panel. --}}
+    <img
+      class="c-feature-card__image"
+      src="{{ $image['url'] }}"
+      alt="{{ $image['alt'] ?? '' }}"
+      onerror="this.onerror=null;this.outerHTML='<div class=&quot;c-feature-card__image c-feature-card__image--empty&quot; aria-hidden=&quot;true&quot;></div>'"
+    >
   @else
     {{-- No image: a placeholder panel, not a broken <img>. --}}
     <div class="c-feature-card__image c-feature-card__image--empty" aria-hidden="true"></div>
