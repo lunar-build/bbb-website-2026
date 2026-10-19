@@ -1,8 +1,5 @@
-// Figma "News/Route/Link card row": a section heading + a row of cards,
-// with the individual card sub-style, extra content (area links), and
-// bottom CTA varying per `type`. Route's cards reuse .c-cycle-route-card__*
-// classes directly (see resources/styles/blocks/_cycle-route-card.scss)
-// rather than duplicating that styling here.
+// Figma "News/Route/Link card row" — card style, area links and CTA vary per `type`.
+// Route cards reuse .c-cycle-route-card__* (blocks/_cycle-route-card.scss).
 
 @use '../base/typography';
 @use '../components/button';
@@ -79,8 +76,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  // Same fix as .c-card-row__link-cta: pins the CTA to the bottom of the
-  // card regardless of how many lines the title above takes up.
+  // Pins the CTA to the card bottom (see .c-card-row__link-cta).
   margin-top: auto;
   padding: 10px 16px;
   border: 2px solid var(--wp--preset--color--charcoal);
@@ -134,10 +130,8 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  // Pins the CTA to the bottom of the card regardless of how many lines the
-  // title/body above take up, so side-by-side cards' CTAs line up (the card
-  // itself stretches to the tallest card in the row via the parent flex
-  // row's default align-items: stretch).
+  // Pins the CTA to the bottom so side-by-side cards' CTAs line up (cards stretch to
+  // the tallest via the row's default align-items).
   margin-top: auto;
   padding: 10px 16px;
   border: 2px solid var(--wp--preset--color--charcoal);
@@ -201,8 +195,7 @@
   }
 }
 
-// News — "Latest news" reads as one continuous phrase in Figma (no two-tone
-// split), so the highlight span just matches the rest of the heading.
+// "Latest news" is one continuous phrase in Figma, so the highlight span matches the heading.
 .c-card-row--news {
   .c-card-row__heading-highlight {
     display: inline;

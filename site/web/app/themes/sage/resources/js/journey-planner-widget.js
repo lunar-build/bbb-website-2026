@@ -1,20 +1,13 @@
-// Powers the "Plan a route" variant's From/To inputs: Google Places
-// Autocomplete captures a real lat/lng per field, then submit builds the
-// `locations` query param the external cycleplanner.betterbybike.info app
-// expects — `?locations=` + JSON.stringify([{lat, lng, name, type}, ...]),
-// lat/lng as strings rounded to 5dp. The "Find nearby feature" variant has
-// no JS wiring yet (see the TODO in journey-planner-widget.blade.php).
+// "Plan a route" From/To inputs: Places Autocomplete captures lat/lng per field,
+// submit builds `?locations=` + JSON.stringify([{lat, lng, name, type}]) (lat/lng as
+// 5dp strings) for the external cycleplanner.betterbybike.info app.
 //
-// window.initJourneyPlannerPlaces is the `callback=` the Google Maps script
-// tag calls once loaded (see JourneyPlannerWidget::assets()) — the script
-// only loads at all when an API key is set and this block is on the page.
+// initJourneyPlannerPlaces is the Google Maps script's `callback=` (see
+// JourneyPlannerWidget::assets(), which only loads it when an API key is set).
 
-// TODO: Implement JS wiring for the "Find nearby feature" variant. Also hook up google Places Autocomplete as currently not finished.
+// TODO: wire up the "Find nearby feature" variant and finish Places Autocomplete.
 
-// TODO: check a Google Maps API key is set (Theme Options -> [tab with
-// google_maps_api_key]) before relying on any of this — without one,
-// JourneyPlannerWidget::assets() never enqueues the script and none of the
-// below runs at all.
+// TODO: check a Google Maps API key is set (Theme Options) — without one none of this runs.
 
 window.initJourneyPlannerPlaces = () => {
   document
@@ -22,9 +15,8 @@ window.initJourneyPlannerPlaces = () => {
       '.c-journey-planner-widget__form[data-variant="plan_route"]',
     )
     .forEach((form) => {
-      // wa-input is a custom element — `[name="from"]` would match the host,
-      // not a real <input>. Google Places needs the real native control,
-      // exposed via wa-input's public `.input` property.
+      // Places needs the native <input>, exposed as wa-input's `.input` (the host
+      // element isn't one).
       const fromInput = form.querySelector('wa-input[name="from"]')?.input;
       const toInput = form.querySelector('wa-input[name="to"]')?.input;
 
@@ -94,10 +86,7 @@ window.initJourneyPlannerPlaces = () => {
     });
 };
 
-// Mirrors <x-input>'s $error prop (aria-invalid + aria-describedby pointing
-// at a visible message, see components/input.blade.php) but toggled at
-// runtime — the error only exists once init has failed or a user has tried
-// to submit without picking a suggestion, not at render time.
+// Runtime version of <x-input>'s $error prop (components/input.blade.php).
 function setFieldError(form, input, message) {
   const errorEl = form.querySelector(`#${input.name}-error`);
   if (!errorEl) return;

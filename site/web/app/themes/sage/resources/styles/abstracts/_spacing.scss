@@ -1,5 +1,4 @@
-// Shared rem margin-bottom steps for typography (h1-h6, p, ul/ol) — a small,
-// deliberately coarse set of steps, not one distinct value per heading level.
+// Shared rem margin-bottom steps for typography — deliberately coarse, not one per heading level.
 //
 // Usage:
 //   @use '../abstracts/spacing';
@@ -9,7 +8,5 @@ $tight: 0.5rem; // list item spacing (li)
 $base: 1rem; // p, ul, ol, and h3-h6 margin-bottom
 $loose: 1.5rem; // h1, h2 margin-bottom
 
-// Shared grid/flex gap for card layouts (Card Grid, Card Row) so their
-// horizontal and vertical card spacing stays identical and in sync across
-// blocks instead of each hardcoding its own rem value.
+// Shared card gap (Card Grid, Card Row) so spacing stays in sync across blocks.
 $card-gap: 1.5rem;

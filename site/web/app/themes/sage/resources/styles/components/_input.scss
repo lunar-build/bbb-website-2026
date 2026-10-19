@@ -2,10 +2,8 @@
 @use '../base/typography';
 @use '../base/utilities';
 
-// Theming for <wa-input>/<wa-textarea>. Shared tokens (border, background,
-// padding) live in base/_wa-theme.scss; this covers label/value typography
-// (not exposed as tokens) and icon layout. GF's own input/textarea in
-// base/_forms.scss is a separate surface.
+// <wa-input>/<wa-textarea> theming. Shared tokens are in base/_wa-theme.scss; this covers
+// label/value typography and icon layout. Gravity Forms' fields: base/_forms.scss.
 
 .c-input {
   display: flex;
@@ -70,9 +68,7 @@ wa-textarea[hint]::part(textarea-wrapper) {
   }
 }
 
-// Icon-button variant: a real adjacent element (see $iconButtonLabel in
-// input.blade.php), squared off where it meets wa-input so they read as
-// one control.
+// Icon-button variant: adjacent real element (see $iconButtonLabel in input.blade.php), squared off at the seam.
 .c-input__field--icon-button {
   display: flex;
   align-items: stretch;

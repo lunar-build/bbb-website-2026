@@ -15,35 +15,16 @@
 --}}
 
 {{--
-  Top nav (sections.header, via layouts.app) → hero → sticky left page-menu
-  beside the right-hand content column → footer. For pages like "Report a
-  road fault" or "Regional cycle maps" that need a persistent jump menu
-  alongside their content.
+  Hero → breadcrumbs → sticky page menu beside the content (breadcrumbs sit above the
+  menu below lg, top of the content column from lg up; see base/_sticky-nav-template.scss).
 
-  Hero: no dedicated hero markup here — editors add the existing "Image
-  Hero" block as the first block in the page's content, same as any other
-  page. Keeping the hero block-editor-driven (rather than template fields)
-  means it stays consistent with how every other hero use case in this
-  theme already works. Leave the Image Hero block's own "Show breadcrumbs"
-  toggle off on this template — breadcrumbs render below instead (see
-  next paragraph), matching the Figma design where they sit at the top of
-  the content column, inline with the sticky nav's top, not inside the
-  hero overlay.
+  Hero: editors add the Image Hero block first in the content, with its "Show breadcrumbs"
+  toggle off — breadcrumbs render here instead.
 
-  Breadcrumbs: hardcoded here (not editor-driven). On mobile they sit above
-  the page menu; from lg up they sit at the top of the content column, on
-  the same row the sticky nav starts — see the grid-template-areas in
-  base/_sticky-nav-template.scss.
-
-  Page menu: items are generated from this page's top-level (H2) headings
-  by App\Support\PageMenu (see app/View/Composers/StickyNavTemplate.php),
-  preferring an editor-set Gutenberg "HTML anchor" per heading and falling
-  back to an auto-slug of the heading text — see the matching
-  render_block_core/heading filter in app/filters.php that injects that
-  fallback slug as the rendered heading's `id`. The current-section
-  highlight is CSS (components/_sticky-page-menu.scss's
-  .c-sticky-page-menu__item--active), toggled client-side as the reader
-  scrolls by resources/js/sticky-nav-template.js.
+  Page menu: built from the page's H2s by App\Support\PageMenu (via
+  View/Composers/StickyNavTemplate.php), using each heading's HTML anchor or an auto-slug
+  (render_block_core/heading in app/filters.php). The active highlight is toggled on scroll by
+  resources/js/sticky-nav-template.js.
 --}}
 
 @extends('layouts.app')

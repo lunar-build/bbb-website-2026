@@ -3,15 +3,12 @@
 @use '../components/header' as header;
 @use '../base/typography';
 
-// Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A
-// sibling of <header class="c-site-header">, not nested inside it — the
-// header's own `transform` (sticky auto-hide) would otherwise become the
-// containing block for this position:fixed overlay, sizing/sliding it
-// against the header instead of the viewport.
+// Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A sibling of
+// .c-site-header, not a child: the header's auto-hide `transform` would become the
+// containing block for this position:fixed overlay.
 //
-// Padding-top is a hardcoded 5.25rem (header) + 2.25rem (Figma gap, node
-// 4:1257) rather than measured via JS — fixed because this overlay only
-// shows below bp.$sm, where the mobile header height doesn't vary.
+// Padding-top is a fixed 5.25rem (header) + 2.25rem (Figma node 4:1257) — the mobile
+// header height doesn't vary below bp.$sm.
 .c-primary-nav {
   position: fixed;
   inset: 0;
@@ -33,8 +30,7 @@
   }
 }
 
-// [hidden] needs the specificity bump or an unconditional `display: flex`
-// below would render every panel at once.
+// Specificity bump so the `display: flex` below doesn't show every [hidden] panel.
 .c-primary-nav__panel[hidden] {
   display: none;
 }
@@ -76,9 +72,7 @@
   text-decoration: none;
   cursor: pointer;
 
-  // Underline on the text only, not the whole flex row — text-decoration
-  // on a display:flex element has no inline content of its own to draw
-  // under, and underlining the icon's gap too would look wrong anyway.
+  // Underline the text span only; text-decoration on the flex row would also hit the icon gap.
   &:hover > span,
   &:focus-visible > span {
     text-decoration: underline;
@@ -238,10 +232,8 @@
   text-decoration: none;
   cursor: pointer;
 
-  // Bold dropped vs Figma — it changes text width, shifting the whole
-  // justify-content:space-between row. Underline instead, shared by
-  // hover/focus/open state, scoped to the text span (see .c-primary-nav__link
-  // above for why not the whole flex row).
+  // Underline instead of Figma's bold, which shifts the space-between row's text width.
+  // Shared by hover/focus/open, on the text span (see .c-primary-nav__link).
   &:hover > span,
   &:focus-visible > span,
   &[aria-expanded='true'] > span {
@@ -376,17 +368,14 @@
   padding-block: 1rem;
 }
 
-// Field + submit button are adjacent real elements, squared off at the
-// seam (button's left border is the only dividing line) — not an overlay,
-// so each keeps its own independent focus ring.
+// Field and button are separate elements squared off at the seam, so each keeps its own focus ring.
 .c-primary-nav-desktop__search-field {
   flex: 1 1 auto;
   display: flex;
   align-items: stretch;
 
   input {
-    // base/_forms.scss sets width:100% !important, which claimed the
-    // whole row now that the button is a real flex sibling.
+    // Overrides base/_forms.scss's width:100% !important, which would claim the whole row.
     width: auto !important;
     flex: 1 1 auto;
     font-size: 1rem; // Figma: 16px vs the shared 14px default

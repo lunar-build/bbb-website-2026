@@ -17,12 +17,8 @@ class PatternLibrary extends Composer
     ];
 
     /**
-     * Every registered block, rendered with its fixture (`$example`) data
-     * standing in for real ACF field values, for display on the pattern
-     * library page. New blocks appear here automatically — see the
-     * "Fixture data" section of the build-acf-block skill for the
-     * per-block convention this relies on ($description + $example +
-     * $exampleContent for InnerBlocks-based blocks).
+     * Every registered block rendered with its `$example` fixture data. New blocks
+     * appear automatically — see "Fixture data" in the build-acf-block skill.
      */
     public function blocks(): array
     {
@@ -42,14 +38,8 @@ class PatternLibrary extends Composer
     }
 
     /**
-     * Render a block's Blade view standalone using its fixture data, with
-     * no live post/ACF context required.
-     *
-     * Blocks with more than one visually distinct fixture (e.g. CtaBanner's
-     * layout variants) can expose an optional `$examples` property — an
-     * array of `['Label' => $exampleOverrides]` — to render each variant
-     * stacked in the library instead of just the default `$example`. This
-     * is opt-in: blocks without `$examples` render exactly as before.
+     * Render a block's view standalone from its fixture data. An optional `$examples`
+     * (`['Label' => $exampleOverrides]`) renders each variant stacked instead.
      */
     protected function render(Block $block): string
     {
@@ -76,10 +66,7 @@ class PatternLibrary extends Composer
         return $html;
     }
 
-    /**
-     * Render a single pass of a block's Blade view using its current
-     * `$example`/`$exampleContent` fixture data.
-     */
+    /** One render pass using the block's current `$example`/`$exampleContent`. */
     protected function renderVariant(Block $block): string
     {
         $content = method_exists($block, 'exampleContent')
@@ -96,15 +83,10 @@ class PatternLibrary extends Composer
     }
 
     /**
-     * Standalone preview rendering (`$block->preview = true`) skips ACF
-     * Composer's normal `WP_Block_Supports::apply_block_supports()` call
-     * (there's no real `WP_Block` context to read from outside a genuine
-     * `render_block()` pass), so a block's default spacing support never
-     * makes it into the rendered `style` attribute here — unlike the front
-     * end and real editor canvas, which both go through that real pipeline.
-     * Recreate just the padding declarations by hand from the block's own
-     * `$spacing` default, using the same style engine WP_Block_Supports
-     * itself calls internally, and merge them onto the root wrapper.
+     * Standalone previews skip `WP_Block_Supports::apply_block_supports()` (no real
+     * `WP_Block` context), so the default spacing support never reaches the `style`
+     * attribute. Rebuild the padding from the block's `$spacing` with the same style
+     * engine and merge it onto the root wrapper.
      */
     protected function injectPreviewSpacingStyle(string $html, Block $block): string
     {
@@ -134,16 +116,10 @@ class PatternLibrary extends Composer
     }
 
     /**
-     * Every Blade `@props` component under resources/views/components/, for
-     * the dev-only "Components" section of the pattern library (see
-     * `resources/views/partials/pattern-library-styles.blade.php` for the
-     * hand-maintained counterpart covering non-component style primitives
-     * like buttons/type scale, which have no file to discover).
-     *
-     * A component appears here automatically — a matching example partial
-     * at resources/views/components/examples/{name}.blade.php is what fills
-     * in its rendered preview; without one it still lists, just with a
-     * "no example yet" note, so the gap stays visible.
+     * Every `@props` component in resources/views/components/ for the dev-only
+     * "Components" section (non-component primitives are hand-maintained in
+     * partials/pattern-library-styles.blade.php). Previews come from
+     * components/examples/{name}.blade.php; without one it lists a "no example yet" note.
      */
     public function components(): array
     {
