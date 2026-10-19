@@ -64,6 +64,11 @@
 
 .c-post-hero__title {
   color: var(--wp--preset--color--blue-dark);
+
+  // No categories: drop the heading's margin so it lines up with the image below.
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .c-post-hero__categories {
