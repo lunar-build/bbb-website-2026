@@ -5,6 +5,11 @@
 
   // Template-rendered, not run through render_block(), so it never picks up its $spacing default — added by hand.
   padding-block: var(--wp--preset--spacing--large);
+
+  // No featured image: the content's first block (e.g. Standfirst) has its own top padding, so don't stack the hero's on it.
+  &:has(+ .e-content) {
+    padding-block-end: 0;
+  }
 }
 
 .c-post-hero__meta {
