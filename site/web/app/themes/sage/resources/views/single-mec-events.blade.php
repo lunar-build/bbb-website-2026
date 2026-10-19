@@ -96,14 +96,14 @@
             </div>
           </div>
 
+          {!! $body !!}
+
           @if ($upcoming)
             <section class="c-event__upcoming" aria-labelledby="c-event-upcoming">
               <h2 id="c-event-upcoming" class="u-heading-5">{{ __('More upcoming sessions', 'sage') }}</h2>
               <x-bullet-list :items="array_map(fn($line) => ['text' => $line], $upcoming)" />
             </section>
           @endif
-
-          {!! $body !!}
 
           @if ($jsonLd)
             <script type="application/ld+json">{!! $jsonLd !!}</script>
