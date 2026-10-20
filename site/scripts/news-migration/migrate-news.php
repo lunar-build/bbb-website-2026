@@ -344,22 +344,27 @@ function news_flatten(array $blocks): array
 }
 
 /**
- * A group/columns layout holding only old acf/card blocks (icon or image,
- * title, text, link) -> one Card Grid of "link" cards.
+ * Old acf/card blocks (icon or image, title, text, link) -> one Card Grid of
+ * "link" cards. A card sourced from a post takes that post's title, excerpt,
+ * featured image and a link by ID (IDs are kept, so `?p=` resolves).
  */
-function news_old_cards(array $b): ?array
+function news_card_grid(array $cards, wpdb $src): array
 {
-    $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i));
-    if (! $leaves || array_filter($leaves, fn($i) => $i['blockName'] !== 'acf/card')) {
-        return null;
-    }
-
-    $fields = ['card_style' => 'link', 'cards' => count($leaves)];
-    foreach (array_values($leaves) as $n => $card) {
+    $fields = ['card_style' => 'link', 'cards' => count($cards)];
+    foreach (array_values($cards) as $n => $card) {
         $d = $card['attrs']['data'] ?? [];
+        if (($d['content_source'] ?? '') === 'post' && ! empty($d['content'])) {
+            $post = $src->get_row($src->prepare("SELECT post_title, post_excerpt FROM {$src->posts} WHERE ID=%d", $d['content']));
+            $d = [
+                'title' => $post->post_title ?? '',
+                'text' => $post->post_excerpt ?? '',
+                'image' => (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $d['content'])),
+                'link' => ['title' => '', 'url' => home_url('/?p=' . (int) $d['content']), 'target' => ''],
+            ];
+        }
         $fields += [
             "cards_{$n}_image" => $d['icon'] ?? $d['image'] ?? '',
-            "cards_{$n}_heading_text" => $d['title'] ?? '',
+            "cards_{$n}_heading_text" => html_entity_decode($d['title'] ?? '', ENT_QUOTES),
             "cards_{$n}_heading_level" => 'h3',
             "cards_{$n}_heading_style" => 'match',
             "cards_{$n}_body_text" => $d['text'] ?? '',
@@ -371,19 +376,151 @@ function news_old_cards(array $b): ?array
     return news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid');
 }
 
+/** A group/columns layout holding only old acf/card blocks -> one Card Grid. */
+function news_old_cards(array $b, wpdb $src): ?array
+{
+    $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i));
+    if (! $leaves || array_filter($leaves, fn($i) => $i['blockName'] !== 'acf/card')) {
+        return null;
+    }
+
+    return news_card_grid($leaves, $src);
+}
+
 /** Swap each outermost all-acf/card group/columns, at any depth, 1:1 for a Card Grid. */
-function news_replace_old_cards(array $blocks, array &$notes): array
+function news_replace_old_cards(array $blocks, wpdb $src, array &$notes): array
 {
     foreach ($blocks as &$b) {
-        if (in_array($b['blockName'], ['core/group', 'core/columns'], true) && ($cards = news_old_cards($b))) {
+        if (in_array($b['blockName'], ['core/group', 'core/columns'], true) && ($cards = news_old_cards($b, $src))) {
             $b = $cards;
             $notes[] = 'acf/card layout -> Card Grid';
         } elseif ($b['innerBlocks']) {
-            $b['innerBlocks'] = news_replace_old_cards($b['innerBlocks'], $notes);
+            $b['innerBlocks'] = news_replace_old_cards($b['innerBlocks'], $src, $notes);
         }
     }
 
     return $blocks;
+}
+
+/** Accordion from the old FAQ block (question/answer repeater). */
+function news_faq(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $fields = ['heading' => '', 'items' => (int) ($d['questions'] ?? 0)];
+    for ($i = 0; $i < $fields['items']; $i++) {
+        $fields["items_{$i}_title"] = news_plain($d["questions_{$i}_question"] ?? '');
+        $fields["items_{$i}_content"] = wpautop($d["questions_{$i}_answer"] ?? '');
+    }
+
+    return news_acf_block('acf/accordion', \App\Blocks\Accordion::class, $fields, 'accordion');
+}
+
+/** Transcript -> an Accordion with one "Transcript" item. */
+function news_transcript(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+
+    return news_acf_block('acf/accordion', \App\Blocks\Accordion::class, [
+        'heading' => '',
+        'items' => 1,
+        'items_0_title' => 'Transcript',
+        'items_0_content' => wpautop($d['transcript'] ?? ''),
+    ], 'accordion');
+}
+
+/** Timeline (numbered markers) from the old step-by-step block. */
+function news_steps(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $fields = [
+        'heading' => news_plain($d['heading'] ?? ''),
+        'intro' => news_plain($d['sub_heading'] ?? ''),
+        'marker_size' => 'number',
+        'steps' => (int) ($d['steps'] ?? 0),
+    ];
+    for ($i = 0; $i < $fields['steps']; $i++) {
+        $fields["steps_{$i}_label"] = '';
+        $fields["steps_{$i}_heading"] = news_plain($d["steps_{$i}_step_title"] ?? '');
+        $fields["steps_{$i}_body"] = news_plain($d["steps_{$i}_step_content"] ?? '');
+    }
+
+    return news_acf_block('acf/timeline', \App\Blocks\Timeline::class, $fields, 'timeline');
+}
+
+/** Testimonial Card Carousel from the old staggered content cards. A title becomes an H2 above it. */
+function news_staggered_cards(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $fields = ['cards' => (int) ($d['cards'] ?? 0)];
+    for ($i = 0; $i < $fields['cards']; $i++) {
+        $fields += [
+            "cards_{$i}_photo" => $d["cards_{$i}_image"] ?? '',
+            "cards_{$i}_name" => news_plain($d["cards_{$i}_author"] ?? ''),
+            "cards_{$i}_info" => news_plain($d["cards_{$i}_subtitle"] ?? ''),
+            "cards_{$i}_quote" => news_plain($d["cards_{$i}_quote"] ?? ''),
+            "cards_{$i}_link" => '',
+        ];
+    }
+    $carousel = news_acf_block('acf/testimonial-card-carousel', \App\Blocks\TestimonialCardCarousel::class, $fields, 'testimonial_card_carousel');
+    if (! empty($d['has_blue_background'])) {
+        $carousel['attrs']['backgroundColor'] = 'blue-light';
+    }
+    $title = news_plain($d['title'] ?? '');
+
+    return $title ? [parse_blocks('<!-- wp:heading --><h2 class="wp-block-heading">' . esc_html($title) . '</h2><!-- /wp:heading -->')[0], $carousel] : [$carousel];
+}
+
+/** A Google Drive "open?id=" link to a My Maps file is the map's embed ID. */
+function news_map_url(string $url): string
+{
+    $parts = parse_url(html_entity_decode($url));
+    parse_str($parts['query'] ?? '', $query);
+    if (($parts['host'] ?? '') === 'drive.google.com' && ! empty($query['id'])) {
+        return 'https://www.google.com/maps/d/embed?mid=' . $query['id'];
+    }
+
+    return html_entity_decode($url);
+}
+
+/** Map Embed from a Google map iframe (core/html) or a Google-provider core/embed; null for anything else. */
+function news_map_embed(array $b, string $title): ?array
+{
+    $url = null;
+    if ($b['blockName'] === 'core/html' && preg_match('#<iframe[^>]+src="([^"]+)"#i', $b['innerHTML'], $m) && str_contains($m[1], 'google.com/maps')) {
+        $url = $m[1];
+        $title = preg_match('#<iframe[^>]+title="([^"]+)"#i', $b['innerHTML'], $t) ? html_entity_decode($t[1]) : $title;
+    } elseif ($b['blockName'] === 'core/embed' && ($b['attrs']['providerNameSlug'] ?? '') === 'google') {
+        $url = $b['attrs']['url'] ?? null;
+    }
+    if (! $url) {
+        return null;
+    }
+
+    return news_acf_block('acf/map-embed', \App\Blocks\MapEmbed::class, [
+        'map_url' => news_map_url($url),
+        'map_title' => $title ?: 'Map',
+        'height' => 'large',
+    ], 'map_embed');
+}
+
+/**
+ * Heading size classes (h3/h4) and centred text mean nothing in this theme —
+ * the heading level stays, the old visual override and alignment go.
+ */
+function news_clean_text(array $b): array
+{
+    unset($b['attrs']['align'], $b['attrs']['textAlign']);
+    if (isset($b['attrs']['className'])) {
+        $b['attrs']['className'] = trim(preg_replace('/\bh[1-6]\b/', '', $b['attrs']['className']));
+        if ($b['attrs']['className'] === '') {
+            unset($b['attrs']['className']);
+        }
+    }
+    $clean = fn($html) => is_string($html) ? preg_replace(['/ has-text-align-(center|left|right)/', '/(class="[^"]*?) h[1-6](?=[ "])/'], '', $html) : $html;
+    $b['innerHTML'] = $clean($b['innerHTML']);
+    $b['innerContent'] = array_map($clean, $b['innerContent']);
+
+    return $b;
 }
 
 /**
@@ -486,15 +623,16 @@ function news_inline_reusable(array $blocks, wpdb $src, array &$notes, int $dept
     return $out;
 }
 
-function news_transform(string $content, wpdb $src, array &$notes): string
+function news_transform(string $content, wpdb $src, array &$notes, bool $keepCalendars = false): string
 {
     // Old card layouts are spotted by their wrapping group, so swap those
     // first; then lift every block out of its group so the loop below
     // converts blocks at any depth, not just the top level.
-    $in = news_unwrap_groups(news_replace_old_cards(news_inline_reusable(parse_blocks($content), $src, $notes), $notes));
+    $in = news_unwrap_groups(news_replace_old_cards(news_inline_reusable(parse_blocks($content), $src, $notes), $src, $notes));
     $out = [];
     $bikes = [];
     $bikeSlot = null;
+    $timetable = false;
 
     for ($i = 0; $i < count($in); $i++) {
         $b = $in[$i];
@@ -538,13 +676,86 @@ function news_transform(string $content, wpdb $src, array &$notes): string
                 }
                 $out[] = news_downloads($run, $src);
                 break;
+            case 'acf/faq':
+                $out[] = news_faq($b);
+                break;
+            case 'acf/transcript':
+                $out[] = news_transcript($b);
+                break;
+            case 'acf/step-by-step':
+                $out[] = news_steps($b);
+                break;
+            case 'acf/staggered-content-cards':
+                array_push($out, ...news_staggered_cards($b));
+                break;
+            case 'acf/calendar':
+                if ($keepCalendars) {
+                    $out[] = $b;
+                    break;
+                }
+                // One Events Timetable shows every timetable, so the per-term "… Timetable" headings go too.
+                while ($out && news_is_blank(end($out))) {
+                    array_pop($out);
+                }
+                if ($out && end($out)['blockName'] === 'core/heading' && str_contains(strtolower(end($out)['innerHTML']), 'timetable')) {
+                    array_pop($out);
+                }
+                if (! $timetable) {
+                    $out[] = news_acf_block('acf/events-timetable', \App\Blocks\EventsTimetable::class, ['source' => 'timetables', 'layout' => 'tabs'], 'events_timetable');
+                    $notes[] = 'acf/calendar blocks -> one Events Timetable (event timetables)';
+                    $timetable = true;
+                }
+                break;
+            case 'acf/divider':
+                $out[] = parse_blocks('<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->')[0];
+                break;
+            case 'acf/illustration':
+            case 'acf/illustration-divider':
+                // Decorative artwork from the old theme, no equivalent here.
+                break;
+            case 'acf/card':
+                // Consecutive loose cards share one grid.
+                $run = [$b];
+                while (isset($in[$i + 1]) && ($in[$i + 1]['blockName'] === 'acf/card' || (news_is_blank($in[$i + 1]) && ($in[$i + 2]['blockName'] ?? null) === 'acf/card'))) {
+                    $i++;
+                    if ($in[$i]['blockName']) {
+                        $run[] = $in[$i];
+                    }
+                }
+                $out[] = news_card_grid($run, $src);
+                $notes[] = count($run) . ' loose acf/card -> Card Grid';
+                break;
+            case 'core/html':
+            case 'core/embed':
+                $prev = null;
+                foreach (array_reverse($out) as $p) {
+                    if ($p && ! news_is_blank($p)) {
+                        $prev = $p;
+
+                        break;
+                    }
+                }
+                $title = $prev && $prev['blockName'] === 'core/heading' ? news_plain($prev['innerHTML']) : '';
+                $map = news_map_embed($b, $title);
+                $out[] = $map ?? $b;
+                if ($map) {
+                    $notes[] = 'Google map -> Map Embed';
+                }
+                break;
+            case 'core/paragraph':
+            case 'core/heading':
+                $out[] = news_clean_text($b);
+                break;
             case 'acf/bike-card':
                 $bikes[] = $b;
                 $bikeSlot ??= count($out);
                 $out[] = null; // placeholder, filled once all cards are collected
                 break;
             default:
-                if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/')) {
+                if ($b['blockName'] === 'acf/form') {
+                    // Same name as this theme's Form block, but the old data is a Contact Form 7 selector.
+                    $notes[] = 'acf/form is an old CF7 form (needs the Gravity Forms conversion)';
+                } elseif ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/') && ! WP_Block_Type_Registry::get_instance()->is_registered($b['blockName'])) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }
                 $out[] = $b['innerBlocks'] ? news_nested($b, $notes) : $b;
@@ -564,7 +775,8 @@ function news_transform(string $content, wpdb $src, array &$notes): string
  * The old theme wrapped sections in core/group purely for its own style
  * classes (is-style-lightblue, is-style-block-fullwidth-bg), which mean
  * nothing here — lift their contents out (at any depth) so each block gets
- * converted and spaces itself. Columns stay; news_nested() handles those.
+ * converted and spaces itself. Columns without images are lifted out too;
+ * columns holding images stay for news_nested() / news_image_columns().
  */
 function news_unwrap_groups(array $blocks): array
 {
@@ -572,6 +784,11 @@ function news_unwrap_groups(array $blocks): array
     foreach ($blocks as $b) {
         if (($b['blockName'] ?? null) === 'core/group') {
             array_push($out, ...news_unwrap_groups($b['innerBlocks']));
+        } elseif (($b['blockName'] ?? null) === 'core/columns' && ! array_filter(news_flatten($b['innerBlocks']), fn($i) => $i['blockName'] === 'core/image')) {
+            // Side-by-side layout is lost; the blocks keep their order. Columns with images stay (Two Column Content).
+            foreach ($b['innerBlocks'] as $column) {
+                array_push($out, ...news_unwrap_groups($column['innerBlocks']));
+            }
         } else {
             $out[] = $b;
         }
@@ -1491,7 +1708,7 @@ if ($mode === 'cycling-centre') {
         $notes = [];
         $blocks = [];
         $timetableAdded = false;
-        foreach (parse_blocks(news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes)) as $b) {
+        foreach (parse_blocks(news_transform(serialize_blocks(cc_strip_blocks(parse_blocks($row->post_content), $notes)), $src, $notes, true)) as $b) {
             if ($b['blockName'] !== 'acf/calendar') {
                 $blocks[] = $b;
 

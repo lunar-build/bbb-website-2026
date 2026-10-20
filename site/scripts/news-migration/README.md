@@ -24,6 +24,17 @@ never touches the old site itself, and it only writes to this site's database.
 | Group/columns holding only `acf/card` blocks | Card Grid with "link" cards (icon or image, title, text, link) |
 | `core/list` | Bullet List with no top padding and Small bottom padding (the block's own default is none). Numbered lists stay numbered, nested lists keep their depth (up to 3 levels, via each item's Indent), and bold, italic and links are kept |
 | `core/block` (reusable) | The reusable block's content, inlined and converted |
+| `acf/faq` | Accordion (one item per question; answers keep their links) |
+| `acf/transcript` | Accordion with a single "Transcript" item |
+| `acf/step-by-step` | Timeline with numbered markers (step title = heading, step content = body) |
+| `acf/staggered-content-cards` | Testimonial Card Carousel (image, author, subtitle, quote). A blue background becomes Blue light, and a title becomes an H2 above it |
+| `acf/calendar` | One Events Timetable per page, which shows the term timetables. The "… Timetable" headings above them go |
+| `acf/divider` | Separator |
+| `acf/illustration`, `acf/illustration-divider` | Dropped (decorative artwork from the old theme) |
+| `acf/card` outside a card layout | Card Grid with "link" cards; consecutive cards share one grid. A card sourced from a post takes its title, excerpt, image and a `?p=` link |
+| Google map iframe (`core/html`) or Google `core/embed` | Map Embed. Drive "open?id=" links become My Maps embed URLs, and the title comes from the iframe or the heading above |
+| Columns with no images | Unwrapped: the blocks keep their order but lose the side-by-side layout |
+| Heading `h3`/`h4` class, centred text | Class and alignment dropped; the heading level stays |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 
