@@ -168,6 +168,10 @@
   padding-block: 1.75rem;
   background: var(--wp--preset--color--blue-dark);
   text-align: center;
+
+  p:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .c-footer-bottom__copyright {

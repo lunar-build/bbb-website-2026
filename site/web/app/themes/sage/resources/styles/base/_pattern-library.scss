@@ -1,16 +1,11 @@
 @use 'typography';
 
-// Styles for the auto-generated block pattern library
-// (resources/views/template-pattern-library.blade.php). New blocks need no
-// styling here — this only frames each entry and the nav, the block itself
-// renders with its normal front-end styles.
+// Frames each entry and the nav of the auto-generated pattern library
+// (template-pattern-library.blade.php); blocks need no styling here.
 //
-// .c-pattern-library gets its own grid-template-columns (nav + content) one
-// level inside .o-container, rather than on the .o-container element itself
-// — .o-container's `> *` rule places direct children on its own named grid
-// lines (content-start/content-end), and stacking a second
-// grid-template-columns on that same element would replace those lines,
-// breaking the placement rule silently.
+// The nav + content grid sits one level inside .o-container: a second
+// grid-template-columns on .o-container itself would replace its named grid lines and
+// silently break its `> *` placement rule.
 
 .c-pattern-library {
   display: grid;
@@ -21,9 +16,7 @@
 
 .c-pattern-library__nav {
   position: sticky;
-  // Sits below the sticky site header (--site-header-height, set in
-  // resources/js/site-header.js) rather than a guessed constant, so this
-  // stays correct if the header's actual height changes.
+  // Below the sticky header (--site-header-height, set in site-header.js).
   top: calc(var(--site-header-height, 6rem) + 1rem);
   margin-block-start: 3rem;
   padding: 1.5rem;
@@ -134,8 +127,7 @@
   }
 }
 
-// Stacked layout variants for blocks with more than one visually distinct
-// fixture (see App\Blocks\CtaBanner's $examples / PatternLibrary::render()).
+// Stacked variants for blocks with several fixtures (see CtaBanner's $examples).
 .c-pattern-library__variant + .c-pattern-library__variant {
   margin-block-start: 1.5rem;
 }

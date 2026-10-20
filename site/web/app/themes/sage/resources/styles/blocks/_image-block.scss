@@ -6,10 +6,7 @@
 .c-image-block__image {
   display: block;
   width: 100%;
-  // Caps very tall/portrait uploads so the block never forces a scroll
-  // taller than the viewport on its own — object-fit crops to fill rather
-  // than letterboxing. 90vh (not 100vh) leaves a visible sliver of
-  // whatever's below so it's clear the page continues.
+  // Caps tall uploads (object-fit crops). 90vh, not 100vh, so the next content peeks in.
   height: auto;
   max-height: 90vh;
   object-fit: cover;
@@ -82,8 +79,7 @@
   }
 }
 
-// The shared .c-bullet-list heading has no bottom border by default —
-// match the icon-rows column's divider so both columns line up.
+// Adds the bottom border the shared .c-bullet-list heading lacks, to match the icon-rows divider.
 .c-image-block__info-box-bullet-list {
   .c-bullet-list__heading {
     padding-bottom: 1rem;

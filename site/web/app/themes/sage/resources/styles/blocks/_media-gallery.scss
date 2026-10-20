@@ -1,7 +1,5 @@
-// Figma: Media blocks / Media gallery (node 81:2426) — the grid is dynamic
-// (editor picks a 1/2-col width per item, see MediaGallery::fields()) rather
-// than matching the frame's fixed 9-tile template, since the exact item
-// count/order can't be guaranteed.
+// Figma "Media gallery" (node 81:2426) — grid is dynamic (per-item 1/2-col width,
+// see MediaGallery::fields()), not the frame's fixed 9 tiles.
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
@@ -17,9 +15,7 @@
   grid-auto-flow: row dense;
   gap: 1rem;
 
-  // 4 columns straight from $md (768px) squeezed every tile too narrow on
-  // tablet/small-laptop widths — step through 2 then 3 columns first and
-  // only go to 4 once there's genuinely enough width for it ($xl).
+  // 2 then 3 columns before 4 ($xl) — 4 from $md squeezed tiles too narrow.
   @include bp.respond($min: bp.$sm) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -35,8 +31,7 @@
 }
 
 .c-media-gallery__tile {
-  // Below $sm every tile is full width regardless of its own --column-span
-  // — a 2-column span item on a 1-column grid would otherwise overflow.
+  // Below $sm a 2-column span would overflow the 1-column grid.
   grid-column: span 1;
   display: block;
   width: 100%;
@@ -48,16 +43,12 @@
 
   @include focus.ring;
 
-  // focus.ring's default +2px offset draws the ring outside the tile —
-  // clipped by the carousel's scroll container (WA's .slides has
-  // overflow: auto) on edge tiles. Inset instead so it never leaves the
-  // tile's own bounds.
+  // Inset: the default outset ring is clipped on edge tiles by WA's .slides overflow.
   &:focus-visible {
     outline-offset: -2px;
   }
 
-  // Clamp matches the grid's own column count at each step above — a
-  // span-2 item should never exceed however many columns actually exist.
+  // Clamp to the grid's column count at each step.
   @include bp.respond($min: bp.$sm) {
     grid-column: span min(var(--column-span, 1), 2);
   }
@@ -81,9 +72,8 @@
   display: block;
 }
 
-// Explicit size, not auto: slotted content under wa-carousel's
-// display:contents wrapper collapses to 0 width in some browsers otherwise
-// (same fix as the other carousel blocks' nav icons).
+// Explicit size: slotted content under wa-carousel's display:contents wrapper
+// collapses to 0 width in some browsers (same as the other carousels' nav icons).
 .c-media-gallery__nav-icon {
   display: inline-flex;
   flex: none;
@@ -105,9 +95,7 @@
   transform: rotate(180deg);
 }
 
-// Re-columns prev/pagination/next together, 1rem apart (default puts nav
-// buttons beside the slides instead) — same technique as
-// RollingStatsCarousel's ::part(carousel) remap.
+// Puts prev/pagination/next in one row below the slides (same as RollingStatsCarousel).
 .c-media-gallery__carousel::part(carousel) {
   grid-template-columns: 1fr min-content max-content min-content 1fr; // max-content: dots' flex-wrap needs it
   grid-template-areas: none;
@@ -118,10 +106,7 @@
   grid-column: 1 / -1;
   grid-row: 1;
 
-  // WA's own .slides centres each slide vertically by default — fine
-  // when every page is the same height, but a shorter trailing page
-  // (scroll track height follows the tallest page) ends up centred in
-  // the leftover space instead of starting at the top.
+  // WA centres slides vertically, which floats a shorter trailing page mid-track.
   align-items: start;
 }
 
@@ -163,11 +148,8 @@
   --width: 60rem;
 }
 
-// wa-dialog's close button is a nested <wa-button> — ::part(close-button)
-// targets that component's own host, which never receives :focus-visible
-// itself (the real focus target is its inner native <button>, two shadow
-// levels down), so wa-button's own focus style wins instead. Target the
-// exported close-button__base part to reach that inner element directly.
+// ::part(close-button) is the <wa-button> host, which never gets :focus-visible (its
+// inner <button> does), so target close-button__base instead.
 .c-media-gallery__dialog::part(close-button__base) {
   @include focus.ring;
 }
@@ -182,9 +164,7 @@
     border-radius: 0.625rem;
   }
 
-  // The lightbox's <video controls> is a real tab stop — give it the
-  // same explicit ring as every other interactive element here, rather
-  // than the browser's native video focus style.
+  // Same ring as other interactive elements, not the browser's native video focus style.
   video {
     @include focus.ring;
   }

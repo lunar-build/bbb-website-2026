@@ -10,11 +10,7 @@ add_filter('excerpt_more', function () {
     return sprintf(' &hellip; <a href="%s">%s</a>', get_permalink(), __('Continued', 'sage'));
 });
 
-/**
- * Register a "Cards" block category so the card blocks (Card Row, Cycle
- * Route Card, Feature Card, Business Card, Image Card) group together
- * in the inserter instead of sitting loose under "Text".
- */
+/** "Cards" inserter category for the card blocks. */
 add_filter('block_categories_all', function (array $categories) {
     return array_merge([
         [
@@ -25,26 +21,14 @@ add_filter('block_categories_all', function (array $categories) {
 });
 
 /**
- * log1x/acf-composer (v3.4) hardcodes every block's `acf_block_version` to 2
- * (see Block::$blockVersion), which stops ACF 6.8.10's own WP 7.1+ default
- * (version_compare($wp_version, '7.1', '>=') ? 3 : 2) from ever kicking in —
- * ACF only applies that default when `acf_block_version` is unset. Blocks
- * stuck on v2 lose the old "auto" mode's inline edit-form swap entirely on
- * WP 7.1 (its canvas is iframe-only now, and ACF's v2 form injection isn't
- * iframe-compatible), so clicking a block only ever opens the Inspector
- * sidebar. Force v3 here, which also brings back the block toolbar's pencil
- * icon ("expanded editor") — click it to open a full-size pop-out panel with
- * every field, the same one access point for every block regardless of
- * field type.
+ * Force ACF block version 3. log1x/acf-composer (v3.4) hardcodes 2, which stops ACF's
+ * own WP 7.1+ default applying (only used when unset). On WP 7.1 v2 blocks lose the
+ * inline edit form (iframe-only canvas) and only open the Inspector; v3 restores the
+ * toolbar pencil that opens a pop-out panel with every field.
  *
- * Deliberately NOT setting `auto_inline_editing` (ACF 6.7+, makes any field
- * whose value is the sole content of an element — e.g. WYSIWYG text —
- * editable directly in the canvas, like core InnerBlocks). It looks like it
- * fixes the sidebar problem, but it only applies to that one field type,
- * so clients can edit the text inline and assume that's the whole block,
- * missing the rest of the fields (icon, image, layout options, etc.) which
- * still need the pop-out editor. Two different edit paths depending on
- * field type is worse UX than one consistent "click the pencil" path.
+ * Deliberately NOT setting `auto_inline_editing` (ACF 6.7+): it only inlines
+ * sole-content fields like WYSIWYG, so clients would edit the text and miss the other
+ * fields. One consistent "click the pencil" path is better UX.
  */
 add_filter('acf/register_block_type_args', function ($block) {
     if (! str_starts_with($block['name'] ?? '', 'acf/')) {
@@ -53,9 +37,8 @@ add_filter('acf/register_block_type_args', function ($block) {
 
     $block['acf_block_version'] = 3;
 
-    // Empty blocks render as nothing in the editor now that example content
-    // is pattern-library only (see shows_example()), leaving a client with
-    // an invisible block they can't find or click — show a placeholder.
+    // Empty blocks render nothing in the editor (example content is pattern-library
+    // only, see shows_example()), leaving an unclickable invisible block — show a placeholder.
     if (is_callable($block['render_callback'] ?? null)) {
         $render = $block['render_callback'];
 
@@ -86,10 +69,7 @@ add_filter('acf/register_block_type_args', function ($block) {
     return $block;
 });
 
-/**
- * Any block allowed on pages is allowed on events (mec-events) — one filter
- * rather than adding 'mec-events' to every block class's $post_types.
- */
+/** Blocks allowed on pages are allowed on mec-events, without editing every $post_types. */
 add_filter('acf/register_block_type_args', function ($block) {
     if (in_array('page', $block['post_types'] ?? [], true)) {
         $block['post_types'][] = 'mec-events';
@@ -99,22 +79,15 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
- * MEC forces the classic editor on events, which can't show our ACF blocks
- * and strips them on save. Use the block editor (MEC's panels still load as
- * meta boxes) — priority 20, after MEC's filter.
+ * MEC forces the classic editor on events, which strips our ACF blocks on save. Use the
+ * block editor (MEC's panels still load as meta boxes) — priority 20, after MEC's filter.
  */
 add_filter('use_block_editor_for_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
 add_filter('gutenberg_can_edit_post_type', fn($use, $postType) => $postType === 'mec-events' ? true : $use, 20, 2);
 
 /**
- * Our own ACF Composer blocks each render their own <section>/.o-container
- * wrapper (see the build-acf-block skill's "<section> root" convention),
- * but third-party/core blocks placed directly in post content — e.g. the
- * Gravity Forms block — render only their own plugin markup, with no
- * containment. Wrap specific block names here so they sit flush and
- * contained like every other block on the page.
- *
- * Add a block name to $contained to bring another non-ACF block in line.
+ * Our ACF blocks render their own <section>/.o-container; third-party blocks (e.g.
+ * Gravity Forms) don't. Add a block name to $contained to wrap it the same way.
  */
 add_filter('render_block', function ($block_content, $block) {
     $contained = [
@@ -131,11 +104,7 @@ add_filter('render_block', function ($block_content, $block) {
     );
 }, 10, 2);
 
-/**
- * Pre-insert the Standfirst block at the top of every new post's content,
- * so it's visible/editable in the canvas immediately. No template_lock —
- * editors can still freely add/remove/reorder blocks after.
- */
+/** Pre-insert Standfirst in new posts. No template_lock, so editors can still change blocks. */
 add_action('init', function () {
     $post_type_object = get_post_type_object('post');
 
@@ -207,13 +176,9 @@ add_filter('gform_submit_button', function ($button, $form) {
 }, 10, 2);
 
 /**
- * The sticky page menu links to each H2 by `id`. Gutenberg only renders an
- * `id` when an editor sets the heading's "HTML anchor", so give the rest an
- * auto-slug. Only for posts whose menu was built
- * (App\Support\PageMenu::shownFor()), so other pages' H2s are untouched.
- *
- * The slugify logic here must match App\Support\PageMenu::anchorFor()'s
- * fallback, which builds the same `items` array of links.
+ * Give H2s an auto-slug `id` for the sticky page menu (Gutenberg only renders one when
+ * an editor sets an HTML anchor). Only on posts with a menu (PageMenu::shownFor()).
+ * Must match PageMenu::anchorFor()'s fallback slug.
  */
 add_filter('render_block_core/heading', function ($block_content, $block) {
     if ((int) ($block['attrs']['level'] ?? 2) !== 2) {
@@ -238,22 +203,16 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         }
     }
 
-    // Focusable without joining the natural tab order — resources/js/sticky-nav-template.js
-    // moves focus here after a Page Index click, so keyboard/screen-reader users land in the
-    // jumped-to section instead of staying on the nav link (WCAG 2.4.3 Focus Order).
+    // tabindex="-1": sticky-nav-template.js focuses it after a Page Index click (WCAG 2.4.3).
     $processor->set_attribute('tabindex', '-1');
 
     return $processor->get_updated_html();
 }, 10, 2);
 
 /**
- * Block background colours.
- *
- * Any ACF block that sets `'color' => ['background' => true]` in its
- * `$supports` gets WP's native Background colour control (in the sidebar's
- * Styles tab, alongside padding) — limited here to
- * theme_block_background_colors() rather than the whole theme palette. The
- * text colour is set from contrast by theme_block_background_css().
+ * Blocks with `'color' => ['background' => true]` in `$supports` get WP's Background
+ * colour control, limited to theme_block_background_colors(). Text colour comes from
+ * contrast via theme_block_background_css().
  */
 add_filter('wp_theme_json_data_theme', function ($theme_json) {
     $data = $theme_json->get_data();
