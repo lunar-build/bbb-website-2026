@@ -30,7 +30,7 @@ class Illustration extends Block
      *
      * @var string
      */
-    public $description = 'A decorative Better by Bike illustration, picked from the library.';
+    public $description = 'A decorative Better by Bike character with up to three objects around it, on an optional blue strip.';
 
     /**
      * The block category.
@@ -53,8 +53,8 @@ class Illustration extends Block
      */
     public $keywords = [
         'illustration',
+        'character',
         'artwork',
-        'decorative',
     ];
 
     /**
@@ -114,7 +114,7 @@ class Illustration extends Block
     public $spacing = [
         'padding' => [
             'top' => 'var:preset|spacing|small',
-            'bottom' => 'var:preset|spacing|small',
+            'bottom' => '0',
         ],
         'margin' => null,
     ];
@@ -152,19 +152,30 @@ class Illustration extends Block
     public $styles = [];
 
     /**
-     * The illustrations bundled in resources/images/illustrations, keyed by file name
-     * (underscores for hyphens).
+     * Characters and objects, keyed by the field value, with their bundled files
+     * under resources/images/illustrations (the old theme's artwork).
      *
      * @var array
      */
-    public const ILLUSTRATIONS = [
-        'cyclist' => 'Cyclist on bike',
-        'grandma' => 'Older cyclist',
-        'mountain_biker' => 'Mountain biker',
-        'bmx' => 'BMX rider',
-        'instructor' => 'Cycle instructor',
-        'helmet' => 'Helmet',
-        'pump' => 'Bike pump',
+    public const CHARACTERS = [
+        'instructor' => ['Instructor', 'instructor.png'],
+        'bmx' => ['BMX', 'bmx.png'],
+        'girl' => ['Girl', 'cyclist.png'],
+        'grandma' => ['Grandma', 'grandma.png'],
+        'mountain_biker' => ['Mountain Biker', 'mountain-biker.png'],
+        'wheelchair_user' => ['Wheelchair User', 'wheelchair-user.png'],
+        'young_girl' => ['Young Girl', 'young-girl.png'],
+    ];
+
+    public const OBJECTS = [
+        'bottle' => ['Bottle', 'objects/bottle.png'],
+        'cone' => ['Cone', 'objects/cone.png'],
+        'helmet' => ['Helmet', 'helmet.png'],
+        'lights' => ['Lights', 'objects/lights.png'],
+        'lock' => ['Lock', 'objects/lock.png'],
+        'map' => ['Map', 'objects/map.png'],
+        'pedal' => ['Pedal', 'objects/pedal.png'],
+        'pump' => ['Pump', 'pump.png'],
     ];
 
     /**
@@ -173,8 +184,11 @@ class Illustration extends Block
      * @var array
      */
     public $example = [
-        'illustration' => 'cyclist',
-        'position' => 'centre',
+        'character' => 'mountain_biker',
+        'object_1' => 'pedal',
+        'object_2' => 'helmet',
+        'object_3' => '',
+        'remove_blue_background' => false,
     ];
 
     /**
@@ -182,12 +196,21 @@ class Illustration extends Block
      */
     public function with(): array
     {
-        $key = $this->resolveField('illustration', '');
+        $character = $this->resolveField('character', '');
 
         return [
-            'url' => isset(self::ILLUSTRATIONS[$key]) ? Vite::asset('resources/images/illustrations/' . str_replace('_', '-', $key) . '.png') : null,
-            'position' => $this->resolveField('position', 'centre'),
+            'character' => $this->url(self::CHARACTERS[$character][1] ?? null),
+            'objects' => array_values(array_filter(array_map(
+                fn($n) => $this->url(self::OBJECTS[$this->resolveField("object_$n", '')][1] ?? null),
+                [1, 2, 3],
+            ))),
+            'removeBackground' => $this->resolveBoolField('remove_blue_background'),
         ];
+    }
+
+    protected function url(?string $file): ?string
+    {
+        return $file ? Vite::asset('resources/images/illustrations/' . $file) : null;
     }
 
     /**
@@ -196,25 +219,31 @@ class Illustration extends Block
     public function fields(): array
     {
         $fields = Builder::make('illustration');
+        $choices = fn(array $set) => array_map(fn($item) => $item[0], $set);
 
-        $fields
-            ->addSelect('illustration', [
-                'label' => 'Illustration',
-                'instructions' => 'Decorative artwork, hidden from screen readers.',
-                'choices' => self::ILLUSTRATIONS,
-                'default_value' => 'cyclist',
+        $fields->addSelect('character', [
+            'label' => 'Character',
+            'choices' => $choices(self::CHARACTERS),
+            'default_value' => 'mountain_biker',
+            'ui' => true,
+            'required' => true,
+        ]);
+
+        foreach ([1, 2, 3] as $n) {
+            $fields->addSelect("object_$n", [
+                'label' => "Optional object $n",
+                'choices' => $choices(self::OBJECTS),
                 'ui' => true,
-                'required' => true,
-            ])
-            ->addButtonGroup('position', [
-                'label' => 'Position',
-                'choices' => [
-                    'left' => 'Left',
-                    'centre' => 'Centre',
-                    'right' => 'Right',
-                ],
-                'default_value' => 'centre',
+                'allow_null' => true,
+                'wrapper' => ['width' => 33],
             ]);
+        }
+
+        $fields->addTrueFalse('remove_blue_background', [
+            'label' => 'Remove blue background',
+            'instructions' => 'This block has a partial blue background strip at the base of the character, which suits a following block that also has a blue background. If the next block has no background, removing it may look better.',
+            'ui' => true,
+        ]);
 
         return $fields->build();
     }

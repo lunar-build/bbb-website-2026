@@ -1,16 +1,99 @@
-// Decorative artwork; --left/--right set where it sits in the content column.
-.c-illustration__image {
-  display: block;
-  width: 100%;
-  max-width: 18.75rem;
-  height: auto;
-  margin-inline: auto;
+@use '../abstracts/breakpoints' as bp;
 
-  .c-illustration--left & {
-    margin-inline: 0 auto;
+// Decorative character with up to three objects around it, ported from the old theme's
+// illustration block. Sizes are viewport-relative so the group scales as one picture.
+.c-illustration {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: center;
+  overflow-x: clip;
+}
+
+// Blue strip across the base of the character, full bleed (behind the content).
+.c-illustration--strip::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  height: 19%;
+  transform: translateX(-50%);
+  background: var(--wp--preset--color--blue-light);
+
+  // A narrow template column can't bleed.
+  .c-sticky-nav-template__content & {
+    width: 100%;
+  }
+}
+
+.c-illustration__figure {
+  position: relative;
+}
+
+.c-illustration__human {
+  display: block;
+  width: auto;
+  max-width: 70vw;
+  height: auto;
+  margin: auto;
+
+  @include bp.respond($min: 480px) {
+    max-width: 55vw;
   }
 
-  .c-illustration--right & {
-    margin-inline: auto 0;
+  @include bp.respond($min: bp.$md) {
+    max-width: 35vw;
+  }
+
+  @include bp.respond($min: bp.$lg) {
+    max-width: 30vw;
+  }
+
+  @include bp.respond($min: 1440px) {
+    max-width: 25vw;
+  }
+}
+
+.c-illustration__item {
+  position: absolute;
+  max-width: 15vw;
+  height: auto;
+
+  @include bp.respond($min: bp.$md) {
+    max-width: 10vw;
+  }
+}
+
+.c-illustration__item--left {
+  top: 50%;
+  left: 0;
+  transform: translate(-15vw, -50%);
+
+  @include bp.respond($min: bp.$md) {
+    transform: translate(-10vw, -50%);
+  }
+}
+
+.c-illustration__item--right-top {
+  top: 0;
+  right: 0;
+  transform: translate(8vw, -50%);
+
+  @include bp.respond($min: bp.$md) {
+    transform: translate(7vw, -50%);
+  }
+}
+
+// Third object only has room on wider screens.
+.c-illustration__item--right-bottom {
+  display: none;
+  bottom: 0;
+  right: 0;
+
+  @include bp.respond($min: bp.$md) {
+    display: block;
+    transform: translate(14vw, -50%);
   }
 }
