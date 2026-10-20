@@ -1,4 +1,4 @@
-// Term timetable editor (wp-admin). Uses WP admin colours and sizes rather
+// Event timetable editor (wp-admin). Uses WP admin colours and sizes rather
 // than the front-end theme tokens, so it sits naturally in the dashboard.
 
 .bbb-tt {
@@ -374,6 +374,24 @@
     font-size: 0.6875rem;
   }
 
+  &__cancelled {
+    align-self: center;
+    margin-right: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border: 0;
+    border-radius: 999px;
+    background: #fbe4e4;
+    color: #8a1c1c;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+      outline-offset: 1px;
+    }
+  }
+
   &__handle {
     display: flex;
     align-items: center;
@@ -404,6 +422,89 @@
   h2 {
     margin: 0;
     font-size: 0.9375rem;
+  }
+}
+
+.bbb-tt-exc {
+  border-inline-start: 0.25rem solid var(--exc, #757575);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &--closure {
+    --exc: #b32d2e;
+  }
+
+  &--cancellation {
+    --exc: #d63638;
+  }
+
+  &--extra {
+    --exc: #00a32a;
+  }
+}
+
+.bbb-tt-count {
+  min-width: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: var(--exc, #757575);
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
+.bbb-tt-empty {
+  margin: 0.5rem 0 0.75rem;
+  color: #50575e;
+  font-style: italic;
+}
+
+.bbb-tt-inplace {
+  padding: 1rem 1.25rem;
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 0.5rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.bbb-tt-inplace__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bbb-tt-inplace__chip {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.8125rem;
+  cursor: pointer;
+
+  &--closure,
+  &--cancellation {
+    color: #8a1c1c;
+  }
+
+  &--extra {
+    color: #1c5b2e;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+    outline-offset: 2px;
   }
 }
 

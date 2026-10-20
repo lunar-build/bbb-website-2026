@@ -1074,7 +1074,7 @@ function cc_terms(wpdb $src, bool $includeEnded = false): array
 }
 
 /**
- * An old term as a term timetable schedule (App\TermTimetable\Schedule):
+ * An old term as an event timetable schedule (App\EventTimetable\Schedule):
  * the weekly slots become sessions, skipping the timetable fillers.
  */
 function cc_term_schedule(array $term, int $category): array
@@ -1228,7 +1228,7 @@ if ($mode === 'cycling-centre') {
     ]);
 
     // Earlier runs' terms go first: deleting one removes the dates it generated.
-    foreach (get_posts(['post_type' => \App\TermTimetable\TermTimetable::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'meta_key' => NEWS_MIGRATED_META, 'fields' => 'ids']) as $termId) {
+    foreach (get_posts(['post_type' => \App\EventTimetable\EventTimetable::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'meta_key' => NEWS_MIGRATED_META, 'fields' => 'ids']) as $termId) {
         wp_delete_post($termId, true);
     }
 
@@ -1249,7 +1249,7 @@ if ($mode === 'cycling-centre') {
         news_copy_row($src, $id, $replaceUrls, ['post_type' => 'mec-events', 'post_content' => '']);
         clean_post_cache($id);
 
-        // Saved undated, on its old publish date: the term timetables below add the sessions.
+        // Saved undated, on its old publish date: the event timetables below add the sessions.
         $start = substr($row->post_date, 0, 10);
         $price = (string) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='price'", $id));
 
@@ -1301,17 +1301,17 @@ if ($mode === 'cycling-centre') {
         echo "imported $id {$row->post_name}" . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
     }
 
-    // The old schedule's current terms, as published term timetables; publishing syncs their sessions into MEC.
+    // The old schedule's current terms, as published event timetables; publishing syncs their sessions into MEC.
     foreach (cc_terms($src) as $term) {
         $name = trim(strtok($term['title'], ':')) ?: 'Term';
-        $termId = wp_insert_post(['post_type' => \App\TermTimetable\TermTimetable::POST_TYPE, 'post_title' => $name, 'post_status' => 'publish']);
-        update_post_meta($termId, \App\TermTimetable\TermTimetable::META, cc_term_schedule($term, $category));
+        $termId = wp_insert_post(['post_type' => \App\EventTimetable\EventTimetable::POST_TYPE, 'post_title' => $name, 'post_status' => 'publish']);
+        update_post_meta($termId, \App\EventTimetable\EventTimetable::META, cc_term_schedule($term, $category));
         update_post_meta($termId, NEWS_MIGRATED_META, 1);
-        $notices = \App\TermTimetable\MecSync::sync($termId);
-        echo "term timetable $termId \"$name\": " . count(cc_term_schedule($term, $category)['sessions']) . ' weekly sessions' . ($notices ? ' (' . implode('; ', $notices) . ')' : '') . "\n";
+        $notices = \App\EventTimetable\MecSync::sync($termId);
+        echo "event timetable $termId \"$name\": " . count(cc_term_schedule($term, $category)['sessions']) . ' weekly sessions' . ($notices ? ' (' . implode('; ', $notices) . ')' : '') . "\n";
         // Bad old data (e.g. a slot ending before it starts) is skipped by the sync; say which, to fix in the editor.
-        $schedule = get_post_meta($termId, \App\TermTimetable\TermTimetable::META, true);
-        foreach (\App\TermTimetable\Schedule::validate($schedule)['errors'] as $error) {
+        $schedule = get_post_meta($termId, \App\EventTimetable\EventTimetable::META, true);
+        foreach (\App\EventTimetable\Schedule::validate($schedule)['errors'] as $error) {
             $session = current(array_filter($schedule['sessions'], fn($x) => $x['id'] === $error['ref']));
             WP_CLI::warning("\"$name\": {$error['message']}" . ($session ? ' ' . get_the_title($session['event']) . ", day {$session['weekday']} {$session['start']}–{$session['end']}" : ''));
         }
@@ -1325,7 +1325,7 @@ if ($mode === 'cycling-centre') {
 
     // The pages above the sessions. What's on had one acf/calendar block per
     // term, each under a "… Timetable" heading; they become a single Events
-    // Timetable showing every current term timetable.
+    // Timetable showing every current event timetable.
     foreach (CC_PAGES as $id) {
         if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
             news_remove_page_import($id);
@@ -1356,7 +1356,7 @@ if ($mode === 'cycling-centre') {
                 'category' => $category,
             ], 'events_timetable');
             $timetableAdded = true;
-            $notes[] = 'acf/calendar blocks -> one Events Timetable (term timetables)';
+            $notes[] = 'acf/calendar blocks -> one Events Timetable (event timetables)';
         }
         $notes = array_filter($notes, fn($n) => $n !== 'UNMAPPED acf/calendar');
 

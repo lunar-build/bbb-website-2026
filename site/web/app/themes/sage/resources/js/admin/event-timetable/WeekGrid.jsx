@@ -3,10 +3,10 @@ import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@wordpress/components';
 import { byStart, WEEKDAYS } from './utils';
 
-function ClassChip({ cls, onAdd }) {
+function EventChip({ item, onAdd }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: `class:${cls.id}`,
-    data: { type: 'class', classId: cls.id },
+    id: `event:${item.id}`,
+    data: { type: 'event', eventId: item.id },
   });
 
   return (
@@ -14,73 +14,78 @@ function ClassChip({ cls, onAdd }) {
       <span
         ref={setNodeRef}
         className={`bbb-tt-chip${isDragging ? ' is-dragging' : ''}`}
-        style={{ '--chip': cls.color, transform: CSS.Translate.toString(transform) }}
+        style={{ '--chip': item.color, transform: CSS.Translate.toString(transform) }}
         {...listeners}
         {...attributes}
-        aria-roledescription="draggable class"
-        aria-label={`${cls.title}. Drag onto a day, or use Add.`}
+        aria-roledescription="draggable event"
+        aria-label={`${item.title}. Drag onto a day, or use Add.`}
       >
-        {cls.title}
+        {item.title}
       </span>
-      <Button size="small" variant="link" onClick={() => onAdd(cls.id)} aria-label={`Add a ${cls.title} session`}>
+      <Button size="small" variant="link" onClick={() => onAdd(item.id)} aria-label={`Add a ${item.title} session`}>
         Add
       </Button>
     </li>
   );
 }
 
-export function Palette({ classes, search, onSearch, onAdd }) {
-  const shown = classes.filter((c) => c.title.toLowerCase().includes(search.toLowerCase()));
+export function Palette({ events, search, onSearch, onAdd }) {
+  const shown = events.filter((c) => c.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <aside className="bbb-tt-palette" aria-labelledby="bbb-tt-palette-title">
-      <h2 id="bbb-tt-palette-title">Classes</h2>
-      <p className="bbb-tt-hint">Drag a class onto a day, or press Add.</p>
-      {classes.length > 6 && (
+      <h2 id="bbb-tt-palette-title">Events</h2>
+      <p className="bbb-tt-hint">Drag an event onto a day, or press Add.</p>
+      {events.length > 6 && (
         <input
           type="search"
           className="bbb-tt-palette__search"
-          placeholder="Find a class"
-          aria-label="Find a class"
+          placeholder="Find an event"
+          aria-label="Find an event"
           value={search}
           onChange={(e) => onSearch(e.target.value)}
         />
       )}
       <ul>
-        {shown.map((cls) => (
-          <ClassChip key={cls.id} cls={cls} onAdd={onAdd} />
+        {shown.map((item) => (
+          <EventChip key={item.id} item={item} onAdd={onAdd} />
         ))}
       </ul>
-      {!classes.length && <p className="bbb-tt-hint">No published classes in this category yet.</p>}
+      {!events.length && <p className="bbb-tt-hint">No published events in this category yet.</p>}
     </aside>
   );
 }
 
-function SessionCard({ session, cls, problems, onEdit }) {
+function SessionCard({ session, item, problems, cancellations, onEdit, onJump }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `session:${session.id}`,
     data: { type: 'session', sessionId: session.id },
   });
-  const label = `${session.start} to ${session.end}, ${cls?.title ?? 'missing class'}`;
+  const label = `${session.start} to ${session.end}, ${item?.title ?? 'missing event'}`;
 
   return (
     <li
       ref={setNodeRef}
       data-ref={session.id}
-      className={`bbb-tt-card${isDragging ? ' is-dragging' : ''}${problems.length ? ' has-problem' : ''}${cls ? '' : ' is-missing'}`}
-      style={{ '--chip': cls?.color ?? '#757575', transform: CSS.Translate.toString(transform) }}
+      className={`bbb-tt-card${isDragging ? ' is-dragging' : ''}${problems.length ? ' has-problem' : ''}${item ? '' : ' is-missing'}`}
+      style={{ '--chip': item?.color ?? '#757575', transform: CSS.Translate.toString(transform) }}
     >
       <button type="button" className="bbb-tt-card__button" onClick={() => onEdit(session)} aria-label={`Edit ${label}`}>
         <span className="bbb-tt-card__time">
           {session.start}–{session.end}
         </span>
-        <span className="bbb-tt-card__title">{cls?.title ?? 'Class no longer available'}</span>
+        <span className="bbb-tt-card__title">{item?.title ?? 'Event no longer available'}</span>
         {problems.map((p) => (
           <span key={p.message} className="bbb-tt-card__problem">
             {p.message}
           </span>
         ))}
       </button>
+      {cancellations.length > 0 && (
+        <button type="button" className="bbb-tt-card__cancelled" onClick={() => onJump(cancellations[0].id)} aria-label={`${cancellations.length} cancelled date${cancellations.length === 1 ? '' : 's'} for ${label}. Go to cancellations.`}>
+          {cancellations.length} cancelled
+        </button>
+      )}
       <span className="bbb-tt-card__handle" {...listeners} {...attributes} aria-roledescription="draggable session" aria-label={`Move ${label}`}>
         ⠿
       </span>
@@ -88,7 +93,7 @@ function SessionCard({ session, cls, problems, onEdit }) {
   );
 }
 
-function DayColumn({ day, sessions, classesById, problemsFor, onEdit, onAdd }) {
+function DayColumn({ day, sessions, eventsById, problemsFor, cancellationsFor, onEdit, onJump, onAdd }) {
   const { setNodeRef, isOver } = useDroppable({ id: `day:${day.n}`, data: { weekday: day.n } });
 
   return (
@@ -97,7 +102,7 @@ function DayColumn({ day, sessions, classesById, problemsFor, onEdit, onAdd }) {
       {sessions.length ? (
         <ul>
           {sessions.map((s) => (
-            <SessionCard key={s.id} session={s} cls={classesById[s.event]} problems={problemsFor(s.id)} onEdit={onEdit} />
+            <SessionCard key={s.id} session={s} item={eventsById[s.event]} problems={problemsFor(s.id)} cancellations={cancellationsFor(s.id)} onEdit={onEdit} onJump={onJump} />
           ))}
         </ul>
       ) : (
@@ -110,7 +115,7 @@ function DayColumn({ day, sessions, classesById, problemsFor, onEdit, onAdd }) {
   );
 }
 
-export function WeekGrid({ sessions, classesById, problemsFor, onEdit, onAdd }) {
+export function WeekGrid({ sessions, eventsById, problemsFor, cancellationsFor, onEdit, onJump, onAdd }) {
   return (
     <div className="bbb-tt-grid" role="group" aria-label="Weekly timetable">
       {WEEKDAYS.map((day) => (
@@ -118,7 +123,9 @@ export function WeekGrid({ sessions, classesById, problemsFor, onEdit, onAdd }) 
           key={day.n}
           day={day}
           sessions={sessions.filter((s) => s.weekday === day.n).sort(byStart)}
-          classesById={classesById}
+          eventsById={eventsById}
+          cancellationsFor={cancellationsFor}
+          onJump={onJump}
           problemsFor={problemsFor}
           onEdit={onEdit}
           onAdd={onAdd}

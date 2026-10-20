@@ -17,7 +17,7 @@ export default defineConfig({
         'resources/css/editor.scss',
         'resources/js/editor.js',
         'resources/js/editor-canvas.js',
-        'resources/js/admin/term-timetable/index.jsx',
+        'resources/js/admin/event-timetable/index.jsx',
       ],
       refresh: true,
       assets: [

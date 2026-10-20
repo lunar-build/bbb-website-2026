@@ -1,7 +1,7 @@
 import { TabPanel } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-const STORAGE_KEY = 'bbbTermTimetableHelpOpen';
+const STORAGE_KEY = 'bbbEventTimetableHelpOpen';
 
 // Remembered per browser; storage can be blocked (private windows), so it's optional.
 const remembered = () => {
@@ -25,29 +25,29 @@ const PANELS = {
   start: (
     <div className="bbb-tt-help__panel">
       <section>
-        <h2>1. Set up the term</h2>
+        <h2>1. Set up the timetable</h2>
         <ol>
           <li>
             Give it a <strong>name</strong> (e.g. “Spring term 2027”) and its <strong>first</strong> and <strong>last day</strong>.
           </li>
           <li>
-            Leave <strong>Classes from</strong> on Bristol Cycling Centre unless the term is for other events.
+            Leave <strong>Event categories</strong> on Bristol Cycling Centre unless the timetable is for other events.
           </li>
           <li>
-            <strong>Repeating a previous term?</strong> In the Term timetables list, hover over it and click <strong>Duplicate</strong>: you get a draft copy with the same week, ready for new dates. Or, on a new term, pick it under <strong>Start from an existing term</strong>.
+            <strong>Repeating a previous timetable?</strong> In the Event timetables list, hover over it and click <strong>Duplicate</strong>: you get a draft copy with the same week, ready for new dates. Or, on a new timetable, pick it under <strong>Start from an existing timetable</strong>.
           </li>
         </ol>
       </section>
       <section>
         <h2>2. Build the week</h2>
-        <p>You set up <strong>one week</strong>; it repeats every week of the term.</p>
+        <p>You set up <strong>one week</strong>; it repeats every week of the timetable.</p>
         <ul>
           <li>
-            <strong>Drag a class</strong> from the list on the left onto a day, or press its <strong>Add</strong> link or a day’s <strong>+ Add session</strong>.
+            <strong>Drag an event</strong> from the list on the left onto a day, or press its <strong>Add</strong> link or a day’s <strong>+ Add session</strong>.
           </li>
           <li>Set the start and end time, then <strong>Add session</strong>. New sessions start after that day’s last one.</li>
           <li>
-            <strong>Click a session</strong> to change its class, day or times, or to <strong>Duplicate</strong> or <strong>Delete</strong> it.
+            <strong>Click a session</strong> to change its event, day or times, or to <strong>Duplicate</strong> or <strong>Delete</strong> it.
           </li>
         </ul>
       </section>
@@ -80,7 +80,10 @@ const PANELS = {
             <strong>Closures</strong>: dates the centre is shut (bank holidays, breaks). Nothing runs.
           </li>
           <li>
-            <strong>Cancelled sessions</strong>: one session off on one date; the rest of the week runs.
+            <strong>Cancelled sessions</strong>: one session off on one date; the rest of the week runs. Pick the session, pick the date and add a reason if you like (e.g. “Instructor ill”). It stays on the What’s on timetable, struck through with a “Cancelled” label and your reason, so people can see it’s off. A “cancelled” badge also appears on that session in the week above.
+          </li>
+          <li>
+            <strong>Cancel sessions here, not in the events calendar.</strong> Don’t use the event’s own Event Status or cancel or delete its dates in the events calendar for a single session: the event’s Event Status applies to the whole event, and dates changed there are put back the next time this timetable is updated.
           </li>
           <li>
             <strong>Extra sessions</strong>: one-offs on top of the pattern, even on a closed day.
@@ -97,7 +100,7 @@ const PANELS = {
             <strong>Publish</strong> (or <strong>Update</strong>) writes every session into the events calendar; What’s on updates straight away. The summary line says how many.
           </li>
           <li>
-            <strong>Switch to draft</strong> (or trashing the term) takes its sessions off the calendar again.
+            <strong>Switch to draft</strong> (or trashing the timetable) takes its sessions off the calendar again.
           </li>
         </ul>
       </section>
@@ -111,20 +114,20 @@ const PANELS = {
           <span className="bbb-tt-help__tag is-error">Red</span> must be fixed before you can publish:
         </p>
         <ul>
-          <li>no class chosen, or a missing start/end time</li>
+          <li>no event chosen, or a missing start/end time</li>
           <li>a session (or closure) that ends before it starts</li>
-          <li>the same class booked twice at overlapping times on one day</li>
-          <li>term dates missing, or the last day before the first</li>
+          <li>the same event booked twice at overlapping times on one day</li>
+          <li>timetable dates missing, or the last day before the first</li>
         </ul>
         <p>
           <span className="bbb-tt-help__tag is-warning">Amber</span> is a heads-up; you can still publish:
         </p>
         <ul>
           <li>a session before 6am or after 11pm</li>
-          <li>a closure outside the term, or a cancellation on the wrong day</li>
-          <li>a class that’s no longer published (it’s skipped)</li>
-          <li>a class with its own repeat rule in the events calendar (this term won’t change it)</li>
-          <li>dates overlapping another published term (both run)</li>
+          <li>a closure outside the timetable, or a cancellation on the wrong day</li>
+          <li>an event that’s no longer published (it’s skipped)</li>
+          <li>an event with its own repeat rule in the events calendar (this timetable won’t change it)</li>
+          <li>dates overlapping another published timetable (both run)</li>
         </ul>
       </section>
     </div>
@@ -135,15 +138,15 @@ const PANELS = {
         <h2>Good to know</h2>
         <ul>
           <li>
-            <strong>Different classes can run at the same time</strong>, and back-to-back sessions (10:00–10:45, 10:45–11:30) are fine.
+            <strong>Different events can run at the same time</strong>, and back-to-back sessions (10:00–10:45, 10:45–11:30) are fine.
           </li>
           <li>
-            Weeks that differ (half term, an alternate-week class) need their <strong>own term</strong>, or use extras and cancellations.
+            Weeks that differ (half term, an alternate-week event) need their <strong>own timetable</strong>, or use extras and cancellations.
           </li>
           <li>Sessions can’t run past midnight.</li>
-          <li>Sessions added by hand on a class in the events calendar are kept when you update a term. Change a class’s <em>weekly</em> times here, not on the class’s own page; if that page was already open when you updated a term, reload it before saving.</li>
-          <li>A class set to repeat by itself in the events calendar (daily, weekly…) isn’t changed here.</li>
-          <li>What’s on lists every current and upcoming published term automatically.</li>
+          <li>Sessions added by hand on an event in the events calendar are kept when you update a timetable. Change an event’s <em>weekly</em> times here, not on the event’s own page; if that page was already open when you updated a timetable, reload it before saving.</li>
+          <li>An event set to repeat by itself in the events calendar (daily, weekly…) isn’t changed here.</li>
+          <li>What’s on lists every current and upcoming published timetable automatically.</li>
         </ul>
       </section>
     </div>
@@ -152,8 +155,8 @@ const PANELS = {
 
 /**
  * How to use the editor, folded into one line once you know it. Open by
- * default on a new, empty term; afterwards it remembers the last choice.
- * The messages listed here mirror App\TermTimetable\Schedule::validate() and
+ * default on a new, empty timetable; afterwards it remembers the last choice.
+ * The messages listed here mirror App\EventTimetable\Schedule::validate() and
  * RestController::preview(); keep them in step.
  */
 export default function HelpPanel({ isNew }) {

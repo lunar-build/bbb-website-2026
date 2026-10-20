@@ -467,7 +467,7 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 
 /**
  * Hide MEC's "Hourly Schedule" tab on the event screen: class times come from
- * term timetables, and nothing on the front end shows an hourly schedule.
+ * event timetables, and nothing on the front end shows an hourly schedule.
  */
 add_filter('mec-single-event-meta-title', function ($tabs) {
     unset($tabs[__('Hourly Schedule', 'mec')]);

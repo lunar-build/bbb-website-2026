@@ -8,55 +8,55 @@ import SessionModal from './SessionModal';
 import { Palette, WeekGrid } from './WeekGrid';
 import { addMinutes, api, dayLabel, DEFAULT_LENGTH, emptySchedule, friendlyDate, META, nextFreeStart, uid, weeksIn } from './utils';
 
-const config = window.bbbTermTimetable;
+const config = window.bbbEventTimetable;
 
 export default function App() {
-  const [termId, setTermId] = useState(config.termId);
+  const [timetableId, setTimetableId] = useState(config.timetableId);
   const [title, setTitle] = useState('');
   const [status, setStatus] = useState('draft');
   const [schedule, setSchedule] = useState(emptySchedule(config.defaultCategory));
-  const [loading, setLoading] = useState(!!config.termId);
+  const [loading, setLoading] = useState(!!config.timetableId);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [classes, setClasses] = useState([]);
+  const [events, setEvents] = useState([]);
   const [search, setSearch] = useState('');
   const [preview, setPreview] = useState(null);
   const [modal, setModal] = useState(null);
-  const [otherTerms, setOtherTerms] = useState([]);
+  const [otherTimetables, setOtherTimetables] = useState([]);
   const altKey = useRef(false);
 
-  const classesById = useMemo(() => Object.fromEntries(classes.map((c) => [c.id, c])), [classes]);
+  const eventsById = useMemo(() => Object.fromEntries(events.map((c) => [c.id, c])), [events]);
 
   const change = (patch) => {
     setSchedule((s) => ({ ...s, ...patch }));
     setDirty(true);
   };
 
-  // Load the term (if editing), the categories, and other terms to copy from.
+  // Load the timetable (if editing), the categories, and other timetables to copy from.
   useEffect(() => {
     api.categories().then(setCategories);
-    api.terms().then((terms) => setOtherTerms(terms.filter((t) => t.id !== config.termId)));
-    if (!config.termId) return;
+    api.timetables().then((timetables) => setOtherTimetables(timetables.filter((t) => t.id !== config.timetableId)));
+    if (!config.timetableId) return;
     api
-      .load(config.termId)
-      .then((term) => {
-        setTitle(term.title.raw);
-        setStatus(term.status);
-        setSchedule({ ...emptySchedule(config.defaultCategory), ...(term.meta?.[META] ?? {}) });
+      .load(config.timetableId)
+      .then((timetable) => {
+        setTitle(timetable.title.raw);
+        setStatus(timetable.status);
+        setSchedule({ ...emptySchedule(config.defaultCategory), ...(timetable.meta?.[META] ?? {}) });
       })
       .catch((e) => setNotice({ status: 'error', message: e.message }))
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
-    api.classes(schedule.category).then(setClasses);
+    api.events(schedule.category).then(setEvents);
   }, [schedule.category]);
 
   // What saving would create, refreshed shortly after each change.
   useEffect(() => {
-    const timer = setTimeout(() => api.preview(schedule, termId).then(setPreview).catch(() => {}), 400);
+    const timer = setTimeout(() => api.preview(schedule, timetableId).then(setPreview).catch(() => {}), 400);
     return () => clearTimeout(timer);
   }, [schedule]);
 
@@ -84,7 +84,7 @@ export default function App() {
 
   const problems = [...(preview?.errors ?? []).map((p) => ({ ...p, level: 'error' })), ...(preview?.warnings ?? []).map((p) => ({ ...p, level: 'warning' }))];
   const problemsFor = (id) => problems.filter((p) => p.ref === id);
-  const termProblems = problems.filter((p) => p.ref === 'dates' || String(p.ref).startsWith('event:'));
+  const timetableProblems = problems.filter((p) => p.ref === 'dates' || String(p.ref).startsWith('event:'));
   const hasErrors = (preview?.errors ?? []).length > 0;
   const warningCount = (preview?.warnings ?? []).length;
 
@@ -102,15 +102,26 @@ export default function App() {
   };
   const errorCount = (preview?.errors ?? []).length;
 
+  const cancellationsFor = (sessionId) => schedule.cancellations.filter((c) => c.session === sessionId);
+  // From a session's "cancelled" badge to its row in the Cancelled sessions list.
+  const jumpTo = (ref) => {
+    const el = document.querySelector(`[data-ref="${CSS.escape(ref)}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    (el.querySelector('button, input, select') ?? el).focus({ preventScroll: true });
+    el.classList.add('is-flagged');
+    setTimeout(() => el.classList.remove('is-flagged'), 2000);
+  };
+
   const save = async (nextStatus) => {
     setSaving(true);
     setNotice(null);
     try {
-      const saved = await api.save(termId, { title: title || 'Untitled term', status: nextStatus, meta: { [META]: schedule } });
-      setTermId(saved.id);
+      const saved = await api.save(timetableId, { title: title || 'Untitled timetable', status: nextStatus, meta: { [META]: schedule } });
+      setTimetableId(saved.id);
       setStatus(saved.status);
       setDirty(false);
-      if (!termId) window.history.replaceState(null, '', `${config.editUrl}&term=${saved.id}`);
+      if (!timetableId) window.history.replaceState(null, '', `${config.editUrl}&timetable=${saved.id}`);
       const message = saved.status === 'publish' ? 'Published — the sessions are now in the events calendar.' : 'Draft saved. Nothing is added to the calendar until you publish.';
       setNotice({ status: 'success', message });
       speak(message);
@@ -130,7 +141,7 @@ export default function App() {
   const saveSession = (session) => {
     const exists = schedule.sessions.some((s) => s.id === session.id);
     change({ sessions: exists ? schedule.sessions.map((s) => (s.id === session.id ? session : s)) : [...schedule.sessions, session] });
-    speak(`${classesById[session.event]?.title} ${exists ? 'updated' : 'added'}: ${dayLabel(session.weekday)} ${session.start}.`);
+    speak(`${eventsById[session.event]?.title} ${exists ? 'updated' : 'added'}: ${dayLabel(session.weekday)} ${session.start}.`);
     setModal(null);
   };
   const deleteSession = (session) => {
@@ -147,15 +158,15 @@ export default function App() {
     setModal(null);
   };
 
-  // Drag and drop: a class onto a day opens Add for that day; a session onto
+  // Drag and drop: an event onto a day opens Add for that day; a session onto
   // another day moves it (or copies it with Alt), keeping its times.
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(KeyboardSensor));
   const onDragEnd = ({ active, over }) => {
     const weekday = over?.data.current?.weekday;
     if (!weekday) return;
     const data = active.data.current;
-    if (data.type === 'class') {
-      openAdd(weekday, data.classId);
+    if (data.type === 'event') {
+      openAdd(weekday, data.eventId);
       return;
     }
     const session = schedule.sessions.find((s) => s.id === data.sessionId);
@@ -168,9 +179,9 @@ export default function App() {
   };
   const describe = (active) => {
     const data = active?.data.current;
-    if (data?.type === 'class') return classesById[data.classId]?.title ?? 'class';
+    if (data?.type === 'event') return eventsById[data.eventId]?.title ?? 'event';
     const s = schedule.sessions.find((x) => x.id === data?.sessionId);
-    return s ? `${classesById[s.event]?.title ?? 'session'} at ${s.start}` : 'item';
+    return s ? `${eventsById[s.event]?.title ?? 'session'} at ${s.start}` : 'item';
   };
   const announcements = {
     onDragStart: ({ active }) => `Picked up ${describe(active)}. Use the arrow keys to move over a day, Space to drop, Escape to cancel.`,
@@ -180,46 +191,46 @@ export default function App() {
   };
 
   const copyFrom = (id) => {
-    const source = otherTerms.find((t) => String(t.id) === String(id));
+    const source = otherTimetables.find((t) => String(t.id) === String(id));
     if (!source) return;
     const s = { ...emptySchedule(), ...(source.meta?.[META] ?? {}) };
     change({ category: s.category, sessions: s.sessions.map((x) => ({ ...x, id: uid() })), cancellations: [], extras: [] });
-    speak(`Copied ${s.sessions.length} weekly sessions from ${source.title.raw}. Set the new term's dates.`);
+    speak(`Copied ${s.sessions.length} weekly sessions from ${source.title.raw}. Set the new timetable's dates.`);
   };
 
   if (loading) return <Spinner />;
 
-  const classCount = Object.keys(preview?.counts ?? {}).length;
+  const eventCount = Object.keys(preview?.counts ?? {}).length;
 
   return (
     <div className="bbb-tt">
-      <HelpPanel isNew={!config.termId} />
+      <HelpPanel isNew={!config.timetableId} />
       <header className="bbb-tt-header">
         <div className="bbb-tt-header__top">
           <a href={config.listUrl} className="bbb-tt-back">
-            ← All term timetables
+            ← All event timetables
           </a>
           <span className={`bbb-tt-status is-${status}`}>{status === 'publish' ? 'Published' : 'Draft'}</span>
         </div>
         <div className="bbb-tt-header__fields" data-ref="dates">
-          <TextControl __nextHasNoMarginBottom label="Term name" placeholder="e.g. Spring term 2027" value={title} onChange={(v) => (setTitle(v), setDirty(true))} />
+          <TextControl __nextHasNoMarginBottom label="Timetable name" placeholder="e.g. Spring term 2027" value={title} onChange={(v) => (setTitle(v), setDirty(true))} />
           <TextControl __nextHasNoMarginBottom label="First day" type="date" value={schedule.start} onChange={(start) => change({ start, end: schedule.end && schedule.end < start ? start : schedule.end })} />
           <TextControl __nextHasNoMarginBottom label="Last day" type="date" value={schedule.end} min={schedule.start} onChange={(end) => change({ end })} />
           <SelectControl
             __nextHasNoMarginBottom
-            label="Classes from"
+            label="Event categories"
             value={schedule.category}
             options={[{ value: 0, label: 'All event categories' }, ...categories.map((c) => ({ value: c.id, label: c.name }))]}
             onChange={(category) => change({ category: Number(category) })}
           />
         </div>
-        {!termId && !schedule.sessions.length && otherTerms.length > 0 && (
+        {!timetableId && !schedule.sessions.length && otherTimetables.length > 0 && (
           <SelectControl
             __nextHasNoMarginBottom
             className="bbb-tt-copy"
-            label="Start from an existing term (copies its weekly sessions)"
+            label="Start from an existing timetable (copies its weekly sessions)"
             value=""
-            options={[{ value: '', label: 'Start from scratch' }, ...otherTerms.map((t) => ({ value: t.id, label: t.title.raw || `Term #${t.id}` }))]}
+            options={[{ value: '', label: 'Start from scratch' }, ...otherTimetables.map((t) => ({ value: t.id, label: t.title.raw || `Timetable #${t.id}` }))]}
             onChange={copyFrom}
           />
         )}
@@ -227,7 +238,7 @@ export default function App() {
 
       {config.lockedBy && (
         <Notice status="warning" isDismissible={false}>
-          {config.lockedBy} is also editing this term. Saving may overwrite their changes.
+          {config.lockedBy} is also editing this timetable. Saving may overwrite their changes.
         </Notice>
       )}
       {notice && (
@@ -242,19 +253,19 @@ export default function App() {
             <strong>
               {preview.total} session{preview.total === 1 ? '' : 's'}
             </strong>{' '}
-            across {classCount} class{classCount === 1 ? '' : 'es'}
+            across {eventCount} event{eventCount === 1 ? '' : 's'}
             {schedule.start && schedule.end && ` over ${weeksIn(schedule.start, schedule.end)} weeks (${friendlyDate(schedule.start)} – ${friendlyDate(schedule.end)})`}
             {status !== 'publish' && ' — added to the calendar when you publish.'}
           </p>
         ) : (
-          <p>Add the term's dates and weekly sessions.</p>
+          <p>Add the timetable's dates and weekly sessions.</p>
         )}
-        {termProblems.map((p) => (
+        {timetableProblems.map((p) => (
           <Notice key={p.message} status={p.level} isDismissible={false}>
             {p.message}
           </Notice>
         ))}
-        {hasErrors && !termProblems.some((p) => p.level === 'error') && (
+        {hasErrors && !timetableProblems.some((p) => p.level === 'error') && (
           <Notice status="error" isDismissible={false}>
             Some sessions need fixing before you can publish — they're outlined in red below.
           </Notice>
@@ -263,21 +274,21 @@ export default function App() {
 
       <DndContext sensors={sensors} onDragEnd={onDragEnd} accessibility={{ announcements }}>
         <div className="bbb-tt-body">
-          <Palette classes={classes} search={search} onSearch={setSearch} onAdd={(classId) => openAdd(6, classId)} />
-          <WeekGrid sessions={schedule.sessions} classesById={classesById} problemsFor={problemsFor} onEdit={(session) => setModal({ isNew: false, session })} onAdd={(weekday) => openAdd(weekday)} />
+          <Palette events={events} search={search} onSearch={setSearch} onAdd={(eventId) => openAdd(6, eventId)} />
+          <WeekGrid sessions={schedule.sessions} eventsById={eventsById} problemsFor={problemsFor} cancellationsFor={cancellationsFor} onJump={jumpTo} onEdit={(session) => setModal({ isNew: false, session })} onAdd={(weekday) => openAdd(weekday)} />
         </div>
       </DndContext>
       <p className="bbb-tt-hint">Tip: hold Alt (Option on a Mac) while dropping a session to copy it to another day.</p>
 
-      <ExceptionsPanel schedule={schedule} classes={classes} classesById={classesById} problemsFor={problemsFor} onChange={change} />
+      <ExceptionsPanel schedule={schedule} events={events} eventsById={eventsById} problemsFor={problemsFor} onChange={change} />
 
       <footer className="bbb-tt-footer">
         <Button
           variant="secondary"
           disabled={saving}
           onClick={() =>
-            // Unpublishing takes every session this term created out of the calendar.
-            (status !== 'publish' || window.confirm('Switch to draft? This removes all of this term\'s sessions from the events calendar until you publish again.')) && save('draft')
+            // Unpublishing takes every session this timetable created out of the calendar.
+            (status !== 'publish' || window.confirm('Switch to draft? This removes all of this timetable\'s sessions from the events calendar until you publish again.')) && save('draft')
           }
         >
           {status === 'publish' ? 'Switch to draft' : 'Save draft'}
@@ -304,7 +315,7 @@ export default function App() {
         <SessionModal
           session={modal.session}
           isNew={modal.isNew}
-          classes={classes}
+          events={events}
           onSave={saveSession}
           onDelete={deleteSession}
           onDuplicate={duplicateSession}

@@ -1,24 +1,24 @@
 <?php
 
-namespace App\TermTimetable;
+namespace App\EventTimetable;
 
 use WP_Post;
 
 /**
- * On a class's MEC edit screen: says which term timetables manage its
+ * On an event's MEC edit screen: says which event timetables manage its
  * sessions, and stops an out-of-date copy of the screen undoing them.
  *
- * MEC's own save writes back every date the page loaded with. If a term was
+ * MEC's own save writes back every date the page loaded with. If a timetable was
  * updated after the page opened, that would quietly restore the old times.
- * The screen carries the class's MecSync timestamp from when it loaded; if
- * it has moved on by the time it's saved, the dates are put back as the term
+ * The screen carries the event's MecSync timestamp from when it loaded; if
+ * it has moved on by the time it's saved, the dates are put back as the timetable
  * left them (everything else on the screen still saves) and a notice says so.
  */
-class ClassEditGuard
+class EventEditGuard
 {
-    public const FIELD = 'bbb_term_synced_at';
+    public const FIELD = 'bbb_timetable_synced_at';
 
-    public const NOTICE = 'bbb_term_stale_save';
+    public const NOTICE = 'bbb_timetable_stale_save';
 
     /** MEC's date fields, restored together after a stale save. */
     protected const DATE_META = [
@@ -36,7 +36,7 @@ class ClassEditGuard
         add_action('enqueue_block_editor_assets', [static::class, 'editorNotice']);
         // save_post_{type} runs before MEC's save_post handler.
         add_action('save_post_mec-events', [static::class, 'guard'], 9);
-        add_action('rest_api_init', fn() => register_rest_route(RestController::NS, '/term-guard/(?P<id>\\d+)', [
+        add_action('rest_api_init', fn() => register_rest_route(RestController::NS, '/timetable-guard/(?P<id>\\d+)', [
             'methods' => 'POST',
             'permission_callback' => fn($request) => current_user_can('edit_post', (int) $request['id']),
             'callback' => fn($request) => ['kept' => static::takeNotice((int) $request['id'])],
@@ -44,32 +44,32 @@ class ClassEditGuard
     }
 
     /**
-     * Published terms that schedule this class (a weekly or extra session),
+     * Published timetables that schedule this event (a weekly or extra session),
      * whether or not any dates came of it — e.g. every session closed.
      */
-    public static function termsFor(int $event): array
+    public static function timetablesFor(int $event): array
     {
         return array_values(array_filter(
-            get_posts(['post_type' => TermTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1]),
-            function (WP_Post $term) use ($event) {
-                $s = Schedule::normalise(get_post_meta($term->ID, TermTimetable::META, true));
+            get_posts(['post_type' => EventTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1]),
+            function (WP_Post $timetable) use ($event) {
+                $s = Schedule::normalise(get_post_meta($timetable->ID, EventTimetable::META, true));
 
                 return in_array($event, array_map('intval', [...array_column($s['sessions'], 'event'), ...array_column($s['extras'], 'event')]), true);
             },
         ));
     }
 
-    /** Sidebar box: the terms, and the load-time stamp the guard compares on save. */
+    /** Sidebar box: the timetables, and the load-time stamp the guard compares on save. */
     public static function metaBox(WP_Post $post): void
     {
-        if (! static::termsFor($post->ID)) {
+        if (! static::timetablesFor($post->ID)) {
             return;
         }
-        add_meta_box('bbb-term-timetables', __('Term timetables', 'sage'), function (WP_Post $post) {
+        add_meta_box('bbb-event-timetables', __('Event timetables', 'sage'), function (WP_Post $post) {
             printf('<input type="hidden" name="%s" value="%s">', esc_attr(static::FIELD), esc_attr((string) get_post_meta($post->ID, MecSync::SYNCED_AT, true)));
-            echo '<p>' . esc_html__('This class\'s weekly sessions come from:', 'sage') . '</p><ul>';
-            foreach (static::termsFor($post->ID) as $term) {
-                printf('<li><a href="%s">%s</a></li>', esc_url(TermTimetable::editUrl($term->ID)), esc_html(get_the_title($term)));
+            echo '<p>' . esc_html__('This event\'s weekly sessions come from:', 'sage') . '</p><ul>';
+            foreach (static::timetablesFor($post->ID) as $timetable) {
+                printf('<li><a href="%s">%s</a></li>', esc_url(EventTimetable::editUrl($timetable->ID)), esc_html(get_the_title($timetable)));
             }
             echo '</ul><p>' . esc_html__('Change its times there. Dates added here by hand are kept.', 'sage') . '</p>';
         }, 'mec-events', 'side', 'high');
@@ -83,12 +83,12 @@ class ClassEditGuard
             return;
         }
         $notices = [];
-        if ($terms = static::termsFor($post->ID)) {
+        if ($timetables = static::timetablesFor($post->ID)) {
             $notices[] = ['info', sprintf(
-                /* translators: %s: term names */
-                __('This class\'s sessions are set by the term timetable%s %s. Change its weekly times there, not under Event Repeating. If a term is updated while this page is open, reload this page before saving. Moving this class to the Trash takes its sessions off the What\'s on timetable until it\'s restored.', 'sage'),
-                count($terms) > 1 ? 's' : '',
-                implode(', ', array_map(fn($t) => '“' . get_the_title($t) . '”', $terms)),
+                /* translators: %s: timetable names */
+                __('This event\'s sessions are set by the event timetable%s %s. Change its weekly times there, not under Event Repeating. If a timetable is updated while this page is open, reload this page before saving. Moving this event to the Trash takes its sessions off the What\'s on timetable until it\'s restored.', 'sage'),
+                count($timetables) > 1 ? 's' : '',
+                implode(', ', array_map(fn($t) => '“' . get_the_title($t) . '”', $timetables)),
             )];
         }
         // The block editor follows the meta-box save's redirect (?message=…) in the
@@ -100,11 +100,11 @@ class ClassEditGuard
         foreach ($notices as [$status, $message]) {
             $js .= sprintf('wp.data.dispatch("core/notices").createNotice(%s, %s, { isDismissible: true });', wp_json_encode($status), wp_json_encode($message));
         }
-        if (static::termsFor($post->ID)) {
-            // After a save, ask whether the guard kept the term's dates, and say so straight away.
+        if (static::timetablesFor($post->ID)) {
+            // After a save, ask whether the guard kept the timetable's dates, and say so straight away.
             $js .= sprintf(
                 'var saving = false; wp.data.subscribe(function () { var now = wp.data.select("core/edit-post").isSavingMetaBoxes(); if (saving && !now) { wp.apiFetch({ path: %s, method: "POST" }).then(function (r) { if (r.kept) wp.data.dispatch("core/notices").createNotice("warning", %s, { isDismissible: true }); }); } saving = now; });',
-                wp_json_encode('/' . RestController::NS . '/term-guard/' . $post->ID),
+                wp_json_encode('/' . RestController::NS . '/timetable-guard/' . $post->ID),
                 wp_json_encode(static::keptMessage()),
             );
         }
@@ -115,10 +115,10 @@ class ClassEditGuard
 
     protected static function keptMessage(): string
     {
-        return __('A term timetable changed this class\'s sessions after you opened this page, so its dates were kept as the term set them. Everything else you changed was saved. Reload the page to see the current dates.', 'sage');
+        return __('A event timetable changed this event\'s sessions after you opened this page, so its dates were kept as the timetable set them. Everything else you changed was saved. Reload the page to see the current dates.', 'sage');
     }
 
-    /** Whether the guard kept this class's dates since the last check (and clear it). */
+    /** Whether the guard kept this event's dates since the last check (and clear it). */
     public static function takeNotice(int $postId): bool
     {
         $key = static::NOTICE . '_' . $postId;
