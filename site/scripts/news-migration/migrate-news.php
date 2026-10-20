@@ -416,12 +416,17 @@ function news_link_cards(array $cards, wpdb $src): array
     return news_acf_block('acf/link-card', \App\Blocks\LinkCard::class, $fields, 'link_card');
 }
 
-/** One layout of old cards: Link Cards when any is a file download (or the page asks for them), else a Card Grid. */
+/**
+ * One layout of old cards: Link Cards when any is a file download, or when the page asks
+ * for them — except photo cards (every card has a title and header photo), which stay a
+ * Card Grid so they sit side by side with their images.
+ */
 function news_card_layout(array $cards, wpdb $src, bool $linkCards): array
 {
     $files = array_filter($cards, fn($c) => news_card_file_id($c, $src));
+    $photos = ! array_filter($cards, fn($c) => empty($c['attrs']['data']['header_image']) || empty($c['attrs']['data']['title']));
 
-    return $linkCards || $files ? news_link_cards($cards, $src) : news_card_grid($cards, $src);
+    return $files || ($linkCards && ! $photos) ? news_link_cards($cards, $src) : news_card_grid($cards, $src);
 }
 
 /** A group/columns layout holding only old acf/card blocks -> one Card Grid. */
