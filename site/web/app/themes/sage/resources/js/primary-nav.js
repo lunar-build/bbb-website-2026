@@ -196,6 +196,13 @@ if (desktopNav) {
       }
     }
 
+    // Focus on an item that just moved into the burger would be dropped to
+    // <body> as it's hidden — hand it to the burger instead (WCAG 2.4.3).
+    const active = document.activeElement;
+    if (active && navItems.some((item) => item.hidden && item.contains(active))) {
+      moreItem.querySelector('.c-primary-nav-desktop__more').focus();
+    }
+
     // An open dropdown whose trigger just moved/vanished would be orphaned.
     const stale = triggers.some(
       (trigger) =>
@@ -212,6 +219,13 @@ if (desktopNav) {
       navList.closest('.o-container'),
     );
     document.fonts?.ready.then(layoutOverflow);
+
+    // Text-only zoom, a larger default font size or text-spacing overrides
+    // widen the labels without resizing the container (WCAG 1.4.4/1.4.12).
+    // Hiding an item for overflow also resizes it, but the layout it
+    // triggers lands on the same state, so this settles rather than loops.
+    const itemObserver = new ResizeObserver(layoutOverflow);
+    navItems.forEach((item) => itemObserver.observe(item));
   }
 
   // Desktop search (Figma "Desktop | Search") replaces the L1 list within

@@ -38,7 +38,7 @@
                      is rendered here up front so the JS only toggles [hidden]. --}}
                 <li class="c-primary-nav-desktop__item c-primary-nav-desktop__item--more" hidden>
                     <button type="button" class="c-primary-nav-desktop__more" aria-expanded="false"
-                        aria-controls="desktop-dropdown-overflow" aria-label="{{ __('More', 'sage') }}">
+                        aria-controls="desktop-dropdown-overflow" aria-label="{{ __('More navigation', 'sage') }}">
                         <x-icon name="menu" class="c-primary-nav-desktop__more-icon-menu" />
                         <x-icon name="close" class="c-primary-nav-desktop__more-icon-close" />
                     </button>
