@@ -14,6 +14,12 @@
   text-align: center;
 }
 
+// No intro between them: the heading's own margin is too tight above a row
+// of cards, so add a step more.
+.c-card-row__heading + .c-card-row__cards {
+  margin-top: 1rem;
+}
+
 .c-card-row__heading-highlight {
   display: block;
   color: var(--wp--preset--color--blue);
@@ -166,7 +172,7 @@
   margin-bottom: 2rem;
 
   @include bp.respond($min: bp.$lg) {
-    max-width: 75vw;
+    max-width: 75%;
     margin-inline: auto;
   }
 }

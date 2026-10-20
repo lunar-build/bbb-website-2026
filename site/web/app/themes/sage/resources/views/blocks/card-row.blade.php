@@ -1,10 +1,14 @@
 <section {{ $attributes->class(['c-card-row']) }}>
 
 <div class="o-container c-card-row--{{ $type }}">
-  <h2 class="c-card-row__heading">
-    <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
-    {{ $heading }}
-  </h2>
+  @if ($headingHighlight || $heading)
+    <h2 class="c-card-row__heading">
+      @if ($headingHighlight)
+        <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
+      @endif
+      {{ $heading }}
+    </h2>
+  @endif
 
   @if ($intro)
     <p class="c-card-row__intro u-body-large">{{ $intro }}</p>
@@ -14,9 +18,11 @@
     @if ($type === 'news')
       @foreach ($newsCards as $card)
         <a class="c-card-row__news-card" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-          <img class="c-card-row__news-image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
+          <img class="c-card-row__news-image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
 
-          <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
+          @if (! empty($card['tag']))
+            <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
+          @endif
           <span class="c-card-row__news-title">{{ $card['title'] }}</span>
           <span class="c-card-row__news-cta">
             {{ $card['link']['title'] }}
@@ -28,7 +34,7 @@
       @foreach ($routeCards as $card)
         <div class="c-cycle-route-card__card c-cycle-route-card--{{ $card['difficulty'] }}">
           <div class="c-cycle-route-card__image">
-            <img src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
+            <img src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
           </div>
 
           <div class="c-cycle-route-card__banner">
@@ -65,7 +71,7 @@
     @else
       @foreach ($linkCards as $card)
         <div class="c-card-row__link-card">
-          <img class="c-card-row__link-image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
+          <img class="c-card-row__link-image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
 
           <span class="c-card-row__link-title">{{ $card['title'] }}</span>
           <p class="c-card-row__link-body">{{ $card['body'] }}</p>

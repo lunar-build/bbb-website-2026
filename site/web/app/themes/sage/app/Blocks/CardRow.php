@@ -155,6 +155,20 @@ class CardRow extends Block
     public $styles = [];
 
     /**
+     * Image crop positions (select value => label); the value, with `_` as a
+     * space, is the CSS object-position.
+     *
+     * @var array
+     */
+    public $imagePositions = [
+        'center' => 'Center',
+        'center_top' => 'Top',
+        'center_bottom' => 'Bottom',
+        'left_center' => 'Left',
+        'right_center' => 'Right',
+    ];
+
+    /**
      * The block preview example data.
      *
      * @var array
@@ -256,6 +270,7 @@ class CardRow extends Block
             'headingHighlight' => $this->headingHighlight(),
             'heading' => $this->heading(),
             'intro' => $this->intro(),
+            'imagePosition' => $this->imagePosition(),
             'newsCards' => $this->newsCards(),
             'routeCards' => $this->routeCards(),
             'linkCards' => $this->linkCards(),
@@ -285,12 +300,11 @@ class CardRow extends Block
                 ])
                 ->addText('heading_highlight', [
                     'label' => 'Heading (highlighted phrase)',
-                    'instructions' => 'Short lead phrase, shown in a lighter blue.',
-                    'required' => 1,
+                    'instructions' => 'Optional. Short lead phrase, shown in a lighter blue.',
                 ])
                 ->addText('heading', [
                     'label' => 'Heading (rest)',
-                    'required' => 1,
+                    'instructions' => 'Optional. Use on its own for a plain heading.',
                 ])
                 ->addTextarea('intro', [
                     'label' => 'Intro text',
@@ -312,6 +326,13 @@ class CardRow extends Block
                             ],
                         ],
                     ],
+                ])
+                ->addSelect('image_position', [
+                    'label' => 'Image position',
+                    'instructions' => 'Which part of each card image stays visible when it\'s cropped to fit. Images at a 5:3 ratio (e.g. 900×540px) are not cropped at all.',
+                    'choices' => $this->imagePositions,
+                    'default_value' => 'center',
+                    'ui' => true,
                 ])
                 ->addRepeater('area_links', [
                     'label' => 'Link box',
@@ -349,31 +370,48 @@ class CardRow extends Block
                     ],
                 ],
             ])
-                ->addRepeater('news_cards', [
-                    'label' => 'Cards',
-                    'button_label' => 'Add card',
-                    'min' => 0,
-                    'layout' => 'block',
+                ->addSelect('news_source', [
+                    'label' => 'Source',
+                    'instructions' => 'Pick specific news posts, or show the most recent ones.',
+                    'choices' => [
+                        'latest' => 'Latest news',
+                        'posts' => 'Choose posts',
+                    ],
+                    'default_value' => 'latest',
+                    'ui' => true,
                 ])
-                    ->addImage('image', [
-                        'label' => 'Image',
-                        'return_format' => 'array',
-                        'preview_size' => 'thumbnail',
-                        'required' => 1,
-                    ])
-                    ->addText('tag', [
-                        'label' => 'Category tag',
-                        'required' => 1,
-                    ])
-                    ->addText('title', [
-                        'label' => 'Title',
-                        'required' => 1,
-                    ])
-                    ->addLink('link', [
-                        'label' => 'Link',
-                        'required' => true,
-                    ])
-                ->endRepeater()
+                ->addNumber('news_count', [
+                    'label' => 'Number of posts',
+                    'default_value' => 3,
+                    'min' => 1,
+                    'max' => 12,
+                    'conditional_logic' => [
+                        [
+                            [
+                                'field' => 'news_source',
+                                'operator' => '==',
+                                'value' => 'latest',
+                            ],
+                        ],
+                    ],
+                ])
+                ->addPostObject('news_posts', [
+                    'label' => 'Posts',
+                    'instructions' => 'Cards use each post\'s featured image, first category, title and link.',
+                    'post_type' => ['post'],
+                    'multiple' => 1,
+                    'return_format' => 'id',
+                    'ui' => 1,
+                    'conditional_logic' => [
+                        [
+                            [
+                                'field' => 'news_source',
+                                'operator' => '==',
+                                'value' => 'posts',
+                            ],
+                        ],
+                    ],
+                ])
             ->addTab('Route cards', [
                 'conditional_logic' => [
                     [
@@ -393,6 +431,7 @@ class CardRow extends Block
                 ])
                     ->addImage('image', [
                         'label' => 'Image',
+                        'instructions' => 'Shown at a 5:3 ratio — upload e.g. 900×540px to avoid cropping.',
                         'return_format' => 'array',
                         'preview_size' => 'thumbnail',
                         'required' => 1,
@@ -443,6 +482,7 @@ class CardRow extends Block
                 ])
                     ->addImage('image', [
                         'label' => 'Image',
+                        'instructions' => 'Shown at a 5:3 ratio — upload e.g. 900×540px to avoid cropping.',
                         'return_format' => 'array',
                         'preview_size' => 'thumbnail',
                         'required' => 1,
@@ -507,13 +547,60 @@ class CardRow extends Block
     }
 
     /**
-     * Retrieve the News type's cards.
+     * Retrieve the cards' image crop position as a CSS object-position value.
+     *
+     * @return string
+     */
+    public function imagePosition()
+    {
+        $position = get_field('image_position');
+
+        return isset($this->imagePositions[$position]) ? str_replace('_', ' ', $position) : 'center';
+    }
+
+    /**
+     * Retrieve the News type's cards, built from chosen or latest posts.
+     * Falls back to the example fixtures for the pattern library.
      *
      * @return array
      */
     public function newsCards()
     {
-        return $this->normalizeCards($this->resolveField('news_cards', []));
+        if (! get_field('news_source') && ($example = $this->exampleField('news_cards'))) {
+            return $this->normalizeCards($example);
+        }
+
+        if (get_field('news_source') === 'posts') {
+            $ids = array_filter((array) get_field('news_posts'));
+            $posts = $ids ? get_posts([
+                'post_type' => 'post',
+                'post__in' => $ids,
+                'orderby' => 'post__in',
+                'posts_per_page' => count($ids),
+                'ignore_sticky_posts' => true,
+            ]) : [];
+        } else {
+            $posts = get_posts([
+                'post_type' => 'post',
+                'posts_per_page' => (int) (get_field('news_count') ?: 3),
+                'ignore_sticky_posts' => true,
+            ]);
+        }
+
+        return $this->normalizeCards(array_map(function ($post) {
+            $category = get_the_category($post->ID)[0] ?? null;
+            $imageId = get_post_thumbnail_id($post);
+
+            return [
+                'image' => $imageId ? [
+                    'url' => wp_get_attachment_image_url($imageId, 'medium_large'),
+                    'alt' => get_post_meta($imageId, '_wp_attachment_image_alt', true),
+                ] : [],
+                'tag' => $category->name ?? '',
+                'title' => get_the_title($post),
+                'link' => ['title' => __('Read more', 'sage'), 'url' => get_permalink($post), 'target' => ''],
+            ];
+        }, $posts));
     }
 
     /**

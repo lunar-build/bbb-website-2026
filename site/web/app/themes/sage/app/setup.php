@@ -288,19 +288,6 @@ add_action('init', function () {
         'has_archive' => true,
         'rewrite' => ['slug' => 'testimonials'],
     ]);
-
-    register_post_type('cycle-route', [
-        'labels' => [
-            'name' => __('Cycle Routes', 'sage'),
-            'singular_name' => __('Cycle Route', 'sage'),
-        ],
-        'public' => true,
-        'show_in_rest' => true,
-        'menu_icon' => 'dashicons-location-alt',
-        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
-        'has_archive' => true,
-        'rewrite' => ['slug' => 'cycle-routes'],
-    ]);
 }, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.
 
 /**
