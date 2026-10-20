@@ -218,14 +218,12 @@
   list-style: none;
   margin: 0;
   padding-block: 1rem;
-  // Hides the un-overflowed items for the instant before primary-nav.js
-  // moves them into the burger menu; the margin keeps focus rings visible.
+  // Hides un-overflowed items before primary-nav.js runs; margin keeps focus rings visible.
   overflow: clip;
   overflow-clip-margin: 0.5rem;
 }
 
-// Items never shrink or wrap, so a full bar overflows (and is measured by
-// primary-nav.js) rather than squashing labels.
+// Never shrink/wrap: a full bar overflows so primary-nav.js can measure it.
 .c-primary-nav-desktop__item {
   flex: none;
   white-space: nowrap;
@@ -405,16 +403,15 @@
   @include focus.ring;
 }
 
-// The overflow dropdown can hold every top-level item, so let it scroll
-// rather than run off the bottom of the viewport.
+// Can hold every top-level item — scroll rather than overflow the viewport.
 .c-primary-nav-desktop__dropdown--overflow {
   max-height: calc(100dvh - 10rem);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-// Many columns scroll sideways. The row is sized to its content, so its own
-// end padding is part of the scroll area (a zero-size ::after spacer isn't).
+// Content-sized so the end padding counts toward the sideways scroll width
+// (a zero-size ::after spacer doesn't).
 .c-primary-nav-desktop__dropdown--overflow .c-primary-nav-desktop__columns {
   width: max-content;
   min-width: 100%;
@@ -441,8 +438,7 @@
 }
 
 .c-primary-nav-desktop__overflow-title {
-  // Larger than the group headings (16px bold) beneath it, so the item
-  // reads as the top level.
+  // Larger than the 16px group headings so the item reads as top level.
   font-size: 1.25rem;
   line-height: normal;
   margin: 0;

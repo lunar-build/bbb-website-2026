@@ -1,6 +1,5 @@
-{{-- Group columns for a desktop dropdown. Shared by each top-level item's own
-     dropdown and the overflow menu in sections/primary-nav-desktop.blade.php.
-     $groups: the item's children; $idPrefix: keeps aria-labelledby ids unique. --}}
+{{-- Group columns for a desktop dropdown, shared by each item's dropdown and the
+     overflow menu. $groups: the item's children; $idPrefix keeps aria-labelledby ids unique. --}}
 <div class="c-primary-nav-desktop__columns">
     @foreach ($groups as $g => $group)
         @php($groupHeadingId = $idPrefix . '-' . $g)

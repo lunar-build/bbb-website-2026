@@ -32,10 +32,8 @@
                     </li>
                 @endforeach
 
-                {{-- Overflow menu: resources/js/primary-nav.js hides the
-                     trailing top-level items that don't fit the bar (this li shows
-                     only then) and reveals their matching section below. Every item
-                     is rendered here up front so the JS only toggles [hidden]. --}}
+                {{-- Overflow menu: primary-nav.js hides trailing items that don't fit and
+                     reveals their sections here. All items render up front; the JS only toggles [hidden]. --}}
                 <li class="c-primary-nav-desktop__item c-primary-nav-desktop__item--more" hidden>
                     <button type="button" class="c-primary-nav-desktop__more" aria-expanded="false"
                         aria-controls="desktop-dropdown-overflow" aria-label="{{ __('More navigation', 'sage') }}">

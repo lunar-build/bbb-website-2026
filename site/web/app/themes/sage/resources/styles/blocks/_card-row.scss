@@ -11,8 +11,7 @@
   text-align: center;
 }
 
-// No intro between them: the heading's own margin is too tight above a row
-// of cards, so add a step more.
+// Extra space when no intro sits between heading and cards.
 .c-card-row__heading + .c-card-row__cards {
   margin-top: 1rem;
 }
@@ -155,7 +154,6 @@
   }
 }
 
-// Optional link box under the cards (all types).
 .c-card-row__area-links {
   display: flex;
   flex-wrap: wrap;

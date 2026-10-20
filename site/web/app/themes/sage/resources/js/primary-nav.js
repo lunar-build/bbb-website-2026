@@ -147,12 +147,9 @@ if (desktopNav) {
       closeAll();
   });
 
-  // Overflow ("priority+") menu: top-level items that don't fit the bar
-  // move into the burger's dropdown, trailing items first, so the client
-  // can add menu items without breaking the bar. Fit is judged from the
-  // last visible item's right edge against the list's, not scrollWidth —
-  // the list is overflow:clip (no flash before this runs), which doesn't
-  // report its overflow through scrollWidth.
+  // Overflow ("priority+"): trailing top-level items that don't fit move into
+  // the burger's dropdown. Fit is the last visible item's right edge vs the
+  // list's, not scrollWidth — overflow:clip doesn't report through it.
   const navList = desktopNav.querySelector('.c-primary-nav-desktop__list');
   const navItems = [...desktopNav.querySelectorAll('[data-nav-item]')];
   const moreItem = desktopNav.querySelector(
@@ -161,8 +158,7 @@ if (desktopNav) {
   const sections = [...desktopNav.querySelectorAll('[data-overflow-index]')];
 
   const layoutOverflow = () => {
-    // Nothing to measure while the bar is display:none (below bp.$sm) or
-    // swapped for the search form.
+    // Skip while the bar is display:none (below bp.$sm) or showing search.
     if (!navList || !moreItem || navList.hidden || !navList.offsetWidth) return;
 
     navItems.forEach((item) => (item.hidden = false));
@@ -187,8 +183,7 @@ if (desktopNav) {
       }
     }
 
-    // Focus on an item that just moved into the burger would be dropped to
-    // <body> as it's hidden — hand it to the burger instead (WCAG 2.4.3).
+    // Hiding the focused item would drop focus to <body> — hand it to the burger (WCAG 2.4.3).
     const active = document.activeElement;
     if (
       active &&
@@ -197,7 +192,7 @@ if (desktopNav) {
       moreItem.querySelector('.c-primary-nav-desktop__more').focus();
     }
 
-    // An open dropdown whose trigger just moved/vanished would be orphaned.
+    // Close a dropdown whose trigger just overflowed.
     const stale = triggers.some(
       (trigger) =>
         trigger.getAttribute('aria-expanded') === 'true' &&
@@ -206,8 +201,7 @@ if (desktopNav) {
     if (stale) closeAll();
   };
 
-  // Deferred to the next frame: layoutOverflow resizes the items it's
-  // observing, and doing that inside the observer callback logs a
+  // Next frame: resizing observed items inside the callback logs a
   // "ResizeObserver loop" error. Also collapses bursts into one pass.
   let layoutFrame;
   const scheduleLayout = () => {
@@ -217,13 +211,11 @@ if (desktopNav) {
 
   if (navList && moreItem && sections.length) {
     const observer = new ResizeObserver(scheduleLayout);
-    // The container, for viewport changes. The list itself is skipped: its
-    // size changes as items hide/show.
+    // Container for viewport changes; not the list, whose size changes as items hide.
     observer.observe(navList.closest('.o-container'));
-    // The items, for text-only zoom, a larger default font size or text
-    // spacing, which widen labels without resizing the container
-    // (WCAG 1.4.4/1.4.12). Hiding an item for overflow resizes it too, but
-    // the next pass lands on the same state, so this settles.
+    // Items for text-only zoom / text spacing, which widen labels without
+    // resizing the container (WCAG 1.4.4/1.4.12). Overflow-hiding resizes
+    // them too, but the next pass lands on the same state, so it settles.
     navItems.forEach((item) => observer.observe(item));
     document.fonts?.ready.then(scheduleLayout);
   }
