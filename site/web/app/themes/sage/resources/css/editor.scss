@@ -32,3 +32,17 @@
         pointer-events: none;
     }
 }
+
+// Core blocks and the post title have no .o-container in the editor, so they run flush to the canvas edge on narrow widths. Pad the whole canvas, and zero the nested gutter so ACF blocks' .o-container doesn't double it.
+.editor-styles-wrapper {
+    --editor-gutter: var(--o-container-gutter);
+
+    .wp-block-post-title,
+    .is-root-container {
+        padding-inline: var(--editor-gutter);
+    }
+
+    .is-root-container {
+        --o-container-gutter: 0px;
+    }
+}

@@ -3,11 +3,8 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../components/download-link';
 
-// Container query, not the shared bp.respond() viewport mixin — the card's
-// own rendered width can be far narrower than the viewport (e.g. the pattern
-// library's sidebar layout), so a viewport breakpoint alone won't reliably
-// stack it. Still reads its cutoff from bp.$md rather than a hardcoded
-// value, to stay in step with the site's shared breakpoints.
+// Container query, not bp.respond(): the card can be far narrower than the viewport
+// (e.g. the pattern library sidebar). Cutoff still comes from bp.$md.
 .c-link-card {
   container-type: inline-size;
 }
@@ -26,9 +23,7 @@
     margin-bottom: 0;
   }
 
-  // Stacks earlier than the usual $sm cutoff — the card's long single-line
-  // CTA/description text wraps awkwardly on tablet-width containers while
-  // still in row layout.
+  // Stacks earlier than $sm — long CTA/description text wraps awkwardly in a row on tablets.
   @container (max-width: #{bp.$md}) {
     flex-direction: column;
     align-items: stretch;
@@ -67,9 +62,7 @@
 .c-link-card__title {
   color: var(--wp--preset--color--blue-medium);
 
-  // Description is optional — when title is the only line in &__content,
-  // its base heading margin-bottom would throw it off-centre in the
-  // vertically centred card row.
+  // Description is optional: a lone title's margin-bottom would throw it off-centre.
   &:last-child {
     margin-bottom: 0;
   }
@@ -99,8 +92,7 @@
 .c-link-card__cta-link {
   @extend .c-download-link__link;
 
-  // Right padding stops the focus outline overlapping the arrow as it
-  // animates to the right on hover/focus.
+  // Right padding keeps the focus outline off the arrow as it animates right.
   .c-icon--arrow-right {
     padding-right: 0.5rem;
   }

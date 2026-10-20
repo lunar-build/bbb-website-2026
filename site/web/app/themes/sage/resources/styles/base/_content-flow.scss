@@ -1,11 +1,9 @@
 @use '../abstracts/spacing';
 
 
-// Full-bleed-background blocks (.o-full-bleed-bg — CTA Banner, Card Grid,
-// Image Hero, Quote Carousel, Video Hero — plus any block given a
-// background colour, which WP marks section.has-background) only pad space
-// inside their own coloured area, not outside it. Margin only on the edge touching a
-// paragraph, so two of these stacked back to back stay flush.
+// Full-bleed-background blocks (.o-full-bleed-bg, or any section.has-background) only
+// pad inside their coloured area. Margin only on the edge touching a paragraph, so
+// stacked ones stay flush.
 .e-content > .wp-block-paragraph + :is(.o-full-bleed-bg, section.has-background) {
   margin-top: var(--wp--preset--spacing--large);
 }
@@ -14,29 +12,23 @@
   margin-bottom: var(--wp--preset--spacing--large);
 }
 
-// Every block already has its own 4rem top spacing (margin above, or
-// padding-top otherwise, same visual effect) — a preceding paragraph's own
-// margin-bottom just stacks an extra gap on top of that. Drop it.
+// Blocks already have 4rem top spacing; a preceding paragraph's margin-bottom would stack on it.
 .e-content > .wp-block-paragraph:has(+ section) {
   margin-bottom: 0;
 }
 
-// Core flow content (paragraphs, lists, tables, images) runs straight into a
-// following heading otherwise — headings only carry margin-bottom.
+// Headings only carry margin-bottom, so flow content would run straight into them.
 .e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image, .c-bullet-list-block) + .wp-block-heading {
   margin-top: var(--wp--preset--spacing--small);
 }
 
-// Lists end on an li with no margin, so the gap to the next paragraph read
-// tighter than paragraph-to-paragraph — give the list itself the extra space.
+// Lists end on an li with no margin, so the next paragraph sat tighter than usual.
 .e-content > .wp-block-list {
   margin-bottom: 1.5rem;
 }
 
-// Embeds (YouTube etc.) are the one core media block left in post content.
-// The saved iframe carries fixed 500x281 attributes, so stretch it to the
-// column at 16:9. Margin rather than block padding since core embeds have no
-// spacing control here; dropped next to ACF sections, which pad themselves.
+// Embeds (YouTube etc.): the saved iframe has fixed 500x281 attributes, so stretch it
+// to the column at 16:9. Margin dropped next to ACF sections, which pad themselves.
 .e-content > .wp-block-embed {
   margin-block: var(--wp--preset--spacing--small);
 
@@ -57,9 +49,8 @@
   margin-bottom: 0;
 }
 
-// Bullet List defaults to no padding, so it sits in running text like a
-// core list: keep the paragraph gap above it (the section rule above drops
-// it) and give it the same gap below.
+// Bullet List sits in running text like a core list: keep the gap above (the section
+// rule drops it) and add the same below.
 .e-content > .wp-block-paragraph:has(+ .c-bullet-list-block) {
   margin-bottom: spacing.$base;
 }

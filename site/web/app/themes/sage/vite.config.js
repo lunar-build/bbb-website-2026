@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
@@ -16,6 +17,7 @@ export default defineConfig({
         'resources/css/editor.scss',
         'resources/js/editor.js',
         'resources/js/editor-canvas.js',
+        'resources/js/admin/event-timetable/index.jsx',
       ],
       refresh: true,
       assets: [
@@ -38,6 +40,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      // Third-party React code (@dnd-kit) must share WordPress's React, not bundle its own.
+      // Absolute paths: the dev server's dependency pre-bundler doesn't resolve root-relative ones.
+      react: fileURLToPath(new URL('./resources/js/admin/shims/react.js', import.meta.url)),
+      'react-dom': fileURLToPath(new URL('./resources/js/admin/shims/react-dom.js', import.meta.url)),
       '@scripts': '/resources/js',
       '@styles': '/resources/css',
       '@fonts': '/resources/fonts',

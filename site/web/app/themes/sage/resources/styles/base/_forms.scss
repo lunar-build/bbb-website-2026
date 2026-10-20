@@ -1,10 +1,8 @@
 @use '../base/focus' as focus;
 
-// Base styling for every native form control — plain element selectors so
-// this also covers Gravity Forms' own rendered fields. `!important` is
-// needed: GF's Orbital theme targets `.gform-theme--framework
-// input[type]:where(...)`, genuinely higher specificity than a bare
-// `input[type=...]`.
+// Base styling for native form controls, including Gravity Forms' fields. `!important`
+// is needed: GF's Orbital theme targets `.gform-theme--framework input[type]:where(...)`,
+// which out-specifies a bare `input[type=...]`.
 
 input[type='text'],
 input[type='email'],
@@ -68,11 +66,8 @@ input[type='radio'] {
     --checked-icon-scale: 1;
   }
 
-  // `::before`, not `::after` — GF draws its own checked dot on `::before`;
-  // targeting the same pseudo-element lets `!important` actually override
-  // it. Fixed px, not %, since `<input>` is a replaced element (% width on
-  // ::before resolves to 0). `color` set explicitly — an inherited value
-  // here still lost to GF's own explicit `::before` color declaration.
+  // `::before` to override GF's own checked dot. Fixed px since `<input>` is a replaced
+  // element (% width on ::before resolves to 0). `color` explicit: inherited lost to GF's.
   &::before {
     content: '' !important;
     width: 0.625rem !important;
@@ -85,9 +80,8 @@ input[type='radio'] {
   }
 }
 
-// Whole box (border+fill+tick) swaps between two exported images — GF's
-// own ::before layers its own background-image regardless of !important,
-// so overriding background-color property-by-property doesn't work.
+// Whole box swaps between two exported images — GF's ::before layers its own
+// background-image, so per-property overrides don't work.
 input[type='checkbox'] {
   border: none !important;
   background-color: transparent !important;
@@ -106,8 +100,7 @@ input[type='checkbox'] {
   }
 }
 
-// GF's Orbital theme ships its own label/required/consent/submit-button
-// styling — none matches brand tokens, same !important treatment as above.
+// GF's Orbital label/required/consent/submit styling doesn't match brand tokens.
 .gfield_label,
 .gfield_consent_label {
   font-family: var(--wp--preset--font-family--nata-sans) !important;

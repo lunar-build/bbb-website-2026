@@ -86,8 +86,7 @@
   }
 }
 
-// Content + widget share one grid row so the widget's overlap (below) is a
-// fixed offset from their shared row-start, not dependent on content height.
+// Shared row so the widget's overlap is a fixed offset from row-start, not content height.
 .c-video-hero__row {
   @include bp.respond($min: bp.$xl) {
     display: grid;
@@ -120,9 +119,8 @@
   line-height: 30px;
 }
 
-// Stacked below $xl. At $xl+, overlaps the media above by 3rem — margin
-// must first clear .c-video-hero__lower's own 3.5rem padding-block-start,
-// hence -6.5rem.
+// Stacked below $xl; at $xl+ overlaps the media by 3rem — -6.5rem also clears
+// .c-video-hero__lower's 3.5rem padding-block-start.
 .c-video-hero__widget {
   margin-block-start: 1.5rem;
 
@@ -132,9 +130,8 @@
     z-index: 1;
   }
 
-  // The widget block's default top/bottom padding is written inline by
-  // WP's spacing support, which would offset the card from the row-start
-  // the overlap above is measured against — !important is needed to beat it.
+  // !important beats the inline padding WP's spacing support writes, which would offset
+  // the card from the row-start.
   > .acf-innerblocks-container > .c-journey-planner-widget {
     padding-block: 0 !important;
   }

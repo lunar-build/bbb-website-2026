@@ -1,10 +1,6 @@
 <?php
 
-/**
- * Convert a WordPress nav menu theme location into a nested item array:
- * [{ label, href, current, children }, ...], children nested recursively.
- * Consumed by sections/header.blade.php and sections/primary-nav.blade.php.
- */
+/** Nav menu location → nested [{ label, href, current, children }] (header and primary-nav views). */
 function menu_items_to_array(string $location): array
 {
     $locations = get_nav_menu_locations();
@@ -37,11 +33,7 @@ function menu_items_to_array(string $location): array
     return $build(0);
 }
 
-/**
- * Convert a WordPress nav menu theme location into a `columns` shape: one
- * column per top-level item (item label as the column title, its children
- * as the column's links). Consumed by sections/footer.blade.php.
- */
+/** Nav menu location → footer columns: one per top-level item, its children as links. */
 function menu_items_to_footer_columns(string $location): array
 {
     $items = menu_items_to_array($location);
@@ -55,12 +47,7 @@ function menu_items_to_footer_columns(string $location): array
     ], $items);
 }
 
-/**
- * Convert the Theme Options "Legal Links" repeater into a `{ label, href }[]`
- * list. Sourced independently from the footer nav menu (not derived from
- * it), since not every project using this theme will want legal links to
- * be whichever footer menu items happen to have no children.
- */
+/** Theme Options "Legal Links" repeater → `{ label, href }[]`, independent of the footer menu. */
 function legal_links_from_options(): array
 {
     $rows = get_field('legal_links', 'option') ?: [];
@@ -72,12 +59,9 @@ function legal_links_from_options(): array
 }
 
 /**
- * Convert the Theme Options "Social" tab's fixed per-platform URL fields
- * into a `{ platform, url }[]` list, skipping any platform left blank.
- * `platform` is the field's own slug (e.g. 'facebook', 'x') rather than a
- * free-text label, so it can be matched to an icon deterministically —
- * see app/Options/ThemeOptions.php for why these are individual fields
- * rather than a repeater.
+ * Theme Options "Social" fields → `{ platform, url }[]`, skipping blanks. `platform` is
+ * the field slug (e.g. 'facebook'), so it maps to an icon deterministically (see
+ * app/Options/ThemeOptions.php for why these aren't a repeater).
  */
 function social_links_from_options(): array
 {
@@ -92,11 +76,9 @@ function social_links_from_options(): array
 }
 
 /**
- * Coerce an ACF `link` field value to its expected shape — ACF normally
- * returns an array, but a legacy/incomplete row can store a plain string
- * (or nothing at all), which would fatal on array access. Shared by any
- * block with a repeater of link-bearing rows (see CardRow.php's own
- * near-identical normalizeLink(), predating this helper).
+ * Coerce an ACF `link` value to an array — legacy/incomplete rows can store a string or
+ * nothing, which would fatal on array access. (CardRow.php has a near-identical
+ * normalizeLink() predating this.)
  */
 function normalize_link($link): array
 {
@@ -107,13 +89,7 @@ function normalize_link($link): array
     return ['title' => '', 'url' => (string) ($link ?? ''), 'target' => ''];
 }
 
-/*
- * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
- * every SVG in resources/svg/ — the curated icon set used by `<x-icon
- * name="...">` (see resources/views/components/icon.blade.php). Glob-based
- * so the icon picker on any ACF select field using this grows automatically
- * as new SVGs are added to that folder, with no code change needed here.
- */
+/** ACF `choices` (`['slug' => 'Label']`) from every SVG in resources/svg/, for `<x-icon>`. Glob-based, so new SVGs appear automatically. */
 function svg_icon_choices(): array
 {
     $files = glob(get_theme_file_path('resources/svg/*.svg')) ?: [];
@@ -128,19 +104,10 @@ function svg_icon_choices(): array
     return $choices;
 }
 
-/**
- * Build an ACF `choices`-shaped array (`['slug' => 'Human Label']`) from
- * the theme's global colour palette (`theme.json`'s `color.palette`, via
- * WP's own settings API so it reflects any core/plugin overrides too) —
- * for ACF select fields offering a background colour pick tied to
- * `var(--wp--preset--color--{slug})`, e.g. IconLinkGrid's `background_color`.
- */
+/** ACF `choices` from the theme.json colour palette, for background pickers tied to `var(--wp--preset--color--{slug})`. */
 function theme_color_choices(): array
 {
-    // wp_get_global_settings(['color', 'palette']) groups by origin
-    // (theme/default/custom) — 'theme' is specifically this theme.json's
-    // own brand palette; WP core's generic 'default' swatches (vivid-red,
-    // pale-pink, etc.) aren't wanted as background choices here.
+    // 'theme' origin only — excludes WP core's generic 'default' swatches.
     $palette = wp_get_global_settings(['color', 'palette', 'theme']) ?: [];
 
     $choices = [];
@@ -153,24 +120,16 @@ function theme_color_choices(): array
 }
 
 /**
- * Whether a block's `$example` fallback content should be shown.
- *
- * Only the `/pattern-library` page wants it: block preview renders there
- * come from a normal front-end request, so `$preview` is true while
- * `is_admin()` is false. The block editor canvas also renders with
- * `$preview = true`, but there empty fields should read as empty rather
- * than show fixture content the client might mistake for real.
+ * Whether a block's `$example` fallback content should show. Only on `/pattern-library`
+ * (`$preview` true, `is_admin()` false); the editor canvas also has `$preview` true but
+ * empty fields should read as empty, not as fixture content.
  */
 function shows_example(bool $preview): bool
 {
     return $preview && ! is_admin();
 }
 
-/**
- * Whether a block's rendered HTML has nothing a visitor could see or click:
- * no text, and none of the media/interactive/nested-block elements that
- * count as content without any text.
- */
+/** Whether rendered block HTML has no text and no media/interactive/nested-block elements. */
 function block_output_is_empty(string $html): bool
 {
     if (preg_match('/<(img|video|picture|svg|iframe|form|input|canvas|InnerBlocks|wa-[a-z-]+)\b/i', $html)) {
@@ -180,9 +139,7 @@ function block_output_is_empty(string $html): bool
     return trim(wp_strip_all_tags($html)) === '';
 }
 
-/**
- * Hex value of a theme.json palette colour, or null if the slug is unknown.
- */
+/** Hex of a theme.json palette colour, or null for an unknown slug. */
 function theme_color_hex(string $slug): ?string
 {
     foreach (wp_get_global_settings(['color', 'palette', 'theme']) ?: [] as $color) {
@@ -194,9 +151,7 @@ function theme_color_hex(string $slug): ?string
     return null;
 }
 
-/**
- * WCAG 2.x contrast ratio between two hex colours.
- */
+/** WCAG 2.x contrast ratio between two hex colours. */
 function color_contrast_ratio(string $a, string $b): float
 {
     $luminance = function (string $hex): float {
@@ -220,10 +175,7 @@ function color_contrast_ratio(string $a, string $b): float
     return ($lighter + 0.05) / ($darker + 0.05);
 }
 
-/**
- * Text colour slug ('white' or 'blue-dark') with the better contrast
- * against a theme.json palette background.
- */
+/** 'white' or 'blue-dark', whichever contrasts better with a palette background. */
 function theme_text_color_for(string $backgroundSlug): string
 {
     $background = theme_color_hex($backgroundSlug);
@@ -239,11 +191,9 @@ function theme_text_color_for(string $backgroundSlug): string
 }
 
 /**
- * Background colours an editor can pick for a block (theme.json palette slug
- * => label). Blocks opt in with `'color' => ['background' => true]` in their
- * `$supports` — see the background-colour filters in app/filters.php, which
- * restrict the block editor's colour picker to exactly this list and set a
- * matching text colour. Edit here to change the choices everywhere.
+ * Background colours editors can pick (palette slug => label). Blocks opt in via
+ * `'color' => ['background' => true]` in `$supports`; app/filters.php restricts the
+ * picker to this list. Edit here to change the choices everywhere.
  */
 function theme_block_background_colors(): array
 {
@@ -255,11 +205,7 @@ function theme_block_background_colors(): array
     ];
 }
 
-/**
- * CSS giving every `.has-{slug}-background-color` block a readable text
- * colour, derived from contrast against that slug's palette colour. Blocks
- * use `var(--c-block-fg, <default>)` for text that should follow it.
- */
+/** CSS giving each `.has-{slug}-background-color` block a contrasting text colour; blocks follow it with `var(--c-block-fg, <default>)`. */
 function theme_block_background_css(): string
 {
     $css = '';

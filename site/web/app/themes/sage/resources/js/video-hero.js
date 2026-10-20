@@ -1,9 +1,6 @@
-// Video Hero's background video: autoplay/loop/muted, with a custom
-// play/pause toggle required by WCAG 2.2.2 (Pause, Stop, Hide) whenever
-// content autoplays. `_playing` state is driven by the video's own
-// play/pause events rather than the button's own intent, so it stays
-// correct whether playback started from autoplay, the toggle, or the
-// browser pausing it (e.g. tab backgrounded).
+// Video Hero background video with the play/pause toggle WCAG 2.2.2 requires for
+// autoplay. State follows the video's own play/pause events, so it stays correct
+// when the browser pauses it (e.g. tab backgrounded).
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 document.querySelectorAll('[data-video-hero]').forEach((wrapper) => {
@@ -28,8 +25,7 @@ document.querySelectorAll('[data-video-hero]').forEach((wrapper) => {
   video.addEventListener('play', () => setPlayingState(true));
   video.addEventListener('pause', () => setPlayingState(false));
 
-  // Unknown duration (metadata not loaded yet) defaults to "show the
-  // control" — safer than briefly hiding a required pause affordance.
+  // Unknown duration defaults to showing the control.
   video.addEventListener('loadedmetadata', () => {
 toggle.hidden = false;
   });

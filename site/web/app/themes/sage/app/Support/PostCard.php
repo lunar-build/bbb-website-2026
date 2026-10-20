@@ -17,7 +17,7 @@ class PostCard
                 'url' => get_the_post_thumbnail_url($post, 'large') ?: '',
                 'alt' => get_post_meta(get_post_thumbnail_id($post), '_wp_attachment_image_alt', true),
             ],
-            'date' => get_the_date('jS F Y', $post),
+            'date' => $post->post_type === 'mec-events' ? self::eventDate($post) : get_the_date('jS F Y', $post),
             'categories' => self::categories($post),
             'heading' => [
                 'text' => $title,
@@ -75,5 +75,15 @@ class PostCard
         $text = $text ?: get_the_excerpt($post);
 
         return wp_trim_words(html_entity_decode(wp_strip_all_tags($text), ENT_QUOTES), 20);
+    }
+
+    /**
+     * Events show their next (or last) session, not their publish date.
+     */
+    protected static function eventDate(\WP_Post $post): string
+    {
+        $shown = EventSessions::forDisplay($post->ID);
+
+        return $shown ? gmdate('jS F Y', $shown['session']->tstart) : '';
     }
 }

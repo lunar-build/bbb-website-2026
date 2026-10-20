@@ -25,10 +25,8 @@ ol {
   }
 }
 
-// Custom bullet marker for real content lists — scoped to post/page body
-// content (.e-content) and the Bullet List block, so it renders identically
-// in both without leaking onto unrelated UI <ul>s elsewhere (nav, the
-// pattern-library's own chrome, etc.) the way an unscoped `ul` selector would.
+// Custom bullet for content lists, scoped to .e-content and the Bullet List block so it
+// doesn't leak onto UI <ul>s (nav, pattern library chrome).
 .e-content ul,
 .c-bullet-list ul {
   list-style: none;
@@ -245,12 +243,9 @@ h6,
   align-items: flex-start;
   gap: 0.625rem;
   padding: 0.625rem 1rem;
-  // Fixed, not 999px — a true pill radius clamps to half the box's own
-  // height, so it reads as a clean pill on one line but balloons into a
-  // stadium shape if the content wraps or grows. 1.375rem is half of this
-  // block's single-line height (2 × 0.625rem padding + 1.5rem line-height),
-  // so one-liners look identical while longer content degrades to a
-  // softly-rounded card instead of a blob.
+  // Not 999px: that becomes a stadium shape when content wraps. 1.375rem is half the
+  // single-line height (2 × 0.625rem padding + 1.5rem line-height), so wrapped content
+  // degrades to a rounded card.
   border-radius: 1.375rem;
   background: var(--wp--preset--color--blue-light);
   color: var(--wp--preset--color--blue-dark);

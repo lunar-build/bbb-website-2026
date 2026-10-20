@@ -7,10 +7,8 @@
   text-align: center;
   background: var(--wp--preset--color--lightest-grey);
 
-  // The side image hangs past the section's bottom edge, but the next block's
-  // background paints over it (later in the DOM, same stacking level). Lift
-  // this section above its neighbours so the image sits on top. Only when
-  // there is one — and well below .c-site-header's z-index (100).
+  // The side image overhangs the section, and the next block's background paints over
+  // it — lift above neighbours (only with an image, and below .c-site-header's z-index 100).
   &:has(.c-card-grid__side-image) {
     z-index: 1;
   }
@@ -27,16 +25,14 @@
     margin-bottom: 2rem;
   }
 
-  // Feature Card's own max-width (443px, right for that block standalone)
-  // fights the grid column here — lets the card fill its 1fr column.
+  // Resets Feature Card's standalone 443px max-width so it fills the column.
   &__card {
     max-width: none;
   }
 
   &__cards {
     display: grid;
-    // Same value used for row and column gap, and shared with Card Row
-    // (spacing.$card-gap) so event/image/link cards all space identically.
+    // Shared with Card Row so all card types space identically.
     gap: spacing.$card-gap;
     text-align: left;
 
@@ -45,18 +41,15 @@
     }
   }
 
-  // Reserves room for &__side-image (a pure overlay, doesn't reflow the
-  // grid) so it reads as standing beside the grid, not on top of it.
-  // Narrower than the image itself — some overlap is fine.
+  // Reserves room for the overlay &__side-image; narrower than it, some overlap is fine.
   &__cards--with-side-image {
     @include bp.respond($min: bp.$xl) {
       padding-right: 16rem;
     }
   }
 
-  // `right` mirrors .o-container's own gutter calc minus a constant 8rem,
-  // so the bleed past the container edge stays consistent at any viewport
-  // width (a flat rem value overshot on laptop widths). xl+ only.
+  // `right` is .o-container's gutter calc minus 8rem — a flat rem value overshot on
+  // laptop widths. xl+ only.
   &__side-image {
     display: none;
     position: absolute;

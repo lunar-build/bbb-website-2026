@@ -7,15 +7,11 @@
 //     <img class="o-container__full" src="…"> <!-- bleeds full width -->
 //   </div>
 //
-// `.o-container--narrow` sets a tighter max-width/gutter via custom
-// properties — put it on any ancestor to cascade into every nested
-// `.o-container` underneath, including other blocks' own markup. See
-// components/_single-post.scss.
+// `.o-container--narrow` sets a tighter max-width/gutter via custom properties; put it
+// on an ancestor to cascade into nested `.o-container`s (see components/_single-post.scss).
 //
-// Never put `.o-container` directly on a <wa-*> custom element — `display:
-// grid` on a shadow host only grids its own shadow-tree wrapper, not the
-// slotted light-DOM content. Wrap the element in a plain
-// <div class="o-container"> instead — see sections/header.blade.php.
+// Never put `.o-container` on a <wa-*> element — `display: grid` on a shadow host
+// doesn't grid slotted content. Wrap it in a <div> (see sections/header.blade.php).
 
 $container-max-width: 80rem;
 $container-gutter: 1.5rem;
@@ -30,11 +26,7 @@ $container-narrow-gutter: 2rem;
 }
 
 .o-container {
-  // Explicit, not relying on default block-level sizing — block-level
-  // elements fill their parent's width automatically in normal flow, but
-  // not when `.o-container` ends up as a flex item (e.g. blocks/_image-hero
-  // .scss's .c-image-hero), where it otherwise shrinks to its content's
-  // width instead of spanning the parent, breaking the centering below.
+  // Explicit: as a flex item (e.g. .c-image-hero) it would shrink to its content and break the centring.
   width: 100%;
   display: grid;
   grid-template-columns:
