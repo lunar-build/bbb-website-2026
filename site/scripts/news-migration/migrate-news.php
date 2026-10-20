@@ -678,6 +678,31 @@ function news_inline_reusable(array $blocks, wpdb $src, array &$notes, int $dept
 }
 
 /**
+ * Every heading gets the theme's default Heading colour (Blue medium), as a freshly
+ * inserted one would. The colour has to be in both the attribute and the saved
+ * markup's classes, or the editor flags the block as invalid.
+ */
+function news_colour_headings(array $blocks): array
+{
+    foreach ($blocks as &$b) {
+        if ($b['blockName'] === 'core/heading' && empty($b['attrs']['textColor']) && empty($b['attrs']['style']['color'])) {
+            $b['attrs']['textColor'] = 'blue-medium';
+            $classes = ' has-blue-medium-color has-text-color';
+            $addClasses = fn($html) => is_string($html)
+                ? (preg_match('/^(\s*<h[1-6][^>]*\sclass=")/', $html) ? preg_replace('/^(\s*<h[1-6][^>]*\sclass="[^"]*)"/', '$1' . $classes . '"', $html) : preg_replace('/^(\s*<h[1-6])/', '$1 class="wp-block-heading' . $classes . '"', $html))
+                : $html;
+            $b['innerHTML'] = $addClasses($b['innerHTML']);
+            $b['innerContent'] = array_map($addClasses, $b['innerContent']);
+        }
+        if ($b['innerBlocks']) {
+            $b['innerBlocks'] = news_colour_headings($b['innerBlocks']);
+        }
+    }
+
+    return $blocks;
+}
+
+/**
  * Card Grids (or Link Cards) with nothing but whitespace between them (the old
  * layouts put one row of cards per group) become one block, so a lone card isn't left stranded.
  */
@@ -859,7 +884,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
         $notes[] = count($bikes) . ' bike-cards -> Timeline + Media Gallery (blocks that were between them now follow)';
     }
 
-    return serialize_blocks(news_tighten_after_headings(news_merge_card_grids($out, $notes)));
+    return serialize_blocks(news_colour_headings(news_tighten_after_headings(news_merge_card_grids($out, $notes))));
 }
 
 /**
