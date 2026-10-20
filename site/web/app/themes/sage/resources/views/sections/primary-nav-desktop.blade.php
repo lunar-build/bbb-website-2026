@@ -23,12 +23,15 @@
                                 hidden>
                                 <div class="o-container">
                                     <div class="c-primary-nav-desktop__columns">
-                                        @foreach ($item['children'] as $group)
+                                        @foreach ($item['children'] as $g => $group)
+                                            @php($groupHeadingId = 'desktop-nav-group-' . $i . '-' . $g)
                                             <div class="c-primary-nav-desktop__column">
-                                                <p class="c-primary-nav-desktop__heading">{{ $group['label'] }}</p>
+                                                <p class="c-primary-nav-desktop__heading" id="{{ $groupHeadingId }}">
+                                                    {{ $group['label'] }}</p>
 
                                                 @if (!empty($group['children']))
-                                                    <ul class="c-primary-nav-desktop__sublist" role="list">
+                                                    <ul class="c-primary-nav-desktop__sublist" role="list"
+                                                        aria-labelledby="{{ $groupHeadingId }}">
                                                         @foreach ($group['children'] as $link)
                                                             <li>
                                                                 <a href="{{ $link['href'] }}"
