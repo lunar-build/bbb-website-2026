@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class CardRow extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -196,6 +199,7 @@ class CardRow extends Block
             'type' => 'route',
             'heading_highlight' => 'Discover',
             'heading' => 'our favourite local rides',
+            'intro' => 'View it on a map, learn more and download printable PDFs.',
             'route_cards' => [
                 [
                     'image' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
@@ -290,7 +294,7 @@ class CardRow extends Block
                 ])
                 ->addTextarea('intro', [
                     'label' => 'Intro text',
-                    'instructions' => 'Only shown on the Link type.',
+                    'instructions' => 'Shown on the Link and Route types.',
                     'rows' => 2,
                     'conditional_logic' => [
                         [
@@ -298,6 +302,13 @@ class CardRow extends Block
                                 'field' => 'type',
                                 'operator' => '==',
                                 'value' => 'link',
+                            ],
+                        ],
+                        [
+                            [
+                                'field' => 'type',
+                                'operator' => '==',
+                                'value' => 'route',
                             ],
                         ],
                     ],
@@ -462,7 +473,7 @@ class CardRow extends Block
      */
     public function type()
     {
-        return get_field('type') ?: $this->example['type'];
+        return $this->resolveField('type', 'news');
     }
 
     /**
@@ -472,7 +483,7 @@ class CardRow extends Block
      */
     public function headingHighlight()
     {
-        return get_field('heading_highlight') ?: $this->example['heading_highlight'];
+        return $this->resolveField('heading_highlight', '');
     }
 
     /**
@@ -482,17 +493,17 @@ class CardRow extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return $this->resolveField('heading', '');
     }
 
     /**
-     * Retrieve the intro text (Link type only).
+     * Retrieve the intro text (Link and Route types).
      *
      * @return string|null
      */
     public function intro()
     {
-        return $this->type() === 'link' ? (get_field('intro') ?: ($this->example['intro'] ?? null)) : null;
+        return in_array($this->type(), ['link', 'route'], true) ? ($this->resolveField('intro')) : null;
     }
 
     /**
@@ -502,7 +513,7 @@ class CardRow extends Block
      */
     public function newsCards()
     {
-        return $this->normalizeCards(get_field('news_cards') ?: ($this->example['news_cards'] ?? []));
+        return $this->normalizeCards($this->resolveField('news_cards', []));
     }
 
     /**
@@ -512,7 +523,7 @@ class CardRow extends Block
      */
     public function routeCards()
     {
-        return $this->normalizeCards(get_field('route_cards') ?: ($this->example['route_cards'] ?? []));
+        return $this->normalizeCards($this->resolveField('route_cards', []));
     }
 
     /**
@@ -522,7 +533,7 @@ class CardRow extends Block
      */
     public function linkCards()
     {
-        return $this->normalizeCards(get_field('link_cards') ?: ($this->example['link_cards'] ?? []));
+        return $this->normalizeCards($this->resolveField('link_cards', []));
     }
 
     /**
@@ -578,7 +589,7 @@ class CardRow extends Block
      */
     public function areaLinks()
     {
-        $rows = get_field('area_links') ?: ($this->example['area_links'] ?? []);
+        $rows = $this->resolveField('area_links', []);
 
         return array_map(fn($row) => ['link' => $this->normalizeLink($row['link'] ?? null)], $rows);
     }
@@ -590,7 +601,7 @@ class CardRow extends Block
      */
     public function browseAllLink()
     {
-        $link = $this->type() !== 'link' ? (get_field('browse_all_link') ?: ($this->example['browse_all_link'] ?? null)) : null;
+        $link = $this->type() !== 'link' ? ($this->resolveField('browse_all_link')) : null;
 
         return $link ? $this->normalizeLink($link) : null;
     }

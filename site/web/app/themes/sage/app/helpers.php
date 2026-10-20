@@ -151,3 +151,124 @@ function theme_color_choices(): array
 
     return $choices;
 }
+
+/**
+ * Whether a block's `$example` fallback content should be shown.
+ *
+ * Only the `/pattern-library` page wants it: block preview renders there
+ * come from a normal front-end request, so `$preview` is true while
+ * `is_admin()` is false. The block editor canvas also renders with
+ * `$preview = true`, but there empty fields should read as empty rather
+ * than show fixture content the client might mistake for real.
+ */
+function shows_example(bool $preview): bool
+{
+    return $preview && ! is_admin();
+}
+
+/**
+ * Whether a block's rendered HTML has nothing a visitor could see or click:
+ * no text, and none of the media/interactive/nested-block elements that
+ * count as content without any text.
+ */
+function block_output_is_empty(string $html): bool
+{
+    if (preg_match('/<(img|video|picture|svg|iframe|form|input|canvas|InnerBlocks|wa-[a-z-]+)\b/i', $html)) {
+        return false;
+    }
+
+    return trim(wp_strip_all_tags($html)) === '';
+}
+
+/**
+ * Hex value of a theme.json palette colour, or null if the slug is unknown.
+ */
+function theme_color_hex(string $slug): ?string
+{
+    foreach (wp_get_global_settings(['color', 'palette', 'theme']) ?: [] as $color) {
+        if ($color['slug'] === $slug) {
+            return $color['color'];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * WCAG 2.x contrast ratio between two hex colours.
+ */
+function color_contrast_ratio(string $a, string $b): float
+{
+    $luminance = function (string $hex): float {
+        $hex = ltrim($hex, '#');
+
+        if (strlen($hex) === 3) {
+            $hex = preg_replace('/(.)/', '$1$1', $hex);
+        }
+
+        return array_sum(array_map(
+            fn ($channel, $weight) => $weight * (($c = hexdec($channel) / 255) <= 0.03928
+                ? $c / 12.92
+                : (($c + 0.055) / 1.055) ** 2.4),
+            str_split($hex, 2),
+            [0.2126, 0.7152, 0.0722],
+        ));
+    };
+
+    [$lighter, $darker] = [max($luminance($a), $luminance($b)), min($luminance($a), $luminance($b))];
+
+    return ($lighter + 0.05) / ($darker + 0.05);
+}
+
+/**
+ * Text colour slug ('white' or 'blue-dark') with the better contrast
+ * against a theme.json palette background.
+ */
+function theme_text_color_for(string $backgroundSlug): string
+{
+    $background = theme_color_hex($backgroundSlug);
+
+    if (! $background) {
+        return 'white';
+    }
+
+    return color_contrast_ratio($background, theme_color_hex('white') ?? '#ffffff')
+        >= color_contrast_ratio($background, theme_color_hex('blue-dark') ?? '#003852')
+        ? 'white'
+        : 'blue-dark';
+}
+
+/**
+ * Background colours an editor can pick for a block (theme.json palette slug
+ * => label). Blocks opt in with `'color' => ['background' => true]` in their
+ * `$supports` — see the background-colour filters in app/filters.php, which
+ * restrict the block editor's colour picker to exactly this list and set a
+ * matching text colour. Edit here to change the choices everywhere.
+ */
+function theme_block_background_colors(): array
+{
+    return [
+        'light-grey' => 'Grey',
+        'blue-light' => 'Blue light',
+        'blue' => 'Blue',
+        'blue-dark' => 'Blue dark',
+    ];
+}
+
+/**
+ * CSS giving every `.has-{slug}-background-color` block a readable text
+ * colour, derived from contrast against that slug's palette colour. Blocks
+ * use `var(--c-block-fg, <default>)` for text that should follow it.
+ */
+function theme_block_background_css(): string
+{
+    $css = '';
+
+    foreach (array_keys(theme_block_background_colors()) as $slug) {
+        $text = theme_text_color_for($slug);
+
+        $css .= ".has-background.has-{$slug}-background-color{--c-block-fg:var(--wp--preset--color--{$text});color:var(--c-block-fg)}";
+    }
+
+    return $css;
+}

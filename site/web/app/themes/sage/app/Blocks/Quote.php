@@ -2,11 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Quote extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -26,7 +30,7 @@ class Quote extends Block
      *
      * @var string
      */
-    public $description = 'A pull quote with optional attribution name and role.';
+    public $description = 'A pull quote with optional attribution name, role and headshot.';
 
     /**
      * The block category.
@@ -170,6 +174,16 @@ class Quote extends Block
     ];
 
     /**
+     * Fallback example data requiring a non-constant expression (Vite::asset).
+     */
+    public function example(): array
+    {
+        return [
+            'image' => ['url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'), 'alt' => ''],
+        ];
+    }
+
+    /**
      * @var array
      */
     public $examples = [
@@ -194,6 +208,7 @@ class Quote extends Block
             'quote' => $this->quote(),
             'attributionName' => $this->attributionName(),
             'attributionRole' => $this->attributionRole(),
+            'image' => $this->image(),
         ];
     }
 
@@ -226,6 +241,13 @@ class Quote extends Block
                 'label' => 'Attribution role',
                 'required' => 0,
                 'instructions' => 'e.g. "Cabinet Member for Sustainable Transport Delivery". Leave blank to hide.',
+            ])
+            ->addImage('image', [
+                'label' => 'Attribution image',
+                'instructions' => 'Optional headshot of the person quoted. Shown as a circle, so a square, face-centred crop works best.',
+                'return_format' => 'array',
+                'preview_size' => 'thumbnail',
+                'required' => 0,
             ]);
 
         return $fields->build();
@@ -233,7 +255,7 @@ class Quote extends Block
 
     public function quoteSize()
     {
-        return get_field('quote_size') ?: $this->example['quote_size'];
+        return $this->resolveField('quote_size', 'large');
     }
 
     /**
@@ -244,17 +266,22 @@ class Quote extends Block
      */
     public function quote()
     {
-        return get_field('quote') ?: wpautop($this->example['quote']);
+        return get_field('quote') ?: wpautop($this->exampleField('quote', ''));
     }
 
     public function attributionName()
     {
-        return get_field('attribution_name') ?: $this->example['attribution_name'];
+        return $this->resolveField('attribution_name', '');
     }
 
     public function attributionRole()
     {
-        return get_field('attribution_role') ?: $this->example['attribution_role'];
+        return $this->resolveField('attribution_role', '');
+    }
+
+    public function image()
+    {
+        return $this->resolveField('image');
     }
 
     /**

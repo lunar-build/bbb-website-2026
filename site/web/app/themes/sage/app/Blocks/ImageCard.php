@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class ImageCard extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -219,7 +222,7 @@ class ImageCard extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return $this->resolveField('image');
     }
 
     /**
@@ -229,7 +232,7 @@ class ImageCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        return $this->resolveField('link', ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

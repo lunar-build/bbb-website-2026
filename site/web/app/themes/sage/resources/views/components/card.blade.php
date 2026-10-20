@@ -1,4 +1,4 @@
-@props(['cardStyle', 'image', 'date' => null, 'heading', 'body' => null, 'link' => null, 'ctaStyle' => 'button'])
+@props(['cardStyle', 'image', 'date' => null, 'categories' => [], 'heading', 'body' => null, 'link' => null, 'ctaStyle' => 'button'])
 
 <div {{ $attributes->class(['c-feature-card__card', 'c-feature-card--'.$cardStyle]) }}>
   <img class="c-feature-card__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
@@ -17,14 +17,24 @@
   @endif
 
   <div class="c-feature-card__body">
-    @if ($date)
-      <p class="c-feature-card__date">{{ $date }}</p>
+    @if ($date || count($categories))
+      <div class="c-feature-card__meta">
+        @if ($date)
+          <p class="c-feature-card__date">{{ $date }}</p>
+        @endif
+
+        @foreach ($categories as $category)
+          <x-pill class="c-feature-card__category" :label="$category['label']" :url="$category['url']" />
+        @endforeach
+      </div>
     @endif
 
     <div class="c-feature-card__content">
-      <x-heading :level="$heading['level']" :style="$heading['style']">
-        {{ $heading['text'] }}
-      </x-heading>
+      @if (! empty($heading['text']))
+        <x-heading :level="$heading['level']" :style="$heading['style']">
+          {{ $heading['text'] }}
+        </x-heading>
+      @endif
       @if (! empty($body['text']))
         <x-copy :style="$body['style']">
           {!! $body['text'] !!}
@@ -51,7 +61,7 @@
             tabindex="-1"
             aria-hidden="true"
           >
-            {{ $link['title'] ?: __('Find out more', 'sage') }}
+            {{ $link['label'] ?? ($link['title'] ?: __('Find out more', 'sage')) }}
             <x-icon name="arrow-right" slot="end" />
           </wa-button>
         @endif

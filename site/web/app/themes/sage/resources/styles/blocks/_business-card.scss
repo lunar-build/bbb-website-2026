@@ -1,9 +1,9 @@
-// Figma "Filter result card": no image, a business/service listing —
-// heading, contact info + services icon/text repeaters, description, CTA.
+// Figma node 58:2560. Also used as Card Grid's "Business card" style.
 @use '../base/typography';
 @use '../components/button';
+@use '../base/focus' as focus;
 
-.c-filter-result-card {
+.c-business-card {
   &__card {
     display: flex;
     flex-direction: column;
@@ -25,6 +25,10 @@
     margin: 0;
     border: none;
     border-top: 1px solid var(--wp--preset--color--light-grey);
+
+    &--accent {
+      border-top-color: var(--wp--preset--color--yellow);
+    }
   }
 
   &__contact-info,
@@ -40,7 +44,7 @@
   &__services {
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   &__contact-item,
@@ -48,6 +52,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-bottom: 0;
   }
 
   &__contact-text {
@@ -57,6 +62,7 @@
 
   &__contact-link {
     text-decoration: none;
+    @include focus.ring;
 
     &:hover,
     &:focus-visible {
@@ -65,7 +71,7 @@
   }
 
   &__service-text {
-    @extend .u-filter-service-label;
+    @extend .u-business-service-label;
     color: var(--wp--preset--color--charcoal);
   }
 
@@ -82,8 +88,18 @@
     color: var(--wp--preset--color--charcoal);
   }
 
+  // Pushed to the card's foot (with the CTA under it) so regions line up
+  // across a row of equal-height cards.
+  &__region {
+    margin: auto 0 0;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
   &__cta {
     @extend .u-cta-small;
+    margin-top: auto;
     display: inline-flex;
     align-self: center;
     align-items: center;
@@ -94,9 +110,15 @@
     color: var(--wp--preset--color--charcoal);
     text-decoration: none;
 
+    @include focus.ring;
+
     &:hover,
     &:focus-visible {
       @include button.arrow-hover;
     }
+  }
+
+  &__region + &__cta {
+    margin-top: 0;
   }
 }

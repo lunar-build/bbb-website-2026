@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Accordion extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -225,12 +228,12 @@ class Accordion extends Block
 
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return $this->resolveField('heading', '');
     }
 
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
+        return $this->resolveField('items', []);
     }
 
     /**

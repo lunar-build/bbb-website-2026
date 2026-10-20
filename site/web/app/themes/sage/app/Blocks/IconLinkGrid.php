@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class IconLinkGrid extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -131,7 +134,7 @@ class IconLinkGrid extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -154,7 +157,6 @@ class IconLinkGrid extends Block
      * @var array
      */
     public $example = [
-        'background_color' => 'blue-light',
         'items' => [
             [
                 'icon' => 'cycling-route',
@@ -190,7 +192,6 @@ class IconLinkGrid extends Block
     {
         return [
             'items' => $this->items(),
-            'backgroundColor' => $this->backgroundColor(),
         ];
     }
 
@@ -199,19 +200,6 @@ class IconLinkGrid extends Block
         $fields = Builder::make('icon_link_grid');
 
         $fields
-            ->addSelect('background_color', [
-                'label' => 'Background colour',
-                'instructions' => 'Optional — matches the Figma reference\'s "Blue light" by default. Leave blank for no background.
-                    Deliberately restricted to this one option: the heading/description text colours are
-                    fixed, so only backgrounds already contrast-checked against them are offered — see
-                    theme_color_choices() in app/helpers.php for the full theme palette if this needs
-                    extending (would also need matching text-colour logic per choice).',
-                'choices' => ['blue-light' => 'Blue light'],
-                'allow_null' => true,
-                'ui' => 1,
-                'placeholder' => 'None',
-                'default_value' => 'blue-light',
-            ])
             ->addRepeater('items', [
                 'label' => 'Items',
                 'button_label' => 'Add item',
@@ -240,18 +228,7 @@ class IconLinkGrid extends Block
 
     public function items()
     {
-        return get_field('items') ?: $this->example['items'];
-    }
-
-    /**
-     * Retrieve the background colour (a theme.json palette slug, or empty
-     * for no background).
-     *
-     * @return string
-     */
-    public function backgroundColor()
-    {
-        return get_field('background_color') ?: $this->example['background_color'];
+        return $this->resolveField('items', []);
     }
 
     /**

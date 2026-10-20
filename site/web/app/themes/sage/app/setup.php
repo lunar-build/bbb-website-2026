@@ -42,6 +42,12 @@ add_action('admin_head', function () {
             }
         }
     }
+
+    printf(
+        '<script>window.sageEditorCanvas = %s;</script>',
+        wp_json_encode(['componentsSrc' => Vite::asset('resources/js/editor-canvas.js')]),
+    );
+
     echo Vite::withEntryPoints([
         'resources/js/editor.js',
     ])->toHtml();
@@ -66,23 +72,34 @@ add_filter('theme_file_path', function ($path, $file) {
 add_filter('should_load_separate_core_block_assets', '__return_false');
 
 /**
- * Excludes core/other-plugin blocks we've built our own ACF Composer
- * replacement for (avoids two confusingly similar options in the inserter).
- * Add a block name here any time this comes up again.
+ * Allowlist of blocks editors can insert. Everything we build is a custom
+ * ACF Composer block (`acf/*`, picked up by prefix so new blocks need no
+ * edit here), so core blocks are off by default — add a name to $core to
+ * bring one back. `core/missing` must stay so blocks saved with a
+ * since-removed type still render their "unsupported" notice.
  *
  * @link https://developer.wordpress.org/reference/hooks/allowed_block_types_all/
  */
 add_filter('allowed_block_types_all', function ($allowed_block_types, $block_editor_context) {
-    $excluded = [
-        'core/quote',
-        'core/pullquote',
+    $prefixes = [
+        'acf/',
+        'gravityforms/',
     ];
 
-    if (! is_array($allowed_block_types)) {
-        $allowed_block_types = array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered());
-    }
+    $core = [
+        'core/paragraph',
+        'core/heading',
+        'core/embed', // YouTube etc. — the Video block only takes uploaded MP4s
+        'core/spacer',
+        'core/separator',
+        'core/missing',
+    ];
 
-    return array_values(array_diff($allowed_block_types, $excluded));
+    return array_values(array_filter(
+        array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered()),
+        fn ($name) => in_array($name, $core, true)
+            || array_any($prefixes, fn ($prefix) => str_starts_with($name, $prefix)),
+    ));
 }, 10, 2);
 
 /**
@@ -233,7 +250,9 @@ add_action('init', function () {
  * @return void
  */
 add_action('init', function () {
-    register_post_type('case-study', [
+    // Name and slug match the old site, so imported IDs/meta and live
+    // /ibikeitilikeit/{slug}/ URLs carry straight over.
+    register_post_type('case_study', [
         'labels' => [
             'name' => __('Case Studies', 'sage'),
             'singular_name' => __('Case Study', 'sage'),
@@ -243,7 +262,18 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-analytics',
         'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
         'has_archive' => true,
-        'rewrite' => ['slug' => 'case-studies'],
+        'rewrite' => ['slug' => 'ibikeitilikeit'],
+    ]);
+
+    register_taxonomy('case_study_tag', 'case_study', [
+        'labels' => [
+            'name' => __('Tags', 'sage'),
+            'singular_name' => __('Tag', 'sage'),
+        ],
+        'public' => true,
+        'show_in_rest' => true,
+        'show_admin_column' => true,
+        'rewrite' => ['slug' => 'ibikeitilikeit/tag'],
     ]);
 
     register_post_type('testimonial', [
@@ -271,4 +301,38 @@ add_action('init', function () {
         'has_archive' => true,
         'rewrite' => ['slug' => 'cycle-routes'],
     ]);
+}, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.
+
+/**
+ * Keep the Map Listing template's open-data cache fresh — hourly, never
+ * on a page request. See App\Support\OpenData.
+ */
+add_action('init', function () {
+    if (! wp_next_scheduled('opendata_refresh')) {
+        wp_schedule_event(time(), 'hourly', 'opendata_refresh');
+    }
 });
+
+add_action('opendata_refresh', function () {
+    foreach (array_keys(Support\OpenData::DATASETS) as $dataset) {
+        Support\OpenData::refresh($dataset);
+    }
+});
+
+if (defined('WP_CLI') && WP_CLI) {
+    /**
+     * Refresh the cached open-data datasets.
+     *
+     * ## OPTIONS
+     *
+     * [<dataset>]
+     * : One of shops, bmx, pumps. Defaults to all.
+     */
+    \WP_CLI::add_command('opendata refresh', function ($args) {
+        foreach ($args ?: array_keys(Support\OpenData::DATASETS) as $dataset) {
+            Support\OpenData::refresh($dataset)
+                ? \WP_CLI::success(sprintf('%s: %d items', $dataset, count(Support\OpenData::items($dataset))))
+                : \WP_CLI::warning("{$dataset}: fetch failed, kept previous cache");
+        }
+    });
+}

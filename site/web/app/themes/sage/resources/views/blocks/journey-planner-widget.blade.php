@@ -16,13 +16,16 @@
         class="c-journey-planner-widget__field"
       />
 
-      <fieldset class="c-journey-planner-widget__options">
-        <legend class="c-input__label">What are you looking for?</legend>
-
-        @foreach ($nearbyOptions as $i => $option)
-          <x-radio name="nearby_feature" label="{{ $option['label'] }}" :checked="$i === 0" />
+      <wa-radio-group
+        class="c-journey-planner-widget__options"
+        label="What are you looking for?"
+        name="nearby_feature"
+        value="{{ \Illuminate\Support\Str::slug($nearbyOptions[0]['label'] ?? '') }}"
+      >
+        @foreach ($nearbyOptions as $option)
+          <x-radio label="{{ $option['label'] }}" value="{{ \Illuminate\Support\Str::slug($option['label']) }}" />
         @endforeach
-      </fieldset>
+      </wa-radio-group>
 
       {{-- TODO: wire up the "find nearby" redirect once the real endpoint/param shape is confirmed. --}}
       <wa-button variant="neutral" appearance="accent" pill with-end disabled class="c-journey-planner-widget__cta">

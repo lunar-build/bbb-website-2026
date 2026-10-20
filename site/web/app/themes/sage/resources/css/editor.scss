@@ -9,3 +9,26 @@
 // webawesome.css — see app.js for why.
 @use '../../node_modules/@awesome.me/webawesome/dist/styles/themes/default.css';
 @use '../styles/app';
+
+// ACF Blocks v3 (see app/filters.php's acf/register_block_type_args filter)
+// dropped the old preview-click overlay, so the rendered preview is now just
+// real markup sitting in the canvas with nothing in front of it — a real
+// `<a href>`, button, or form control behaves like the real thing (e.g.
+// navigates away) instead of selecting the block. Nothing inside a block
+// preview should be interactive anymore (editing is toolbar pencil ->
+// pop-out panel only), so kill pointer events on anything that could
+// intercept the click, letting it fall through to the block wrapper for
+// normal WP selection instead.
+.acf-block-preview {
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    wa-button,
+    wa-icon-button,
+    [role='button'],
+    [onclick] {
+        pointer-events: none;
+    }
+}

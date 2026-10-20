@@ -2,13 +2,17 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
+use App\Support\Breadcrumbs;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class TextHero extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -154,6 +158,7 @@ class TextHero extends Block
         'heading_style' => 'match',
         'intro_text' => 'Example intro text for the hero — replace with real page content.',
         'intro_style' => 'standfirst',
+        'show_breadcrumbs' => true,
     ];
 
     /**
@@ -162,6 +167,7 @@ class TextHero extends Block
     public function with(): array
     {
         return [
+            'breadcrumbs' => $this->showBreadcrumbs() ? Breadcrumbs::forPost() : [],
             'heading' => $this->heading(),
             'intro' => $this->intro(),
         ];
@@ -187,6 +193,13 @@ class TextHero extends Block
             'default_style' => 'standfirst',
         ]);
 
+        $fields->addTrueFalse('show_breadcrumbs', [
+            'label' => 'Show breadcrumbs',
+            'instructions' => 'Shown above the heading, as on the Image Hero. Off by default — the Sticky Nav template already shows its own breadcrumbs.',
+            'default_value' => 0,
+            'ui' => true,
+        ]);
+
         return $fields->build();
     }
 
@@ -198,10 +211,20 @@ class TextHero extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: $this->example['heading_text'],
-            'level' => get_field('heading_level') ?: $this->example['heading_level'],
-            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h1'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
+    }
+
+    /**
+     * Whether to show breadcrumbs above the heading.
+     *
+     * @return bool
+     */
+    public function showBreadcrumbs()
+    {
+        return (bool) (get_field('show_breadcrumbs') ?? (shows_example($this->preview) ? $this->example['show_breadcrumbs'] : false));
     }
 
     /**
@@ -212,8 +235,8 @@ class TextHero extends Block
     public function intro()
     {
         return [
-            'text' => get_field('intro_text') ?: $this->example['intro_text'],
-            'style' => get_field('intro_style') ?: $this->example['intro_style'],
+            'text' => $this->resolveField('intro_text', ''),
+            'style' => $this->resolveField('intro_style', 'standfirst'),
         ];
     }
 

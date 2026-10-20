@@ -1,0 +1,13 @@
+// Alignment only — the button itself is the shared <wa-button> styling in components/_button.scss.
+.c-button-block__inner {
+  display: flex;
+  justify-content: flex-start;
+
+  &--center {
+    justify-content: center;
+  }
+
+  &--right {
+    justify-content: flex-end;
+  }
+}

@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class CycleRouteCard extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -269,7 +272,7 @@ class CycleRouteCard extends Block
      */
     public function difficulty()
     {
-        return get_field('difficulty') ?: $this->example['difficulty'];
+        return $this->resolveField('difficulty', 'easy');
     }
 
     /**
@@ -279,7 +282,7 @@ class CycleRouteCard extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return $this->resolveField('image');
     }
 
     /**
@@ -289,7 +292,7 @@ class CycleRouteCard extends Block
      */
     public function routeName()
     {
-        return get_field('route_name') ?: $this->example['route_name'];
+        return $this->resolveField('route_name', '');
     }
 
     /**
@@ -299,7 +302,7 @@ class CycleRouteCard extends Block
      */
     public function timeNeeded()
     {
-        return get_field('time_needed') ?: $this->example['time_needed'];
+        return $this->resolveField('time_needed', '');
     }
 
     /**
@@ -309,7 +312,7 @@ class CycleRouteCard extends Block
      */
     public function distance()
     {
-        return get_field('distance') ?: $this->example['distance'];
+        return $this->resolveField('distance', '');
     }
 
     /**
@@ -319,7 +322,7 @@ class CycleRouteCard extends Block
      */
     public function link()
     {
-        return get_field('link') ?: $this->example['link'];
+        return $this->resolveField('link', ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**

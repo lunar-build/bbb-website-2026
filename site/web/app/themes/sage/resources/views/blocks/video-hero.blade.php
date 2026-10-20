@@ -1,4 +1,4 @@
-  <section {{ $attributes->class(['c-video-hero']) }}>
+  <section {{ $attributes->class(['c-video-hero', 'o-full-bleed-bg']) }}>
 
 <div class="c-video-hero__media" data-video-hero>
   @if ($video['url'] ?? null)

@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class CtaBanner extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -133,7 +136,7 @@ class CtaBanner extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -249,7 +252,6 @@ class CtaBanner extends Block
                 ])
                 ->addTextarea('body', [
                     'label' => 'Body text',
-                    'required' => true,
                     'rows' => 4,
                 ])
                 ->addLink('link', [
@@ -318,7 +320,7 @@ class CtaBanner extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: $this->example['layout'];
+        return $this->resolveField('layout', 'centred');
     }
 
     /**
@@ -328,7 +330,7 @@ class CtaBanner extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: ($this->layout() !== 'slimline' ? $this->example['heading'] : '');
+        return get_field('heading') ?: ($this->layout() !== 'slimline' ? $this->exampleField('heading', '') : '');
     }
 
     /**
@@ -338,7 +340,7 @@ class CtaBanner extends Block
      */
     public function body()
     {
-        return get_field('body') ?: $this->example['body'];
+        return $this->resolveField('body', '');
     }
 
     /**
@@ -350,13 +352,7 @@ class CtaBanner extends Block
      */
     public function link()
     {
-        $link = get_field('link');
-
-        if ($link) {
-            return $link;
-        }
-
-        return $this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
+        return $this->resolveField('link', ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**
@@ -366,7 +362,7 @@ class CtaBanner extends Block
      */
     public function imageLeft()
     {
-        return $this->illustrationUrl(get_field('image_left') ?: ($this->layout() === 'centred' ? $this->example['image_left'] : ''));
+        return $this->illustrationUrl(get_field('image_left') ?: ($this->layout() === 'centred' ? $this->exampleField('image_left', '') : ''));
     }
 
     /**
@@ -376,7 +372,7 @@ class CtaBanner extends Block
      */
     public function imageRight()
     {
-        return $this->illustrationUrl(get_field('image_right') ?: ($this->layout() === 'centred' ? $this->example['image_right'] : ''));
+        return $this->illustrationUrl(get_field('image_right') ?: ($this->layout() === 'centred' ? $this->exampleField('image_right', '') : ''));
     }
 
     /**
@@ -388,7 +384,7 @@ class CtaBanner extends Block
     {
         $isLeftLayout = in_array($this->layout(), ['left', 'row'], true);
 
-        return $this->illustrationUrl(get_field('image') ?: ($isLeftLayout ? $this->example['image'] : ''));
+        return $this->illustrationUrl(get_field('image') ?: ($isLeftLayout ? $this->exampleField('image', '') : ''));
     }
 
     /**

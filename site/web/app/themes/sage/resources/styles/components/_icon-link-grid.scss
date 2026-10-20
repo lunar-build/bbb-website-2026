@@ -4,7 +4,12 @@
 
 // Figma "Icon link grid" (node 10:4389)
 .c-icon-link-grid-block {
-  padding-block: 2.125rem; // 34px — background colour itself is set inline via the block's ACF field
+  padding-block: 2.125rem; // 34px
+
+  // Blue light until an editor picks another (WP's native Background colour).
+  &:not(.has-background) {
+    background: var(--wp--preset--color--blue-light);
+  }
 }
 
 .c-icon-link-grid__list {
@@ -63,7 +68,7 @@
   @extend .u-short-form-link;
   letter-spacing: 0.06rem;
   text-transform: uppercase;
-  color: var(--wp--preset--color--blue-medium);
+  color: var(--c-block-fg, var(--wp--preset--color--blue-medium));
 }
 
 .c-icon-link-grid__arrow {
@@ -93,5 +98,5 @@
   font-weight: 300;
   font-size: 1rem;
   line-height: 1.5;
-  color: var(--wp--preset--color--charcoal);
+  color: var(--c-block-fg, var(--wp--preset--color--charcoal));
 }

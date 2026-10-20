@@ -1,0 +1,57 @@
+// Figma node 348:600 — offset two-column grid of image+quote cards.
+// One grid, so each row's two cards are the same height and the right-hand
+// card is always dropped by exactly $offset — independent flex columns let
+// card heights drift and the stagger shrink or vanish.
+@use '../abstracts/breakpoints' as bp;
+
+$gap: 2.5rem; // Figma's 40px; distinct from spacing.$card-gap (1.5rem)
+$offset: 5.875rem; // 94px
+
+.c-case-study-grid {
+  &__cards {
+    display: grid;
+    gap: $gap;
+
+    @include bp.respond($min: bp.$lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      // transform, not margin, so the dropped card doesn't stretch its row —
+      // room for the last one is added below instead.
+      > :nth-child(even) {
+        transform: translateY($offset);
+      }
+
+      &:has(> :nth-child(2)) {
+        padding-bottom: $offset;
+      }
+    }
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    background: var(--wp--preset--color--white);
+    border-radius: 0.75rem; // 12px
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+    overflow: hidden; // keeps the image's rounded top corners without duplicating the radius on <img>
+  }
+
+  &__image {
+    aspect-ratio: 750 / 450;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  &__quote {
+    flex: 1 1 auto; // takes spare height so the button sits at the card's bottom
+    padding: 1.5rem;
+  }
+
+  // Quote's own bottom padding already clears the attribution; this only
+  // needs the sides and a bottom edge.
+  &__cta {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 1.5rem 1.5rem;
+  }
+}

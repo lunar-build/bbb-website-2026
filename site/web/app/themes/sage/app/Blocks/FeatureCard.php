@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
@@ -10,6 +11,8 @@ use Log1x\AcfComposer\Builder;
 
 class FeatureCard extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -307,7 +310,7 @@ class FeatureCard extends Block
      */
     public function cardStyle()
     {
-        return get_field('card_style') ?: $this->example['card_style'];
+        return $this->resolveField('card_style', 'link');
     }
 
     /**
@@ -317,7 +320,7 @@ class FeatureCard extends Block
      */
     public function image()
     {
-        return get_field('image') ?: $this->example['image'];
+        return $this->resolveField('image');
     }
 
     /**
@@ -327,7 +330,7 @@ class FeatureCard extends Block
      */
     public function date()
     {
-        return get_field('date') ?: ($this->example['date'] ?? null);
+        return $this->resolveField('date');
     }
 
     /**
@@ -338,9 +341,9 @@ class FeatureCard extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: $this->example['heading_text'],
-            'level' => get_field('heading_level') ?: $this->example['heading_level'],
-            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h3'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
     }
 
@@ -353,8 +356,8 @@ class FeatureCard extends Block
     public function body()
     {
         return [
-            'text' => get_field('body_text') ?: ($this->example['body_text'] ?? ''),
-            'style' => get_field('body_style') ?: ($this->example['body_style'] ?? 'body'),
+            'text' => $this->resolveField('body_text', ''),
+            'style' => $this->resolveField('body_style', 'body'),
         ];
     }
 
@@ -365,13 +368,7 @@ class FeatureCard extends Block
      */
     public function link()
     {
-        $link = get_field('link');
-
-        if ($link) {
-            return $link;
-        }
-
-        return $this->preview ? $this->example['link'] : ['title' => '', 'url' => '', 'target' => ''];
+        return $this->resolveField('link', ['title' => '', 'url' => '', 'target' => '']);
     }
 
     /**
@@ -381,7 +378,9 @@ class FeatureCard extends Block
      */
     public function ctaStyle()
     {
-        return get_field('cta_style') ?: ($this->example['cta_style'] ?? ($this->cardStyle() === 'link' ? 'icon' : 'button'));
+        $default = $this->cardStyle() === 'link' ? 'icon' : 'button';
+
+        return $this->resolveField('cta_style', $default);
     }
 
     /**

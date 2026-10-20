@@ -1,11 +1,9 @@
-@unless ($block->preview)
-  <section {{ $attributes->class(['c-callout-text-block']) }}>
-@endunless
+<section {{ $attributes->class(['c-callout-text-block']) }}>
 
+@if ($text)
 <div class="o-container">
   <x-callout-text :text="$text" />
 </div>
+@endif
 
-@unless ($block->preview)
-  </section>
-@endunless
+</section>

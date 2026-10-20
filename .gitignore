@@ -1,1 +1,7 @@
 .claude/settings.local.json
+
+# Local-only prod data (DB dumps, uploads tarballs) for setting up environments — never commit
+/downloads/
+
+# macOS Finder metadata
+.DS_Store

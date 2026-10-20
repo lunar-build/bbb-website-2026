@@ -2,13 +2,17 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
+use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Form extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -28,7 +32,7 @@ class Form extends Block
      *
      * @var string
      */
-    public $description = 'An intro heading/text with a Gravity Forms form.';
+    public $description = 'An intro heading/text with a Gravity Forms form, either alongside an image or centred with no image.';
 
     /**
      * The block category.
@@ -152,13 +156,29 @@ class Form extends Block
     public $styles = [];
 
     /**
+     * Image crop positions (select value => label); the value, with `_` as a
+     * space, is the CSS object-position.
+     *
+     * @var array
+     */
+    public $imagePositions = [
+        'center' => 'Center',
+        'center_top' => 'Top',
+        'center_bottom' => 'Bottom',
+        'left_center' => 'Left',
+        'right_center' => 'Right',
+    ];
+
+    /**
      * The block preview example data.
      *
      * @var array
      */
     public $example = [
+        'layout' => 'image',
         'form_id' => 1,
-        'heading_text' => 'Get in touch',
+        'heading_highlight' => 'Stay up to date',
+        'heading_text' => 'with the latest news and events in your region',
         'heading_level' => 'h2',
         'heading_style' => 'match',
         'subheading_text' => 'Subtitle…',
@@ -169,15 +189,34 @@ class Form extends Block
     ];
 
     /**
+     * Component combinations to render stacked on the pattern-library page
+     * (see App\View\Composers\PatternLibrary::render()) — each entry is
+     * merged onto $example above, so only needs to override what differs.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Image' => [],
+        'Centred' => [
+            'layout' => 'centred',
+            'heading_text' => 'If you have any questions or would like some advice, please feel free to get in touch.',
+        ],
+    ];
+
+    /**
      * Data to be passed to the block before rendering.
      */
     public function with(): array
     {
         return [
+            'layout' => $this->layout(),
             'formId' => $this->formId(),
+            'headingHighlight' => $this->headingHighlight(),
             'heading' => $this->heading(),
             'subheading' => $this->subheading(),
             'intro' => $this->intro(),
+            'image' => $this->image(),
+            'imagePosition' => $this->imagePosition(),
         ];
     }
 
@@ -187,6 +226,24 @@ class Form extends Block
     public function fields(): array
     {
         $fields = Builder::make('form');
+
+        $fields->addTab('Content');
+
+        $fields->addSelect('layout', [
+            'label' => 'Layout',
+            'instructions' => 'Image: form alongside an image. Centred: form only, no image. The heading and text below show beside/above the form in both.',
+            'choices' => [
+                'image' => 'Image with form',
+                'centred' => 'Centred (no image)',
+            ],
+            'default_value' => 'image',
+            'ui' => true,
+        ]);
+
+        $fields->addText('heading_highlight', [
+            'label' => 'Heading (highlighted words)',
+            'instructions' => 'Optional bold lead-in shown before the heading, e.g. "Stay up to date". The rest of the heading then renders in a lighter weight.',
+        ]);
 
         $fields->addPartial(Heading::class, [
             'name' => 'heading',
@@ -206,6 +263,37 @@ class Form extends Block
             'label' => 'Intro text',
             'default_style' => 'body',
         ]);
+
+        // Tab-level condition: the Image tab only exists for the image layout.
+        $fields->addTab('Image', [
+            'conditional_logic' => [
+                [
+                    [
+                        'field' => 'layout',
+                        'operator' => '==',
+                        'value' => 'image',
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields->addImage('image', [
+            'label' => 'Image',
+            'instructions' => 'Shown alongside the form.',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'required' => 1,
+        ]);
+
+        $fields->addSelect('image_position', [
+            'label' => 'Image position',
+            'instructions' => 'Which part of the image stays visible when it\'s cropped to fit.',
+            'choices' => $this->imagePositions,
+            'default_value' => 'center',
+            'ui' => true,
+        ]);
+
+        $fields->addTab('Form');
 
         $fields
             ->addSelect('form_id', [
@@ -242,6 +330,51 @@ class Form extends Block
     }
 
     /**
+     * Retrieve the selected layout.
+     *
+     * @return string
+     */
+    public function layout()
+    {
+        return $this->resolveField('layout', 'image');
+    }
+
+    /**
+     * Retrieve the image's crop position as a CSS object-position value.
+     *
+     * @return string
+     */
+    public function imagePosition()
+    {
+        $position = get_field('image_position');
+
+        return isset($this->imagePositions[$position]) ? str_replace('_', ' ', $position) : 'center';
+    }
+
+    /**
+     * Retrieve the image, falling back to a placeholder.
+     *
+     * @return array
+     */
+    public function image()
+    {
+        return get_field('image') ?: [
+            'url' => Vite::asset('resources/images/placeholder/pattern-placeholder.svg'),
+            'alt' => '',
+        ];
+    }
+
+    /**
+     * Retrieve the optional bold lead-in words for the heading.
+     *
+     * @return string
+     */
+    public function headingHighlight()
+    {
+        return $this->resolveField('heading_highlight', '');
+    }
+
+    /**
      * Retrieve the heading text/level/style.
      *
      * @return array
@@ -249,9 +382,9 @@ class Form extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: $this->example['heading_text'],
-            'level' => get_field('heading_level') ?: $this->example['heading_level'],
-            'style' => get_field('heading_style') ?: $this->example['heading_style'],
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h2'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
     }
 
@@ -264,9 +397,9 @@ class Form extends Block
     public function subheading()
     {
         return [
-            'text' => get_field('subheading_text') ?: ($this->example['subheading_text'] ?? ''),
-            'level' => get_field('subheading_level') ?: ($this->example['subheading_level'] ?? 'h3'),
-            'style' => get_field('subheading_style') ?: ($this->example['subheading_style'] ?? 'match'),
+            'text' => $this->resolveField('subheading_text', ''),
+            'level' => $this->resolveField('subheading_level', 'h3'),
+            'style' => $this->resolveField('subheading_style', 'match'),
         ];
     }
 
@@ -278,9 +411,15 @@ class Form extends Block
      */
     public function intro()
     {
+        // get_field() already applies the 'intro_text' field's
+        // new_lines => 'wpautop' (see Fields\Copy) — the example fallback
+        // bypasses ACF entirely, so it needs the same wpautop() pass
+        // manually to match (real <p> tags for the preview/example).
+        $text = get_field('intro_text');
+
         return [
-            'text' => get_field('intro_text') ?: ($this->example['intro_text'] ?? ''),
-            'style' => get_field('intro_style') ?: ($this->example['intro_style'] ?? 'body'),
+            'text' => $this->resolveField('intro_text', ''),
+            'style' => $this->resolveField('intro_style', 'body'),
         ];
     }
 
@@ -291,7 +430,7 @@ class Form extends Block
      */
     public function formId()
     {
-        return get_field('form_id') ?: $this->example['form_id'];
+        return $this->resolveField('form_id');
     }
 
     /**

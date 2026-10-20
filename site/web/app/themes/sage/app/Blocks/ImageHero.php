@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class ImageHero extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -20,7 +23,7 @@ class ImageHero extends Block
      *
      * @var string
      */
-    public $description = 'A full-bleed image hero, with an optional heading + breadcrumbs overlay — covers both the "Basic picture" and "Picture with text overlay" Figma variants via one toggle.';
+    public $description = 'A full-bleed image hero, with an optional heading and/or breadcrumbs overlay — covers the "Basic picture" and "Picture with text overlay" Figma variants, heading and breadcrumbs toggled independently.';
 
     /**
      * The block category.
@@ -148,9 +151,10 @@ class ImageHero extends Block
      * @var array
      */
     public $example = [
-        'show_text' => true,
+        'show_heading' => true,
         'show_breadcrumbs' => true,
         'heading' => 'Bike shops',
+        'image_position' => 'center',
     ];
 
     /**
@@ -171,7 +175,8 @@ class ImageHero extends Block
     {
         return [
             'backgroundImage' => $this->backgroundImage(),
-            'showText' => $this->showText(),
+            'imagePosition' => $this->imagePosition(),
+            'showHeading' => $this->showHeading(),
             'showBreadcrumbs' => $this->showBreadcrumbs(),
             'heading' => $this->heading(),
         ];
@@ -191,9 +196,20 @@ class ImageHero extends Block
                 'return_format' => 'array',
                 'preview_size' => 'large',
             ])
-            ->addTrueFalse('show_text', [
-                'label' => 'Show heading & breadcrumbs',
-                'instructions' => 'Off renders a plain full-bleed image with no overlay ("Basic picture").',
+            ->addSelect('image_position', [
+                'label' => 'Image position',
+                'instructions' => 'Which part of the image stays visible when it\'s cropped to fit the hero.',
+                'choices' => [
+                    'top' => 'Top',
+                    'center' => 'Center',
+                    'bottom' => 'Bottom',
+                ],
+                'default_value' => 'center',
+                'ui' => true,
+            ])
+            ->addTrueFalse('show_heading', [
+                'label' => 'Show heading',
+                'instructions' => 'Off (with "Show breadcrumbs" also off) renders a plain full-bleed image with no overlay ("Basic picture").',
                 'default_value' => 1,
                 'ui' => true,
             ])
@@ -202,7 +218,7 @@ class ImageHero extends Block
                 'conditional_logic' => [
                     [
                         [
-                            'field' => 'show_text',
+                            'field' => 'show_heading',
                             'operator' => '==',
                             'value' => '1',
                         ],
@@ -211,17 +227,9 @@ class ImageHero extends Block
             ])
             ->addTrueFalse('show_breadcrumbs', [
                 'label' => 'Show breadcrumbs',
+                'instructions' => 'Independent of "Show heading" — e.g. off here and on in template-sticky-nav.blade.php\'s own hardcoded breadcrumbs instead.',
                 'default_value' => 1,
                 'ui' => true,
-                'conditional_logic' => [
-                    [
-                        [
-                            'field' => 'show_text',
-                            'operator' => '==',
-                            'value' => '1',
-                        ],
-                    ],
-                ],
             ]);
 
         return $fields->build();
@@ -234,27 +242,37 @@ class ImageHero extends Block
      */
     public function backgroundImage()
     {
-        return get_field('background_image') ?: ($this->example['background_image'] ?? null);
+        return $this->resolveField('background_image');
     }
 
     /**
-     * Whether to show the heading + breadcrumbs overlay.
+     * Retrieve the image position (object-position keyword).
+     *
+     * @return string
+     */
+    public function imagePosition()
+    {
+        return get_field('image_position') ?: 'center';
+    }
+
+    /**
+     * Whether to show the heading within the overlay.
      *
      * @return bool
      */
-    public function showText()
+    public function showHeading()
     {
-        return (bool) (get_field('show_text') ?? $this->example['show_text']);
+        return $this->resolveBoolField('show_heading');
     }
 
     /**
-     * Whether to show breadcrumbs within the overlay.
+     * Whether to show breadcrumbs within the overlay — independent of showHeading().
      *
      * @return bool
      */
     public function showBreadcrumbs()
     {
-        return (bool) (get_field('show_breadcrumbs') ?? $this->example['show_breadcrumbs']);
+        return $this->resolveBoolField('show_breadcrumbs');
     }
 
     /**
@@ -264,7 +282,7 @@ class ImageHero extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: $this->example['heading'];
+        return $this->resolveField('heading', '');
     }
 
     /**

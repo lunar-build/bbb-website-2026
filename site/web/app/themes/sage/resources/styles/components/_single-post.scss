@@ -1,0 +1,67 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../abstracts/spacing';
+
+// Figma "Sample page -> News article": featured image + "Also read" section shell.
+
+// Full-bleed-background blocks (.o-full-bleed-bg, or any section with a
+// picked background colour) normally run edge to edge
+// — .e-content is itself an .o-container here, so escape them back onto the
+// full-bleed track; their own inner .o-container still narrows their content.
+.e-content.o-container > :is(.o-full-bleed-bg, section.has-background) {
+  grid-column: full-start / full-end;
+}
+
+// Non-full-bleed blocks are already narrowed (their <section> IS the
+// content column) — most also wrap their content in their own
+// .o-container, which would narrow a second time. Flatten that inner grid
+// to a 100%-width passthrough instead.
+.e-content.o-container > section:not(.o-full-bleed-bg, .has-background) .o-container {
+  grid-template-columns: [full-start content-start] 100% [content-end full-end];
+}
+
+.c-single-post {
+  &__image-el {
+    display: block;
+    width: 100%;
+    aspect-ratio: 940 / 564;
+    object-fit: cover;
+    border-radius: 1.25rem;
+  }
+
+  &__quote {
+    margin-block: 2.5rem;
+  }
+
+  &__related {
+    padding-block: 3.5rem;
+    text-align: center;
+  }
+
+  &__related-heading {
+    margin-bottom: 3.5rem;
+  }
+
+  &__related-cards {
+    display: grid;
+    gap: spacing.$card-gap;
+    text-align: left;
+
+    @include bp.respond($min: bp.$md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  // wa-button's host defaults to filling its container (see _cta-banner.scss's align-self:flex-start) — shrink + center instead.
+  &__related-cta {
+    display: block;
+    width: fit-content;
+    margin-top: 3.5rem;
+    margin-inline: auto;
+  }
+}
+
+// Feature Card's fixed Figma width is for the standalone block — fill the
+// column. Two classes so it wins regardless of stylesheet order.
+.c-single-post__related-cards .c-single-post__related-card {
+  max-width: none;
+}

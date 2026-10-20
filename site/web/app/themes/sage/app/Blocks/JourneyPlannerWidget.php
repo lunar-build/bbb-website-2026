@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\ContainedToggle;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class JourneyPlannerWidget extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -183,7 +186,7 @@ class JourneyPlannerWidget extends Block
     {
         $fields = Builder::make('journey_planner_widget');
 
-        $fields->addPartial(ContainedToggle::class);
+        $fields->addPartial(ContainedToggle::class, ['default_value' => 0]);
 
         $fields
             ->addTab('Content')
@@ -251,7 +254,7 @@ class JourneyPlannerWidget extends Block
      */
     public function contained()
     {
-        return (bool) (get_field('contained') ?? $this->example['contained'] ?? true);
+        return (bool) (get_field('contained') ?? $this->example['contained'] ?? false);
     }
 
     /**
@@ -261,7 +264,7 @@ class JourneyPlannerWidget extends Block
      */
     public function variant()
     {
-        return get_field('variant') ?: $this->example['variant'];
+        return $this->resolveField('variant', 'plan_route');
     }
 
     /**
@@ -273,7 +276,7 @@ class JourneyPlannerWidget extends Block
     {
         return get_field('heading') ?: ($this->variant() === 'find_nearby'
             ? "What's near you…"
-            : $this->example['heading']);
+            : $this->exampleField('heading', ''));
     }
 
     /**
@@ -285,7 +288,7 @@ class JourneyPlannerWidget extends Block
     {
         return get_field('cta_label') ?: ($this->variant() === 'find_nearby'
             ? 'Search near here'
-            : $this->example['cta_label']);
+            : $this->exampleField('cta_label', ''));
     }
 
     /**
@@ -295,7 +298,7 @@ class JourneyPlannerWidget extends Block
      */
     public function journeyPlannerUrl()
     {
-        return get_field('journey_planner_url') ?: $this->example['journey_planner_url'];
+        return $this->resolveField('journey_planner_url', '');
     }
 
     /**
@@ -305,7 +308,7 @@ class JourneyPlannerWidget extends Block
      */
     public function nearbyOptions()
     {
-        return get_field('nearby_options') ?: $this->example['nearby_options'];
+        return $this->resolveField('nearby_options', []);
     }
 
     /**
