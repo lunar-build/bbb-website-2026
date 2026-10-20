@@ -1,0 +1,16 @@
+// Decorative artwork; --left/--right set where it sits in the content column.
+.c-illustration__image {
+  display: block;
+  width: 100%;
+  max-width: 18.75rem;
+  height: auto;
+  margin-inline: auto;
+
+  .c-illustration--left & {
+    margin-inline: 0 auto;
+  }
+
+  .c-illustration--right & {
+    margin-inline: auto 0;
+  }
+}
