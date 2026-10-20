@@ -57,6 +57,10 @@
     max-width: none; // .c-quote's own 46rem cap isn't needed at card width
   }
 
+  &__body p + p {
+    margin-top: 1rem;
+  }
+
   &__cta {
     margin-top: auto;
   }
