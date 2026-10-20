@@ -379,7 +379,8 @@ function news_card_grid(array $cards, wpdb $src): array
 /** A group/columns layout holding only old acf/card blocks -> one Card Grid. */
 function news_old_cards(array $b, wpdb $src): ?array
 {
-    $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i));
+    // Empty paragraphs (editor leftovers padding a column) don't count as content.
+    $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i) && ! ($i['blockName'] === 'core/paragraph' && news_plain($i['innerHTML']) === ''));
     if (! $leaves || array_filter($leaves, fn($i) => $i['blockName'] !== 'acf/card')) {
         return null;
     }
@@ -623,6 +624,43 @@ function news_inline_reusable(array $blocks, wpdb $src, array &$notes, int $dept
     return $out;
 }
 
+/**
+ * Card Grids with nothing but whitespace between them (the old layouts put one
+ * row of cards per group) become one grid, so a lone card isn't left stranded.
+ */
+function news_merge_card_grids(array $blocks, array &$notes): array
+{
+    $out = [];
+    $last = null;
+    foreach ($blocks as $b) {
+        if (news_is_blank($b)) {
+            $out[] = $b;
+
+            continue;
+        }
+        if ($b['blockName'] === 'acf/card-grid' && $last !== null && $out[$last]['blockName'] === 'acf/card-grid') {
+            $base = (int) $out[$last]['attrs']['data']['cards'];
+            foreach ($b['attrs']['data'] as $key => $value) {
+                if (preg_match('/^(_?)cards_(\d+)_(.+)$/', $key, $m)) {
+                    $out[$last]['attrs']['data'][$m[1] . 'cards_' . ($base + (int) $m[2]) . '_' . $m[3]] = $value;
+                }
+            }
+            $out[$last]['attrs']['data']['cards'] = $base + (int) $b['attrs']['data']['cards'];
+            // Whitespace between the two grids goes with them.
+            while (news_is_blank(end($out))) {
+                array_pop($out);
+            }
+            $notes[] = 'adjacent Card Grids merged';
+
+            continue;
+        }
+        $out[] = $b;
+        $last = count($out) - 1;
+    }
+
+    return $out;
+}
+
 function news_transform(string $content, wpdb $src, array &$notes, bool $keepCalendars = false): string
 {
     // Old card layouts are spotted by their wrapping group, so swap those
@@ -768,7 +806,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
         $notes[] = count($bikes) . ' bike-cards -> Timeline + Media Gallery (blocks that were between them now follow)';
     }
 
-    return serialize_blocks(news_tighten_after_headings($out));
+    return serialize_blocks(news_tighten_after_headings(news_merge_card_grids($out, $notes)));
 }
 
 /**
