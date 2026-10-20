@@ -313,6 +313,18 @@ class CardRow extends Block
                         ],
                     ],
                 ])
+                ->addRepeater('area_links', [
+                    'label' => 'Link box',
+                    'instructions' => 'Optional. A box of arrow links shown below the cards.',
+                    'button_label' => 'Add link',
+                    'min' => 0,
+                    'layout' => 'block',
+                ])
+                    ->addLink('link', [
+                        'label' => 'Link',
+                        'required' => true,
+                    ])
+                ->endRepeater()
                 ->addLink('browse_all_link', [
                     'label' => 'Browse all link',
                     'instructions' => 'Bottom CTA. Not shown on the Link type.',
@@ -407,18 +419,6 @@ class CardRow extends Block
                         'default_value' => 'easy',
                         'ui' => true,
                     ])
-                    ->addLink('link', [
-                        'label' => 'Link',
-                        'required' => true,
-                    ])
-                ->endRepeater()
-                ->addRepeater('area_links', [
-                    'label' => 'Area links',
-                    'instructions' => 'Quick links to routes by area, shown below the cards.',
-                    'button_label' => 'Add area link',
-                    'min' => 0,
-                    'layout' => 'block',
-                ])
                     ->addLink('link', [
                         'label' => 'Link',
                         'required' => true,
@@ -583,7 +583,7 @@ class CardRow extends Block
     }
 
     /**
-     * Retrieve the Route type's area quick-links.
+     * Retrieve the optional link box's links.
      *
      * @return array
      */

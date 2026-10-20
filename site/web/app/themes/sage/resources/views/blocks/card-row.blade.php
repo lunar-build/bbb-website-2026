@@ -83,7 +83,7 @@
     @endif
   </div>
 
-  @if ($type === 'route' && ! empty($areaLinks))
+  @if (! empty($areaLinks))
     <div class="c-card-row__area-links">
       @foreach ($areaLinks as $row)
         <a

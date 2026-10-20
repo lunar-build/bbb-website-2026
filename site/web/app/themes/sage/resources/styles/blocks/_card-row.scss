@@ -7,6 +7,7 @@
 @use '../base/typography';
 @use '../components/button';
 @use '../abstracts/spacing';
+@use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 
 .c-card-row__heading {
@@ -153,7 +154,7 @@
   }
 }
 
-// Route type's extra "browse by area" quick-links panel.
+// Optional link box under the cards (all types).
 .c-card-row__area-links {
   display: flex;
   flex-wrap: wrap;
@@ -163,6 +164,11 @@
   border-radius: 20px;
   background: var(--wp--preset--color--lightest-grey);
   margin-bottom: 2rem;
+
+  @include bp.respond($min: bp.$lg) {
+    max-width: 75vw;
+    margin-inline: auto;
+  }
 }
 
 .c-card-row__area-link {
