@@ -172,8 +172,9 @@ if (desktopNav) {
     const fits = () => {
       const last = [...navList.children].reverse().find((li) => !li.hidden);
       return (
+        !last ||
         last.getBoundingClientRect().right <=
-        navList.getBoundingClientRect().right + 0.5
+          navList.getBoundingClientRect().right + 0.5
       );
     };
 
@@ -205,18 +206,26 @@ if (desktopNav) {
     if (stale) closeAll();
   };
 
-  // Observe the container, not the list: the list's own size changes as
-  // items hide/show, which would feed back into this observer.
-  if (navList && moreItem && sections.length) {
-    new ResizeObserver(layoutOverflow).observe(navList.closest('.o-container'));
-    document.fonts?.ready.then(layoutOverflow);
+  // Deferred to the next frame: layoutOverflow resizes the items it's
+  // observing, and doing that inside the observer callback logs a
+  // "ResizeObserver loop" error. Also collapses bursts into one pass.
+  let layoutFrame;
+  const scheduleLayout = () => {
+    cancelAnimationFrame(layoutFrame);
+    layoutFrame = requestAnimationFrame(layoutOverflow);
+  };
 
-    // Text-only zoom, a larger default font size or text-spacing overrides
-    // widen the labels without resizing the container (WCAG 1.4.4/1.4.12).
-    // Hiding an item for overflow also resizes it, but the layout it
-    // triggers lands on the same state, so this settles rather than loops.
-    const itemObserver = new ResizeObserver(layoutOverflow);
-    navItems.forEach((item) => itemObserver.observe(item));
+  if (navList && moreItem && sections.length) {
+    const observer = new ResizeObserver(scheduleLayout);
+    // The container, for viewport changes. The list itself is skipped: its
+    // size changes as items hide/show.
+    observer.observe(navList.closest('.o-container'));
+    // The items, for text-only zoom, a larger default font size or text
+    // spacing, which widen labels without resizing the container
+    // (WCAG 1.4.4/1.4.12). Hiding an item for overflow resizes it too, but
+    // the next pass lands on the same state, so this settles.
+    navItems.forEach((item) => observer.observe(item));
+    document.fonts?.ready.then(scheduleLayout);
   }
 
   // Desktop search (Figma "Desktop | Search") replaces the L1 list within
@@ -225,16 +234,15 @@ if (desktopNav) {
     '.c-primary-nav-desktop__search-toggle',
   );
   const searchForm = document.getElementById('desktop-search');
-  const list = desktopNav.querySelector('.c-primary-nav-desktop__list');
 
-  if (searchToggle && searchForm && list) {
+  if (searchToggle && searchForm && navList) {
     const setSearchOpen = (open) => {
       closeAll();
       searchToggle.setAttribute('aria-expanded', String(open));
-      list.hidden = open;
+      navList.hidden = open;
       searchForm.hidden = !open;
-      if (!open) layoutOverflow();
       if (open) searchForm.querySelector('input').focus();
+      else layoutOverflow();
     };
 
     searchToggle.addEventListener('click', () => setSearchOpen(true));
