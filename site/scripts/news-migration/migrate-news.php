@@ -456,6 +456,22 @@ function news_replace_old_cards(array $blocks, wpdb $src, array &$notes, bool $l
     return $blocks;
 }
 
+/**
+ * The old illustration blocks composed a figure with up to three objects. The
+ * Illustration block shows one picture, so the figure is kept and the objects go.
+ * Figures map to the theme's library (the old "girl" is the theme's cyclist).
+ */
+function news_illustration(array $b): ?array
+{
+    $file = strtolower(pathinfo($b['attrs']['data']['illustration_figure'] ?? '', PATHINFO_FILENAME));
+    $key = ['girl' => 'cyclist'][$file] ?? $file;
+    if (! isset(\App\Blocks\Illustration::ILLUSTRATIONS[$key])) {
+        return null;
+    }
+
+    return news_acf_block('acf/illustration', \App\Blocks\Illustration::class, ['illustration' => $key, 'position' => 'centre'], 'illustration');
+}
+
 /** Accordion from the old FAQ block (question/answer repeater). */
 function news_faq(array $b): array
 {
@@ -827,7 +843,11 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 break;
             case 'acf/illustration':
             case 'acf/illustration-divider':
-                // Decorative artwork from the old theme, no equivalent here.
+                if ($illustration = news_illustration($b)) {
+                    $out[] = $illustration;
+                } else {
+                    $notes[] = 'illustration dropped (figure not in the theme library)';
+                }
                 break;
             case 'acf/card':
                 // Consecutive loose cards share one grid.
@@ -1637,9 +1657,8 @@ function cc_strip_blocks(array $blocks, array &$notes): array
     $out = [];
     foreach ($blocks as $b) {
         $name = (string) $b['blockName'];
-        // Next session + price now come from the single event template; the
-        // old theme's decorative illustrations have no place in this one.
-        if (in_array($name, ['acf/upcoming-sessions', 'acf/illustration'], true)) {
+        // Next session + price now come from the single event template.
+        if ($name === 'acf/upcoming-sessions') {
             continue;
         }
         // Old CF7 forms (Bristol Cycling Centre contact/newsletter) need rebuilding in Gravity Forms.
