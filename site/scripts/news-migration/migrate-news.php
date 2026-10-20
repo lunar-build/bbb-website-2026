@@ -363,7 +363,7 @@ function news_card_grid(array $cards, wpdb $src): array
             ];
         }
         $fields += [
-            "cards_{$n}_image" => $d['icon'] ?? $d['image'] ?? '',
+            "cards_{$n}_image" => $d['icon'] ?? $d['image'] ?? $d['header_image'] ?? '',
             "cards_{$n}_heading_text" => html_entity_decode($d['title'] ?? '', ENT_QUOTES),
             "cards_{$n}_heading_level" => 'h3',
             "cards_{$n}_heading_style" => 'match',
@@ -376,8 +376,56 @@ function news_card_grid(array $cards, wpdb $src): array
     return news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid');
 }
 
+/** The old card's link points at an uploaded file (map, guide) rather than a page. */
+function news_card_file_id(array $card, wpdb $src): int
+{
+    $url = html_entity_decode($card['attrs']['data']['link']['url'] ?? '');
+    if (! preg_match('#/app/uploads/(.+\.(?:pdf|docx?|xlsx?|zip))$#i', $url, $m)) {
+        return 0;
+    }
+
+    return (int) $src->get_var($src->prepare("SELECT post_id FROM {$src->postmeta} WHERE meta_key='_wp_attached_file' AND meta_value=%s", $m[1]));
+}
+
+/**
+ * Old acf/card blocks -> Link Card: files (maps, guides) become download cards,
+ * anything else a link card whose CTA label is the old link text. The old
+ * icon is the logo; large header photos have no place on these cards.
+ */
+function news_link_cards(array $cards, wpdb $src): array
+{
+    $fields = ['cards' => count($cards)];
+    foreach (array_values($cards) as $i => $card) {
+        $d = $card['attrs']['data'] ?? [];
+        $fileId = news_card_file_id($card, $src);
+        $file = $fileId ? $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_wp_attached_file'", $fileId)) : null;
+        $path = $file ? wp_upload_dir()['basedir'] . '/' . $file : null;
+        $link = $d['link'] ?? ['title' => '', 'url' => '', 'target' => ''];
+        $fields += [
+            "cards_{$i}_logo" => ($d['image_options'] ?? '') === 'icon' ? ($d['icon'] ?? '') : '',
+            "cards_{$i}_title" => html_entity_decode(news_plain($d['title'] ?? ''), ENT_QUOTES),
+            "cards_{$i}_description" => news_plain($d['text'] ?? ''),
+            "cards_{$i}_cta_type" => $fileId ? 'download' : 'link',
+            "cards_{$i}_link" => $fileId ? '' : $link,
+            "cards_{$i}_file" => $fileId ?: '',
+            "cards_{$i}_cta_label" => $link['title'] ?? 'Download',
+            "cards_{$i}_file_size" => $path && file_exists($path) ? trim(strtoupper(pathinfo($file, PATHINFO_EXTENSION)) . ' ' . str_replace(' ', '', size_format(filesize($path), 1))) : '',
+        ];
+    }
+
+    return news_acf_block('acf/link-card', \App\Blocks\LinkCard::class, $fields, 'link_card');
+}
+
+/** One layout of old cards: Link Cards when any is a file download (or the page asks for them), else a Card Grid. */
+function news_card_layout(array $cards, wpdb $src, bool $linkCards): array
+{
+    $files = array_filter($cards, fn($c) => news_card_file_id($c, $src));
+
+    return $linkCards || $files ? news_link_cards($cards, $src) : news_card_grid($cards, $src);
+}
+
 /** A group/columns layout holding only old acf/card blocks -> one Card Grid. */
-function news_old_cards(array $b, wpdb $src): ?array
+function news_old_cards(array $b, wpdb $src, bool $linkCards = false): ?array
 {
     // Empty paragraphs (editor leftovers padding a column) don't count as content.
     $leaves = array_filter(news_flatten($b['innerBlocks']), fn($i) => ! $i['innerBlocks'] && ! news_is_blank($i) && ! ($i['blockName'] === 'core/paragraph' && news_plain($i['innerHTML']) === ''));
@@ -385,18 +433,18 @@ function news_old_cards(array $b, wpdb $src): ?array
         return null;
     }
 
-    return news_card_grid($leaves, $src);
+    return news_card_layout($leaves, $src, $linkCards);
 }
 
 /** Swap each outermost all-acf/card group/columns, at any depth, 1:1 for a Card Grid. */
-function news_replace_old_cards(array $blocks, wpdb $src, array &$notes): array
+function news_replace_old_cards(array $blocks, wpdb $src, array &$notes, bool $linkCards = false): array
 {
     foreach ($blocks as &$b) {
-        if (in_array($b['blockName'], ['core/group', 'core/columns'], true) && ($cards = news_old_cards($b, $src))) {
+        if (in_array($b['blockName'], ['core/group', 'core/columns'], true) && ($cards = news_old_cards($b, $src, $linkCards))) {
             $b = $cards;
             $notes[] = 'acf/card layout -> Card Grid';
         } elseif ($b['innerBlocks']) {
-            $b['innerBlocks'] = news_replace_old_cards($b['innerBlocks'], $src, $notes);
+            $b['innerBlocks'] = news_replace_old_cards($b['innerBlocks'], $src, $notes, $linkCards);
         }
     }
 
@@ -625,8 +673,8 @@ function news_inline_reusable(array $blocks, wpdb $src, array &$notes, int $dept
 }
 
 /**
- * Card Grids with nothing but whitespace between them (the old layouts put one
- * row of cards per group) become one grid, so a lone card isn't left stranded.
+ * Card Grids (or Link Cards) with nothing but whitespace between them (the old
+ * layouts put one row of cards per group) become one block, so a lone card isn't left stranded.
  */
 function news_merge_card_grids(array $blocks, array &$notes): array
 {
@@ -638,7 +686,7 @@ function news_merge_card_grids(array $blocks, array &$notes): array
 
             continue;
         }
-        if ($b['blockName'] === 'acf/card-grid' && $last !== null && $out[$last]['blockName'] === 'acf/card-grid') {
+        if (in_array($b['blockName'], ['acf/card-grid', 'acf/link-card'], true) && $last !== null && $out[$last]['blockName'] === $b['blockName']) {
             $base = (int) $out[$last]['attrs']['data']['cards'];
             foreach ($b['attrs']['data'] as $key => $value) {
                 if (preg_match('/^(_?)cards_(\d+)_(.+)$/', $key, $m)) {
@@ -650,7 +698,7 @@ function news_merge_card_grids(array $blocks, array &$notes): array
             while (news_is_blank(end($out))) {
                 array_pop($out);
             }
-            $notes[] = 'adjacent Card Grids merged';
+            $notes[] = 'adjacent card blocks merged';
 
             continue;
         }
@@ -661,12 +709,12 @@ function news_merge_card_grids(array $blocks, array &$notes): array
     return $out;
 }
 
-function news_transform(string $content, wpdb $src, array &$notes, bool $keepCalendars = false): string
+function news_transform(string $content, wpdb $src, array &$notes, bool $keepCalendars = false, bool $linkCards = false): string
 {
     // Old card layouts are spotted by their wrapping group, so swap those
     // first; then lift every block out of its group so the loop below
     // converts blocks at any depth, not just the top level.
-    $in = news_unwrap_groups(news_replace_old_cards(news_inline_reusable(parse_blocks($content), $src, $notes), $src, $notes));
+    $in = news_unwrap_groups(news_replace_old_cards(news_inline_reusable(parse_blocks($content), $src, $notes), $src, $notes, $linkCards));
     $out = [];
     $bikes = [];
     $bikeSlot = null;
@@ -760,8 +808,8 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                         $run[] = $in[$i];
                     }
                 }
-                $out[] = news_card_grid($run, $src);
-                $notes[] = count($run) . ' loose acf/card -> Card Grid';
+                $out[] = news_card_layout($run, $src, $linkCards);
+                $notes[] = count($run) . ' loose acf/card -> Card Grid / Link Card';
                 break;
             case 'core/html':
             case 'core/embed':
@@ -943,6 +991,9 @@ const NEWS_PAGES_SKIP = [59, 1985, 1550, 1717];
 
 /** Landing pages, held back until their hero/carousel/card blocks have conversions. */
 const NEWS_PAGES_DEFERRED = [220, 241];
+
+/** Pages whose cards are all downloads/links to elsewhere: every card layout becomes Link Cards. */
+const NEWS_LINK_CARD_PAGES = [701];
 
 /** Sticky Nav suits long pages: this many H2s or more. */
 const NEWS_STICKY_NAV_H2S = 4;
@@ -1308,7 +1359,7 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
 {
     $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
     $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
-    $blocks = parse_blocks(news_transform($row->post_content, $src, $notes));
+    $blocks = parse_blocks(news_transform($row->post_content, $src, $notes, false, in_array($id, NEWS_LINK_CARD_PAGES, true)));
 
     $h2s = 0;
     $walk = function (array $list) use (&$walk, &$h2s) {
