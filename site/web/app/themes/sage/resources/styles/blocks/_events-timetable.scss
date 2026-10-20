@@ -1,0 +1,271 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/typography';
+@use '../base/focus' as focus;
+
+// Figma "Events timetable" (node 26:1172) and "Events timetable (alt)" (node 63:2406)
+
+.c-events-timetable {
+  color: var(--wp--preset--color--blue-dark);
+}
+
+/* Session rows (both layouts) */
+
+// Doubled class to beat .e-content ul's bullets in page content.
+.c-events-timetable__sessions.c-events-timetable__sessions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li::before {
+    content: none;
+  }
+}
+
+.c-events-timetable__session {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'time link';
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1.0625rem;
+  border-bottom: 1px solid var(--wp--preset--color--place-holder-grey);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.c-events-timetable__time {
+  @extend .u-table-column-heading;
+  grid-area: time;
+  white-space: nowrap;
+}
+
+.c-events-timetable__link {
+  @extend .u-standfirst;
+  grid-area: link;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-align: end;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include focus.ring;
+
+  .c-icon svg {
+    display: block;
+    width: 1rem;
+    height: 0.75rem;
+  }
+}
+
+.c-events-timetable__empty {
+  margin: 0;
+  padding-block: 1.0625rem;
+}
+
+/* Weekday tabs layout */
+
+.c-events-timetable__panel {
+  padding: 1.625rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--blue-light);
+
+  & + & {
+    margin-top: 1.25rem;
+  }
+
+  @include bp.respond($max: bp.$md) {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.c-events-timetable__title {
+  margin-bottom: 1.25rem;
+  color: inherit;
+}
+
+.c-events-timetable__tabs {
+  --track-width: 0;
+  --indicator-color: transparent;
+
+  &::part(tabs) {
+    // Wrap, not scroll, so every day stays visible (WCAG 1.4.10).
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.25rem;
+  }
+
+  &::part(scroll-button) {
+    display: none;
+  }
+
+  // WA's unexposed scroller (.nav) clips the focus ring: pad the strip by the
+  // ring's reach (2px + 2px offset), pull `nav` back so the pills stay aligned.
+  &::part(nav) {
+    margin: -0.25rem;
+  }
+
+  &::part(body) {
+    margin-top: 0.75rem;
+  }
+
+  // Focus is on the host but the pill is the `tab` part; ring that (replaces
+  // WA's inset ring).
+  wa-tab:focus-visible::part(tab) {
+    @include focus.ring-styles;
+  }
+
+  wa-tab::part(tab) {
+    @extend .u-table-column-heading;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--wp--preset--color--blue-dark);
+    border-radius: 999px;
+    background: var(--wp--preset--color--blue-light);
+    color: var(--wp--preset--color--blue-dark);
+  }
+
+  wa-tab[active]::part(tab) {
+    border-color: var(--wp--preset--color--blue);
+    background: var(--wp--preset--color--blue);
+    color: var(--wp--preset--color--blue-light);
+  }
+
+  wa-tab-panel::part(base) {
+    padding: 0;
+  }
+
+  @include bp.respond($max: bp.$md) {
+    wa-tab::part(tab) {
+      padding: 0.375rem 0.75rem;
+    }
+
+    &::part(tabs) {
+      justify-content: flex-start;
+    }
+  }
+}
+
+/* Day-by-day accordion layout. Scoped under the block so the site-wide
+   wa-accordion-item rules in _accordion.scss don't apply here. */
+
+.c-events-timetable__periods {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: visible;
+}
+
+.c-events-timetable .c-events-timetable__period {
+  --spacing: 0;
+  // WA sets its own text colour on the item; keep the block's dark blue.
+  color: var(--wp--preset--color--blue-dark);
+  padding: 1.25rem 1.625rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--white);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.25);
+
+  &::part(button) {
+    @extend .u-heading-5;
+    margin-bottom: 0;
+    padding: 0;
+    align-items: flex-start;
+    border-radius: 0;
+    color: var(--wp--preset--color--blue-dark);
+
+    @include focus.ring;
+  }
+
+  &::part(icon) {
+    margin-top: calc((2.25rem - 0.6875rem) / 2);
+    color: var(--wp--preset--color--blue-dark);
+    rotate: 0deg;
+  }
+
+  &[expanded]::part(icon) {
+    rotate: 180deg;
+  }
+
+  &::part(content) {
+    padding: 1.25rem 0 0;
+  }
+
+  @include bp.respond($max: bp.$md) {
+    padding: 1rem;
+  }
+}
+
+.c-events-timetable__days {
+  display: block;
+  overflow: visible;
+}
+
+.c-events-timetable .c-events-timetable__day {
+  --spacing: 0;
+
+  & + & {
+    margin-top: 1.25rem;
+  }
+
+  &::part(button) {
+    @extend .u-table-column-heading;
+    padding: 0.375rem 0;
+    border-bottom: 1px solid var(--wp--preset--color--blue);
+    border-radius: 0;
+    color: var(--wp--preset--color--blue);
+
+    @include focus.ring;
+  }
+
+  &::part(icon) {
+    color: var(--wp--preset--color--blue);
+    rotate: 0deg;
+  }
+
+  &[expanded]::part(icon) {
+    rotate: 180deg;
+  }
+
+  &::part(content) {
+    padding: 0;
+  }
+
+  .c-events-timetable__session {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'dot link time';
+    gap: 1.25rem;
+    padding-block: 0.75rem;
+    border-bottom-color: var(--wp--preset--color--light-grey);
+  }
+
+  .c-events-timetable__time {
+    @extend .u-body-large;
+  }
+
+  .c-events-timetable__link {
+    @extend .u-table-cell-heading;
+    justify-self: start;
+    text-align: start;
+  }
+}
+
+.c-events-timetable__dot {
+  grid-area: dot;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--dot);
+}
+
+.c-events-timetable__chevron svg {
+  display: block;
+  width: 1.25rem;
+  height: 0.6875rem;
+}

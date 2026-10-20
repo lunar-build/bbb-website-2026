@@ -336,3 +336,22 @@ if (defined('WP_CLI') && WP_CLI) {
         }
     });
 }
+
+/**
+ * MEC enqueues ~20 styles/scripts (and Typekit) on every page, unused since
+ * the theme renders events itself. Keep them only where an [MEC] shortcode is.
+ */
+add_action('wp_enqueue_scripts', function () {
+    if (is_singular() && has_shortcode((string) get_post_field('post_content'), 'MEC')) {
+        return;
+    }
+
+    $isMec = fn(string $handle) => str_starts_with($handle, 'mec-') || $handle === 'featherlight';
+
+    foreach (array_filter(wp_styles()->queue, $isMec) as $handle) {
+        wp_dequeue_style($handle);
+    }
+    foreach (array_filter(wp_scripts()->queue, $isMec) as $handle) {
+        wp_dequeue_script($handle);
+    }
+}, 100);

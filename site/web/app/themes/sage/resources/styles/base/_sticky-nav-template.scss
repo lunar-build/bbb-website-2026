@@ -1,4 +1,5 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../abstracts/column-blocks';
 
 // Styles for the Sticky Nav page template
 // (resources/views/template-sticky-nav.blade.php): a sticky left-rail page
@@ -58,6 +59,8 @@
   > .c-breadcrumbs {
     margin-bottom: 2rem;
   }
+
+  @include column-blocks.blocks;
 
   // Same reason as .c-sticky-nav-template__nav's `top` above — a heading
   // jumped to via the page menu (or a direct #anchor link) would otherwise
