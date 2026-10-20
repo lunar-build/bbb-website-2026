@@ -16,10 +16,8 @@
   padding: 0;
   list-style: none;
 
-  // Single line spanning first-marker-centre to last-marker-centre, sat
-  // behind the markers (z-index 1) which mask it into a connector between
-  // them. Drawn once on the list so per-step baseline shifts (see
-  // .c-timeline__step) can't throw off a per-row length calculation.
+  // One line from first to last marker centre, behind the markers (z-index 1). Drawn on
+  // the list so per-step baseline shifts (.c-timeline__step) can't skew its length.
   &::before {
     content: '';
     position: absolute;
@@ -32,23 +30,20 @@
   }
 }
 
-// All markers in a block share one size, set here rather than per-step, so a
-// mix of numbers and dates never renders as mismatched circle sizes.
+// One marker size per block, so mixed numbers and dates don't mismatch.
 .c-timeline--dates {
   --timeline-marker-size: 6rem; // 96px — fits an 8-char DD/MM/YY date
 }
 
 .c-timeline__step {
   display: flex;
-  // Content's first line (heading or body) starts level with the marker's
-  // own text baseline, whatever the marker's height happens to be.
+  // First line level with the marker's text baseline, whatever its height.
   align-items: baseline;
   gap: 1.625rem; // 26px
   margin: 0;
 }
 
-// No heading: centre copy block on the marker's height instead of baseline-
-// aligning its first line, so a two-line wrap still centres correctly.
+// No heading: centre on the marker so a two-line wrap still centres.
 .c-timeline__step--no-heading {
   align-items: center;
 }

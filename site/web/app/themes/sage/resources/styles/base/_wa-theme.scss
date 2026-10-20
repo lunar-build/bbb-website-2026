@@ -1,8 +1,6 @@
-// Overrides Web Awesome's semantic color tokens with brand tokens, so
-// <wa-button variant="brand|neutral" appearance="accent"> renders in brand
-// colors without fighting WA's generated 05-95 OKLCH color-scale system.
-// Hover/focus pseudo-states are handled separately in base/_button.scss.
-// See: node_modules/@awesome.me/webawesome/dist/styles/themes/default.css
+// Overrides WA's semantic colour tokens with brand tokens, rather than fighting its
+// generated OKLCH scale. Hover/focus states: components/_button.scss.
+// Token list: node_modules/@awesome.me/webawesome/dist/styles/themes/default.css
 
 :root {
   --wa-color-brand-fill-loud: var(--wp--preset--color--yellow);
@@ -15,10 +13,8 @@
 
   --wa-color-focus: var(--wp--preset--color--blue);
 
-  // Shared brand styling for every wa-input/wa-textarea/wa-checkbox/wa-radio
-  // (full --wa-form-control-* list: webawesome/dist/styles/themes/default.css).
-  // GF's own fields are styled separately in base/_forms.scss; these tokens
-  // don't reach them.
+  // Shared by wa-input/textarea/checkbox/radio. Doesn't reach Gravity Forms' own
+  // fields (base/_forms.scss).
   --wa-form-control-background-color: var(--wp--preset--color--white);
   --wa-form-control-border-color: var(--wp--preset--color--charcoal);
   --wa-form-control-border-width: 2px;
@@ -34,8 +30,7 @@
   --wa-form-control-required-content-color: var(--wp--preset--color--dark-orange);
 }
 
-// Repoints WA's own focus ring (blue by default) to the theme's
-// focus.ring colour/width instead of reimplementing a ring per component.
+// Repoints WA's focus ring to the theme's focus.ring colour/width.
 wa-input,
 wa-textarea,
 wa-radio,
@@ -47,12 +42,19 @@ wa-checkbox-group {
   --wa-focus-ring-offset: 2px;
 }
 
-// wa-checkbox/wa-radio draw their ring via the composite `--wa-focus-ring`
-// token, which is resolved once at :root — overriding the raw tokens above
-// doesn't recompute it, so the composite itself needs re-declaring here.
+// `--wa-focus-ring` is resolved once at :root, so overriding the raw tokens above
+// doesn't update it — re-declare the composite here.
 wa-radio,
 wa-radio-group,
 wa-checkbox,
 wa-checkbox-group {
   --wa-focus-ring: 2px solid var(--focus-color);
+}
+
+// WA collapses closed items to height 0 but leaves content focusable (WCAG 2.4.3/2.4.7);
+// hide it after the close animation. Never set `visible` — it would show an open item
+// nested in a closed one.
+wa-accordion-item:not([expanded])::part(panel) {
+  visibility: hidden;
+  transition: visibility 0s linear var(--hide-duration, 200ms);
 }

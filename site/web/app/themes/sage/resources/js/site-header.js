@@ -1,20 +1,14 @@
-// Sticky site header, auto-hide on scroll: slides out of view scrolling
-// down, slides back in scrolling up, so it doesn't permanently eat
-// viewport space while still being reachable.
-const SCROLL_DELTA_THRESHOLD = 8; // px of movement before a direction change counts, so trackpad/momentum jitter near a reversal doesn't flicker the header
+// Sticky header: slides out scrolling down, back in scrolling up.
+const SCROLL_DELTA_THRESHOLD = 8; // px before a direction change counts (avoids trackpad jitter flicker)
 
 const header = document.querySelector('.c-site-header');
 
-// Exposed so other modules (e.g. sticky-nav-template.js) can force the header visible
-// before a programmatic scroll, rather than letting its own scroll-direction detection
-// catch up after the fact — a no-op if there's no header on this page.
+// Lets other modules (e.g. sticky-nav-template.js) force the header visible before
+// a programmatic scroll. No-op without a header.
 export let setHeaderHidden = () => {};
 
 if (header) {
-  // Exposes the header's real rendered height (it now includes the desktop
-  // nav row, not just the logo/CTA row, and varies by breakpoint) as a CSS
-  // var, so anything sticky further down the page (e.g. the pattern
-  // library nav) can offset itself below it instead of a guessed constant.
+  // Real header height (varies by breakpoint) as a CSS var for sticky elements below it.
   const updateHeaderHeightVar = () => {
     document.documentElement.style.setProperty('--site-header-height', `${header.offsetHeight}px`);
   };
@@ -25,15 +19,9 @@ if (header) {
   let lastScrollY = window.scrollY;
   let ticking = false;
 
-  // While hidden, the header is also marked inert/aria-hidden so assistive
-  // tech and keyboard focus stay in sync with what's visually present
-  // (WCAG 4.1.2) — a sighted keyboard user can't tab into controls that
-  // are currently translated off-screen.
-  //
-  // Also toggled on <html> as .is-header-hidden — a plain state class, not
-  // a measured height or custom property — for anything elsewhere that
-  // needs to know whether the header is currently covering the top of the
-  // viewport (e.g. the sticky nav template's `top` offset).
+  // While hidden the header is inert/aria-hidden so focus and AT match what's visible
+  // (WCAG 4.1.2). Also sets .is-header-hidden on <html> for offsets elsewhere
+  // (e.g. the sticky nav template's `top`).
   const setHidden = (hidden) => {
     header.classList.toggle('is-hidden', hidden);
     header.toggleAttribute('inert', hidden);

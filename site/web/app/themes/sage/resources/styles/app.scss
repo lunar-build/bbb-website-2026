@@ -29,6 +29,8 @@
 @use 'components/download-link';
 @use 'components/single-post';
 @use 'components/archive';
+@use 'components/event';
+@use 'components/label';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'base/sticky-nav-template';
@@ -59,3 +61,4 @@
 @use 'blocks/video-block';
 @use 'blocks/button-block';
 @use 'blocks/map-embed';
+@use 'blocks/events-timetable';

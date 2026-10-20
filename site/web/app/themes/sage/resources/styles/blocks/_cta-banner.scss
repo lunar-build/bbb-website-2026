@@ -1,12 +1,10 @@
 @use '../abstracts/breakpoints' as bp;
 
-// Each layout supplies its own default background/text colour below. A
-// background picked in the editor (see theme_block_background_colors()) wins
-// over the background via WP's `!important` preset class, and sets
-// `--c-block-fg` so the text follows it.
+// Each layout sets default colours below; an editor-picked background (see
+// theme_block_background_colors()) wins via WP's `!important` preset class and sets
+// `--c-block-fg` for the text.
 
-// overflow:hidden clips Centred's edge-bleeding illustrations so they
-// never cause horizontal scroll.
+// overflow:hidden stops Centred's edge-bleeding illustrations causing horizontal scroll.
 .c-cta-banner {
   position: relative;
   overflow: hidden;
@@ -36,8 +34,7 @@
   align-self: flex-start;
 }
 
-// Centred's decorative illustrations. Hidden below `xl` — no room beside
-// the centred text without overlapping it.
+// Centred's illustrations. Hidden below `xl` — they'd overlap the text.
 .c-cta-banner__image {
   display: none;
   position: absolute;
@@ -52,8 +49,7 @@
   }
 }
 
-// Anchored a fixed distance from centre, not the section edge, so the gap
-// to the text stays constant as the viewport grows.
+// Anchored from centre, not the edge, so the gap to the text stays constant.
 .c-cta-banner__image--left {
   left: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
   transform: translateY(-50%);
@@ -61,13 +57,11 @@
 
 .c-cta-banner__image--right {
   right: calc(50% - 18.5rem - var(--c-cta-banner-image-width));
-  // Both Centred illustrations face outward (away from the text) — the
-  // source art faces left, so the right-hand rider needs mirroring.
+  // Source art faces left; mirror so the right-hand rider faces outward.
   transform: translateY(-50%) scaleX(-1);
 }
 
-// Centred — Figma "Layout=Centred": blue bg, white centred text/CTA, two
-// optional illustrations flanking the content.
+// Figma "Layout=Centred"
 .c-cta-banner--centred {
   background: var(--wp--preset--color--blue);
   color: var(--c-block-fg, var(--wp--preset--color--white));
@@ -89,9 +83,7 @@
   }
 }
 
-// Left — Figma "Layout=Left": light bg, dark left-aligned text/CTA, one
-// optional illustration, as a real grid column (contained, not bleeding)
-// rather than overlapping/overflowing the block.
+// Figma "Layout=Left" — illustration is a real grid column, not bleeding.
 .c-cta-banner--left {
   background: var(--wp--preset--color--blue-light);
   color: var(--c-block-fg, var(--wp--preset--color--blue-dark));
@@ -115,9 +107,7 @@
   }
 }
 
-// Row — same grid as Left, but blue bg + white text, image / text / button
-// in a single row (Figma "Card grid" banner: cyclist illustration on a
-// solid blue field, image on the LEFT — opposite side from Left's own).
+// Row — Left's grid with blue bg/white text; image sits on the left (Left's is right).
 .c-cta-banner--row {
   background: var(--wp--preset--color--blue);
   color: var(--c-block-fg, var(--wp--preset--color--white));
@@ -127,8 +117,7 @@
     color: var(--c-block-fg, var(--wp--preset--color--white));
   }
 
-  // Same 2rem gap as &__content's text/button row below, so image-to-text
-  // and text-to-button read as equal spacing.
+  // Matches &__content's 2rem gap so image-to-text and text-to-button read equal.
   .c-cta-banner__grid {
     @include bp.respond($min: bp.$md) {
       display: flex;
@@ -156,9 +145,7 @@
     }
   }
 
-  // `order: -1` puts it first regardless of DOM order. Hidden until `xl`
-  // (not `lg` like the base rule) — no room for image+row-text+button
-  // together that early.
+  // `order: -1` puts it first. Hidden until `xl` (base rule: `lg`) — too tight before.
   .c-cta-banner__image--column {
     display: none;
 
@@ -180,7 +167,7 @@
   width: 100%;
   max-width: 22rem;
   margin-inline: auto;
-  // Source art faces left; mirror so the rider faces outward (right).
+  // Source art faces left; mirror to face right.
   transform: scaleX(-1);
 
   @include bp.respond($min: bp.$lg) {
@@ -189,8 +176,7 @@
   }
 }
 
-// Slimline — Figma "Layout=Slimline": dark bg, no heading/illustration,
-// body + CTA share a single compact row.
+// Figma "Layout=Slimline" — no heading/illustration, body + CTA in one row.
 .c-cta-banner--slimline {
   background: var(--wp--preset--color--blue-dark);
   color: var(--c-block-fg, var(--wp--preset--color--white));
@@ -212,9 +198,7 @@
     max-width: 40rem;
   }
 
-  // The base &__cta rule forces align-self:flex-start regardless of the
-  // parent's own align-items, so it needs its own override here to
-  // actually sit centred on the row's cross axis.
+  // Overrides the base &__cta's align-self:flex-start.
   .c-cta-banner__cta {
     @include bp.respond($min: bp.$md) {
       align-self: center;

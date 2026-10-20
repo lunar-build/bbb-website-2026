@@ -39,18 +39,22 @@ Both plugins are premium/paid, so they aren't on Packagist or [WP Packages](http
 |---|---|---|
 | ACF Pro | `wpengine/advanced-custom-fields` | `git@github.com:lunar-build/advanced-custom-fields-pro.git` |
 | Gravity Forms | `gravityforms/gravityforms` | `git@github.com:lunar-build/gravityforms.git` |
+| Modern Events Calendar Pro | `lunar-build/modern-events-calendar-pro` | `git@github.com:lunar-build/modern-events-calendar.git` |
 
 Both are declared as `"type": "vcs"` entries in `site/composer.json`'s `repositories` array, alongside the `wp-packages` entry. To add another premium plugin later, follow the same pattern: get (or create) a `lunar-build/<plugin-slug>` mirror repo, add a matching `vcs` entry, `require` the package.
 
 Install/update them the same way as any other Composer dependency:
 
 ```bash
-ddev exec "composer install"                          # first install (uses composer.lock)
-ddev composer update wpengine/advanced-custom-fields   # bump ACF Pro only
-ddev composer update gravityforms/gravityforms         # bump Gravity Forms only
+ddev exec "composer install"                                    # first install (uses composer.lock)
+ddev composer update wpengine/advanced-custom-fields             # bump ACF Pro only
+ddev composer update gravityforms/gravityforms                   # bump Gravity Forms only
+ddev composer update lunar-build/modern-events-calendar-pro      # bump Modern Events Calendar Pro only
 ```
 
-Both land in `web/app/plugins/` (gitignored — Composer-managed, don't hand-edit or commit).
+All three land in `web/app/plugins/` (gitignored — Composer-managed, don't hand-edit or commit).
+
+Modern Events Calendar Pro's mirror repo has no version tags yet (just a `main` branch), so it's required as `dev-main` rather than a semver range — `composer.lock` pins the exact commit, same reproducibility guarantee as a tagged release, it just needs `composer update lunar-build/modern-events-calendar-pro` (not a version bump) to pull in a newer commit.
 
 #### Auth: GitHub token required
 
@@ -80,8 +84,54 @@ If `composer install` fails with a 404 downloading either package, or silently f
 Once WP install screen has run (site loads, DB set up):
 
 1. Grab `ACF_PRO_KEY` from 1Password and set it in `site/.env`
-2. Activate ACF Pro and Gravity Forms plugins in WP admin (Plugins)
+2. Activate ACF Pro, Gravity Forms, and Modern Events Calendar Pro plugins in WP admin (Plugins)
 3. Confirm active theme is **Sage** (`web/app/themes/sage`) — WP admin > Appearance > Themes
+
+# Events (Modern Events Calendar)
+
+MEC is used as the **data and admin layer only**: editors add and edit events under **Events** in WP admin, and MEC keeps a table of every dated session (`{prefix}mec_dates`). None of MEC's own templates, skins, CSS or JS are used on the front end (its assets are dequeued in `app/setup.php` unless a page contains an `[MEC]` shortcode). The theme renders everything itself:
+
+- **Events Timetable block** (`app/Blocks/EventsTimetable.php`): goes on a page like Bristol Cycling Centre → What's on, and lists sessions as weekday tabs or a day-by-day accordion. Its **Periods** setting is either **Event timetables (automatic)**, the default, which shows every current and upcoming published event timetable, or **Set dates here** for typed-in periods.
+- **Single event** (`resources/views/single-mec-events.blade.php` + `app/View/Composers/SingleMecEvent.php`): breadcrumbs, title, featured image, a "Next session / Price" card (from MEC's next date and Cost field, with the cost split into bullets on `|`), then the event's own blocks.
+- **`/events/` archive**: the theme's standard archive view, ordered by next session. It's an interim layout until the archive has a design.
+
+Give each event a **Color** in MEC: it's the dot in the accordion timetable and the chip colour in the timetable editor.
+
+## Event timetables
+
+Termly events (Cycling Centre sessions) aren't typed into MEC date by date. An event timetable's **weekly pattern** is drawn once in **M.E. Calendar → Event timetables**, and publishing it writes every dated session into each event's MEC Custom Days.
+
+**Adding a new event timetable (for clients):**
+1. **M.E. Calendar → Event timetables → Add New.** Optionally pick **Start from an existing event timetable** to copy its weekly sessions.
+2. Enter the **Timetable name** (e.g. "Spring term 2027") and the **First day** and **Last day**.
+3. Build the week: **drag an event** from the list onto a day, or press **Add** / **+ Add session**, then set the times. Click a session to change its event, day or times, or to duplicate or delete it. Drag a session to another day to move it, or hold Alt (Option on a Mac) while dropping to copy it.
+4. Under the grid, add **Closures** (bank holidays, breaks), **Cancelled sessions** (one session off on one date) and **Extra sessions** (one-offs).
+5. The summary shows how many sessions publishing will create. Fix anything outlined in red, then **Publish**. What's on updates straight away.
+
+
+**Cancelling a single session:** do it in the timetable editor, under **Cancelled sessions**, not in MEC. Pick the session, pick the date and add an optional reason (e.g. "Instructor ill"). On What's on (day-by-day accordion) it stays in the list, struck through, with a "Cancelled" label and the reason; the session also gets a "cancelled" badge in the editor's week grid. It no longer appears as the event's next session or in its upcoming sessions. MEC's **Event Status** (Cancelled) applies to the *whole* event, and dates removed or changed on the event itself are put back the next time the timetable is saved, so use the timetable for single dates. A cancellation on a closure date isn't shown separately: the closure's reason covers the day.
+
+**Changing an event timetable:**
+- Edit it and press **Update**; the dates it created are replaced.
+- **Switch to draft** (or trash it) to take its sessions off the calendar.
+
+**Hand edits:** sessions added by hand on an event in MEC are kept when an event timetable is re-saved. An event timetable only replaces the dates it created.
+
+How it works:
+- **Code:** `app/EventTimetable/`. `Schedule` (plain PHP, unit-tested in `site/tests/Feature/EventScheduleTest.php`) expands the pattern. `MecSync` writes MEC's fields on publish, update, unpublish, trash and delete, keeping hand-added dates via each timetable's `_timetable_generated_days`. `RestController` serves the editor and refuses to publish a schedule with errors.
+- **Editor:** a React app in `resources/js/admin/event-timetable/`, built by Vite. `@dnd-kit` uses WordPress's React through `resources/js/admin/shims/`.
+- **Events with their own repeat:** an event that uses MEC's daily or weekly repeat is left alone; the timetable editor warns about it (amber) before you publish.
+- **Re-syncing:** `wp event-timetable sync [id]` re-syncs one timetable, or all of them, for example after a deploy.
+
+Events in the **Bristol Cycling Centre** category are served at `/cycling-centres/bristol-cycling-centre/whats-on/{slug}/`, matching the old site (`app/filters.php`), and all other events at `/events/{slug}/`. After deploying, flush permalinks (`wp rewrite flush`).
+
+**Event Status** (MEC's SEO Schema tab): *Cancelled* and *Postponed* events drop off the What's on timetable, and their page shows a notice (the cancellation reason too, if "display" is ticked). *Rescheduled* shows a notice only. **Hide Event Time** hides the time line on an event page; it no longer reads "All day". An event timetable's weekday tabs show only its weekly pattern, so one-off extras appear in the by-date view only.
+
+**Labels:** add them under M.E. Calendar → Labels (name plus a colour), then tick them in the "Event Labels" box on an event. They show as coloured pills under the event page title and beside the event name on What's on. The Hourly Schedule tab is hidden on the event screen (event times come from event timetables).
+
+**Event page extras:** times show start and end (unless MEC's *Hide End Time* is on), MEC's *Time comment* appears under the time, the organizer's name, phone, email and website show in the info card when an Organizer is picked, "More upcoming sessions" lists the following sessions (untick **Page options** on the event to hide it), and schema.org `Event` JSON-LD is added for search engines. A closure's reason shows on What's on (accordion layout) instead of "No sessions".
+
+`App\Support\EventSessions` is the one place that reads MEC's session data. Note that MEC stores times as wall-clock time in UTC timestamps, so format them with `gmdate()`, not `wp_date()`.
 
 # [ACF Composer](https://github.com/log1x/acf-composer)
 

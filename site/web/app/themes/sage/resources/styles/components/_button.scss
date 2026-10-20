@@ -20,8 +20,7 @@ wa-button[size='small']::part(label) {
   letter-spacing: normal;
 }
 
-// Horizontal padding matches the solid/black button at every size and
-// appearance — WA's own default is tighter.
+// Matches the solid/black button's padding at every size — WA's default is tighter.
 wa-button::part(button) {
   padding-inline: 16px;
 }
@@ -31,8 +30,7 @@ wa-button[size='small']::part(button) {
   gap: 10px;
 }
 
-// Yellow at rest (border matches the fill, so the outline is invisible but
-// the button keeps the same size), charcoal outline on hover/focus.
+// Yellow border matches the fill at rest so size doesn't change; charcoal on hover/focus.
 wa-button[variant='brand'][appearance='accent']::part(button) {
   border: 2px solid var(--wp--preset--color--yellow);
 }
@@ -54,20 +52,17 @@ wa-button::part(button) {
   @include focus.ring;
 }
 
-// No button uses a leading icon, but WA's empty "start" slot still takes a
-// flex `gap` share — an invisible offset pushing the label off the edge.
+// WA's empty "start" slot still takes a flex `gap` share, offsetting the label.
 wa-button::part(start) {
   display: none;
 }
 
-// Decorative wa-button (e.g. FeatureCard's, aria-hidden + tabindex="-1" —
-// the card itself is the real link) must let clicks pass through.
+// Decorative buttons (e.g. FeatureCard's — the card is the link) pass clicks through.
 wa-button[aria-hidden='true'] {
   pointer-events: none;
 }
 
-// Hover path extends past the icon's 22-wide viewBox — browsers clip SVG
-// to the viewBox by default, so every arrow-right CTA needs this.
+// The hover path extends past the 22-wide viewBox, which browsers clip by default.
 .c-icon--arrow-right svg {
   overflow: visible;
 }
@@ -83,8 +78,7 @@ wa-button .c-icon--arrow-right {
   }
 }
 
-// Extracted so hand-rolled CTAs that can't use <wa-button> directly (the
-// whole card is the click target, see _feature-card.scss) can reuse it.
+// Extracted for hand-rolled CTAs that can't use <wa-button> (see _feature-card.scss).
 .c-icon--arrow-right .c-icon__arrow {
   transition: d 0.15s ease;
 }

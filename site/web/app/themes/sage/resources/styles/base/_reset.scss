@@ -20,8 +20,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-// Sticky footer: #app stretches to fill the viewport so .footer always
-// sits at the bottom, even when page content is short.
+// Sticky footer: #app fills the viewport so .footer sits at the bottom on short pages.
 #app {
   display: flex;
   flex-direction: column;
@@ -57,10 +56,8 @@ h6 {
   overflow-wrap: break-word;
 }
 
-// role="list" keeps list semantics for VoiceOver/Safari when list-style
-// is removed. Scoped to [role='list'] so real content lists keep their
-// indent. :where() keeps this at zero specificity so components can
-// always override it.
+// role="list" keeps list semantics in VoiceOver/Safari once list-style is removed.
+// Scoped so content lists keep their indent; :where() keeps specificity at zero.
 :where(ul[role='list'], ol[role='list']) {
   list-style: none;
   padding-inline-start: 0;
@@ -71,8 +68,7 @@ a:not([class]) {
   color: currentColor;
 }
 
-// Neutralises the browser's a:visited colour everywhere; :where() keeps
-// it overridable by any component.
+// Neutralises a:visited colour; :where() keeps it overridable.
 :where(a, a:visited) {
   color: inherit;
 }

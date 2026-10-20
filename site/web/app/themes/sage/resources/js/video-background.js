@@ -1,7 +1,5 @@
-// Pause/play toggle for decorative autoplaying background videos
-// (resources/views/components/video.blade.php, variant="background").
-// Required even for muted/looping decorative video per WCAG 2.2.2
-// (Pause, Stop, Hide).
+// Pause/play toggle for background videos (components/video.blade.php) — required
+// even for muted/looping video by WCAG 2.2.2.
 document.querySelectorAll('[data-video-background]').forEach((wrapper) => {
   const video = wrapper.querySelector('video');
   const control = wrapper.querySelector('[data-video-control]');

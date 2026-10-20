@@ -1,4 +1,5 @@
 @use '../abstracts/breakpoints' as bp;
+@use '../abstracts/column-blocks';
 @use '../base/focus';
 
 // Figma "Sample page -> Filter page": intro over the results column, then a
@@ -40,39 +41,14 @@
     }
   }
 
-  // Blocks in the linked page's intro wrap themselves in .o-container —
-  // already narrowed by the archive column, so flatten that inner grid.
-  &__intro .o-container {
-    grid-template-columns: [full-start content-start] 100% [content-end full-end];
+  // Blocks in the linked page's intro: flattened containers, background
+  // blocks as rounded panels — shared with the Sticky Nav column.
+  &__intro {
+    @include column-blocks.blocks;
   }
 
   &__intro > section {
     padding-block: 0;
-  }
-
-  // Background blocks (Card Grid, CTA Banner, any picked colour) can't run
-  // full bleed from this column — box them as a rounded panel instead. Their
-  // spacing controls still set top/bottom inline; this adds the sides.
-  &__intro :is(.o-full-bleed-bg, section.has-background) {
-    padding: var(--wp--preset--spacing--small) 1.5rem;
-    border-radius: 1.25rem;
-
-    @include bp.respond($min: bp.$md) {
-      padding-inline: 2.5rem;
-    }
-  }
-
-  // Back-to-back background blocks join into one panel: rounded only on the
-  // outer corners, no gap between them — as they'd sit flush full bleed.
-  &__intro :is(.o-full-bleed-bg, section.has-background) + :is(.o-full-bleed-bg, section.has-background) {
-    margin-top: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-
-  &__intro :is(.o-full-bleed-bg, section.has-background):has(+ :is(.o-full-bleed-bg, section.has-background)) {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
   }
 
   &__intro > * + * {

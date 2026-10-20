@@ -1,9 +1,6 @@
-// Figma "Filter checkboxes" — a heading plus a stack of `<x-checkbox>`
-// rows, reused standalone (always visible) or grouped inside
-// `.c-filter-checkboxes` (desktop plain list / mobile disclosure panel).
-// Root is <wa-checkbox-group>, which already renders its own accessible
-// fieldset/legend pairing internally (WCAG 1.3.1) — this just resets its
-// host display and themes the label part.
+// Figma "Filter checkboxes": heading + `<x-checkbox>` rows, standalone or inside
+// `.c-filter-checkboxes`. <wa-checkbox-group> already renders a fieldset/legend
+// (WCAG 1.3.1); this resets its host display and themes the label.
 
 .c-filter-checkbox-group {
   display: block;
@@ -27,9 +24,7 @@
   gap: 0.875rem;
 }
 
-// Each <wa-checkbox> row defaults to shrink-to-fit (inline-flex), so
-// different label lengths stagger their left edges once blockified as flex
-// items — force full-width rows so every checkbox starts at the same x.
+// Shrink-to-fit rows stagger their left edges by label length — force full width.
 .c-filter-checkbox-group__item {
   width: 100%;
 }
