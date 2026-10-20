@@ -40,7 +40,7 @@ class PageMenu
 
         $items = collect(static::headingBlocks(parse_blocks($content)))
             ->map(fn($block) => [
-                'label' => trim(wp_strip_all_tags($block['innerHTML'] ?? '')),
+                'label' => trim(html_entity_decode(wp_strip_all_tags($block['innerHTML'] ?? ''), ENT_QUOTES | ENT_HTML5)),
                 'anchor' => static::anchorFor($block),
             ])
             ->filter(fn($item) => $item['label'] !== '' && $item['anchor'] !== '')

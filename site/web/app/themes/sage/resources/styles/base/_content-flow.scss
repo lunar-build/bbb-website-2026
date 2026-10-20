@@ -22,6 +22,12 @@
   margin-top: var(--wp--preset--spacing--small);
 }
 
+// A heading after a block belongs to what follows it, so it needs clear space above.
+// Also covers the Sticky Nav column, whose blocks aren't inside .e-content.
+:is(.e-content, .c-sticky-nav-template__content) > :is(section, .wp-block-embed) + .wp-block-heading {
+  margin-top: var(--wp--preset--spacing--large);
+}
+
 // Lists end on an li with no margin, so the next paragraph sat tighter than usual.
 .e-content > .wp-block-list {
   margin-bottom: 1.5rem;
