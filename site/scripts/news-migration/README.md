@@ -81,21 +81,26 @@ linking to them survive.
 
 `cycling-centre` copies the old Bristol Cycling Centre sessions
 (`cycling_centre_event`) into Modern Events Calendar as `mec-events`, keeping
-IDs, slugs, featured images and Yoast meta. MEC must be active. The old site
-kept session times in a separate timetable (the `options_schedule` ACF options
-repeater, one row per term). Every term that hasn't ended yet is expanded into
-dated sessions, which are saved as MEC "custom days" so each date keeps its own
-time. Sessions with no slots in those terms are kept as undated pages so their
-URLs still work. The timetable fillers (Break, Closed, No sessions) are skipped,
-as are the old site's one-off `event` posts, which have all expired. Each event
-gets the Bristol Cycling Centre category, which keeps its live
+IDs, slugs, featured images and Yoast meta. MEC must be active.
+
+The classes are imported **undated**. The old site's timetable (the
+`options_schedule` ACF options repeater, one row per term) becomes **term
+timetables** instead: every term that hasn't ended is created as a published
+`bbb_event_timetable` with its weekly slots, and publishing it writes the dated
+sessions into each event (see the root README, "Event timetables"). Slots that
+fail validation are skipped and reported. One example is Term 1's Wednesday
+Disability Cycling at 11:45–00:30; fix it in the term editor. The timetable
+fillers (Break, Closed, No sessions) are skipped, and so are the old site's
+one-off `event` posts (use the `events` mode for those). Re-running deletes and
+recreates the migrated terms.
+
+Each class gets the Bristol Cycling Centre category, which keeps its live
 `/cycling-centres/bristol-cycling-centre/whats-on/{slug}/` URL (see
-`app/filters.php`). The old "upcoming sessions" block is dropped (the event
-template shows the next session), as is the old CF7 contact form on Schools and
-Private Hire, which still needs rebuilding in Gravity Forms. The run ends by
-listing the terms it found, ready to add to the What's On page's Events
-Timetable block. MEC stores session times as wall-clock time in UTC timestamps,
-so format them with `gmdate()`, not `wp_date()`.
+`app/filters.php`). The old "upcoming sessions" block is dropped, because the
+event template shows the next session. So is the old CF7 contact form on
+Schools and Private Hire, which still needs rebuilding in Gravity Forms. What's
+on's per-term calendar blocks become a single Events Timetable that shows the
+event timetables automatically.
 
 `events` copies the old site's one-off `event` posts into MEC, keeping IDs,
 slugs (`/events/{slug}/`, as on the live site), featured images and Yoast

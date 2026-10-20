@@ -14,7 +14,9 @@ class EventSessions
     /**
      * Published sessions starting between two dates (inclusive, Y-m-d),
      * optionally limited to one mec_category term, ordered by start time.
-     * Events set to MEC's "Hide from calendars & lists" are left out.
+     * Events set to MEC's "Hide from calendars & lists", cancelled or
+     * postponed ones (Event Status), and undated ones (whose only date is a
+     * placeholder), are left out.
      *
      * @return array<int, object{post_id: int, title: string, tstart: int, tend: int}>
      */
@@ -36,6 +38,8 @@ class EventSessions
             WHERE p.post_type = 'mec-events' AND p.post_status = 'publish'
                 AND d.dstart BETWEEN %s AND %s {$category}
                 AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} v WHERE v.post_id = p.ID AND v.meta_key = 'mec_public' AND v.meta_value = '0')
+                AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} u WHERE u.post_id = p.ID AND u.meta_key = '_event_undated')
+                AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} c WHERE c.post_id = p.ID AND c.meta_key = 'mec_event_status' AND c.meta_value IN ('EventCancelled', 'EventPostponed'))
             ORDER BY d.tstart, p.post_title",
             $from,
             $to,
@@ -59,6 +63,26 @@ class EventSessions
             WHERE post_id = %d AND tstart >= %d ORDER BY tstart LIMIT 1",
             $postId,
             $now,
+        ));
+    }
+
+    /**
+     * An event's next sessions from now (the first included), soonest first.
+     *
+     * @return array<int, object{tstart: int, tend: int}>
+     */
+    public static function upcoming(int $postId, int $limit = 8): array
+    {
+        global $wpdb;
+
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
+            WHERE post_id = %d AND tstart >= %d ORDER BY tstart LIMIT %d",
+            $postId,
+            $now,
+            $limit,
         ));
     }
 
@@ -106,6 +130,33 @@ class EventSessions
     public static function timeRange(int $start, int $end): string
     {
         return gmdate('H:i', $start) . ' — ' . gmdate('H:i', $end);
+    }
+
+    /**
+     * The MEC labels (Events → Labels) on an event, each with its picked
+     * colour and a readable text colour to sit on it.
+     *
+     * @return list<array{name: string, bg: string, fg: string}>
+     */
+    public static function labels(int $postId): array
+    {
+        $terms = get_the_terms($postId, 'mec_label');
+        if (! $terms || is_wp_error($terms)) {
+            return [];
+        }
+
+        return array_map(function ($term) {
+            $hex = ltrim((string) get_term_meta($term->term_id, 'color', true), '#');
+            $hex = preg_match('/^[0-9a-f]{6}$/i', $hex) ? $hex : '1EACDB';
+            [$r, $g, $b] = array_map('hexdec', str_split($hex, 2));
+
+            return [
+                'name' => html_entity_decode($term->name, ENT_QUOTES),
+                'bg' => '#' . $hex,
+                // Dark text on light labels, white on dark (perceived brightness).
+                'fg' => ($r * 299 + $g * 587 + $b * 114) / 1000 > 150 ? '#1a1a1a' : '#ffffff',
+            ];
+        }, $terms);
     }
 
     /**

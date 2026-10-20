@@ -21,6 +21,74 @@
   }
 }
 
+.c-events-timetable__session--cancelled {
+  .c-events-timetable__time,
+  .c-events-timetable__link {
+    text-decoration: line-through;
+    opacity: 0.65;
+  }
+}
+
+.c-events-timetable__notices {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--wp--preset--color--place-holder-grey);
+  border-radius: 0.5rem;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.c-events-timetable__notices-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.c-events-timetable__notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding-block: 0.375rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 0.25rem solid currentColor;
+
+  & + & {
+    margin-top: 0.5rem;
+  }
+
+  &--closed {
+    color: #8a1c1c;
+  }
+
+  &--cancelled {
+    color: #8a1c1c;
+  }
+
+  &--extra {
+    color: #1c5b2e;
+  }
+}
+
+.c-events-timetable__notice-when {
+  font-weight: 700;
+}
+
+.c-events-timetable__cancelled {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.c-events-timetable__reason {
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
 .c-events-timetable__session {
   display: grid;
   grid-template-columns: auto 1fr;

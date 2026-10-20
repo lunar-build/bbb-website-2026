@@ -19,6 +19,14 @@
 
           <h1 class="c-event__title">{!! get_the_title() !!}</h1>
 
+          @if ($labels)
+            <ul class="c-label-list c-event__labels" role="list" aria-label="{{ __('Labels', 'sage') }}">
+              @foreach ($labels as $label)
+                <li class="c-label" style="--label-bg: {{ $label['bg'] }}; --label-fg: {{ $label['fg'] }}">{{ $label['name'] }}</li>
+              @endforeach
+            </ul>
+          @endif
+
           <div class="c-event__summary">
             @if (has_post_thumbnail())
               {!! get_the_post_thumbnail(null, 'large', ['class' => 'c-event__image']) !!}
@@ -38,6 +46,9 @@
                       {{ $nextSession['time'] }}
                     </p>
                   @endif
+                  @if ($nextSession['note'])
+                    <p class="c-event__note">{{ $nextSession['note'] }}</p>
+                  @endif
                 @else
                   <p class="c-event__info-line">{{ __('No sessions are scheduled at the moment.', 'sage') }}</p>
                 @endif
@@ -55,6 +66,22 @@
                   </div>
                 @endif
 
+                @if ($organizer)
+                  <div class="c-event__info-line c-event__venue">
+                    <x-icon name="info" />
+                    <p>
+                      {{ $organizer['name'] }}
+                      @if ($organizer['tel'])<br><a href="tel:{{ preg_replace('/[^+\d]/', '', $organizer['tel']) }}">{{ $organizer['tel'] }}</a>@endif
+                      @if ($organizer['email'])<br><a href="mailto:{{ $organizer['email'] }}">{{ $organizer['email'] }}</a>@endif
+                      @if ($organizer['url'])<br><a href="{{ $organizer['url'] }}">{{ __('Website', 'sage') }}</a>@endif
+                    </p>
+                  </div>
+                @endif
+
+                @if ($status)
+                  <x-callout-text class="c-event__finished">{{ $status }}</x-callout-text>
+                @endif
+
                 @if ($nextSession['finished'] ?? false)
                   <x-callout-text class="c-event__finished">{{ __('This event has finished.', 'sage') }}</x-callout-text>
                 @endif
@@ -70,6 +97,17 @@
           </div>
 
           {!! $body !!}
+
+          @if ($upcoming)
+            <section class="c-event__upcoming" aria-labelledby="c-event-upcoming">
+              <h2 id="c-event-upcoming" class="u-heading-5">{{ __('More upcoming sessions', 'sage') }}</h2>
+              <x-bullet-list :items="array_map(fn($line) => ['text' => $line], $upcoming)" />
+            </section>
+          @endif
+
+          @if ($jsonLd)
+            <script type="application/ld+json">{!! $jsonLd !!}</script>
+          @endif
         </div>
       </div>
     </div>

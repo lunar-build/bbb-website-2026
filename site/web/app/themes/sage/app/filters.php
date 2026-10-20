@@ -407,6 +407,28 @@ add_action('save_post_mec-events', function () {
 }, 9);
 
 /**
+ * "Page options" box on the event edit screen: untick to hide the "More
+ * upcoming sessions" list on that class's page (shown by default).
+ */
+add_action('add_meta_boxes_mec-events', function () {
+    add_meta_box('bbb-event-page-options', __('Page options', 'sage'), function (\WP_Post $post) {
+        wp_nonce_field('bbb_event_page_options', 'bbb_event_page_options_nonce');
+        printf(
+            '<label><input type="checkbox" name="bbb_show_upcoming" value="1"%s> %s</label>',
+            checked(! get_post_meta($post->ID, 'bbb_hide_upcoming', true), true, false),
+            esc_html__('Show "More upcoming sessions" on the page', 'sage'),
+        );
+    }, 'mec-events', 'side');
+});
+
+add_action('save_post_mec-events', function (int $postId) {
+    if (! isset($_POST['bbb_event_page_options_nonce']) || ! wp_verify_nonce(sanitize_key($_POST['bbb_event_page_options_nonce']), 'bbb_event_page_options') || ! current_user_can('edit_post', $postId)) {
+        return;
+    }
+    empty($_POST['bbb_show_upcoming']) ? update_post_meta($postId, 'bbb_hide_upcoming', 1) : delete_post_meta($postId, 'bbb_hide_upcoming');
+});
+
+/**
  * The /events/ archive uses the theme's archive view (no design of its own
  * yet). MEC's query parsing forces 1 post per page there; restore the site
  * setting, and list events by their next session, undated ones last.
@@ -442,3 +464,13 @@ add_action('pre_get_posts', function (\WP_Query $query) {
         return $clauses;
     }, 10, 2);
 }, 20);
+
+/**
+ * Hide MEC's "Hourly Schedule" tab on the event screen: class times come from
+ * event timetables, and nothing on the front end shows an hourly schedule.
+ */
+add_filter('mec-single-event-meta-title', function ($tabs) {
+    unset($tabs[__('Hourly Schedule', 'mec')]);
+
+    return $tabs;
+});
