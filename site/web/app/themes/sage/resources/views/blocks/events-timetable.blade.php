@@ -39,6 +39,7 @@
             @if ($period['empty'] ?? false)
               <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
             @else
+            @include('partials.events-timetable-notices', ['notices' => $period['notices'] ?? []])
             <wa-tab-group class="c-events-timetable__tabs" active="{{ strtolower($active) }}">
               @foreach ($period['weekdays'] as $day => $sessions)
                 {{-- wa-tab-group only applies `active` once scrolled into view, so set it in markup too. --}}

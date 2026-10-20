@@ -1,9 +1,9 @@
 import domReady from '@wordpress/dom-ready';
 import { createRoot } from '@wordpress/element';
 import App from './App';
-import './term-timetable.scss';
+import './event-timetable.scss';
 
 domReady(() => {
-  const root = document.getElementById('bbb-term-timetable');
+  const root = document.getElementById('bbb-event-timetable');
   if (root) createRoot(root).render(<App />);
 });

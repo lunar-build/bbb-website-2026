@@ -158,22 +158,43 @@ In the generated class:
   The string passed to `make()` becomes the field group key.
 - `with()` returns the array exposed to the Blade view as variables (no `$block->` prefix
   needed for these).
-- Add one accessor method per field, following the existing pattern (see
-  `app/Blocks/CtaBanner.php`, `app/Blocks/VideoHero.php`):
-  - **Gate the `$example` fallback behind `shows_example($this->preview)`** (helper in
-    `app/helpers.php`). It's true only for preview renders outside wp-admin — i.e. the
-    `/pattern-library` page (`App\View\Composers\PatternLibrary` renders with
-    `preview = true`). It's false on the real front end *and* in the block-editor
-    canvas, which also renders with `$this->preview = true` but is `is_admin()`: a
-    freshly inserted block must read as empty there, not as fixture copy a client could
-    mistake for real content. A real empty field must render empty: `return
-    get_field('x') ?: (shows_example($this->preview) ? $this->example['x'] : '');` — the
-    non-example fallback is a genuine empty value for that type (`''` for text, `null`
-    for image/file, `[]` for repeaters, a blank link shape `['title' => '', 'url' => '',
-    'target' => '']` for link fields), not `$example['x']`. Never use bare
-    `$this->preview` for this, and never the unconditional `get_field('x') ?:
-    $this->example['x']`. A block that renders nothing visible while empty gets a
-    "click the pencil to add content" placeholder in the editor automatically (the
+- Add one accessor method per field. **Every block with ACF fields uses the
+  `ResolvesFields` trait** (`use App\Blocks\Concerns\ResolvesFields;` + `use ResolvesFields;` in the
+  class) and reads fields through it. Never write the fallback logic out by hand:
+  ```php
+  public function heading() { return $this->resolveField('heading', ''); }
+  public function showBreadcrumbs() { return $this->resolveBoolField('show_breadcrumbs'); }
+  public function title() {  // fallback with an extra condition
+      return get_field('title') ?: ($this->layout() !== 'slimline' ? $this->exampleField('title', '') : '');
+  }
+  ```
+  - `resolveField($name, $default = null)`: the default choice for almost every field.
+    It returns the saved value, else `$example[$name]` on the pattern library, else
+    `$default`.
+  - `resolveBoolField($name, $default = false)`: for true/false fields. A saved `false`
+    is a real answer, so it only falls back when the field has never been saved.
+    `resolveField` would treat `false` as empty.
+  - `exampleField($name, $default = null)`: the pattern-library fallback on its own,
+    for when the lookup needs an extra condition (layout/variant-dependent examples), a
+    transform (`wpautop($this->exampleField('quote', ''))`), or the field name differs
+    from the example key (a layout-specific `get_field($field)` with a shared
+    `$example['links']`).
+  - **Why the fallback is gated:** the trait's example fallback only fires when
+    `shows_example($this->preview)` (`app/helpers.php`) is true. That's only for preview
+    renders outside wp-admin, i.e. the `/pattern-library` page
+    (`App\View\Composers\PatternLibrary` renders with `preview = true`). It's false on
+    the real front end *and* in the block-editor canvas, which also renders with
+    `$this->preview = true` but is `is_admin()`: a freshly inserted block must read as
+    empty there, not as fixture copy a client could mistake for real content. So never
+    call `shows_example()` or use `$this->preview` directly in a block, and never write
+    `get_field('x') ?: $this->example['x']`.
+  - **`$default` is a genuine empty value for the type,** not example copy: `''` for
+    text, omitted/`null` for image/file, `[]` for repeaters, and a blank link shape
+    `['title' => '', 'url' => '', 'target' => '']` for link fields.
+  - **Keep each `$example` key identical to its ACF field name** (snake_case) so the
+    trait finds it.
+  - A block that renders nothing visible while empty gets a "click the pencil to add
+    content" placeholder in the editor automatically (the
     `acf/register_block_type_args` filter in `app/filters.php`), so no per-block empty
     state is needed unless you want a richer one.
   - Image/file/relationship fields: the preview fallback is a bundled placeholder

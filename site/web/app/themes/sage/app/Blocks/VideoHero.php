@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class VideoHero extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -249,7 +252,7 @@ class VideoHero extends Block
      */
     public function video()
     {
-        return get_field('video') ?: (shows_example($this->preview) ? ($this->example['video'] ?? null) : null);
+        return $this->resolveField('video');
     }
 
     /**
@@ -259,7 +262,7 @@ class VideoHero extends Block
      */
     public function poster()
     {
-        return get_field('poster') ?: (shows_example($this->preview) ? ($this->example['poster'] ?? null) : null);
+        return $this->resolveField('poster');
     }
 
     /**
@@ -269,7 +272,7 @@ class VideoHero extends Block
      */
     public function videoAlt()
     {
-        return get_field('video_alt') ?: (shows_example($this->preview) ? $this->example['video_alt'] : '');
+        return $this->resolveField('video_alt', '');
     }
 
     /**
@@ -279,7 +282,7 @@ class VideoHero extends Block
      */
     public function heading()
     {
-        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
+        return $this->resolveField('heading', '');
     }
 
     /**
@@ -289,7 +292,7 @@ class VideoHero extends Block
      */
     public function intro()
     {
-        return get_field('intro') ?: (shows_example($this->preview) ? $this->example['intro'] : '');
+        return $this->resolveField('intro', '');
     }
 
     /**

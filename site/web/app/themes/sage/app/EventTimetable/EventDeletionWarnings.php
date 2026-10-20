@@ -1,16 +1,16 @@
 <?php
 
-namespace App\TermTimetable;
+namespace App\EventTimetable;
 
 use WP_Post;
 
 /**
- * Warns before a class that term timetables use is trashed or deleted, and
+ * Warns before an event that event timetables use is trashed or deleted, and
  * after it's trashed. Trashing takes its sessions off What's on (restoring
- * brings them back); deleting permanently loses its dates, and the terms
- * then need another class picked for those sessions.
+ * brings them back); deleting permanently loses its dates, and the timetables
+ * then need another event picked for those sessions.
  */
-class ClassDeletionWarnings
+class EventDeletionWarnings
 {
     public static function boot(): void
     {
@@ -20,35 +20,35 @@ class ClassDeletionWarnings
     }
 
     /** "Term 1" and “Half Term”, for messages. */
-    protected static function termNames(int $event): string
+    protected static function timetableNames(int $event): string
     {
-        return implode(', ', array_map(fn(WP_Post $t) => '“' . html_entity_decode(get_the_title($t), ENT_QUOTES) . '”', ClassEditGuard::termsFor($event)));
+        return implode(', ', array_map(fn(WP_Post $t) => '“' . html_entity_decode(get_the_title($t), ENT_QUOTES) . '”', EventEditGuard::timetablesFor($event)));
     }
 
     public static function trashMessage(int $event): string
     {
         return sprintf(
-            /* translators: 1: class name, 2: term names */
-            __('“%1$s” is used in the term timetable(s) %2$s. Moving it to the Trash takes its sessions off the What\'s on timetable until it\'s restored. Continue?', 'sage'),
+            /* translators: 1: event name, 2: timetable names */
+            __('“%1$s” is used in the event timetable(s) %2$s. Moving it to the Trash takes its sessions off the What\'s on timetable until it\'s restored. Continue?', 'sage'),
             html_entity_decode(get_the_title($event), ENT_QUOTES),
-            static::termNames($event),
+            static::timetableNames($event),
         );
     }
 
     public static function deleteMessage(int $event): string
     {
         return sprintf(
-            /* translators: 1: class name, 2: term names */
-            __('“%1$s” is used in the term timetable(s) %2$s. Deleting it permanently removes all its sessions, and those terms will show it as a missing class until another is picked in the term editor. This can\'t be undone. Continue?', 'sage'),
+            /* translators: 1: event name, 2: timetable names */
+            __('“%1$s” is used in the event timetable(s) %2$s. Deleting it permanently removes all its sessions, and those timetables will show it as a missing event until another is picked in the timetable editor. This can\'t be undone. Continue?', 'sage'),
             html_entity_decode(get_the_title($event), ENT_QUOTES),
-            static::termNames($event),
+            static::timetableNames($event),
         );
     }
 
     /** A confirm() on the list screen's Trash and Delete Permanently links. */
     public static function rowActions(array $actions, WP_Post $post): array
     {
-        if ($post->post_type !== 'mec-events' || ! ClassEditGuard::termsFor($post->ID)) {
+        if ($post->post_type !== 'mec-events' || ! EventEditGuard::timetablesFor($post->ID)) {
             return $actions;
         }
         foreach (['trash' => static::trashMessage($post->ID), 'delete' => static::deleteMessage($post->ID)] as $key => $message) {
@@ -68,7 +68,7 @@ class ClassDeletionWarnings
         }
         $used = [];
         foreach (get_posts(['post_type' => 'mec-events', 'post_status' => ['publish', 'draft', 'trash', 'private', 'future'], 'numberposts' => -1, 'fields' => 'ids']) as $id) {
-            if ($names = static::termNames($id)) {
+            if ($names = static::timetableNames($id)) {
                 $used[$id] = html_entity_decode(get_the_title($id), ENT_QUOTES) . " ($names)";
             }
         }
@@ -92,8 +92,8 @@ class ClassDeletionWarnings
             var hit = ids.filter(function (id) { return used[id]; }).map(function (id) { return '• ' + used[id]; });
             if (!hit.length) return;
             var message = (action === 'trash'
-              ? <?php echo wp_json_encode(__('These classes are used in term timetables. Moving them to the Trash takes their sessions off the What\'s on timetable until they\'re restored:', 'sage')); ?>
-              : <?php echo wp_json_encode(__('These classes are used in term timetables. Deleting them permanently removes all their sessions, and the terms will need other classes picked. This can\'t be undone:', 'sage')); ?>)
+              ? <?php echo wp_json_encode(__('These events are used in event timetables. Moving them to the Trash takes their sessions off the What\'s on timetable until they\'re restored:', 'sage')); ?>
+              : <?php echo wp_json_encode(__('These events are used in event timetables. Deleting them permanently removes all their sessions, and the timetables will need other events picked. This can\'t be undone:', 'sage')); ?>)
               + '\n\n' + hit.join('\n') + '\n\n' + <?php echo wp_json_encode(__('Continue?', 'sage')); ?>;
             if (!window.confirm(message)) e.preventDefault();
           });
@@ -109,13 +109,13 @@ class ClassDeletionWarnings
             return;
         }
         foreach (array_map('intval', explode(',', (string) $_GET['ids'])) as $id) {
-            if (! $names = static::termNames($id)) {
+            if (! $names = static::timetableNames($id)) {
                 continue;
             }
             printf(
                 '<div class="notice notice-warning"><p>%s</p></div>',
                 esc_html(sprintf(
-                    /* translators: 1: class name, 2: term names */
+                    /* translators: 1: event name, 2: timetable names */
                     __('“%1$s” is in the Trash, so its sessions from %2$s are no longer on the What\'s on timetable. Restore it from the Trash (or use Undo above) to bring them back.', 'sage'),
                     html_entity_decode(get_the_title($id), ENT_QUOTES),
                     $names,

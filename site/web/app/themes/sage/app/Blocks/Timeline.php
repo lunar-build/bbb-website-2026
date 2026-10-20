@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Timeline extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -202,7 +205,7 @@ class Timeline extends Block
             ],
         ],
         'Dates' => [
-            'markerSize' => 'date',
+            'marker_size' => 'date',
             'steps' => [
                 ['label' => '12/03/19', 'heading' => 'Scheme launched', 'body' => 'Better by Bike began with a handful of pilot routes.'],
                 ['label' => '04/07/21', 'heading' => 'Network expanded', 'body' => 'New cycle routes added across the city.'],
@@ -273,22 +276,22 @@ class Timeline extends Block
 
     public function heading()
     {
-        return get_field('heading') ?: (shows_example($this->preview) ? $this->example['heading'] : '');
+        return $this->resolveField('heading', '');
     }
 
     public function intro()
     {
-        return get_field('intro') ?: (shows_example($this->preview) ? $this->example['intro'] : '');
+        return $this->resolveField('intro', '');
     }
 
     public function markerSize()
     {
-        return get_field('marker_size') ?: (shows_example($this->preview) ? ($this->example['markerSize'] ?? 'number') : 'number');
+        return $this->resolveField('marker_size', 'number');
     }
 
     public function steps()
     {
-        return get_field('steps') ?: (shows_example($this->preview) ? $this->example['steps'] : []);
+        return $this->resolveField('steps', []);
     }
 
     /**

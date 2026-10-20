@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class LinkList extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -360,7 +363,7 @@ class LinkList extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'short_centred');
+        return $this->resolveField('layout', 'short_centred');
     }
 
     /**
@@ -381,7 +384,7 @@ class LinkList extends Block
             return '';
         }
 
-        return get_field($field) ?: (shows_example($this->preview) ? $this->example['icon'] : '');
+        return get_field($field) ?: $this->exampleField('icon', '');
     }
 
     /**
@@ -401,7 +404,7 @@ class LinkList extends Block
             default => 'short_centred_links',
         };
 
-        $rows = get_field($field) ?: (shows_example($this->preview) ? $this->example['links'] : []);
+        $rows = get_field($field) ?: $this->exampleField('links', []);
 
         return array_map(fn($row) => [
             'description' => $row['description'] ?? '',

@@ -1,72 +1,72 @@
 <?php
 
-namespace App\TermTimetable;
+namespace App\EventTimetable;
 
 use WP_Post;
 
 /**
- * Writes a published term's sessions into each class's MEC Custom Days.
+ * Writes a published timetable's sessions into each event's MEC Custom Days.
  *
- * Each term remembers the day strings it generated (TERM_GENERATED), so a
+ * Each timetable remembers the day strings it generated (TIMETABLE_GENERATED), so a
  * re-save only swaps out its own dates: sessions added by hand in MEC, and
- * other terms' sessions, are left alone. Every entry point runs the same
+ * other timetables' sessions, are left alone. Every entry point runs the same
  * idempotent sync(), so being called twice for one save is harmless.
  */
 class MecSync
 {
-    /** On the term: {eventId: [MEC day strings]} it generated last time. */
-    public const TERM_GENERATED = '_term_generated_days';
+    /** On the timetable: {eventId: [MEC day strings]} it generated last time. */
+    public const TIMETABLE_GENERATED = '_timetable_generated_days';
 
-    /** On the term: problems the last sync hit (skipped classes), shown in the editor. */
-    public const TERM_NOTICES = '_term_sync_notices';
+    /** On the timetable: problems the last sync hit (skipped events), shown in the editor. */
+    public const TIMETABLE_NOTICES = '_timetable_sync_notices';
 
-    /** On the class: when a term last rewrote its dates (ClassEditGuard compares it). */
-    public const SYNCED_AT = '_term_synced_at';
+    /** On the event: when a timetable last rewrote its dates (EventEditGuard compares it). */
+    public const SYNCED_AT = '_timetable_synced_at';
 
     public static function boot(): void
     {
-        add_action('rest_after_insert_' . TermTimetable::POST_TYPE, fn(WP_Post $post) => static::sync($post->ID));
+        add_action('rest_after_insert_' . EventTimetable::POST_TYPE, fn(WP_Post $post) => static::sync($post->ID));
         add_action('transition_post_status', function ($new, $old, $post) {
-            if ($post->post_type === TermTimetable::POST_TYPE && $new !== $old) {
+            if ($post->post_type === EventTimetable::POST_TYPE && $new !== $old) {
                 static::sync($post->ID);
             }
         }, 10, 3);
         add_action('before_delete_post', function ($postId) {
-            if (get_post_type($postId) === TermTimetable::POST_TYPE) {
+            if (get_post_type($postId) === EventTimetable::POST_TYPE) {
                 static::sync((int) $postId, true);
             }
         });
 
         if (defined('WP_CLI') && WP_CLI) {
-            // `wp term-timetable sync [id]`: re-sync one term, or every term (e.g. after a deploy).
-            \WP_CLI::add_command('term-timetable sync', function ($args) {
-                $ids = $args ? array_map('intval', $args) : get_posts(['post_type' => TermTimetable::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']);
+            // `wp event-timetable sync [id]`: re-sync one timetable, or every timetable (e.g. after a deploy).
+            \WP_CLI::add_command('event-timetable sync', function ($args) {
+                $ids = $args ? array_map('intval', $args) : get_posts(['post_type' => EventTimetable::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']);
                 foreach ($ids as $id) {
                     $notices = static::sync($id);
-                    \WP_CLI::log("term $id synced" . ($notices ? ': ' . implode('; ', $notices) : ''));
+                    \WP_CLI::log("timetable $id synced" . ($notices ? ': ' . implode('; ', $notices) : ''));
                 }
             });
         }
     }
 
     /**
-     * Bring MEC in line with this term: its generated dates if published,
+     * Bring MEC in line with this timetable: its generated dates if published,
      * none otherwise (draft, trash, or being deleted).
      *
-     * @return list<string> notices about classes that were skipped
+     * @return list<string> notices about events that were skipped
      */
-    public static function sync(int $termId, bool $deleting = false): array
+    public static function sync(int $timetableId, bool $deleting = false): array
     {
-        $previous = (array) get_post_meta($termId, static::TERM_GENERATED, true);
-        $published = ! $deleting && get_post_status($termId) === 'publish';
+        $previous = (array) get_post_meta($timetableId, static::TIMETABLE_GENERATED, true);
+        $published = ! $deleting && get_post_status($timetableId) === 'publish';
         $wanted = [];
         $notices = [];
 
         if ($published) {
-            $schedule = Schedule::normalise(get_post_meta($termId, TermTimetable::META, true));
+            $schedule = Schedule::normalise(get_post_meta($timetableId, EventTimetable::META, true));
             foreach (Schedule::expand($schedule) as $event => $sessions) {
                 if (get_post_type($event) !== 'mec-events' || get_post_status($event) === 'trash') {
-                    $notices[] = sprintf(__('A class (#%d) no longer exists, so its sessions were skipped.', 'sage'), $event);
+                    $notices[] = sprintf(__('An event (#%d) no longer exists, so its sessions were skipped.', 'sage'), $event);
 
                     continue;
                 }
@@ -79,23 +79,23 @@ class MecSync
                 continue;
             }
             if (static::hasOtherRepeat($event)) {
-                $notices[] = sprintf(__('“%s” uses its own repeat rule in MEC, so this term didn\'t change it. Set its repeat to Custom Days (or none) to schedule it here.', 'sage'), get_the_title($event));
+                $notices[] = sprintf(__('“%s” uses its own repeat rule in MEC, so this timetable didn\'t change it. Set its repeat to Custom Days (or none) to schedule it here.', 'sage'), get_the_title($event));
                 unset($wanted[$event]);
 
                 continue;
             }
             $current = static::currentDays($event);
             $keep = array_diff($current, $previous[$event] ?? []);
-            $days = array_values(array_unique([...$keep, ...($wanted[$event] ?? []), ...static::otherTermsDays($termId, $event)]));
+            $days = array_values(array_unique([...$keep, ...($wanted[$event] ?? []), ...static::otherTimetablesDays($timetableId, $event)]));
             static::writeDays($event, $days);
         }
 
         if ($wanted) {
-            update_post_meta($termId, static::TERM_GENERATED, $wanted);
+            update_post_meta($timetableId, static::TIMETABLE_GENERATED, $wanted);
         } else {
-            delete_post_meta($termId, static::TERM_GENERATED);
+            delete_post_meta($timetableId, static::TIMETABLE_GENERATED);
         }
-        update_post_meta($termId, static::TERM_NOTICES, $notices);
+        update_post_meta($timetableId, static::TIMETABLE_NOTICES, $notices);
 
         return $notices;
     }
@@ -108,7 +108,7 @@ class MecSync
         return "{$session['date']}:{$session['date']}:{$time($session['start'])}:{$time($session['end'])}";
     }
 
-    /** Daily/weekly/etc. repeats can't be merged with dated sessions, so those classes are left alone. */
+    /** Daily/weekly/etc. repeats can't be merged with dated sessions, so those events are left alone. */
     public static function hasOtherRepeat(int $event): bool
     {
         return get_post_meta($event, 'mec_repeat_status', true)
@@ -134,12 +134,12 @@ class MecSync
         return array_values(array_unique([...$first, ...$custom]));
     }
 
-    /** Day strings other published terms generated for this event, so an overlap isn't removed by mistake. */
-    protected static function otherTermsDays(int $termId, int $event): array
+    /** Day strings other published timetables generated for this event, so an overlap isn't removed by mistake. */
+    protected static function otherTimetablesDays(int $timetableId, int $event): array
     {
         $days = [];
-        foreach (get_posts(['post_type' => TermTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1, 'exclude' => [$termId], 'fields' => 'ids']) as $other) {
-            $days = [...$days, ...((array) get_post_meta($other, static::TERM_GENERATED, true))[$event] ?? []];
+        foreach (get_posts(['post_type' => EventTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1, 'exclude' => [$timetableId], 'fields' => 'ids']) as $other) {
+            $days = [...$days, ...((array) get_post_meta($other, static::TIMETABLE_GENERATED, true))[$event] ?? []];
         }
 
         return $days;

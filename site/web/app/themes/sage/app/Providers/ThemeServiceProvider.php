@@ -25,6 +25,6 @@ class ThemeServiceProvider extends SageServiceProvider
     {
         parent::boot();
 
-        \App\TermTimetable\TermTimetable::boot();
+        \App\EventTimetable\EventTimetable::boot();
     }
 }

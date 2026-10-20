@@ -1,18 +1,18 @@
 <?php
 
 /*
-| App\TermTimetable\Schedule is plain PHP (no WordPress), so it's loaded
+| App\EventTimetable\Schedule is plain PHP (no WordPress), so it's loaded
 | directly, as PageMenuTest does for PageMenu.
 */
 
-require_once dirname(__DIR__, 2) . '/web/app/themes/sage/app/TermTimetable/Schedule.php';
+require_once dirname(__DIR__, 2) . '/web/app/themes/sage/app/EventTimetable/Schedule.php';
 
-use App\TermTimetable\Schedule;
+use App\EventTimetable\Schedule;
 
 const LEARN_TO_RIDE = 753;
 const FAMILY_CYCLING = 2083;
 
-function springTerm(array $overrides = []): array
+function springTimetable(array $overrides = []): array
 {
     return array_merge([
         'start' => '2027-01-01',
@@ -31,8 +31,8 @@ function springTerm(array $overrides = []): array
     ], $overrides);
 }
 
-test('a 1 Jan – 23 Mar term expands to 48 Learn to Ride sessions', function () {
-    $sessions = Schedule::expand(springTerm());
+test('a 1 Jan – 23 Mar timetable expands to 48 Learn to Ride sessions', function () {
+    $sessions = Schedule::expand(springTimetable());
 
     // 12 Saturdays × 2 + 12 Sundays + 12 Tuesdays.
     expect($sessions[LEARN_TO_RIDE])->toHaveCount(48)
@@ -42,7 +42,7 @@ test('a 1 Jan – 23 Mar term expands to 48 Learn to Ride sessions', function ()
 });
 
 test('sessions come out in date then time order', function () {
-    $keys = array_map(fn($s) => $s['date'] . $s['start'], Schedule::expand(springTerm())[LEARN_TO_RIDE]);
+    $keys = array_map(fn($s) => $s['date'] . $s['start'], Schedule::expand(springTimetable())[LEARN_TO_RIDE]);
     $sorted = $keys;
     sort($sorted);
 
@@ -50,7 +50,7 @@ test('sessions come out in date then time order', function () {
 });
 
 test('a closure removes every session in its date range', function () {
-    $sessions = Schedule::expand(springTerm([
+    $sessions = Schedule::expand(springTimetable([
         'closures' => [['id' => 'c1', 'from' => '2027-02-13', 'to' => '2027-02-21', 'label' => 'Half term']],
     ]));
     $dates = array_column($sessions[LEARN_TO_RIDE], 'date');
@@ -62,7 +62,7 @@ test('a closure removes every session in its date range', function () {
 });
 
 test('a cancellation removes one session on one date only', function () {
-    $sessions = Schedule::expand(springTerm([
+    $sessions = Schedule::expand(springTimetable([
         'cancellations' => [['id' => 'x1', 'date' => '2027-03-13', 'session' => 'sat-am']],
     ]))[LEARN_TO_RIDE];
     $onDay = array_values(array_filter($sessions, fn($s) => $s['date'] === '2027-03-13'));
@@ -72,7 +72,7 @@ test('a cancellation removes one session on one date only', function () {
 });
 
 test('extras are added, even on a closed date', function () {
-    $sessions = Schedule::expand(springTerm([
+    $sessions = Schedule::expand(springTimetable([
         'closures' => [['id' => 'c1', 'from' => '2027-02-17', 'to' => '2027-02-17', 'label' => '']],
         'extras' => [['id' => 'e1', 'date' => '2027-02-17', 'event' => LEARN_TO_RIDE, 'start' => '10:00', 'end' => '10:45']],
     ]))[LEARN_TO_RIDE];
@@ -82,7 +82,7 @@ test('extras are added, even on a closed date', function () {
 });
 
 test('an extra matching a weekly session is not doubled up', function () {
-    $sessions = Schedule::expand(springTerm([
+    $sessions = Schedule::expand(springTimetable([
         'extras' => [['id' => 'e1', 'date' => '2027-01-02', 'event' => LEARN_TO_RIDE, 'start' => '10:45', 'end' => '11:30']],
     ]))[LEARN_TO_RIDE];
 
@@ -90,7 +90,7 @@ test('an extra matching a weekly session is not doubled up', function () {
 });
 
 test('incomplete or invalid sessions are skipped, not expanded', function () {
-    $sessions = Schedule::expand(springTerm(['sessions' => [
+    $sessions = Schedule::expand(springTimetable(['sessions' => [
         ['id' => 'a', 'event' => 0, 'weekday' => 6, 'start' => '10:00', 'end' => '11:00'],
         ['id' => 'b', 'event' => LEARN_TO_RIDE, 'weekday' => 6, 'start' => '11:00', 'end' => '10:00'],
         ['id' => 'c', 'event' => LEARN_TO_RIDE, 'weekday' => 6, 'start' => '', 'end' => '10:00'],
@@ -99,31 +99,31 @@ test('incomplete or invalid sessions are skipped, not expanded', function () {
     expect($sessions)->toBe([]);
 });
 
-test('a term without valid dates expands to nothing', function () {
-    expect(Schedule::expand(springTerm(['end' => '2026-12-01'])))->toBe([])
-        ->and(Schedule::expand(springTerm(['start' => ''])))->toBe([]);
+test('a timetable without valid dates expands to nothing', function () {
+    expect(Schedule::expand(springTimetable(['end' => '2026-12-01'])))->toBe([])
+        ->and(Schedule::expand(springTimetable(['start' => ''])))->toBe([]);
 });
 
-test('a valid term has no errors', function () {
-    expect(Schedule::validate(springTerm())['errors'])->toBe([]);
+test('a valid timetable has no errors', function () {
+    expect(Schedule::validate(springTimetable())['errors'])->toBe([]);
 });
 
-test('validation flags bad dates, missing classes, backwards times and same-class clashes', function () {
-    $errors = Schedule::validate(springTerm([
+test('validation flags bad dates, missing events, backwards times and same-event clashes', function () {
+    $errors = Schedule::validate(springTimetable([
         'end' => '2026-12-01',
         'sessions' => [
-            ['id' => 'no-class', 'event' => 0, 'weekday' => 1, 'start' => '10:00', 'end' => '11:00'],
+            ['id' => 'no-event', 'event' => 0, 'weekday' => 1, 'start' => '10:00', 'end' => '11:00'],
             ['id' => 'backwards', 'event' => LEARN_TO_RIDE, 'weekday' => 1, 'start' => '12:00', 'end' => '11:00'],
             ['id' => 'one', 'event' => FAMILY_CYCLING, 'weekday' => 3, 'start' => '10:00', 'end' => '11:00'],
             ['id' => 'clash', 'event' => FAMILY_CYCLING, 'weekday' => 3, 'start' => '10:30', 'end' => '11:30'],
         ],
     ]))['errors'];
 
-    expect(array_column($errors, 'ref'))->toContain('dates', 'no-class', 'backwards', 'clash');
+    expect(array_column($errors, 'ref'))->toContain('dates', 'no-event', 'backwards', 'clash');
 });
 
-test('different classes at the same time are allowed', function () {
-    $errors = Schedule::validate(springTerm(['sessions' => [
+test('different events at the same time are allowed', function () {
+    $errors = Schedule::validate(springTimetable(['sessions' => [
         ['id' => 'a', 'event' => LEARN_TO_RIDE, 'weekday' => 6, 'start' => '10:00', 'end' => '11:00'],
         ['id' => 'b', 'event' => FAMILY_CYCLING, 'weekday' => 6, 'start' => '10:00', 'end' => '11:00'],
     ]]))['errors'];
@@ -131,8 +131,8 @@ test('different classes at the same time are allowed', function () {
     expect($errors)->toBe([]);
 });
 
-test('warnings: odd hours, closures outside the term, cancellations on the wrong day', function () {
-    $warnings = Schedule::validate(springTerm([
+test('warnings: odd hours, closures outside the timetable, cancellations on the wrong day', function () {
+    $warnings = Schedule::validate(springTimetable([
         'sessions' => [['id' => 'late', 'event' => LEARN_TO_RIDE, 'weekday' => 1, 'start' => '22:30', 'end' => '23:30']],
         'closures' => [['id' => 'away', 'from' => '2027-06-01', 'to' => '2027-06-02', 'label' => '']],
         'cancellations' => [['id' => 'wrong-day', 'date' => '2027-01-05', 'session' => 'late']],

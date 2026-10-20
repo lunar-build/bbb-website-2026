@@ -2,7 +2,7 @@
 @if ($sessions)
   <ul class="c-events-timetable__sessions" role="list">
     @foreach ($sessions as $session)
-      <li class="c-events-timetable__session">
+      <li @class(['c-events-timetable__session', 'c-events-timetable__session--cancelled' => $session['cancelled'] ?? false])>
         @if ($dots)
           <span class="c-events-timetable__dot" style="--dot: {{ $session['color'] }}" aria-hidden="true"></span>
         @endif
@@ -14,6 +14,19 @@
           @endforeach
           <x-icon name="arrow-right" />
         </a>
+        @if ($session['extra'] ?? false)
+          <span class="c-events-timetable__cancelled">
+            <span class="c-label c-label--small" style="--label-bg: #dff3e4; --label-fg: #1c5b2e">{{ __('Extra session', 'sage') }}</span>
+          </span>
+        @endif
+        @if ($session['cancelled'] ?? false)
+          <span class="c-events-timetable__cancelled">
+            <span class="c-label c-label--small" style="--label-bg: #fbe4e4; --label-fg: #8a1c1c">{{ __('Cancelled', 'sage') }}</span>
+            @if ($session['reason'])
+              <span class="c-events-timetable__reason">{{ $session['reason'] }}</span>
+            @endif
+          </span>
+        @endif
       </li>
     @endforeach
   </ul>

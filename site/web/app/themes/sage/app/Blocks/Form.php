@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
@@ -10,6 +11,8 @@ use Log1x\AcfComposer\Builder;
 
 class Form extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -333,7 +336,7 @@ class Form extends Block
      */
     public function layout()
     {
-        return get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'image');
+        return $this->resolveField('layout', 'image');
     }
 
     /**
@@ -368,7 +371,7 @@ class Form extends Block
      */
     public function headingHighlight()
     {
-        return get_field('heading_highlight') ?: (shows_example($this->preview) ? ($this->example['heading_highlight'] ?? '') : '');
+        return $this->resolveField('heading_highlight', '');
     }
 
     /**
@@ -379,9 +382,9 @@ class Form extends Block
     public function heading()
     {
         return [
-            'text' => get_field('heading_text') ?: (shows_example($this->preview) ? $this->example['heading_text'] : ''),
-            'level' => get_field('heading_level') ?: (shows_example($this->preview) ? $this->example['heading_level'] : 'h2'),
-            'style' => get_field('heading_style') ?: (shows_example($this->preview) ? $this->example['heading_style'] : 'match'),
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h2'),
+            'style' => $this->resolveField('heading_style', 'match'),
         ];
     }
 
@@ -394,9 +397,9 @@ class Form extends Block
     public function subheading()
     {
         return [
-            'text' => get_field('subheading_text') ?: (shows_example($this->preview) ? ($this->example['subheading_text'] ?? '') : ''),
-            'level' => get_field('subheading_level') ?: (shows_example($this->preview) ? ($this->example['subheading_level'] ?? 'h3') : 'h3'),
-            'style' => get_field('subheading_style') ?: (shows_example($this->preview) ? ($this->example['subheading_style'] ?? 'match') : 'match'),
+            'text' => $this->resolveField('subheading_text', ''),
+            'level' => $this->resolveField('subheading_level', 'h3'),
+            'style' => $this->resolveField('subheading_style', 'match'),
         ];
     }
 
@@ -415,8 +418,8 @@ class Form extends Block
         $text = get_field('intro_text');
 
         return [
-            'text' => get_field('intro_text') ?: (shows_example($this->preview) ? ($this->example['intro_text'] ?? '') : ''),
-            'style' => get_field('intro_style') ?: (shows_example($this->preview) ? ($this->example['intro_style'] ?? 'body') : 'body'),
+            'text' => $this->resolveField('intro_text', ''),
+            'style' => $this->resolveField('intro_style', 'body'),
         ];
     }
 
@@ -427,7 +430,7 @@ class Form extends Block
      */
     public function formId()
     {
-        return get_field('form_id') ?: (shows_example($this->preview) ? $this->example['form_id'] : null);
+        return $this->resolveField('form_id');
     }
 
     /**

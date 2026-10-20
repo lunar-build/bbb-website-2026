@@ -2,12 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class ImageBlock extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -357,7 +360,7 @@ class ImageBlock extends Block
      */
     public function image()
     {
-        return get_field('image') ?: (shows_example($this->preview) ? $this->example['image'] : null);
+        return $this->resolveField('image');
     }
 
     /**
@@ -367,7 +370,7 @@ class ImageBlock extends Block
      */
     public function contentType()
     {
-        return get_field('content_type') ?: (shows_example($this->preview) ? $this->example['content_type'] : 'caption');
+        return $this->resolveField('content_type', 'caption');
     }
 
     /**
@@ -379,7 +382,7 @@ class ImageBlock extends Block
      */
     public function caption()
     {
-        return get_field('caption') ?: (shows_example($this->preview) ? ($this->example['caption'] ?? '') : '');
+        return $this->resolveField('caption', '');
     }
 
     /**
@@ -389,7 +392,7 @@ class ImageBlock extends Block
      */
     public function infoBoxType()
     {
-        return get_field('info_box_type') ?: (shows_example($this->preview) ? $this->example['info_box_type'] : 'columns');
+        return $this->resolveField('info_box_type', 'columns');
     }
 
     /**
@@ -401,7 +404,7 @@ class ImageBlock extends Block
      */
     public function infoBoxRowsHeading()
     {
-        return get_field('info_box_rows_heading') ?: (shows_example($this->preview) ? ($this->example['info_box_rows_heading'] ?? '') : '');
+        return $this->resolveField('info_box_rows_heading', '');
     }
 
     /**
@@ -411,7 +414,7 @@ class ImageBlock extends Block
      */
     public function infoBoxRows()
     {
-        return get_field('info_box_rows') ?: (shows_example($this->preview) ? $this->example['info_box_rows'] : []);
+        return $this->resolveField('info_box_rows', []);
     }
 
     /**
@@ -423,7 +426,7 @@ class ImageBlock extends Block
      */
     public function infoBoxHeading()
     {
-        return get_field('info_box_heading') ?: (shows_example($this->preview) ? ($this->example['info_box_heading'] ?? '') : '');
+        return $this->resolveField('info_box_heading', '');
     }
 
     /**
@@ -433,7 +436,7 @@ class ImageBlock extends Block
      */
     public function infoBoxBullets()
     {
-        return get_field('info_box_bullets') ?: (shows_example($this->preview) ? $this->example['info_box_bullets'] : []);
+        return $this->resolveField('info_box_bullets', []);
     }
 
     /**
@@ -443,7 +446,7 @@ class ImageBlock extends Block
      */
     public function infoBoxContent()
     {
-        return get_field('info_box_content') ?: (shows_example($this->preview) ? $this->example['info_box_content'] : '');
+        return $this->resolveField('info_box_content', '');
     }
 
     /**

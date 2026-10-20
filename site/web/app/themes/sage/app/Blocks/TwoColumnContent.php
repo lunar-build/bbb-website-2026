@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
@@ -10,6 +11,8 @@ use Log1x\AcfComposer\Builder;
 
 class TwoColumnContent extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -311,7 +314,7 @@ class TwoColumnContent extends Block
         $row = is_array($rows) ? ($rows[0] ?? null) : null;
 
         if (! $row) {
-            $row = shows_example($this->preview) ? ($this->example[$name] ?? ['type' => 'text']) : ['type' => 'text'];
+            $row = $this->exampleField($name, ['type' => 'text']);
             $row = ['acf_fc_layout' => $row['type']] + $row;
         }
 

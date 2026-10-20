@@ -1,13 +1,13 @@
 <?php
 
-namespace App\TermTimetable;
+namespace App\EventTimetable;
 
 use DateTimeImmutable;
 
 /**
- * A term's schedule: dates, a weekly pattern of sessions, closures,
+ * A timetable's schedule: dates, a weekly pattern of sessions, closures,
  * single-date cancellations and one-off extras. Plain PHP, no WordPress, so
- * expand()/validate() are unit-tested directly (tests/Feature/TermScheduleTest.php).
+ * expand()/validate() are unit-tested directly (tests/Feature/EventScheduleTest.php).
  *
  * Times are wall-clock "HH:MM"; weekdays are ISO 1 (Mon) – 7 (Sun).
  */
@@ -55,6 +55,7 @@ class Schedule
                 'id' => ['type' => 'string'],
                 'date' => $date,
                 'session' => ['type' => 'string'],
+                'reason' => ['type' => 'string'],
             ])],
             'extras' => ['type' => 'array', 'items' => $object([
                 'id' => ['type' => 'string'],
@@ -87,13 +88,13 @@ class Schedule
         $warnings = [];
 
         if (! preg_match(static::DATE, $s['start']) || ! preg_match(static::DATE, $s['end'])) {
-            $errors[] = ['message' => 'Set the term start and end dates.', 'ref' => 'dates'];
+            $errors[] = ['message' => 'Set the timetable start and end dates.', 'ref' => 'dates'];
         } elseif ($s['end'] < $s['start']) {
-            $errors[] = ['message' => 'The term ends before it starts.', 'ref' => 'dates'];
+            $errors[] = ['message' => 'The timetable ends before it starts.', 'ref' => 'dates'];
         }
 
         $timed = fn(array $item, string $what) => array_filter([
-            empty($item['event']) ? "Choose a class for this $what." : null,
+            empty($item['event']) ? "Choose an event for this $what." : null,
             ! preg_match(static::TIME, $item['start'] ?? '') || ! preg_match(static::TIME, $item['end'] ?? '') ? "Set a start and end time for this $what." : null,
             preg_match(static::TIME, $item['start'] ?? '') && preg_match(static::TIME, $item['end'] ?? '') && $item['end'] <= $item['start'] ? "This $what ends before it starts." : null,
         ]);
@@ -107,16 +108,16 @@ class Schedule
             }
         }
 
-        // The same class twice at overlapping times on one day is almost certainly a mistake.
-        $byDayClass = [];
+        // The same event twice at overlapping times on one day is almost certainly a mistake.
+        $byDayEvent = [];
         foreach ($s['sessions'] as $session) {
-            $byDayClass[($session['weekday'] ?? 0) . ':' . ($session['event'] ?? 0)][] = $session;
+            $byDayEvent[($session['weekday'] ?? 0) . ':' . ($session['event'] ?? 0)][] = $session;
         }
-        foreach ($byDayClass as $group) {
+        foreach ($byDayEvent as $group) {
             usort($group, fn($a, $b) => strcmp($a['start'] ?? '', $b['start'] ?? ''));
             for ($i = 1; $i < count($group); $i++) {
                 if (($group[$i]['start'] ?? '') < ($group[$i - 1]['end'] ?? '')) {
-                    $errors[] = ['message' => 'This class already has a session at an overlapping time on this day.', 'ref' => $group[$i]['id'] ?? ''];
+                    $errors[] = ['message' => 'This event already has a session at an overlapping time on this day.', 'ref' => $group[$i]['id'] ?? ''];
                 }
             }
         }
@@ -127,12 +128,12 @@ class Schedule
             }
         }
 
-        $inTerm = fn(string $date) => $date >= $s['start'] && $date <= $s['end'];
+        $inTimetable = fn(string $date) => $date >= $s['start'] && $date <= $s['end'];
         foreach ($s['closures'] as $closure) {
             if (($closure['to'] ?? '') < ($closure['from'] ?? '')) {
                 $errors[] = ['message' => 'This closure ends before it starts.', 'ref' => $closure['id'] ?? ''];
-            } elseif (! $inTerm($closure['from'] ?? '') && ! $inTerm($closure['to'] ?? '')) {
-                $warnings[] = ['message' => 'This closure is outside the term, so it has no effect.', 'ref' => $closure['id'] ?? ''];
+            } elseif (! $inTimetable($closure['from'] ?? '') && ! $inTimetable($closure['to'] ?? '')) {
+                $warnings[] = ['message' => 'This closure is outside the timetable, so it has no effect.', 'ref' => $closure['id'] ?? ''];
             }
         }
 
@@ -150,8 +151,8 @@ class Schedule
     }
 
     /**
-     * Every dated session the term creates, per class: the weekly pattern on
-     * each date in the term, minus closures and cancellations, plus extras.
+     * Every dated session the timetable creates, per event: the weekly pattern on
+     * each date in the timetable, minus closures and cancellations, plus extras.
      * Sorted by date then start, duplicates removed.
      *
      * @return array<int, list<array{date: string, start: string, end: string}>>

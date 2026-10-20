@@ -1,8 +1,8 @@
 import apiFetch from '@wordpress/api-fetch';
 
-export const META = '_term_schedule';
+export const META = '_event_timetable_schedule';
 
-// ISO weekday numbers, matching App\TermTimetable\Schedule.
+// ISO weekday numbers, matching App\EventTimetable\Schedule.
 export const WEEKDAYS = [
   { n: 1, label: 'Monday' },
   { n: 2, label: 'Tuesday' },
@@ -61,10 +61,10 @@ export const weeksIn = (start, end) => {
 };
 
 export const api = {
-  load: (id) => apiFetch({ path: `/wp/v2/bbb_term/${id}?context=edit` }),
-  save: (id, data) => apiFetch({ path: id ? `/wp/v2/bbb_term/${id}` : '/wp/v2/bbb_term', method: 'POST', data }),
-  terms: () => apiFetch({ path: '/wp/v2/bbb_term?context=edit&per_page=100&status=publish,draft&_fields=id,title,meta' }),
-  categories: () => apiFetch({ path: '/bbb/v1/term-categories' }),
-  classes: (category) => apiFetch({ path: `/bbb/v1/term-classes?category=${category || 0}` }),
-  preview: (schedule, term) => apiFetch({ path: '/bbb/v1/term-preview', method: 'POST', data: { schedule, term } }),
+  load: (id) => apiFetch({ path: `/wp/v2/bbb_event_timetable/${id}?context=edit` }),
+  save: (id, data) => apiFetch({ path: id ? `/wp/v2/bbb_event_timetable/${id}` : '/wp/v2/bbb_event_timetable', method: 'POST', data }),
+  timetables: () => apiFetch({ path: '/wp/v2/bbb_event_timetable?context=edit&per_page=100&status=publish,draft&_fields=id,title,meta' }),
+  categories: () => apiFetch({ path: '/bbb/v1/timetable-categories' }),
+  events: (category) => apiFetch({ path: `/bbb/v1/timetable-events?category=${category || 0}` }),
+  preview: (schedule, timetable) => apiFetch({ path: '/bbb/v1/timetable-preview', method: 'POST', data: { schedule, timetable } }),
 };

@@ -2,11 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\ResolvesFields;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Table extends Block
 {
+    use ResolvesFields;
+
     /**
      * The block name.
      *
@@ -271,7 +274,7 @@ class Table extends Block
      */
     public function caption()
     {
-        return get_field('caption') ?: (shows_example($this->preview) ? $this->example['caption'] : '');
+        return $this->resolveField('caption', '');
     }
 
     /**
@@ -281,9 +284,7 @@ class Table extends Block
      */
     public function firstColumnIsHeader()
     {
-        $value = get_field('first_column_is_header');
-
-        return $value !== null ? (bool) $value : (shows_example($this->preview) ? $this->example['first_column_is_header'] : true);
+        return $this->resolveBoolField('first_column_is_header', true);
     }
 
     /**
@@ -293,13 +294,7 @@ class Table extends Block
      */
     public function columns()
     {
-        $rows = get_field('columns');
-
-        if (! $rows) {
-            $rows = shows_example($this->preview) ? $this->example['columns'] : [];
-        }
-
-        return $rows;
+        return $this->resolveField('columns', []);
     }
 
     /**
@@ -310,11 +305,7 @@ class Table extends Block
      */
     public function rows()
     {
-        $rows = get_field('rows');
-
-        if (! $rows) {
-            $rows = shows_example($this->preview) ? $this->example['rows'] : [];
-        }
+        $rows = $this->resolveField('rows', []);
 
         return array_map(function ($row) {
             $row['cells'] = array_map(function ($cell) {
