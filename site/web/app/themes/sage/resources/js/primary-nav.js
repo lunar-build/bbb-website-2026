@@ -109,7 +109,7 @@ const desktopNav = document.querySelector('.c-primary-nav-desktop');
 if (desktopNav) {
   const triggers = [
     ...desktopNav.querySelectorAll(
-      '.c-primary-nav-desktop__link[aria-controls]',
+      '.c-primary-nav-desktop__link[aria-controls], .c-primary-nav-desktop__more',
     ),
   ];
 
@@ -157,6 +157,63 @@ if (desktopNav) {
       closeAll();
   });
 
+  // Overflow ("priority+") menu: top-level items that don't fit the bar
+  // move into the burger's dropdown, trailing items first, so the client
+  // can add menu items without breaking the bar. Fit is judged from the
+  // last visible item's right edge against the list's, not scrollWidth —
+  // the list is overflow:clip (no flash before this runs), which doesn't
+  // report its overflow through scrollWidth.
+  const navList = desktopNav.querySelector('.c-primary-nav-desktop__list');
+  const navItems = [...desktopNav.querySelectorAll('[data-nav-item]')];
+  const moreItem = desktopNav.querySelector('.c-primary-nav-desktop__item--more');
+  const sections = [
+    ...desktopNav.querySelectorAll('[data-overflow-index]'),
+  ];
+
+  const layoutOverflow = () => {
+    // Nothing to measure while the bar is display:none (below bp.$sm) or
+    // swapped for the search form.
+    if (!navList || !moreItem || navList.hidden || !navList.offsetWidth) return;
+
+    navItems.forEach((item) => (item.hidden = false));
+    moreItem.hidden = true;
+    sections.forEach((section) => (section.hidden = true));
+
+    const fits = () => {
+      const last = [...navList.children].reverse().find((li) => !li.hidden);
+      return (
+        last.getBoundingClientRect().right <=
+        navList.getBoundingClientRect().right + 0.5
+      );
+    };
+
+    if (!fits()) {
+      moreItem.hidden = false;
+      for (let i = navItems.length - 1; i >= 0; i--) {
+        navItems[i].hidden = true;
+        sections[i].hidden = false;
+        if (fits()) break;
+      }
+    }
+
+    // An open dropdown whose trigger just moved/vanished would be orphaned.
+    const stale = triggers.some(
+      (trigger) =>
+        trigger.getAttribute('aria-expanded') === 'true' &&
+        trigger.closest('li').hidden,
+    );
+    if (stale) closeAll();
+  };
+
+  // Observe the container, not the list: the list's own size changes as
+  // items hide/show, which would feed back into this observer.
+  if (navList && moreItem && sections.length) {
+    new ResizeObserver(layoutOverflow).observe(
+      navList.closest('.o-container'),
+    );
+    document.fonts?.ready.then(layoutOverflow);
+  }
+
   // Desktop search (Figma "Desktop | Search") replaces the L1 list within
   // the same bar rather than opening a separate overlay.
   const searchToggle = desktopNav.querySelector(
@@ -171,6 +228,7 @@ if (desktopNav) {
       searchToggle.setAttribute('aria-expanded', String(open));
       list.hidden = open;
       searchForm.hidden = !open;
+      if (!open) layoutOverflow();
       if (open) searchForm.querySelector('input').focus();
     };
 

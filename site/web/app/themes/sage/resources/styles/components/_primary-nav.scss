@@ -220,9 +220,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1.5rem; // minimum gap before items overflow into the burger menu
   list-style: none;
   margin: 0;
   padding-block: 1rem;
+  // Hides the un-overflowed items for the instant before primary-nav.js
+  // moves them into the burger menu; the margin keeps focus rings visible.
+  overflow: clip;
+  overflow-clip-margin: 0.5rem;
+}
+
+// Items never shrink or wrap, so a full bar overflows (and is measured by
+// primary-nav.js) rather than squashing labels.
+.c-primary-nav-desktop__item {
+  flex: none;
+  white-space: nowrap;
 }
 
 .c-primary-nav-desktop__link {
@@ -279,6 +291,7 @@
   z-index: 10;
   background: var(--wp--preset--color--blue);
   border-block-start: 1px solid rgb(255 255 255 / 30%); // separates it from the bar above
+  white-space: normal; // the nowrap <li> it sits in would otherwise stop links wrapping
   box-shadow: header.$site-header-shadow; // overflows the header, so its shadow doesn't reach here
   padding-block: 2rem;
 
@@ -363,6 +376,102 @@
   }
 
   @include focus.ring;
+}
+
+.c-primary-nav-desktop__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8125rem;
+  height: 2.8125rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &-icon-close {
+    display: none;
+  }
+
+  &[aria-expanded='true'] {
+    .c-primary-nav-desktop__more-icon-menu {
+      display: none;
+    }
+
+    .c-primary-nav-desktop__more-icon-close {
+      display: inline-flex;
+    }
+  }
+
+  @include focus.ring;
+}
+
+// The overflow dropdown can hold every top-level item, so let it scroll
+// rather than run off the bottom of the viewport.
+.c-primary-nav-desktop__dropdown--overflow {
+  max-height: calc(100dvh - 10rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+// Many columns scroll sideways. The row is sized to its content, so its own
+// end padding is part of the scroll area (a zero-size ::after spacer isn't).
+.c-primary-nav-desktop__dropdown--overflow .c-primary-nav-desktop__columns {
+  width: max-content;
+  min-width: 100%;
+  padding-inline-end: 3rem;
+}
+
+.c-primary-nav-desktop__overflow-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  // display:flex above beats the UA [hidden] rule, so restate it.
+  &[hidden] {
+    display: none;
+  }
+
+  // Only between visible sections: hidden (still-in-the-bar) ones sit before
+  // the first visible one, so a plain `& + &` would give it a stray divider.
+  &:not([hidden]) ~ &:not([hidden]) {
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid rgb(255 255 255 / 30%);
+  }
+}
+
+.c-primary-nav-desktop__overflow-title {
+  // Larger than the group headings (16px bold) beneath it, so the item
+  // reads as the top level.
+  font-size: 1.25rem;
+  line-height: normal;
+  margin: 0;
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.c-primary-nav-desktop__overflow-link {
+  align-self: flex-start;
+
+  &:hover > span,
+  &:focus-visible > span {
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 .c-primary-nav-desktop__list[hidden],
