@@ -1,7 +1,6 @@
-// Bespoke slot-counter — WA's wa-carousel has no counting feature. Each
-// digit is a "reel" (0-9 strip repeated 3x, see the component Blade view)
-// that translateY()s to its target row. Presentational only — aria-hidden,
-// see the sr-only sentence in the Blade view for the real value.
+// Slot-counter (wa-carousel has none): each digit is a "reel" (0-9 strip repeated 3x,
+// see the Blade view) that translateY()s to its target row. aria-hidden — the
+// Blade view's sr-only sentence carries the real value.
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const SET_SIZE = 10; // digits 0-9 per repeated set in the reel track
@@ -21,8 +20,7 @@ const spinReel = (reel, index) => {
     return;
   }
 
-  // Reset to row 0 (digit '0') before every spin, so a revisited slide
-  // counts up from 0 again instead of starting on its target digit.
+  // Reset to row 0 so a revisited slide counts up from 0 again.
   track.style.transition = 'none';
   track.style.transform = 'translateY(0)';
   void track.offsetHeight; // force reflow so the reset isn't animated
@@ -45,15 +43,13 @@ const spinReel = (reel, index) => {
   );
 };
 
-// WA stretches every wa-carousel-item to one shared box (--aspect-ratio,
-// see component SCSS) — measure each slide's real content height instead
-// and size the carousel to the tallest, so no slide's copy gets clipped.
+// WA stretches every item to one --aspect-ratio box; size the carousel to the
+// tallest slide's real content instead so no copy is clipped.
 const syncCarouselHeight = (wrapper, carousel) => {
   const contents = carousel.querySelectorAll('.c-rolling-stats-carousel__content');
   if (!contents.length) return;
 
-  // .content itself isn't stretched (only its wa-carousel-item ancestor is), so
-  // offsetHeight here is each slide's true natural height regardless of the box applied.
+  // .content isn't stretched (only its wa-carousel-item is), so this is the natural height.
   const tallestContent = Math.max(...[...contents].map((el) => el.offsetHeight));
 
   const item = carousel.querySelector('wa-carousel-item');
@@ -74,9 +70,8 @@ document.querySelectorAll('[data-rolling-stats-carousel]').forEach((wrapper) => 
     item.querySelectorAll('[data-rolling-stats-reel]').forEach((reel, index) => spinReel(reel, index));
   };
 
-  // A looping wa-carousel pads both ends with cloned slides (data-clone="<original index>")
-  // and scrolls onto a clone when wrapping, only jumping to the real slide once it settles.
-  // Spin every copy of the slide, or the wrapped-to clone just sits at its final number.
+  // A looping wa-carousel scrolls onto cloned slides (data-clone="<index>") when
+  // wrapping — spin every copy or the clone sits at its final number.
   const animateSlide = (index) => {
     if (typeof index !== 'number') return;
 
@@ -86,9 +81,7 @@ document.querySelectorAll('[data-rolling-stats-carousel]').forEach((wrapper) => 
 
   carousel.addEventListener('wa-slide-change', (event) => animateSlide(event.detail?.index));
 
-  // Spin the first slide only once it actually scrolls into view, not on page
-  // load — a block below the fold used to spin off-screen and just sit at its
-  // final value by the time the user scrolled down to it.
+  // Spin on scroll into view, not page load — below-the-fold blocks spun off-screen.
   const observer = new IntersectionObserver(
     (entries) => {
       if (!entries[0].isIntersecting) return;
@@ -101,8 +94,7 @@ document.querySelectorAll('[data-rolling-stats-carousel]').forEach((wrapper) => 
 
   syncCarouselHeight(wrapper, carousel);
 
-  // Re-measure on resize (clamped font-size + wrapping both change with viewport
-  // width) and once more on load in case web fonts swap in and shift line heights.
+  // Re-measure on resize (fluid font-size/wrapping) and on load (web font swap).
   let resizeFrame;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeFrame);

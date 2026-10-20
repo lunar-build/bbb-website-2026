@@ -1,6 +1,5 @@
-// Map for the Map Listing template (template-map-listing.blade.php). Pins come
-// from the results fragment's [data-map-markers] JSON, re-read whenever
-// archive-filters.js swaps the results, so the map always matches the cards.
+// Map Listing template map. Pins come from the results' [data-map-markers] JSON,
+// re-read whenever archive-filters.js swaps results.
 const container = document.querySelector('[data-map-listing]');
 
 // Figma "Pin Blue" map pin.
@@ -24,8 +23,8 @@ const loadGoogleMaps = (key) =>
   });
 
 if (container) {
-  // Google's global hook for a rejected key (e.g. this domain isn't in its
-  // allowed referrers) — drop the map rather than show Google's error box.
+  // Google's rejected-key hook (e.g. domain not an allowed referrer) — drop the map
+  // rather than show its error box.
   window.gm_authFailure = () => container.remove();
 
   loadGoogleMaps(container.dataset.apiKey)

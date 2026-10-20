@@ -47,12 +47,17 @@
     {
       "type": "vcs",
       "url": "git@github.com:lunar-build/instagram-feed-pro.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@github.com:lunar-build/modern-events-calendar.git"
     }
   ],
   "require": {
     "php": ">=8.4",
     "composer/installers": "^2.0",
     "gravityforms/gravityforms": "^3.0",
+    "lunar-build/modern-events-calendar-pro": "dev-main",
     "oscarotero/env": "^2.0",
     "roots/bedrock-autoloader": "^1.0",
     "roots/bedrock-disallow-indexing": "^2.0",

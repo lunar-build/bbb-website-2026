@@ -1,7 +1,5 @@
-// Archive filters (resources/views/archive.blade.php): ticking a checkbox or
-// following a pagination link fetches that URL's full page and swaps in just
-// its [data-archive-results] fragment, keeping real ?filter_{taxonomy}[]=
-// URLs so every state is shareable and reloadable.
+// Archive filters: a checkbox or pagination click fetches the URL and swaps in its
+// [data-archive-results] fragment, keeping real ?filter_{taxonomy}[]= URLs shareable.
 const form = document.querySelector('[data-archive-filters]');
 const results = document.querySelector('[data-archive-results]');
 
@@ -41,8 +39,7 @@ if (results) {
     }
   };
 
-  // Always from the unfiltered archive URL (form action), so a filter change
-  // drops /page/N/ and leaves a term archive's own URL.
+  // Built from the form action so a filter change drops /page/N/.
   const filterUrl = () => {
     const url = new URL(form.action);
     new FormData(form).forEach((value, name) => url.searchParams.append(name, value));
@@ -67,9 +64,8 @@ if (results) {
     load(link.href);
   });
 
-  // Checkbox states belong to the page being left, so do a full reload on
-  // back/forward rather than re-syncing every checkbox by hand. Only once
-  // we've pushed — hash-only history (e.g. the skip link) also fires popstate.
+  // Full reload on back/forward rather than re-syncing checkboxes. Only after we've
+  // pushed — hash-only history (e.g. the skip link) also fires popstate.
   window.addEventListener('popstate', () => {
     if (pushed) window.location.reload();
   });

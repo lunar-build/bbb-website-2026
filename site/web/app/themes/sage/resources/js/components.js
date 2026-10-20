@@ -1,6 +1,4 @@
-// Web Awesome custom element registrations, shared between the front end
-// (app.js) and the block editor (editor.js) so <wa-*> tags in block preview
-// mode render as real components, not inert markup.
+// Web Awesome registrations shared by app.js and the editor canvas.
 import '@awesome.me/webawesome/dist/components/button/button.js';
 import '@awesome.me/webawesome/dist/components/card/card.js';
 import '@awesome.me/webawesome/dist/components/accordion/accordion.js';
@@ -18,3 +16,6 @@ import '@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.j
 import '@awesome.me/webawesome/dist/components/carousel/carousel.js';
 import '@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js';
 import '@awesome.me/webawesome/dist/components/dialog/dialog.js';
+import '@awesome.me/webawesome/dist/components/tab-group/tab-group.js';
+import '@awesome.me/webawesome/dist/components/tab/tab.js';
+import '@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js';

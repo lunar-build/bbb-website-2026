@@ -1,5 +1,4 @@
-// Figma node 53:989 — reusable pull-quote, also hardcodable into other
-// blocks. Mark is <x-icon> (auto aria-hidden, decorative), not a glyph.
+// Figma node 53:989 — reusable pull-quote. Mark is a decorative <x-icon>, not a glyph.
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
@@ -14,8 +13,7 @@
 }
 
 .c-quote {
-  // Defaults are fallbacks on .c-quote__body etc. below, not declared here,
-  // so an ancestor (e.g. Quote Carousel) can still override --c-quote-color.
+  // Defaults live on the children, not here, so an ancestor (Quote Carousel) can override --c-quote-color.
   display: grid;
   row-gap: 1rem; // mobile: single column, stacked via source order
   align-items: start;
@@ -115,8 +113,7 @@
   justify-content: center;
 }
 
-// No design yet — client asked for headshots (prod used pre-cropped circular
-// PNGs). Cropped to a circle here so rectangular uploads also work.
+// No design yet — client asked for headshots (prod used pre-cropped circles); crop here so any upload works.
 .c-quote__attribution-image {
   flex-shrink: 0;
   width: 4rem;

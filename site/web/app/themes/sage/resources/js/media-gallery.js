@@ -1,8 +1,6 @@
-// Every tile is a plain <button> (data-media-gallery-item) describing its
-// media via data-* attributes; clicking it fills the block's <wa-dialog>
-// with a real <img> or <video controls> rather than pre-rendering every
-// tile's full-size media up front. wa-dialog traps focus and handles Esc
-// itself — this only restores focus to the trigger on close (WCAG 2.4.3).
+// Tiles are <button data-media-gallery-item> with data-* media info; a click fills the
+// <wa-dialog> with an <img>/<video> instead of pre-rendering full-size media.
+// wa-dialog handles focus trap and Esc — this only restores focus on close (WCAG 2.4.3).
 document.querySelectorAll('[data-media-gallery]').forEach((wrapper) => {
   const dialog = wrapper.querySelector('[data-media-gallery-dialog]');
   const body = wrapper.querySelector('[data-media-gallery-dialog-body]');
@@ -18,9 +16,7 @@ document.querySelectorAll('[data-media-gallery]').forEach((wrapper) => {
       body.innerHTML = '';
 
       if (type === 'video') {
-        // No autoplay — an unexpected sound burst the instant the dialog
-        // opens is a startle/surprise hazard; the visitor presses the
-        // native controls' own play button instead.
+        // No autoplay — unexpected sound on open is a startle hazard.
         const video = document.createElement('video');
         video.src = src;
         video.controls = true;

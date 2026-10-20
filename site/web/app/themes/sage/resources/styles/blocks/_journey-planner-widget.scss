@@ -1,6 +1,4 @@
-// Figma: yellow card (#FFBF47), 20px radius, stacked From/To or
-// location+radios, dark CTA pill. Input/radio control styling itself comes
-// from _input.scss/_choice.scss — this only covers the card shell.
+// Figma yellow card (#FFBF47), 20px radius. Control styling: _input.scss/_choice.scss.
 
 .c-journey-planner-widget {
   max-width: 40.0625rem;
@@ -30,10 +28,7 @@
   align-items: flex-start;
 }
 
-// <wa-radio-group> renders its own accessible fieldset/legend pairing
-// internally, so the label/options relationship is programmatic, not just
-// visual — this just themes its label part and lays out the slotted
-// <x-radio> options.
+// <wa-radio-group> renders its own fieldset/legend; this themes the label part and lays out the <x-radio>s.
 .c-journey-planner-widget__options {
   width: 100%;
 
@@ -54,9 +49,7 @@
   }
 }
 
-// Figma's CTA is a solid charcoal pill — neither wa-button token preset
-// matches (brand = yellow, neutral = black), so override the neutral
-// tokens locally rather than adding a third global variant for one button.
+// Charcoal pill: neither wa-button preset matches (brand = yellow, neutral = black), so override locally.
 .c-journey-planner-widget__cta {
   align-self: center;
   --wa-color-neutral-fill-loud: var(--wp--preset--color--charcoal);
