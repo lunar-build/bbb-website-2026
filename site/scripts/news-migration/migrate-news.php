@@ -456,20 +456,32 @@ function news_replace_old_cards(array $blocks, wpdb $src, array &$notes, bool $l
     return $blocks;
 }
 
+/** An old illustration asset path (images/illustrations/figures/mountain_biker.png) as the block's field value. */
+function news_illustration_key(string $path): string
+{
+    return strtolower(pathinfo($path, PATHINFO_FILENAME));
+}
+
 /**
- * The old illustration blocks composed a figure with up to three objects. The
- * Illustration block shows one picture, so the figure is kept and the objects go.
- * Figures map to the theme's library (the old "girl" is the theme's cyclist).
+ * Old acf/illustration(-divider) -> Illustration block: same character, objects and
+ * blue-strip setting. A character the theme doesn't have (the old "Instructor and
+ * girl" image is missing on the live site too) drops the block.
  */
 function news_illustration(array $b): ?array
 {
-    $file = strtolower(pathinfo($b['attrs']['data']['illustration_figure'] ?? '', PATHINFO_FILENAME));
-    $key = ['girl' => 'cyclist'][$file] ?? $file;
-    if (! isset(\App\Blocks\Illustration::ILLUSTRATIONS[$key])) {
+    $d = $b['attrs']['data'] ?? [];
+    $character = news_illustration_key($d['illustration_figure'] ?? '');
+    if (! isset(\App\Blocks\Illustration::CHARACTERS[$character])) {
         return null;
     }
+    $fields = ['character' => $character];
+    foreach ([1, 2, 3] as $n) {
+        $object = news_illustration_key($d["illustration_object_$n"] ?? '');
+        $fields["object_$n"] = isset(\App\Blocks\Illustration::OBJECTS[$object]) ? $object : '';
+    }
+    $fields['remove_blue_background'] = ! empty($d['remove_blue_background']) ? '1' : '0';
 
-    return news_acf_block('acf/illustration', \App\Blocks\Illustration::class, ['illustration' => $key, 'position' => 'centre'], 'illustration');
+    return news_acf_block('acf/illustration', \App\Blocks\Illustration::class, $fields, 'illustration');
 }
 
 /** Accordion from the old FAQ block (question/answer repeater). */
@@ -846,7 +858,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 if ($illustration = news_illustration($b)) {
                     $out[] = $illustration;
                 } else {
-                    $notes[] = 'illustration dropped (figure not in the theme library)';
+                    $notes[] = 'illustration dropped (character not in the theme library)';
                 }
                 break;
             case 'acf/card':
