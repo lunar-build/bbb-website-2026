@@ -16,6 +16,7 @@
 // Dark-surface contexts override the variable; anything inside that
 // still calls ring() with the default picks up white automatically.
 .c-primary-nav,
+.c-primary-nav-desktop__bar,
 .c-primary-nav-desktop__dropdown {
   --focus-color: var(--wp--preset--color--white);
 }

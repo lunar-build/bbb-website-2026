@@ -213,7 +213,7 @@
 
 // Full-bleed bg, content stays gutter-constrained via .o-container inside
 .c-primary-nav-desktop__bar {
-  background: var(--wp--preset--color--lightest-grey);
+  background: var(--wp--preset--color--blue);
 }
 
 .c-primary-nav-desktop__list {
@@ -232,7 +232,7 @@
   border: none;
   background: none;
   padding: 0;
-  color: var(--wp--preset--color--charcoal);
+  color: var(--wp--preset--color--white);
   font-family: var(--wp--preset--font-family--nata-sans);
   @extend .u-nav-link;
   text-decoration: none;
@@ -278,6 +278,8 @@
   top: 100%;
   z-index: 10;
   background: var(--wp--preset--color--blue);
+  border-block-start: 1px solid rgb(255 255 255 / 30%); // separates it from the bar above
+  box-shadow: header.$site-header-shadow; // overflows the header, so its shadow doesn't reach here
   padding-block: 2rem;
 
   &[hidden] {
@@ -352,7 +354,7 @@
   border: none;
   border-radius: 50%;
   background: none;
-  color: var(--wp--preset--color--charcoal);
+  color: var(--wp--preset--color--white);
   cursor: pointer;
 
   svg {
