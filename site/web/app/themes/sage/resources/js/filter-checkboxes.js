@@ -1,7 +1,5 @@
-// Mobile disclosure for .c-filter-checkboxes: the toggle button opens/closes
-// the grouped checkbox panel and always shows the current selected-filter
-// count. Desktop shows the panel permanently via CSS regardless of the
-// `hidden` attribute this toggles — see _filter-checkboxes.scss.
+// Mobile disclosure for .c-filter-checkboxes (toggle + selected-count). Desktop shows
+// the panel via CSS regardless of the `hidden` attribute — see _filter-checkboxes.scss.
 document.querySelectorAll('.c-filter-checkboxes').forEach((root) => {
   const toggle = root.querySelector('.c-filter-checkboxes__toggle');
   const panel = root.querySelector('.c-filter-checkboxes__panel');
@@ -22,9 +20,7 @@ document.querySelectorAll('.c-filter-checkboxes').forEach((root) => {
     label.textContent = count === 1 ? '1 filter selected' : `${count} filters selected`;
   };
 
-  // wa-checkbox's `change` event retargets to the host element (shadow DOM
-  // event retargeting) — event.target IS the <wa-checkbox>, not a
-  // descendant, so `.matches()` not `.closest()`.
+  // Shadow DOM retargets `change` to the <wa-checkbox> host, so `.matches()` not `.closest()`.
   panel.addEventListener('change', (event) => {
     if (event.target.matches('wa-checkbox')) updateLabel();
   });

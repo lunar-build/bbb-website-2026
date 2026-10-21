@@ -1,0 +1,8 @@
+// Google Maps / My Maps iframe. Height comes inline from the block's Height field.
+.c-map-embed__frame {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--lightest-grey);
+}

@@ -39,16 +39,14 @@
   @include focus.ring;
 
   &:focus-visible {
-    // Wider than the 2px default — this card has no padding, so the ring
-    // needs room for the arrow's hover-animation (overflow:visible) to stay inside it.
+    // Wider than the default: the card has no padding, so the ring must contain the arrow's hover animation.
     outline-offset: 0.5rem;
   }
 }
 
 .c-icon-link-grid__icon {
-  // KNOWN WCAG 1.4.11 FAILURE: --orange is ~2.3:1 on white, ~1.9:1 on Blue
-  // light — below the required 3:1. Design-system colour choice; flag to
-  // design/client rather than silently swapping to an off-brand colour.
+  // KNOWN WCAG 1.4.11 FAILURE: --orange is ~2.3:1 on white, ~1.9:1 on Blue light (3:1
+  // required). Design-system colour — flag to design/client, don't swap it.
   display: inline-flex;
   color: var(--wp--preset--color--orange);
 
@@ -60,9 +58,7 @@
 
 .c-icon-link-grid__item-heading {
   display: inline-flex;
-  // flex-start, not center: when the heading text wraps to two lines the
-  // arrow should sit level with the first line, not centred against the
-  // whole wrapped block.
+  // flex-start: a wrapped heading's arrow stays level with the first line.
   align-items: flex-start;
   gap: 0.75rem;
   @extend .u-short-form-link;

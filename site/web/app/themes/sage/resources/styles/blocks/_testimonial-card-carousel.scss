@@ -20,8 +20,7 @@
   }
 
   &__carousel {
-    // Invalid on purpose — WA's own default (16/9) gives the slides row a
-    // fixed height; this makes it content-sized instead (see scroll-container below).
+    // Invalid on purpose: overrides WA's fixed 16/9 so the row is content-sized.
     --aspect-ratio: auto;
 
     display: block;
@@ -32,8 +31,7 @@
     padding-inline: 0.25rem; // small breathing room between slide edge and card shadow
   }
 
-  // Move the nav buttons off the slides row's edges (WA's default) to sit
-  // either side of the pagination dots instead.
+  // Nav buttons flank the pagination dots instead of the slides row's edges.
   &__carousel::part(carousel) {
     grid-template-columns: 1fr auto auto auto 1fr;
     column-gap: 0.5rem;
@@ -41,8 +39,7 @@
 
   &__carousel::part(scroll-container) {
     grid-column: 1 / -1;
-    // Stretch (not WA's default center) + the invalid --aspect-ratio above
-    // makes every visible slide match the tallest one's content height.
+    // With the invalid --aspect-ratio above, every visible slide matches the tallest.
     align-items: stretch;
     // Room for the cards' box-shadow, otherwise clipped by WA's own overflow-y: hidden here.
     padding-block: 0.25rem;

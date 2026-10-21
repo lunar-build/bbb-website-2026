@@ -1,0 +1,33 @@
+@use 'breakpoints' as bp;
+
+// Blocks in a narrow template column rather than full width — used by the
+// archive intro and the Sticky Nav column. Include on the column element.
+@mixin blocks {
+  // The column already narrows blocks; their own .o-container gutter would indent them twice.
+  .o-container {
+    grid-template-columns: [full-start content-start] 100% [content-end full-end];
+  }
+
+  // Background blocks can't bleed from a column, so box them as rounded
+  // panels. Their spacing controls still set top/bottom inline.
+  :is(.o-full-bleed-bg, section.has-background) {
+    padding: var(--wp--preset--spacing--small) 1.5rem;
+    border-radius: 1.25rem;
+
+    @include bp.respond($min: bp.$md) {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  // Stacked background blocks join into one panel, as they would full bleed.
+  :is(.o-full-bleed-bg, section.has-background) + :is(.o-full-bleed-bg, section.has-background) {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  :is(.o-full-bleed-bg, section.has-background):has(+ :is(.o-full-bleed-bg, section.has-background)) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}

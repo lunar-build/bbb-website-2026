@@ -1,8 +1,5 @@
-// Scroll-spy + click handling for the Sticky Nav page menu
-// (resources/views/components/sticky-page-menu.blade.php) — that component
-// only renders the static list; active-state/track styling is CSS, this
-// just toggles the class and handles clicks (native #anchor jump wasn't
-// reliably scrolling in testing).
+// Scroll-spy + click handling for components/sticky-page-menu.blade.php. Clicks
+// are handled in JS because the native #anchor jump wasn't reliably scrolling.
 import { setHeaderHidden } from './site-header.js';
 
 const nav = document.querySelector('[data-sticky-nav-menu]');
@@ -34,11 +31,9 @@ if (nav) {
     });
   };
 
-  // Set true while a programmatic scroll is in flight: the IntersectionObserver below
-  // otherwise re-fires mid-animation (and once more on settling) and can reassign active
-  // state to whichever section ends up centered, overriding the just-clicked item — e.g.
-  // a short first section scrolled to from the bottom of the page settles with the
-  // viewport's center past it, into the second section.
+  // True during a programmatic scroll: otherwise the observer re-fires mid-animation
+  // and overrides the just-clicked item (a short first section settles with the
+  // viewport centre past it, in the second).
   let suppressObserver = false;
   let suppressObserverTimeout = null;
 
@@ -52,29 +47,23 @@ if (nav) {
     suppressObserver = true;
     window.clearTimeout(suppressObserverTimeout);
 
-    // Scrolling up always reveals the header once movement settles (site-header.js's
-    // own scroll-direction logic) — force it visible *before* scrollIntoView runs,
-    // since scroll-margin-top is read once at call time: without this, a jump up from
-    // a scrolled-down (header-hidden) position locks in the smaller hidden-state
-    // offset, and the heading lands under the header once it reappears mid-scroll.
+    // Show the header *before* scrolling: scroll-margin-top is read once at call time,
+    // so jumping up from a header-hidden position would lock in the smaller offset
+    // and land the heading under the header when it reappears.
     if (target.getBoundingClientRect().top < 0) {
       setHeaderHidden(false);
     }
 
-    // block: 'start' respects the target's scroll-margin-top so it clears the header.
     target.scrollIntoView({ behavior, block: 'start' });
     setActiveLink(id);
 
-    // Only on a real click — the heading (tabindex="-1", see app/filters.php) takes
-    // keyboard focus so the next Tab continues into the section just jumped to, instead
-    // of staying on the nav link (WCAG 2.4.3). preventScroll since scrollIntoView above
-    // already handled it.
+    // Click only: focus the heading (tabindex="-1", see app/filters.php) so the next
+    // Tab continues into that section (WCAG 2.4.3).
     if (moveFocus) {
       target.focus({ preventScroll: true });
     }
 
-    // 'scrollend' fires once the scroll genuinely settles, however long the animation
-    // takes; timeout fallback for browsers without it (Safari < 17.4).
+    // Timeout fallback for browsers without scrollend (Safari < 17.4).
     if ('onscrollend' in window) {
       window.addEventListener('scrollend', () => { suppressObserver = false; }, { once: true });
     } else {
@@ -96,7 +85,6 @@ if (nav) {
     });
   });
 
-  // Default the first item active on load, before any scroll/intersection fires.
   if (links[0]) {
     const firstId = links[0].getAttribute('href')?.replace(/^#/, '');
 
@@ -105,8 +93,7 @@ if (nav) {
     }
   }
 
-  // A direct #section URL load gets the browser's native fragment scroll before the
-  // Image Hero above it finishes loading and reflows the page — re-run once loaded.
+  // Native fragment scroll fires before the hero image loads and reflows the page.
   const initialHashId = location.hash.replace(/^#/, '');
 
   if (initialHashId && document.getElementById(initialHashId)) {
@@ -114,8 +101,8 @@ if (nav) {
   }
 
   if (sections.length && 'IntersectionObserver' in window) {
-    // rootMargin shrinks the root to a 1px line at viewport center — symmetric
-    // trigger for both scroll directions, unlike a top-biased zone.
+    // rootMargin shrinks the root to a 1px line at viewport centre — symmetric for
+    // both scroll directions.
     const observer = new IntersectionObserver(
       (entries) => {
         if (suppressObserver) {

@@ -1,11 +1,7 @@
-// wa-carousel only builds its loop clones once, in connectedCallback — it
-// doesn't regenerate them when slidesPerPage changes afterwards, so simply
-// mutating the attribute on a live instance leaves a stale/mismatched
-// clone set. Instead we rebuild the element from scratch on each
-// breakpoint change, so it goes through a normal fresh connect every time.
-// (Equal card heights across visible slides are handled in CSS — see
-// _testimonial-card-carousel.scss's ::part(scroll-container) rule — not
-// here.)
+// wa-carousel builds its loop clones once, in connectedCallback, so changing
+// slidesPerPage on a live instance leaves stale clones — rebuild the element on each
+// breakpoint change instead. (Equal card heights are CSS: see
+// _testimonial-card-carousel.scss.)
 const desktop = window.matchMedia('(min-width: 64rem)'); // bp.$lg
 
 document.querySelectorAll('[data-testimonial-carousel]').forEach((carousel) => {

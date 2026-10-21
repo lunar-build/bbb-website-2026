@@ -1,8 +1,5 @@
-// Figma "Image and content card" (node 9-3214): white card, no border —
-// image (top corners rounded only) + a text block with a rule directly
-// under the heading. Four style variants share this shell: Link with
-// picture (arrow-only CTA), Bikeability, Event card and News card (button
-// CTA, the latter two adding a date above the heading).
+// Figma "Image and content card" (node 9-3214). Four variants share this shell: Link
+// with picture (arrow-only CTA), Bikeability, Event and News (button CTA, plus a date).
 @use '../base/typography';
 @use '../base/focus' as focus;
 @use '../components/button';
@@ -12,9 +9,7 @@
     display: flex;
     flex-direction: column;
     position: relative; // containing block for the stretched-link overlay
-    // Figma's fixed card width — only right for the standalone Feature
-    // Card block. Card Grid overrides this back to none in _card-grid.scss
-    // so the card fills its grid column instead.
+    // Figma's width, for the standalone block; _card-grid.scss resets it to none.
     max-width: 443px;
     border-radius: 12px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
@@ -27,6 +22,10 @@
     aspect-ratio: 443 / 302;
     object-fit: cover;
     border-radius: 12px 12px 0 0;
+  }
+
+  &__image--empty {
+    background: var(--wp--preset--color--blue-light);
   }
 
   &__stretched-link {
@@ -43,8 +42,7 @@
     flex: 1;
     gap: 16px;
     padding: 20px;
-    // &__card has no overflow:hidden (would clip the stretched-link's
-    // focus ring), so round &__body's own bottom corners to match.
+    // &__card can't overflow:hidden (clips the stretched-link focus ring), so round here.
     border-radius: 0 0 12px 12px;
   }
 
@@ -72,6 +70,11 @@
   }
 
   &__content {
+    // Heading and copy are siblings (x-copy wraps its paragraphs in a <div>).
+    > * + * {
+      margin-top: 0.75rem;
+    }
+
     :where(h1, h2, h3, h4, h5, h6) {
       margin: 0;
       padding-bottom: 8px;
@@ -95,13 +98,10 @@
     align-items: center;
     justify-content: flex-start;
     margin-top: auto;
-    // No z-index here: the CTA below (a decorative <wa-button>, or the
-    // bare arrow icon) must NOT sit above __stretched-link — otherwise
-    // clicking it would be a dead zone on an otherwise whole-card link.
+    // No z-index: the CTA must stay below __stretched-link or it's a dead zone.
   }
 
-  // Styling/typography/colour come from the real Button component
-  // (_button.scss's `size="small"` rules) — this just positions it.
+  // Styling comes from _button.scss's `size="small"` rules; this only positions it.
   &__cta {
     align-self: flex-start;
     flex: none;
@@ -120,17 +120,14 @@
     }
   }
 
-  // CTA is pointer-events:none (card itself is the real link), so its
-  // arrow-morph is driven off the card's own hover instead.
+  // CTA is pointer-events:none, so its arrow-morph follows the card's hover.
   &__card:is(:hover, :focus-within) &__cta,
   &__card:is(:hover, :focus-within) &__cta-icon {
     @include button.arrow-hover;
   }
 }
 
-// Event/News — Figma "Type=Event card"/"Type=News card": heading reads in
-// blue-dark (rather than the Link/Bikeability styles' blue) and sits below
-// a blue __date.
+// Figma "Type=Event card"/"Type=News card" — blue-dark heading below a blue __date.
 .c-feature-card--event,
 .c-feature-card--news {
   .c-feature-card__content :where(h1, h2, h3, h4, h5, h6) {
@@ -138,9 +135,7 @@
   }
 }
 
-// News — Figma "Type=News card" (node 9-3294): the body content area (not
-// the image) sits on a lightest-grey fill, distinguishing it from the
-// white-bodied Link/Bikeability/Event styles.
+// Figma "Type=News card" (node 9-3294) — body on lightest-grey fill.
 .c-feature-card--news {
   .c-feature-card__body {
     background: var(--wp--preset--color--lightest-grey);

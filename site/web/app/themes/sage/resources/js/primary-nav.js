@@ -1,19 +1,13 @@
-// Mobile nav overlay: open/close via .c-header-menu-toggle, plus panel
-// drill-in/back between the root L1 list and each L1 item's level-2 panel.
+// Mobile nav overlay: open/close, plus drill-in/back between the L1 list and level-2 panels.
 const toggle = document.querySelector('.c-header-menu-toggle');
 const menu = document.getElementById('primary-menu');
 
 if (toggle && menu) {
   const panels = menu.querySelectorAll('.c-primary-nav__panel');
 
-  // Moving focus onto the newly-shown panel isn't just nice-to-have: the
-  // element that was focused when its panel got hidden doesn't stay
-  // focused — the browser drops focus to <body> (on the next tick, not
-  // synchronously). Since <body> isn't tracked by the Tab trap below,
-  // leaving it there would let Tab escape the overlay entirely after any
-  // drill-in/back. Focusing the panel's first focusable element (its Back
-  // button for a level-2 panel) keeps the trap intact and gives keyboard
-  // users a sensible landing point.
+  // Focus the new panel's first focusable element: when a panel is hidden the
+  // browser drops focus to <body> (next tick), which the Tab trap below doesn't
+  // track, so Tab would escape the overlay.
   const showPanel = (name) => {
     panels.forEach((panel) => {
       panel.hidden = panel.dataset.panel !== name;
@@ -29,8 +23,7 @@ if (toggle && menu) {
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
     menu.hidden = !open;
 
-    // Without this, scrolling past the overlay's content reaches the page
-    // underneath and triggers the header's own scroll-hide behaviour.
+    // Stops scroll reaching the page underneath and triggering the header's scroll-hide.
     document.documentElement.style.overflow = open ? 'hidden' : '';
 
     if (open) {
@@ -65,8 +58,7 @@ if (toggle && menu) {
     }
   });
 
-  // Toggle sits outside #primary-menu, so it's included explicitly as the
-  // trap's start/end. Recomputed each keypress since the visible panel changes.
+  // Toggle sits outside #primary-menu, so it's added explicitly. Recomputed per keypress.
   const getTrapElements = () => {
     const panel = menu.querySelector('.c-primary-nav__panel:not([hidden])');
     const panelFocusables = panel
@@ -100,10 +92,8 @@ if (toggle && menu) {
   });
 }
 
-// Desktop dropdown mega-menu. Click/tap and keyboard (Enter/Space, native
-// <button> activation) only — no hover-to-open and no focus-driven
-// open/close, since either caused dropdowns to flicker open/closed while
-// just tabbing or moving the mouse through the bar.
+// Desktop mega-menu. Click/keyboard only — hover- or focus-driven open/close made
+// dropdowns flicker while tabbing or moving the mouse through the bar.
 const desktopNav = document.querySelector('.c-primary-nav-desktop');
 
 if (desktopNav) {
@@ -157,8 +147,7 @@ if (desktopNav) {
       closeAll();
   });
 
-  // Desktop search (Figma "Desktop | Search") replaces the L1 list within
-  // the same bar rather than opening a separate overlay.
+  // Desktop search replaces the L1 list within the same bar (Figma "Desktop | Search").
   const searchToggle = desktopNav.querySelector(
     '.c-primary-nav-desktop__search-toggle',
   );

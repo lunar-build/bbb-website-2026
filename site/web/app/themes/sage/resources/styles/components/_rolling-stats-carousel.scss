@@ -32,7 +32,7 @@
   --wp--preset--font-size--stat-value: clamp(2.5rem, 1.2rem + 4.5vw, 8.75rem);
 }
 
-// Re-columns prev/pagination/next together, 1rem apart (default puts nav at the far edges).
+// Prev/pagination/next in one row, 1rem apart (WA puts nav at the far edges).
 .c-rolling-stats-carousel__carousel::part(carousel) {
   grid-template-columns: 1fr min-content max-content min-content 1fr; // max-content: dots' flex-wrap needs it
   grid-template-areas: none;

@@ -5,6 +5,11 @@ namespace App\Support;
 class PageMenu
 {
     /**
+     * @var array<int, true> Post IDs a menu was built for this request.
+     */
+    protected static array $shown = [];
+
+    /**
      * Build the sticky page menu's `items` array (for <x-sticky-page-menu>)
      * from a post's top-level H2 headings.
      *
@@ -14,6 +19,10 @@ class PageMenu
      * the heading text otherwise — see the matching `render_block_core/heading`
      * filter in app/filters.php, which injects that same fallback slug as
      * the rendered heading's `id` so the links here actually resolve.
+     *
+     * Also marks the post for shownFor(), which switches that filter on —
+     * so call this before rendering the content (composers list
+     * pageMenuItems before body in with()).
      */
     public static function forPost(?int $postId = null): array
     {
@@ -29,19 +38,34 @@ class PageMenu
             return [];
         }
 
-        return collect(static::headingBlocks(parse_blocks($content)))
-            ->map(fn ($block) => [
+        $items = collect(static::headingBlocks(parse_blocks($content)))
+            ->map(fn($block) => [
                 'label' => trim(wp_strip_all_tags($block['innerHTML'] ?? '')),
                 'anchor' => static::anchorFor($block),
             ])
-            ->filter(fn ($item) => $item['label'] !== '' && $item['anchor'] !== '')
-            ->map(fn ($item) => [
+            ->filter(fn($item) => $item['label'] !== '' && $item['anchor'] !== '')
+            ->map(fn($item) => [
                 'label' => $item['label'],
-                'url' => '#'.$item['anchor'],
+                'url' => '#' . $item['anchor'],
                 'active' => false,
             ])
             ->values()
             ->all();
+
+        if ($items) {
+            static::$shown[$postId] = true;
+        }
+
+        return $items;
+    }
+
+    /**
+     * Whether this post's H2s need `id`s for a page menu's links. Tied to
+     * the menu, not a template list, so any template using it just works.
+     */
+    public static function shownFor(int $postId): bool
+    {
+        return isset(static::$shown[$postId]);
     }
 
     /**

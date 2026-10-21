@@ -17,16 +17,14 @@
   }
 
   &__content {
-    // Figma has this block's heading in Blue dark, not the sitewide default
-    // (Charcoal, set globally in base/_typography.scss).
+    // Blue dark per Figma, not the sitewide Charcoal (base/_typography.scss).
     :where(h1, h2, h3, h4, h5, h6) {
       color: var(--wp--preset--color--blue-dark);
     }
   }
 
-  // "Image with form" layout: a coloured panel with the heading/form on the
-  // left and an image filling the right half, bleeding to the panel's own
-  // edge (not the block's — the panel is the full-bleed element here).
+  // "Image with form": heading/form left, image right bleeding to the panel's edge
+  // (the panel is the full-bleed element).
   &--image {
     .c-form__panel {
       position: relative;
@@ -39,9 +37,7 @@
       }
     }
 
-    // Heading + form stack in a single column occupying the panel's left
-    // half — NOT split into side-by-side grid columns, which squeezed the
-    // form into a narrow strip next to the heading and let the image
+    // One stacked column, not side-by-side: that squeezed the form and let the image
     // (sized off this column's height) balloon over it.
     .c-form__inner {
       @include bp.respond($min: bp.$lg) {
@@ -72,8 +68,7 @@
     }
   }
 
-  // "Centred" layout: plain background, no image, a single narrower column
-  // of heading + form centred within the container.
+  // "Centred": no image, one narrower column.
   &--centred {
     .c-form__inner {
       max-width: 48rem;
@@ -87,7 +82,8 @@
       }
     }
 
-    // GF stretches each choice label full width, so centred text drifts from its control; shrink-wrap the group, centre it, and left-align rows so controls line up.
+    // GF stretches choice labels full width, so centred text drifts from its control:
+    // shrink-wrap the group, centre it, left-align rows.
     .gfield_radio,
     .gfield_checkbox {
       width: fit-content;

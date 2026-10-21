@@ -5,8 +5,7 @@
 $site-header-z-index: 100;
 $site-header-transition-duration: 0.25s;
 
-// Sticky, auto-hide-on-scroll behaviour (toggles .is-hidden) lives in
-// resources/js/site-header.js.
+// Auto-hide-on-scroll (.is-hidden) is in site-header.js.
 .c-site-header {
   position: sticky;
   inset-block-start: 0;
@@ -18,9 +17,8 @@ $site-header-transition-duration: 0.25s;
     transform $site-header-transition-duration ease,
     visibility 0s linear 0s;
 
-  // translateY(-100%) only clears the header's own box — content that
-  // overflows it (e.g. a tall open submenu) can still paint on screen, so
-  // visibility is switched off too once the slide-out finishes.
+  // translateY(-100%) only clears the header's own box; overflowing content (e.g. an
+  // open submenu) would still show, so hide visibility after the slide-out.
   &.is-hidden {
     transform: translateY(-100%);
     visibility: hidden;
