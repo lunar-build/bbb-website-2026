@@ -1,5 +1,12 @@
+@use '../abstracts/container';
 @use '../abstracts/spacing';
 
+
+// Pages put core blocks straight in .e-content; only the blocks (sections) manage their own
+// width, so keep everything else inside the container. Posts already make .e-content a container.
+.e-content:not(.o-container) > :not(section, .alignfull) {
+  @include container.contained;
+}
 
 // Full-bleed-background blocks (.o-full-bleed-bg, or any section.has-background) only
 // pad inside their coloured area. Margin only on the edge touching a paragraph, so
