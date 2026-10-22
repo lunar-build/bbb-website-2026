@@ -69,6 +69,19 @@ add_filter('acf/register_block_type_args', function ($block) {
     return $block;
 });
 
+/**
+ * Blocks with a Background colour support (see theme_block_background_colors()) show that
+ * control straight away in the Color panel, rather than hidden behind the panel's menu, so
+ * choosing a colour is: Background, pick a swatch.
+ */
+add_filter('acf/register_block_type_args', function ($block) {
+    if (str_starts_with($block['name'] ?? '', 'acf/') && ! empty($block['supports']['color']['background'])) {
+        $block['supports']['color']['__experimentalDefaultControls'] = ['background' => true];
+    }
+
+    return $block;
+});
+
 /** Blocks allowed on pages are allowed on mec-events, without editing every $post_types. */
 add_filter('acf/register_block_type_args', function ($block) {
     if (in_array('page', $block['post_types'] ?? [], true)) {
