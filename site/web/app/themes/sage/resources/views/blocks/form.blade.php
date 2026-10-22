@@ -32,7 +32,7 @@
                 {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
               </p>
             @else
-              @php gravity_form($formId, false, false, false, null, false, 0, true); @endphp
+              @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
             @endif
           </div>
         </div>
@@ -65,7 +65,7 @@
               {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
             </p>
           @else
-            @php gravity_form($formId, false, false, false, null, false, 0, true); @endphp
+            @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
           @endif
         </div>
       </div>
