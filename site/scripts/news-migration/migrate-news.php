@@ -699,8 +699,7 @@ function news_events_group(array $b): array
     }
 
     return [
-        news_heading_block(esc_html(trim(news_plain($d['title'] ?? '') . ' ' . news_plain($d['sub_title'] ?? '')))),
-        news_paragraph_block(esc_html(news_plain($d['introduction_paragraph'] ?? ''))),
+        news_plain_cta(trim(news_plain($d['title'] ?? '') . ' ' . news_plain($d['sub_title'] ?? '')), news_plain($d['introduction_paragraph'] ?? '')),
         news_acf_block('acf/icon-link-grid', \App\Blocks\IconLinkGrid::class, $fields, 'icon_link_grid'),
     ];
 }
@@ -728,8 +727,7 @@ function news_visit_cycling_centre(array $b, wpdb $src): array
     }
 
     return [
-        news_heading_block(esc_html(trim(news_plain($d['title'] ?? '') . ': ' . news_plain($d['sub_title'] ?? ''), ': '))),
-        news_paragraph_block(esc_html(news_plain($d['introduction'] ?? ''))),
+        news_plain_cta(trim(news_plain($d['title'] ?? '') . ': ' . news_plain($d['sub_title'] ?? ''), ': '), news_plain($d['introduction'] ?? '')),
         news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid'),
         news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
             'layout' => 'centred',
@@ -802,6 +800,23 @@ function news_newsletter_form(array &$notes): ?array
     $notes[] = 'no "News letter" Gravity Form, so no newsletter sign-up was added';
 
     return null;
+}
+
+/** A Text Banner (statement text, optional bold line under it) on an optional background colour slug. */
+function news_text_banner(string $text, string $emphasis = '', string $background = ''): array
+{
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['text' => $text, 'emphasis' => $emphasis], 'text_banner');
+    if ($background) {
+        $banner['attrs']['backgroundColor'] = $background;
+    }
+
+    return $banner;
+}
+
+/** A centred CTA Banner with no illustrations, for a heading and the text under it. */
+function news_plain_cta(string $heading, string $body): array
+{
+    return news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, ['layout' => 'centred', 'heading' => $heading, 'body' => $body, 'link' => '', 'image_left' => '', 'image_right' => ''], 'cta_banner');
 }
 
 /** Accordion from the old FAQ block (question/answer repeater). */
@@ -1253,10 +1268,11 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 $title = $prev && $prev['blockName'] === 'core/heading' ? news_plain($prev['innerHTML']) : '';
                 $map = news_map_embed($b, $title);
                 if (! $map && $b['blockName'] === 'core/html' && preg_match('#^\s*<h([1-6])[^>]*>(.*)</h\1>\s*$#s', $b['innerHTML'], $h)) {
-                    // A centred heading pasted as raw HTML is a banner line (the homepage's "Healthier, faster…"): a CTA Banner with no images.
-                    $text = trim(preg_replace('/\s+/', ' ', news_plain(str_replace('<br>', ' ', $h[2]))));
+                    // A centred heading pasted as raw HTML is a statement banner (the homepage's "Healthier, faster…"):
+                    // the text before the line break, and the bold part after it as the emphasised line.
+                    $parts = preg_split('#<br\s*/?>#i', $h[2], 2);
                     $out[] = str_contains($h[0], 'has-text-align-center')
-                        ? news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, ['layout' => 'centred', 'heading' => $text, 'body' => '', 'link' => '', 'image_left' => '', 'image_right' => ''], 'cta_banner')
+                        ? news_text_banner(trim(preg_replace('/\s+/', ' ', news_plain($parts[0]))), trim(preg_replace('/\s+/', ' ', news_plain($parts[1] ?? ''))), 'blue-light')
                         : news_heading_block(trim($h[2]), (int) $h[1]);
                     break;
                 }
@@ -1277,6 +1293,19 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                         }
                     }
                     $paragraph = ($rest[0]['blockName'] ?? null) === 'core/paragraph' ? $rest[0] : null;
+                    if (! $paragraph && $cta === '') {
+                        // A heading with nothing under it is a statement: a Text Banner, with a closing "Get started today." in bold.
+                        $statement = trim(preg_replace('/\s+/', ' ', news_plain(str_replace('<br>', ' ', $b['innerHTML']))));
+                        $emphasis = '';
+                        foreach (NEWS_EMPHASIS_ENDINGS as $ending) {
+                            if (str_ends_with($statement, $ending)) {
+                                $emphasis = $ending;
+                                $statement = trim(substr($statement, 0, -strlen($ending)));
+                            }
+                        }
+                        $out[] = news_text_banner($statement, $emphasis, $emphasis ? 'blue-light' : '');
+                        break;
+                    }
                     $button = $paragraph && ($rest[1]['blockName'] ?? null) === 'core/buttons' ? (news_buttons($rest[1])[0] ?? null) : null;
                     $out[] = news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
                         'layout' => 'centred',
@@ -1478,6 +1507,9 @@ const NEWS_CTA_HEADINGS = [
     'ibikeit,ilikeit!' => 'bmx',
     'explorewaystogetabike' => '',
 ];
+
+/** Closing phrases a Text Banner shows bold on their own line. */
+const NEWS_EMPHASIS_ENDINGS = ['Get started today.'];
 
 /** Landing pages where every heading is a CTA Banner (heading, any text under it, no images). */
 const NEWS_CTA_HEADING_PAGES = [241];
