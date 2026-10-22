@@ -2,7 +2,7 @@
 // optional normal-size body text under it. The block's background colour comes from the sidebar
 // (theme_block_background_colors()); --c-block-fg is the contrasting text colour set for it.
 .c-text-banner__inner {
-  max-width: 48rem;
+  max-width: 60rem;
   margin: 0 auto;
   text-align: center;
   color: var(--c-block-fg, var(--wp--preset--color--blue-dark));
