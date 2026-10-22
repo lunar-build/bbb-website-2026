@@ -727,7 +727,7 @@ function news_visit_cycling_centre(array $b, wpdb $src): array
     }
 
     return [
-        news_plain_cta(trim(news_plain($d['title'] ?? '') . ': ' . news_plain($d['sub_title'] ?? ''), ': '), news_plain($d['introduction'] ?? '')),
+        news_lead_text_banner(news_plain($d['title'] ?? ''), news_plain($d['sub_title'] ?? ''), news_plain($d['introduction'] ?? '')),
         news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid'),
         news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
             'layout' => 'centred',
@@ -802,16 +802,27 @@ function news_newsletter_form(array &$notes): ?array
     return null;
 }
 
-/** A Text Banner (statement text, an optional bold line under it) on an optional background colour slug. */
-function news_text_banner(string $text, string $emphasis = '', string $background = ''): array
+/** A Text Banner from its rich text, on an optional background colour slug. */
+function news_text_banner_html(string $html, string $background = ''): array
 {
-    $html = '<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>';
     $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['text' => $html, 'alignment' => 'centre'], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
 
     return $banner;
+}
+
+/** A Text Banner (statement text, an optional bold line under it) on an optional background colour slug. */
+function news_text_banner(string $text, string $emphasis = '', string $background = ''): array
+{
+    return news_text_banner_html('<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>', $background);
+}
+
+/** A Text Banner with a bold lead phrase, the rest of the line under it, then a paragraph ("Explore / ways to get a bike"). */
+function news_lead_text_banner(string $lead, string $rest, string $body): array
+{
+    return news_text_banner_html('<p><strong>' . esc_html($lead) . '</strong><br>' . esc_html($rest) . '</p>' . ($body ? '<p>' . esc_html($body) . '</p>' : ''));
 }
 
 /** A centred CTA Banner with no illustrations, for a heading and the text under it. */
@@ -1294,6 +1305,21 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                         }
                     }
                     $paragraph = ($rest[0]['blockName'] ?? null) === 'core/paragraph' ? $rest[0] : null;
+                    if ($paragraph && $cta === '' && ($rest[1]['blockName'] ?? null) !== 'core/buttons') {
+                        // Heading and text, no button or illustration ("Explore / ways to get a bike"): a Text Banner
+                        // with the first line bold. The old heading broke after its lead word.
+                        $headingParts = preg_split('#<br\s*/?>#i', $b['innerHTML'], 2);
+                        $lead = trim(preg_replace('/\s+/', ' ', news_plain($headingParts[0])));
+                        $leadRest = trim(preg_replace('/\s+/', ' ', news_plain($headingParts[1] ?? '')));
+                        if (! $leadRest) {
+                            [$lead, $leadRest] = array_pad(explode(' ', $lead, 2), 2, '');
+                        }
+                        $out[] = news_lead_text_banner($lead, $leadRest, news_unwrap_lines(news_plain($paragraph['innerHTML'])));
+                        while ($i < count($in) - 1 && $in[$i] !== $paragraph) {
+                            $i++;
+                        }
+                        break;
+                    }
                     if (! $paragraph && $cta === '') {
                         // A heading with nothing under it is a statement: a Text Banner, with a closing "Get started today." in bold.
                         $statement = trim(preg_replace('/\s+/', ' ', news_plain(str_replace('<br>', ' ', $b['innerHTML']))));
