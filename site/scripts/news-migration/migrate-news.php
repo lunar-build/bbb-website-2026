@@ -706,12 +706,49 @@ function news_page_ids(wpdb $src, ?array $only): array
     return $only ? array_values(array_intersect($ids, array_map('strval', $only))) : $ids;
 }
 
-/** Local rows already using any of $ids. */
+/**
+ * Local rows already using any of $ids, apart from the harmless kind: revisions, auto-drafts and
+ * trashed rows can't be anyone's content, and `news_clear_clashes()` removes them before a write.
+ */
 function news_taken(array $ids): array
 {
     global $wpdb;
 
-    return $ids ? $wpdb->get_results('SELECT ID, post_type, post_title FROM ' . $wpdb->posts . ' WHERE ID IN (' . implode(',', array_map('intval', $ids)) . ')') : [];
+    return $ids ? $wpdb->get_results('SELECT ID, post_type, post_title FROM ' . $wpdb->posts . ' WHERE ID IN (' . implode(',', array_map('intval', $ids)) . ") AND post_type NOT IN ('revision', 'auto-draft') AND post_status NOT IN ('trash', 'auto-draft')") : [];
+}
+
+/**
+ * Before a write mode copies rows under the old site's IDs: delete local revisions, auto-drafts and
+ * trashed rows sitting on those IDs, which are never content. Anything else is left for the clash
+ * check to report, unless NEWS_REPLACE_CLASHES=1 says to delete it too (listed as it goes). A row this
+ * script imported itself is never touched here: a re-run replaces those in place.
+ */
+function news_clear_clashes(array $ids): void
+{
+    global $wpdb;
+
+    if (! $ids) {
+        return;
+    }
+    $list = implode(',', array_map('intval', $ids));
+    $harmless = $wpdb->get_results("SELECT ID FROM {$wpdb->posts} WHERE ID IN ($list) AND (post_type IN ('revision', 'auto-draft') OR post_status IN ('trash', 'auto-draft'))");
+    foreach ($harmless as $row) {
+        wp_delete_post((int) $row->ID, true);
+    }
+    if ($harmless) {
+        echo 'cleared ' . count($harmless) . " revision/auto-draft/trashed rows on the old site's IDs\n";
+    }
+
+    if (! getenv('NEWS_REPLACE_CLASHES')) {
+        return;
+    }
+    foreach (news_taken($ids) as $row) {
+        if (get_post_meta($row->ID, NEWS_MIGRATED_META, true)) {
+            continue;
+        }
+        echo "replacing {$row->ID} {$row->post_type} \"{$row->post_title}\" (NEWS_REPLACE_CLASHES)\n";
+        wp_delete_post((int) $row->ID, true);
+    }
 }
 
 /** Posts this script imported carry this flag, so a re-run may replace them — and only them. */
@@ -851,6 +888,7 @@ if ($mode === 'categories') {
 }
 
 if ($mode === 'attachments') {
+    news_clear_clashes($attachmentIds);
     $existing = array_map(fn($r) => (string) $r->ID, array_filter(news_taken($attachmentIds), fn($r) => $r->post_type === 'attachment'));
     if ($clash = array_filter(news_taken($attachmentIds), fn($r) => $r->post_type !== 'attachment')) {
         WP_CLI::error('Local IDs already taken, resolve first (see `check`): ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
@@ -870,6 +908,7 @@ if ($mode === 'attachments') {
 }
 
 if ($mode === 'posts') {
+    news_clear_clashes($postIds);
     if ($clash = news_post_clashes($postIds)) {
         WP_CLI::error('Local IDs already taken, resolve first (see `check`): ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
     }
@@ -906,6 +945,7 @@ if ($mode === 'case-studies') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
+    news_clear_clashes($ids);
     $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'case_study' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
@@ -1075,6 +1115,7 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
 
 if ($mode === 'pages') {
     $ids = news_page_ids($src, $only);
+    news_clear_clashes($ids);
     $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first (see `check`): ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
@@ -1104,6 +1145,7 @@ if ($mode === 'pages') {
 
 if ($mode === 'map-pages') {
     $pages = NEWS_MAP_PAGES;
+    news_clear_clashes([...array_keys($pages), 6669]);
     $clash = array_filter(news_taken([...array_keys($pages), 6669]), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
@@ -1369,6 +1411,7 @@ if ($mode === 'cycling-centre') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
+    news_clear_clashes([...$ids, ...CC_PAGES]);
     $clash = array_filter(news_taken([...$ids, ...CC_PAGES]), fn($r) => ! (in_array($r->post_type, ['mec-events', 'page'], true) && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
@@ -1551,6 +1594,7 @@ if ($mode === 'events') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
+    news_clear_clashes($ids);
     $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'mec-events' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
