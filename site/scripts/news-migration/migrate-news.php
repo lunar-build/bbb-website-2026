@@ -608,7 +608,7 @@ function news_planner_cta(array $b): array
 
 /**
  * Old carousel -> Rolling Stats Carousel of statements (the title with its bold figures). The slide's
- * text becomes the small source line, and a link is added after the statement.
+ * text becomes the small source line and its link becomes the slide's button.
  */
 function news_old_carousel(array $b): array
 {
@@ -616,20 +616,15 @@ function news_old_carousel(array $b): array
     $n = (int) ($d['slides'] ?? 0);
     $fields = ['image_left' => '', 'image_right' => '', 'slides' => $n];
     for ($i = 0; $i < $n; $i++) {
-        $statement = str_replace(['<b>', '</b>', '&nbsp;'], ['<strong>', '</strong>', ' '], trim((string) ($d["slides_{$i}_title"] ?? '')));
-        $link = $d["slides_{$i}_link"] ?? null;
-        if (! empty($link['url'])) {
-            // The statement sits in a <p>: inline markup only.
-            $statement .= '<br><a href="' . esc_url($link['url']) . '">' . esc_html($link['title'] ?: 'Find out more') . '</a>';
-        }
         $fields += [
             "slides_{$i}_slide_type" => 'statement',
             "slides_{$i}_prefix_text" => '',
             "slides_{$i}_value" => '',
             "slides_{$i}_unit" => '',
             "slides_{$i}_caption_text" => '',
-            "slides_{$i}_statement" => trim(preg_replace('/\s+/', ' ', $statement)),
+            "slides_{$i}_statement" => trim(preg_replace('/\s+/', ' ', str_replace(['<b>', '</b>', '&nbsp;'], ['<strong>', '</strong>', ' '], trim((string) ($d["slides_{$i}_title"] ?? ''))))),
             "slides_{$i}_source" => news_unwrap_lines(news_plain($d["slides_{$i}_text"] ?? '')),
+            "slides_{$i}_link" => ! empty($d["slides_{$i}_link"]['url']) ? $d["slides_{$i}_link"] : '',
         ];
     }
 
