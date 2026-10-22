@@ -54,9 +54,15 @@
   }
 }
 
+// The title and text keep at least 20rem and win over a long CTA label, which wraps instead.
 .c-link-card__content {
-  flex: 1 0 0;
+  flex: 1 0 20rem;
   min-width: 0;
+
+  // Stacked: the basis would otherwise set a minimum height.
+  @container (max-width: #{bp.$md}) {
+    flex: none;
+  }
 }
 
 .c-link-card__title {
@@ -74,7 +80,8 @@
 }
 
 .c-link-card__cta {
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -85,12 +92,20 @@
   }
 
   @container (max-width: #{bp.$md}) {
+    flex: none;
     align-items: center;
   }
 }
 
 .c-link-card__cta-link {
   @extend .c-download-link__link;
+  // Let a long label wrap (the shared link never does).
+  white-space: normal;
+  text-align: right;
+
+  @container (max-width: #{bp.$md}) {
+    text-align: center;
+  }
 
   // Right padding keeps the focus outline off the arrow as it animates right.
   .c-icon--arrow-right {
