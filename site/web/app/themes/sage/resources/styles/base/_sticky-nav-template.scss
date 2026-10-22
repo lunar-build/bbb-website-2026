@@ -32,6 +32,9 @@
     'content';
 
   @include bp.respond($min: bp.$lg) {
+    grid-template-areas:
+      '. crumbs'
+      '. content';
     grid-template-columns: 16.875rem minmax(0, 1fr); // .c-sticky-page-menu's width
   }
 }
