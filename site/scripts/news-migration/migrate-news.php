@@ -1208,8 +1208,8 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 while ($out && news_is_blank(end($out))) {
                     array_pop($out);
                 }
-                // The intro heading, or the CTA Banner it became on pages that turn headings into banners.
-                if ($out && in_array(end($out)['blockName'], ['core/heading', 'acf/cta-banner'], true)) {
+                // The intro heading, or the banner it became on pages that turn headings into banners.
+                if ($out && in_array(end($out)['blockName'], ['core/heading', 'acf/cta-banner', 'acf/text-banner'], true)) {
                     array_pop($out);
                 }
                 $notes[] = 'acf/instagram feed and its intro heading dropped';
