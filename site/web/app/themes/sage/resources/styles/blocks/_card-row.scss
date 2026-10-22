@@ -185,23 +185,9 @@
 }
 
 .c-card-row__browse-all {
-  @extend .u-cta-large;
-  display: flex;
+  display: block;
   width: fit-content;
   margin-inline: auto;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 26px;
-  border: 2px solid var(--wp--preset--color--charcoal);
-  border-radius: 999px;
-  text-decoration: none;
-
-  @include focus.ring;
-
-  &:hover,
-  &:focus-visible {
-    @include button.arrow-hover;
-  }
 }
 
 // "Latest news" is one continuous phrase in Figma, so the highlight span matches the heading.
@@ -215,20 +201,11 @@
     color: var(--wp--preset--color--blue-dark);
   }
 
-  .c-card-row__browse-all {
-    background: var(--wp--preset--color--yellow);
-    color: var(--wp--preset--color--charcoal);
-  }
 }
 
 .c-card-row--route {
   .c-card-row__heading {
     color: var(--wp--preset--color--blue-dark);
-  }
-
-  .c-card-row__browse-all {
-    background: var(--wp--preset--color--charcoal);
-    color: var(--wp--preset--color--white);
   }
 }
 
