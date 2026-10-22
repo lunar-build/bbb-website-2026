@@ -426,16 +426,18 @@ function news_link_cards(array $cards, wpdb $src): array
 }
 
 /**
- * One layout of old cards: Link Cards when any is a file download, or when the page asks
- * for them — except photo cards (every card has a title and header photo), which stay a
- * Card Grid so they sit side by side with their images.
+ * One layout of old cards: Link Cards when any is a file download, when every card is an icon
+ * card with a link (the old site showed those icons small, which Link Card's logo does; a
+ * Card Grid image would be huge), or when the page asks for them — except photo cards (every
+ * card has a title and header photo), which stay a Card Grid so they sit side by side.
  */
 function news_card_layout(array $cards, wpdb $src, bool $linkCards): array
 {
     $files = array_filter($cards, fn($c) => news_card_file_id($c, $src));
     $photos = ! array_filter($cards, fn($c) => empty($c['attrs']['data']['header_image']) || empty($c['attrs']['data']['title']));
+    $icons = ! array_filter($cards, fn($c) => ($c['attrs']['data']['image_options'] ?? '') !== 'icon' || empty($c['attrs']['data']['link']['url']));
 
-    return $files || ($linkCards && ! $photos) ? news_link_cards($cards, $src) : news_card_grid($cards, $src);
+    return $files || $icons || ($linkCards && ! $photos) ? news_link_cards($cards, $src) : news_card_grid($cards, $src);
 }
 
 /** A group/columns layout holding only old acf/card blocks -> one Card Grid. */

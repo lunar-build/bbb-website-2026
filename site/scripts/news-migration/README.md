@@ -31,6 +31,7 @@ never touches the old site itself, and it only writes to this site's database.
 | `acf/calendar` | One Events Timetable per page, which shows the term timetables. The "… Timetable" headings above them go |
 | `acf/divider` | Separator |
 | `acf/illustration`, `acf/illustration-divider` | Illustration block with the same character, up to three objects and the "remove blue background" setting. "Instructor and girl" has no image on the live site, so that block is dropped |
+| `acf/card` layouts where every card is an icon card with a link | Link Card, with the icon as the logo. The old site showed these icons small; a Card Grid image would be large |
 | `acf/card` layouts linking to an uploaded file (map, guide) | Link Card with download cards (file, label from the old link text, size). Adjacent layouts under one heading merge into one block. Regional cycle maps (701) turns every layout into Link Cards except the photo cards (title and header photo on every card), which stay a Card Grid |
 | `acf/card` outside a card layout | Card Grid with "link" cards; consecutive cards share one grid. A card sourced from a post takes its title, excerpt, image and a `?p=` link |
 | Google map iframe (`core/html`) or Google `core/embed` | Map Embed. Drive "open?id=" links become My Maps embed URLs, and the title comes from the iframe or the heading above |
