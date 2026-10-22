@@ -1898,15 +1898,13 @@ if ($mode === 'cycling-centre') {
         }
         $notes = array_filter($notes, fn($n) => $n !== 'UNMAPPED acf/calendar');
 
-        // What's on uses the Sticky Nav template, which supplies its own hero and breadcrumbs.
-        $stickyNav = $id === 796;
-        $content = ($stickyNav ? '' : serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n") . serialize_blocks($blocks);
+        // Every page uses Sticky Nav, which draws its own breadcrumbs. What's on has no hero
+        // block: the template falls back to a Text Hero with the page title.
+        $content = ($id === 796 ? '' : serialize_block(news_page_hero($row->post_title, $thumb, false)) . "\n\n") . serialize_blocks($blocks);
         news_copy_row($src, $id, $replaceUrls, ['post_content' => $replaceUrls($content)]);
         news_copy_meta($src, $id, $skipMeta, fn($k, $v) => $k === '_thumbnail_id' || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
         update_post_meta($id, NEWS_MIGRATED_META, 1);
-        if ($stickyNav) {
-            update_post_meta($id, '_wp_page_template', 'template-sticky-nav.blade.php');
-        }
+        update_post_meta($id, '_wp_page_template', 'template-sticky-nav.blade.php');
         clean_post_cache($id);
         echo "imported page $id " . ($notes ? '(' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
     }
