@@ -38,6 +38,7 @@
 @use 'blocks/video-hero';
 @use 'blocks/text-hero';
 @use 'blocks/cta-banner';
+@use 'blocks/text-banner';
 @use 'blocks/journey-planner-widget';
 @use 'blocks/feature-card';
 @use 'blocks/image-card';
@@ -61,5 +62,4 @@
 @use 'blocks/video-block';
 @use 'blocks/button-block';
 @use 'blocks/map-embed';
-@use 'blocks/text-banner';
 @use 'blocks/events-timetable';
