@@ -805,7 +805,7 @@ function news_newsletter_form(array &$notes): ?array
 /** A Text Banner from its heading and body rich text, on an optional background colour slug; $level is h2-h4, or none for a standalone statement. */
 function news_text_banner_html(string $heading, string $body = '', string $background = '', string $level = 'none'): array
 {
-    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'heading_level' => $level, 'body' => $body, 'alignment' => 'centre'], 'text_banner');
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'heading_level' => $level, 'heading_style' => 'h3', 'body' => $body, 'alignment' => 'centre'], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
