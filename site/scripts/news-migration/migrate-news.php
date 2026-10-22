@@ -802,10 +802,11 @@ function news_newsletter_form(array &$notes): ?array
     return null;
 }
 
-/** A Text Banner (statement text, optional bold line under it) on an optional background colour slug. */
+/** A Text Banner (statement text, an optional bold line under it) on an optional background colour slug. */
 function news_text_banner(string $text, string $emphasis = '', string $background = ''): array
 {
-    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['text' => $text, 'emphasis' => $emphasis], 'text_banner');
+    $html = '<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>';
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['text' => $html, 'alignment' => 'centre'], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
