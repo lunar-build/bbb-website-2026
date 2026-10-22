@@ -172,7 +172,8 @@ class TextBanner extends Block
      * @var array
      */
     public $example = [
-        'text' => '<p>Healthier, faster, more sustainable.<br><strong>Better by bike.</strong></p>',
+        'heading' => '<p><strong>Explore</strong><br>ways to get a bike</p>',
+        'body' => '<p>There are so many ways to get a bike, discover one that suits you best.</p>',
         'alignment' => 'centre',
     ];
 
@@ -182,17 +183,18 @@ class TextBanner extends Block
     public function with(): array
     {
         return [
-            'text' => $this->text(),
+            'heading' => $this->clean($this->resolveField('heading', '')),
+            'body' => $this->clean($this->resolveField('body', '')),
             'alignment' => $this->resolveField('alignment', 'centre'),
         ];
     }
 
     /**
-     * The text, limited to paragraphs, line breaks, bold, italic and links.
+     * Rich text limited to paragraphs, line breaks, bold, italic and links.
      */
-    public function text(): string
+    protected function clean(string $html): string
     {
-        return wp_kses((string) $this->resolveField('text', ''), [
+        return wp_kses($html, [
             'p' => [],
             'br' => [],
             'strong' => [],
@@ -210,13 +212,19 @@ class TextBanner extends Block
         $fields = Builder::make('text_banner');
 
         $fields
-            ->addWysiwyg('text', [
-                'label' => 'Text',
-                'instructions' => 'Select words and use Bold to make them stand out (shown bold and in blue). Shift+Enter makes a line break. The background colour is set in the block sidebar.',
+            ->addWysiwyg('heading', [
+                'label' => 'Heading',
+                'instructions' => 'The large text. Select words and use Bold to make them stand out (shown bold and in blue). Shift+Enter makes a line break. The background colour is set in the block sidebar.',
                 'tabs' => 'visual',
                 'toolbar' => 'basic',
                 'media_upload' => 0,
-                'required' => 1,
+            ])
+            ->addWysiwyg('body', [
+                'label' => 'Body text',
+                'instructions' => 'Optional. Normal-size text under the heading.',
+                'tabs' => 'visual',
+                'toolbar' => 'basic',
+                'media_upload' => 0,
             ])
             ->addButtonGroup('alignment', [
                 'label' => 'Alignment',
