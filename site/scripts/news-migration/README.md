@@ -145,6 +145,13 @@ first. Finished events still show their date ("Date … This event has
 finished"). Sessions that `cycling-centre` imports without timetable slots
 are flagged `_event_undated`, so their placeholder date is never shown.
 
+Before a write mode copies rows under the old site's IDs, it deletes any local revision, auto-draft
+or trashed row sitting on those IDs (they're never content). Anything else on a clashing ID makes the
+mode stop and list it, so nothing real is overwritten by accident. Rows this script imported itself
+are replaced in place on a re-run. To clear the rest too (a throwaway local database, say), put
+`NEWS_REPLACE_CLASHES=1` in front of the command: each deleted row is listed as it goes. Don't use it
+on staging or production unless the clashing rows really are disposable.
+
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item
 or revision already uses one of the old site's IDs, `posts` and `attachments`
