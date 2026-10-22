@@ -88,6 +88,15 @@ function news_plain(string $html): string
     return trim(html_entity_decode(wp_strip_all_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 }
 
+/**
+ * Old text fields were hard-wrapped (a newline every few words, mostly pasted from Word).
+ * Single newlines would render as <br>, so join them; blank lines stay as paragraph breaks.
+ */
+function news_unwrap_lines(string $text): string
+{
+    return trim(preg_replace('/(?<!\n)\n(?!\n)/', ' ', str_replace("\r\n", "\n", $text)));
+}
+
 function news_is_blank(array $b): bool
 {
     return $b['blockName'] === null && trim($b['innerHTML']) === '';
@@ -122,7 +131,7 @@ function news_quote(array $b): array
 function news_notification(array $b): array
 {
     $d = $b['attrs']['data'] ?? [];
-    $text = esc_html(trim((string) ($d['content'] ?? '')));
+    $text = esc_html(news_unwrap_lines((string) ($d['content'] ?? '')));
     $link = $d['link'] ?? null;
 
     if (is_array($link) && ! empty($link['url'])) {
@@ -367,7 +376,7 @@ function news_card_grid(array $cards, wpdb $src): array
             "cards_{$n}_heading_text" => html_entity_decode($d['title'] ?? '', ENT_QUOTES),
             "cards_{$n}_heading_level" => 'h3',
             "cards_{$n}_heading_style" => 'match',
-            "cards_{$n}_body_text" => $d['text'] ?? '',
+            "cards_{$n}_body_text" => news_unwrap_lines($d['text'] ?? ''),
             "cards_{$n}_body_style" => 'body',
             "cards_{$n}_link" => $d['link'] ?? '',
         ];
@@ -404,7 +413,7 @@ function news_link_cards(array $cards, wpdb $src): array
         $fields += [
             "cards_{$i}_logo" => ($d['image_options'] ?? '') === 'icon' ? ($d['icon'] ?? '') : '',
             "cards_{$i}_title" => html_entity_decode(news_plain($d['title'] ?? ''), ENT_QUOTES),
-            "cards_{$i}_description" => news_plain($d['text'] ?? ''),
+            "cards_{$i}_description" => news_unwrap_lines(news_plain($d['text'] ?? '')),
             "cards_{$i}_cta_type" => $fileId ? 'download' : 'link',
             "cards_{$i}_link" => $fileId ? '' : $link,
             "cards_{$i}_file" => $fileId ?: '',
@@ -491,7 +500,7 @@ function news_faq(array $b): array
     $fields = ['heading' => '', 'items' => (int) ($d['questions'] ?? 0)];
     for ($i = 0; $i < $fields['items']; $i++) {
         $fields["items_{$i}_title"] = news_plain($d["questions_{$i}_question"] ?? '');
-        $fields["items_{$i}_content"] = wpautop($d["questions_{$i}_answer"] ?? '');
+        $fields["items_{$i}_content"] = wpautop(news_unwrap_lines($d["questions_{$i}_answer"] ?? ''));
     }
 
     return news_acf_block('acf/accordion', \App\Blocks\Accordion::class, $fields, 'accordion');
@@ -506,7 +515,7 @@ function news_transcript(array $b): array
         'heading' => '',
         'items' => 1,
         'items_0_title' => 'Transcript',
-        'items_0_content' => wpautop($d['transcript'] ?? ''),
+        'items_0_content' => wpautop(news_unwrap_lines($d['transcript'] ?? '')),
     ], 'accordion');
 }
 
@@ -523,7 +532,7 @@ function news_steps(array $b): array
     for ($i = 0; $i < $fields['steps']; $i++) {
         $fields["steps_{$i}_label"] = '';
         $fields["steps_{$i}_heading"] = news_plain($d["steps_{$i}_step_title"] ?? '');
-        $fields["steps_{$i}_body"] = news_plain($d["steps_{$i}_step_content"] ?? '');
+        $fields["steps_{$i}_body"] = news_unwrap_lines(news_plain($d["steps_{$i}_step_content"] ?? ''));
     }
 
     return news_acf_block('acf/timeline', \App\Blocks\Timeline::class, $fields, 'timeline');
@@ -539,7 +548,7 @@ function news_staggered_cards(array $b): array
             "cards_{$i}_photo" => $d["cards_{$i}_image"] ?? '',
             "cards_{$i}_name" => news_plain($d["cards_{$i}_author"] ?? ''),
             "cards_{$i}_info" => news_plain($d["cards_{$i}_subtitle"] ?? ''),
-            "cards_{$i}_quote" => news_plain($d["cards_{$i}_quote"] ?? ''),
+            "cards_{$i}_quote" => news_unwrap_lines(news_plain($d["cards_{$i}_quote"] ?? '')),
             "cards_{$i}_link" => '',
         ];
     }
@@ -599,6 +608,13 @@ function news_clean_text(array $b): array
         }
     }
     $clean = fn($html) => is_string($html) ? preg_replace(['/ has-text-align-(center|left|right)/', '/(class="[^"]*?) h[1-6](?=[ "])/'], '', $html) : $html;
+    if ($b['blockName'] === 'core/paragraph') {
+        // A line break between two lowercase letters is a hard wrap mid-sentence; addresses
+        // (a capital after the break) keep theirs.
+        $unwrap = fn($html) => is_string($html) ? preg_replace('#(?<=[a-z])<br\s*/?>(?=[a-z])#', ' ', $html) : $html;
+        $b['innerHTML'] = $unwrap($b['innerHTML']);
+        $b['innerContent'] = array_map($unwrap, $b['innerContent']);
+    }
     $b['innerHTML'] = $clean($b['innerHTML']);
     $b['innerContent'] = array_map($clean, $b['innerContent']);
 
@@ -1389,7 +1405,7 @@ function news_pump_fault_form(): int
  * The old template's featured-image header as an Image Hero, or a Text Hero
  * when there's no image (e.g. BMX).
  */
-function news_page_hero(string $title, int $thumb): array
+function news_page_hero(string $title, int $thumb, bool $breadcrumbs = true): array
 {
     $title = html_entity_decode($title, ENT_QUOTES);
     $hero = $thumb
@@ -1398,13 +1414,13 @@ function news_page_hero(string $title, int $thumb): array
             'image_position' => 'center',
             'show_heading' => '1',
             'heading' => $title,
-            'show_breadcrumbs' => '1',
+            'show_breadcrumbs' => $breadcrumbs ? '1' : '0',
         ], 'image_hero')
         : news_acf_block('acf/text-hero', \App\Blocks\TextHero::class, [
             'heading_text' => $title,
             'heading_level' => 'h1',
             'heading_style' => 'match',
-            'show_breadcrumbs' => '1',
+            'show_breadcrumbs' => $breadcrumbs ? '1' : '0',
         ], 'text_hero');
     $hero['attrs']['align'] = 'full';
 
@@ -1434,9 +1450,12 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
     };
     $walk($blocks);
 
+    // Sticky Nav draws its own breadcrumbs, so the hero's would show twice.
+    $sticky = $h2s >= NEWS_STICKY_NAV_H2S;
+
     return [
-        'content' => $replaceUrls(serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n" . serialize_blocks($blocks)),
-        'template' => $h2s >= NEWS_STICKY_NAV_H2S ? 'template-sticky-nav.blade.php' : '',
+        'content' => $replaceUrls(serialize_block(news_page_hero($row->post_title, $thumb, ! $sticky)) . "\n\n" . serialize_blocks($blocks)),
+        'template' => $sticky ? 'template-sticky-nav.blade.php' : '',
         'h2s' => $h2s,
     ];
 }
