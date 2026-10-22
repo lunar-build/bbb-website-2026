@@ -130,3 +130,16 @@
     }
   }
 }
+
+// On the dark background colours the labels follow the block's contrasting text colour
+// (_forms.scss colours them Charcoal with !important, so these need it too).
+.c-form:is(.has-blue-background-color, .has-blue-dark-background-color) {
+  .gfield_label,
+  .gfield_required,
+  .gfield_description,
+  .gform-field-label,
+  legend {
+    color: var(--c-block-fg) !important;
+  }
+}
+
