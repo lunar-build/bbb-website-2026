@@ -35,11 +35,9 @@
     {!! $hero !!}
 
     <div class="o-container">
-      {{-- No H2 headings means no page-menu items (App\Support\PageMenu returns
-      []) — skip the two-column grid entirely rather than leaving an empty,
-      collapsed nav column with its grid gap still showing as a stray gap
-      with nothing in it. --}}
-      <div @if (count($pageMenuItems)) class="c-sticky-nav-template" @endif>
+      {{-- No H2 headings means no page menu (App\Support\PageMenu returns []): the layout
+      stays, with the menu's column left empty, so these pages match the rest. --}}
+      <div class="c-sticky-nav-template @if (! count($pageMenuItems)) c-sticky-nav-template--no-menu @endif">
         <div class="c-sticky-nav-template__crumbs">
           <x-breadcrumbs :items="App\Support\Breadcrumbs::forPost()" />
         </div>

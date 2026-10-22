@@ -25,6 +25,17 @@
   }
 }
 
+// No H2s, so no menu: keep the same content column, with the menu's column left empty.
+.c-sticky-nav-template--no-menu {
+  grid-template-areas:
+    'crumbs'
+    'content';
+
+  @include bp.respond($min: bp.$lg) {
+    grid-template-columns: 16.875rem minmax(0, 1fr); // .c-sticky-page-menu's width
+  }
+}
+
 .c-sticky-nav-template__crumbs {
   grid-area: crumbs;
   min-width: 0;
