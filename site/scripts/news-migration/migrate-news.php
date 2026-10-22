@@ -802,10 +802,10 @@ function news_newsletter_form(array &$notes): ?array
     return null;
 }
 
-/** A Text Banner from its heading and body rich text, on an optional background colour slug. */
-function news_text_banner_html(string $heading, string $body = '', string $background = ''): array
+/** A Text Banner from its heading and body rich text, on an optional background colour slug; $level is h2-h4, or none for a standalone statement. */
+function news_text_banner_html(string $heading, string $body = '', string $background = '', string $level = 'none'): array
 {
-    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'body' => $body, 'alignment' => 'centre'], 'text_banner');
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'heading_level' => $level, 'body' => $body, 'alignment' => 'centre'], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
@@ -814,15 +814,15 @@ function news_text_banner_html(string $heading, string $body = '', string $backg
 }
 
 /** A Text Banner (statement text, an optional bold line under it) on an optional background colour slug. */
-function news_text_banner(string $text, string $emphasis = '', string $background = ''): array
+function news_text_banner(string $text, string $emphasis = '', string $background = '', string $level = 'none'): array
 {
-    return news_text_banner_html('<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>', '', $background);
+    return news_text_banner_html('<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>', '', $background, $level);
 }
 
-/** A Text Banner with a bold lead phrase, the rest of the line under it, and the body text in normal size ("Explore / ways to get a bike"). */
+/** A Text Banner (an H2) with a bold lead phrase, the rest of the line under it, and the body text in normal size ("Explore / ways to get a bike"). */
 function news_lead_text_banner(string $lead, string $rest, string $body): array
 {
-    return news_text_banner_html('<p><strong>' . esc_html($lead) . '</strong><br>' . esc_html($rest) . '</p>', $body ? '<p>' . esc_html($body) . '</p>' : '');
+    return news_text_banner_html('<p><strong>' . esc_html($lead) . '</strong><br>' . esc_html($rest) . '</p>', $body ? '<p>' . esc_html($body) . '</p>' : '', '', 'h2');
 }
 
 /** A centred CTA Banner with no illustrations, for a heading and the text under it. */
@@ -1330,7 +1330,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                                 $statement = trim(substr($statement, 0, -strlen($ending)));
                             }
                         }
-                        $out[] = news_text_banner($statement, $emphasis, $emphasis ? 'blue-light' : '');
+                        $out[] = news_text_banner($statement, $emphasis, $emphasis ? 'blue-light' : '', $emphasis ? 'h2' : 'none');
                         break;
                     }
                     $button = $paragraph && ($rest[1]['blockName'] ?? null) === 'core/buttons' ? (news_buttons($rest[1])[0] ?? null) : null;
