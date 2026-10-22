@@ -32,6 +32,8 @@
 global $wpdb;
 
 $mode = $args[0] ?? 'check';
+// check and preview only read: they must not create Gravity Forms.
+define('NEWS_DRY_RUN', in_array($mode, ['check', 'preview'], true));
 $only = isset($args[1]) ? array_map('intval', explode(',', $args[1])) : null;
 
 $src = new wpdb(
@@ -838,6 +840,10 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 }
                 $out[] = news_downloads($run, $src);
                 break;
+            case 'acf/form':
+            case 'contact-form-7/contact-form-selector':
+                $out[] = news_form_block($b, $src, $notes) ?? $b;
+                break;
             case 'acf/faq':
                 $out[] = news_faq($b);
                 break;
@@ -918,10 +924,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 $out[] = null; // placeholder, filled once all cards are collected
                 break;
             default:
-                if ($b['blockName'] === 'acf/form') {
-                    // Same name as this theme's Form block, but the old data is a Contact Form 7 selector.
-                    $notes[] = 'acf/form is an old CF7 form (needs the Gravity Forms conversion)';
-                } elseif ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/') && ! WP_Block_Type_Registry::get_instance()->is_registered($b['blockName'])) {
+                if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/') && ! WP_Block_Type_Registry::get_instance()->is_registered($b['blockName'])) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }
                 $out[] = $b['innerBlocks'] ? news_nested($b, $notes) : $b;
@@ -1071,6 +1074,25 @@ const NEWS_PAGES_SKIP = [59, 1985, 1550, 1717];
 
 /** Landing pages, held back until their hero/carousel/card blocks have conversions. */
 const NEWS_PAGES_DEFERRED = [220, 241];
+
+/**
+ * Contact Form 7 forms the pages use -> their Gravity Forms title. 2429 is labelled TEST on the old
+ * site but is the live Schools form (2420 has duplicate field names and is not used anywhere).
+ * 4444 (pump fault) is built by hand in news_pump_fault_form().
+ */
+const NEWS_CF7_FORMS = [
+    252 => 'Bristol Cycling Centre Contact',
+    403 => 'Register Event',
+    807 => 'Contact Page',
+    2429 => 'School Bikeability Enquiry - Bristol',
+    3671 => 'Volunteering at Bristol Cycling Centre',
+];
+
+/** Where an old form template mislabels a field: label => replacement type/name. */
+const NEWS_CF7_FIXES = [
+    // The "Your Name" field is a textarea sharing your-message with the real message.
+    3671 => ['Your Name' => ['type' => 'text', 'name' => 'your-name']],
+];
 
 /** Pages whose cards are all downloads/links to elsewhere: every card layout becomes Link Cards. */
 const NEWS_LINK_CARD_PAGES = [701];
@@ -1329,6 +1351,173 @@ if ($mode === 'case-studies') {
     WP_CLI::success(count($ids) . ' case studies imported.');
 
     return;
+}
+
+/**
+ * A Contact Form 7 template -> Gravity Forms field definitions. Handles the tags the old forms use
+ * (text, email, tel, textarea, file, submit); anything else is reported so it isn't dropped silently.
+ *
+ * @return array{fields: list<array>, names: array<string, array>, submit: string}
+ */
+function news_cf7_parse(string $template, array $fixes = []): array
+{
+    preg_match_all('/\[(\w+)(\*?)\s*([^\]]*)\]/', $template, $tags, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+    $types = ['text' => 'text', 'email' => 'email', 'tel' => 'phone', 'textarea' => 'textarea', 'file' => 'fileupload'];
+    $fields = [];
+    $names = [];
+    $submit = 'Send';
+    $from = 0;
+
+    foreach ($tags as $m) {
+        [$whole, $offset] = $m[0];
+        $label = trim(preg_replace('/\s+/', ' ', str_replace('(required)', '', html_entity_decode(wp_strip_all_tags(substr($template, $from, $offset - $from))))));
+        $label = trim(preg_replace('/\((optional)\)/i', '', $label));
+        $from = $offset + strlen($whole);
+        $tag = $m[1][0];
+        if ($tag === 'submit') {
+            $submit = trim(explode('"', $m[3][0])[1] ?? 'Send');
+
+            continue;
+        }
+        if (! isset($types[$tag])) {
+            WP_CLI::warning("Contact Form 7 tag [$tag] has no conversion; skipped");
+
+            continue;
+        }
+        $fix = $fixes[$label] ?? [];
+        $type = $types[$fix['type'] ?? $tag] ?? $types[$tag];
+        $name = $fix['name'] ?? trim(explode(' ', trim($m[3][0]))[0]);
+        $id = count($fields) + 1;
+        $field = ['id' => $id, 'type' => $type, 'label' => $label, 'isRequired' => $m[2][0] === '*', 'size' => 'large'];
+        if ($type === 'phone') {
+            $field['phoneFormat'] = 'standard';
+        }
+        if ($type === 'fileupload') {
+            $field['allowedExtensions'] = 'jpg, jpeg, png, gif, pdf';
+        }
+        if ($type === 'textarea') {
+            $field['size'] = 'medium';
+        }
+        $fields[] = $field;
+        $names[$name] = ['id' => $id, 'label' => $label];
+    }
+
+    return ['fields' => $fields, 'names' => $names, 'submit' => $submit];
+}
+
+/** CF7 mail template -> Gravity Forms merge tags ({:ID}, so a label's punctuation can't break them). Tags that match no field are dropped. */
+function news_cf7_merge(string $text, array $names): string
+{
+    $text = str_replace(['[_site_title]', '[_site_url]'], ['Better by Bike', '{embed_url}'], $text);
+
+    return preg_replace_callback('/\[([\w-]+)\]/', fn($m) => isset($names[$m[1]]) ? '{:' . $names[$m[1]]['id'] . '}' : '', $text);
+}
+
+/**
+ * The Gravity Forms copy of an old Contact Form 7 form, matched on title: re-running updates it in
+ * place. In check/preview (NEWS_DRY_RUN) nothing is written: an existing form's ID, else 0.
+ */
+function news_gravity_form(int $cf7Id, wpdb $src): int
+{
+    $title = NEWS_CF7_FORMS[$cf7Id];
+    $existing = 0;
+    // null = inactive forms too, or an earlier copy would never be found and re-runs would duplicate it.
+    foreach (GFAPI::get_forms(null) as $form) {
+        if ($form['title'] === $title) {
+            $existing = (int) $form['id'];
+        }
+    }
+    if (NEWS_DRY_RUN) {
+        return $existing;
+    }
+
+    $meta = fn($key) => maybe_unserialize($src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key=%s", $cf7Id, $key)));
+    $parsed = news_cf7_parse((string) $meta('_form'), NEWS_CF7_FIXES[$cf7Id] ?? []);
+    $mail = (array) $meta('_mail');
+    $messages = (array) $meta('_messages');
+    preg_match('/^\s*(?:"?([^"<]*?)"?\s*)?<?([^<>\s]+@[^<>\s]+)>?\s*$/', (string) ($mail['sender'] ?? ''), $sender);
+    $email = current(array_filter($parsed['fields'], fn($f) => $f['type'] === 'email'));
+    $body = news_cf7_merge((string) ($mail['body'] ?? ''), $parsed['names']);
+    foreach (NEWS_CF7_FIXES[$cf7Id] ?? [] as $label => $fix) {
+        // A field the old mail never mentioned (its name clashed with another): add it.
+        if (isset($parsed['names'][$fix['name']]) && ! str_contains($body, '{:' . $parsed['names'][$fix['name']]['id'] . '}')) {
+            $body = $label . ': {:' . $parsed['names'][$fix['name']]['id'] . "}\n\n" . $body;
+        }
+    }
+
+    $definition = [
+        'title' => $title,
+        'description' => '',
+        'labelPlacement' => 'top_label',
+        'descriptionPlacement' => 'above',
+        'requiredIndicator' => 'text',
+        'validationSummary' => '1',
+        'enableHoneypot' => true,
+        'markupVersion' => 2,
+        'button' => ['type' => 'text', 'text' => $parsed['submit']],
+        'fields' => $parsed['fields'],
+        'notifications' => [
+            "cf7_$cf7Id" => [
+                'id' => "cf7_$cf7Id",
+                'name' => 'Admin notification',
+                'event' => 'form_submission',
+                'toType' => 'email',
+                'to' => preg_replace('/\s*,\s*/', ',', (string) ($mail['recipient'] ?? '')),
+                'from' => $sender[2] ?? 'website@betterbybike.info',
+                'fromName' => ($sender[1] ?? '') ?: 'Better by Bike',
+                'replyTo' => $email ? '{:' . $email['id'] . '}' : '',
+                'subject' => news_cf7_merge((string) ($mail['subject'] ?? ''), $parsed['names']) ?: $title,
+                'message' => trim($body),
+                'isActive' => true,
+            ],
+        ],
+        'confirmations' => [
+            'default' => [
+                'id' => 'default',
+                'name' => 'Default Confirmation',
+                'isDefault' => true,
+                'type' => 'message',
+                'message' => $messages['mail_sent_ok'] ?? 'Thank you for your message. It has been sent.',
+            ],
+        ],
+    ];
+    // A form from an earlier run is updated in place, so pages already pointing at it stay valid.
+    $id = $existing ? GFAPI::update_form($definition + ['id' => $existing], $existing) : GFAPI::add_form($definition);
+    if (is_wp_error($id)) {
+        WP_CLI::error('Gravity Forms: ' . $id->get_error_message());
+    }
+
+    $formId = $existing ?: (int) $id;
+    // The form record's own flag, which update_form() leaves alone: inactive forms reject submissions.
+    GFFormsModel::update_form_active($formId, true);
+
+    return $formId;
+}
+
+/** The old form block (an acf/form holding a CF7 ID, or the CF7 selector) -> a Form block for its Gravity Form. */
+function news_form_block(array $b, wpdb $src, array &$notes): ?array
+{
+    $cf7 = (int) ($b['attrs']['data']['cf7_form'] ?? $b['attrs']['id'] ?? 0);
+    if ($cf7 === 4444) {
+        $gf = NEWS_DRY_RUN ? 0 : news_pump_fault_form();
+    } elseif (isset(NEWS_CF7_FORMS[$cf7])) {
+        $gf = news_gravity_form($cf7, $src);
+    } else {
+        $notes[] = "Contact Form 7 form $cf7 has no Gravity Forms conversion";
+
+        return null;
+    }
+    $notes[] = "CF7 form $cf7 -> Gravity Form " . ($gf ?: '(not created in check/preview)');
+
+    return news_acf_block('acf/form', \App\Blocks\Form::class, [
+        'layout' => 'centred',
+        'heading_text' => '',
+        'heading_level' => 'h2',
+        'heading_style' => 'match',
+        'intro_text' => '',
+        'intro_style' => 'body',
+        'form_id' => $gf,
+    ], 'form');
 }
 
 /**
@@ -1688,12 +1877,6 @@ function cc_strip_blocks(array $blocks, array &$notes): array
         $name = (string) $b['blockName'];
         // Next session + price now come from the single event template.
         if ($name === 'acf/upcoming-sessions') {
-            continue;
-        }
-        // Old CF7 forms (Bristol Cycling Centre contact/newsletter) need rebuilding in Gravity Forms.
-        if (in_array($name, ['acf/form', 'contact-form-7/contact-form-selector'], true)) {
-            $notes[] = "dropped $name (CF7 form, rebuild in Gravity Forms)";
-
             continue;
         }
         if ($name === 'core-embed/youtube') {
