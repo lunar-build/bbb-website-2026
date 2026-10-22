@@ -101,7 +101,8 @@
 .c-rolling-stats-carousel__statement {
   margin: 0;
   color: var(--wp--preset--color--blue-medium);
-  font-size: var(--wp--preset--font-size--heading-1);
+  // Heading 3 size: a sentence at Heading 1 size dominated the page.
+  font-size: var(--wp--preset--font-size--heading-3);
   font-weight: 400;
   line-height: 1.25;
 
