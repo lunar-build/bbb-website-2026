@@ -110,16 +110,6 @@
     color: var(--wp--preset--color--dark-orange);
     font-weight: 800;
   }
-
-  // A link after the statement (migrated slides): smaller, underlined, so it reads as a link.
-  a {
-    display: inline-block;
-    margin-top: 1rem;
-    font-size: var(--wp--preset--font-size--standfirst);
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
-  }
 }
 
 .c-rolling-stats-carousel__source {
