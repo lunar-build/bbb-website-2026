@@ -497,6 +497,259 @@ function news_illustration(array $b): ?array
     return news_acf_block('acf/illustration', \App\Blocks\Illustration::class, $fields, 'illustration');
 }
 
+/** Latest published posts of a type from the old site (IDs are kept, so links by ?p= resolve here). */
+function news_latest(wpdb $src, string $type, int $count): array
+{
+    return $src->get_results($src->prepare("SELECT ID, post_title FROM {$src->posts} WHERE post_type=%s AND post_status='publish' ORDER BY post_date DESC LIMIT %d", $type, $count));
+}
+
+function news_post_link(int $id, string $label = ''): array
+{
+    return ['title' => $label, 'url' => home_url('/?p=' . $id), 'target' => ''];
+}
+
+function news_meta(wpdb $src, int $id, string $key): string
+{
+    return (string) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key=%s", $id, $key));
+}
+
+function news_heading_block(string $html, int $level = 2): array
+{
+    return parse_blocks('<!-- wp:heading {"level":' . $level . '} --><h' . $level . ' class="wp-block-heading">' . $html . '</h' . $level . '><!-- /wp:heading -->')[0];
+}
+
+function news_paragraph_block(string $html): array
+{
+    return parse_blocks('<!-- wp:paragraph --><p>' . $html . '</p><!-- /wp:paragraph -->')[0];
+}
+
+/**
+ * The old landing-page hero: a video background with the cycle planner box over it (the Video Hero's
+ * Journey Planner Widget) and, if switched on, the blue call to action under it as a CTA Banner.
+ *
+ * @return list<array>
+ */
+function news_landing_hero(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $cta = $d['content_cta_link'] ?? [];
+    $hero = news_acf_block('acf/video-hero', \App\Blocks\VideoHero::class, [
+        'video' => $d['media_video'] ?? '',
+        'poster' => $d['media_image'] ?? '',
+        'video_alt' => '',
+        'heading' => news_plain($d['content_title'] ?? ''),
+        'intro' => news_unwrap_lines(news_plain($d['content_sub_title'] ?? '')),
+    ], 'video_hero');
+    $hero['attrs']['align'] = 'full';
+    $hero['innerBlocks'] = [news_acf_block('acf/journey-planner-widget', \App\Blocks\JourneyPlannerWidget::class, [
+        'variant' => 'plan_route',
+        'heading' => news_plain($d['content_cta_title'] ?? ''),
+        'cta_label' => $cta['title'] ?? 'Plan a route',
+        'journey_planner_url' => $cta['url'] ?? '',
+    ], 'journey_planner_widget')];
+    $hero['innerContent'] = [null];
+    $out = [$hero];
+
+    if (! empty($d['show_blue_cta'])) {
+        $out[] = news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
+            'layout' => 'row',
+            'heading' => news_plain($d['blue_cta_title'] ?? ''),
+            'body' => news_plain($d['blue_cta_sub_title'] ?? ''),
+            'link' => $d['blue_cta_link'] ?? '',
+        ], 'cta_banner');
+    }
+
+    return $out;
+}
+
+/** "Plan a bike ride / Simply." -> a CTA Banner (the label under the old button joins the text). */
+function news_planner_cta(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+
+    return news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
+        'layout' => 'left',
+        'heading' => trim(news_plain($d['title'] ?? '') . '. ' . news_plain($d['sub_title'] ?? ''), ' .') . '.',
+        'body' => trim(news_plain($d['text'] ?? '') . ' ' . news_plain($d['cta_label'] ?? '')),
+        'link' => $d['cta_link'] ?? '',
+        'image' => '',
+    ], 'cta_banner');
+}
+
+/**
+ * Old carousel: slides with a link become Link Cards (title, text, "Find out more"); slides that are
+ * only a statement ("There are 75 miles…") become a Rolling Stats Carousel.
+ */
+function news_old_carousel(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $n = (int) ($d['slides'] ?? 0);
+    $linked = array_filter(range(0, $n - 1), fn($i) => ! empty($d["slides_{$i}_link"]['url']));
+
+    if ($linked) {
+        $fields = ['cards' => $n];
+        for ($i = 0; $i < $n; $i++) {
+            $link = $d["slides_{$i}_link"] ?? '';
+            $fields += [
+                "cards_{$i}_logo" => '',
+                "cards_{$i}_title" => news_unwrap_lines(news_plain($d["slides_{$i}_title"] ?? '')),
+                "cards_{$i}_description" => news_unwrap_lines(news_plain($d["slides_{$i}_text"] ?? '')),
+                "cards_{$i}_cta_type" => 'link',
+                "cards_{$i}_link" => $link ?: '',
+                "cards_{$i}_file" => '',
+                "cards_{$i}_cta_label" => 'Download',
+                "cards_{$i}_file_size" => '',
+            ];
+        }
+
+        return news_acf_block('acf/link-card', \App\Blocks\LinkCard::class, $fields, 'link_card');
+    }
+
+    $fields = ['image_left' => '', 'image_right' => '', 'slides' => $n];
+    for ($i = 0; $i < $n; $i++) {
+        $fields += [
+            "slides_{$i}_slide_type" => 'statement',
+            "slides_{$i}_prefix_text" => '',
+            "slides_{$i}_value" => '',
+            "slides_{$i}_unit" => '',
+            "slides_{$i}_caption_text" => '',
+            "slides_{$i}_statement" => '<p>' . str_replace(['<b>', '</b>', '&nbsp;'], ['<strong>', '</strong>', ' '], trim((string) ($d["slides_{$i}_title"] ?? ''))) . '</p>',
+            "slides_{$i}_source" => news_plain($d["slides_{$i}_text"] ?? ''),
+        ];
+    }
+
+    return news_acf_block('acf/rolling-stats-carousel', \App\Blocks\RollingStatsCarousel::class, $fields, 'rolling_stats_carousel');
+}
+
+/** The old staggered quote cards pulled case studies by relation (empty here): show the latest three. */
+function news_case_study_cards(wpdb $src): array
+{
+    $studies = news_latest($src, 'case_study', 3);
+    $fields = ['cards' => count($studies)];
+    foreach ($studies as $i => $study) {
+        $tags = $src->get_col($src->prepare("SELECT t.name FROM {$src->term_relationships} r JOIN {$src->term_taxonomy} tt USING(term_taxonomy_id) JOIN {$src->terms} t USING(term_id) WHERE r.object_id=%d AND tt.taxonomy='case_study_tag' LIMIT 2", $study->ID));
+        $fields += [
+            "cards_{$i}_image" => news_meta($src, $study->ID, 'card_image') ?: news_meta($src, $study->ID, '_thumbnail_id'),
+            "cards_{$i}_quote" => news_unwrap_lines(news_plain(news_meta($src, $study->ID, 'quote'))),
+            "cards_{$i}_name" => html_entity_decode($study->post_title, ENT_QUOTES),
+            "cards_{$i}_info" => implode(', ', array_map('html_entity_decode', $tags)),
+            "cards_{$i}_link" => news_post_link($study->ID, 'Read more'),
+        ];
+    }
+
+    return news_acf_block('acf/case-study-grid', \App\Blocks\CaseStudyGrid::class, $fields, 'case_study_grid');
+}
+
+/** "Our favourite local rides": four route cards -> a Card Row of the route type. */
+function news_planner_rides(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $fields = [
+        'type' => 'route',
+        'heading_highlight' => news_plain($d['sub_title'] ?? ''),
+        'heading' => news_plain($d['title'] ?? ''),
+        'intro' => news_plain($d['text'] ?? ''),
+        'browse_all_link' => '',
+        'route_cards' => 0,
+    ];
+    foreach (['one', 'two', 'three', 'four'] as $name) {
+        if (empty($d["ride_{$name}_title"])) {
+            continue;
+        }
+        $i = $fields['route_cards']++;
+        $fields += [
+            "route_cards_{$i}_image" => $d["ride_{$name}_image"] ?? '',
+            "route_cards_{$i}_route_name" => news_plain($d["ride_{$name}_title"]),
+            "route_cards_{$i}_time_needed" => news_plain($d["ride_{$name}_duration"] ?? ''),
+            "route_cards_{$i}_distance" => news_plain($d["ride_{$name}_length"] ?? ''),
+            "route_cards_{$i}_difficulty" => strtolower($d["ride_{$name}_difficulty"] ?? 'easy'),
+            "route_cards_{$i}_link" => $d["ride_{$name}_link"] ?? '',
+        ];
+    }
+
+    return news_acf_block('acf/card-row', \App\Blocks\CardRow::class, $fields, 'card_row');
+}
+
+/** "Join us at cycling events": a heading and intro, then the three icon cards as an Icon Link Grid. */
+function news_events_group(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $icons = ['flag' => 'calendar', 'bike' => 'bike', 'helping' => 'cycling-person'];
+    $fields = ['items' => 0];
+    foreach ([1, 2, 3] as $n) {
+        if (empty($d["card_{$n}_title"])) {
+            continue;
+        }
+        $i = $fields['items']++;
+        $fields += [
+            "items_{$i}_icon" => $icons[$d["card_{$n}_icon"] ?? ''] ?? 'cycling-person',
+            "items_{$i}_link" => ['title' => news_plain($d["card_{$n}_title"]), 'url' => home_url('/events/'), 'target' => ''],
+            "items_{$i}_description" => news_plain($d["card_{$n}_text"] ?? ''),
+        ];
+    }
+
+    return [
+        news_heading_block(esc_html(trim(news_plain($d['title'] ?? '') . ' ' . news_plain($d['sub_title'] ?? '')))),
+        news_paragraph_block(esc_html(news_plain($d['introduction_paragraph'] ?? ''))),
+        news_acf_block('acf/icon-link-grid', \App\Blocks\IconLinkGrid::class, $fields, 'icon_link_grid'),
+    ];
+}
+
+/** "Get confidence, visit a cycling centre": intro, the four centres as Link Cards, then the adult training call to action. */
+function news_visit_cycling_centre(array $b, wpdb $src): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $n = (int) ($d['cycle_centre_links'] ?? 0);
+    $fields = ['cards' => $n];
+    for ($i = 0; $i < $n; $i++) {
+        $page = (int) ($d["cycle_centre_links_{$i}_cycle_centre"] ?? 0);
+        $fields += [
+            "cards_{$i}_logo" => $d["cycle_centre_links_{$i}_logo"] ?? '',
+            "cards_{$i}_title" => html_entity_decode((string) $src->get_var($src->prepare("SELECT post_title FROM {$src->posts} WHERE ID=%d", $page)), ENT_QUOTES),
+            "cards_{$i}_description" => '',
+            "cards_{$i}_cta_type" => 'link',
+            "cards_{$i}_link" => news_post_link($page, 'Visit'),
+            "cards_{$i}_file" => '',
+            "cards_{$i}_cta_label" => 'Download',
+            "cards_{$i}_file_size" => '',
+        ];
+    }
+    $button = news_acf_block('acf/button', \App\Blocks\ButtonBlock::class, [
+        'link' => $d['cta_link'] ?? '',
+        'button_style' => 'brand',
+        'button_size' => 'large',
+        'button_align' => 'left',
+    ], 'button');
+
+    return [
+        news_heading_block(esc_html(trim(news_plain($d['title'] ?? '') . ': ' . news_plain($d['sub_title'] ?? ''), ': '))),
+        news_paragraph_block(esc_html(news_plain($d['introduction'] ?? ''))),
+        news_acf_block('acf/link-card', \App\Blocks\LinkCard::class, $fields, 'link_card'),
+        news_heading_block(esc_html(news_plain($d['cta_title'] ?? '')), 3),
+        news_paragraph_block(esc_html(news_unwrap_lines(news_plain($d['cta_description'] ?? '')))),
+        $button,
+    ];
+}
+
+/** "Latest News": the three newest posts as a News Card Row. */
+function news_latest_news(array $b, wpdb $src): array
+{
+    $fields = ['type' => 'news', 'heading_highlight' => '', 'heading' => news_plain($b['attrs']['data']['title'] ?? 'Latest News'), 'intro' => '', 'news_cards' => 0];
+    $fields['browse_all_link'] = ['title' => 'Browse all news', 'url' => home_url('/news/'), 'target' => ''];
+    foreach (news_latest($src, 'post', 3) as $i => $post) {
+        $category = $src->get_var($src->prepare("SELECT t.name FROM {$src->term_relationships} r JOIN {$src->term_taxonomy} tt USING(term_taxonomy_id) JOIN {$src->terms} t USING(term_id) WHERE r.object_id=%d AND tt.taxonomy='category' LIMIT 1", $post->ID));
+        $fields['news_cards']++;
+        $fields += [
+            "news_cards_{$i}_image" => news_meta($src, $post->ID, '_thumbnail_id'),
+            "news_cards_{$i}_tag" => html_entity_decode((string) $category, ENT_QUOTES),
+            "news_cards_{$i}_title" => html_entity_decode($post->post_title, ENT_QUOTES),
+            "news_cards_{$i}_link" => news_post_link($post->ID, 'Read more'),
+        ];
+    }
+
+    return news_acf_block('acf/card-row', \App\Blocks\CardRow::class, $fields, 'card_row');
+}
+
 /** Accordion from the old FAQ block (question/answer repeater). */
 function news_faq(array $b): array
 {
@@ -844,6 +1097,41 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
             case 'contact-form-7/contact-form-selector':
                 $out[] = news_form_block($b, $src, $notes) ?? $b;
                 break;
+            case 'acf/hero':
+                array_push($out, ...news_landing_hero($b));
+                break;
+            case 'acf/cycle-planner-cta':
+                $out[] = news_planner_cta($b);
+                break;
+            case 'acf/carousel':
+                $out[] = news_old_carousel($b);
+                break;
+            case 'acf/staggered-quote-cards':
+                $out[] = news_case_study_cards($src);
+                $notes[] = 'staggered quote cards (no case studies chosen) -> Case Study Grid of the latest 3';
+                break;
+            case 'acf/cycle-planner-rides':
+                $out[] = news_planner_rides($b);
+                break;
+            case 'acf/events-group':
+                array_push($out, ...news_events_group($b));
+                break;
+            case 'acf/visit-a-cycling-centre':
+                array_push($out, ...news_visit_cycling_centre($b, $src));
+                break;
+            case 'acf/latest-news':
+                $out[] = news_latest_news($b, $src);
+                break;
+            case 'acf/instagram':
+                // Held back until the client decides about Instagram: drop the block and the heading that introduces it.
+                while ($out && news_is_blank(end($out))) {
+                    array_pop($out);
+                }
+                if ($out && end($out)['blockName'] === 'core/heading') {
+                    array_pop($out);
+                }
+                $notes[] = 'acf/instagram and its intro heading dropped';
+                break;
             case 'acf/faq':
                 $out[] = news_faq($b);
                 break;
@@ -909,13 +1197,44 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 }
                 $title = $prev && $prev['blockName'] === 'core/heading' ? news_plain($prev['innerHTML']) : '';
                 $map = news_map_embed($b, $title);
+                if (! $map && $b['blockName'] === 'core/html' && preg_match('#^\s*<h([1-6])[^>]*>(.*)</h\1>\s*$#s', $b['innerHTML'], $h)) {
+                    // A heading pasted as raw HTML.
+                    $out[] = news_heading_block(trim($h[2]), (int) $h[1]);
+                    break;
+                }
                 $out[] = $map ?? $b;
                 if ($map) {
                     $notes[] = 'Google map -> Map Embed';
                 }
                 break;
-            case 'core/paragraph':
             case 'core/heading':
+                // The homepage's "I bike it, I like it!" heading, text and button -> one centred CTA Banner.
+                if (news_plain($b['innerHTML']) === 'I bike it, I like it!') {
+                    $rest = [];
+                    for ($j = $i + 1; $j < count($in) && count($rest) < 2; $j++) {
+                        if (! news_is_blank($in[$j])) {
+                            $rest[] = $in[$j];
+                        }
+                    }
+                    if (($rest[0]['blockName'] ?? null) === 'core/paragraph' && ($rest[1]['blockName'] ?? null) === 'core/buttons') {
+                        $button = news_buttons($rest[1])[0] ?? null;
+                        $out[] = news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
+                            'layout' => 'centred',
+                            'heading' => news_plain($b['innerHTML']),
+                            'body' => news_unwrap_lines(news_plain($rest[0]['innerHTML'])),
+                            'link' => $button['attrs']['data']['link'] ?? '',
+                            'image_left' => 'bmx',
+                            'image_right' => '',
+                        ], 'cta_banner');
+                        while ($i < count($in) - 1 && $in[$i] !== $rest[1]) {
+                            $i++;
+                        }
+                        break;
+                    }
+                }
+                $out[] = news_clean_text($b);
+                break;
+            case 'core/paragraph':
                 $out[] = news_clean_text($b);
                 break;
             case 'acf/bike-card':
@@ -1072,8 +1391,8 @@ const CC_PAGES = [308, 309, 796];
 /** Pages `pages` mode leaves alone: the old News archive, and CF7 leftovers (test page, thank-you, survey). */
 const NEWS_PAGES_SKIP = [59, 1985, 1550, 1717];
 
-/** Landing pages, held back until their hero/carousel/card blocks have conversions. */
-const NEWS_PAGES_DEFERRED = [220, 241];
+/** Landing pages (Homepage, Why cycle): full-width blocks, so the default template rather than Sticky Nav. */
+const NEWS_LANDING_PAGES = [220, 241];
 
 /**
  * Contact Form 7 forms the pages use -> their Gravity Forms title. 2429 is labelled TEST on the old
@@ -1105,7 +1424,7 @@ function news_page_ids(wpdb $src, ?array $only): array
 {
     $ids = array_values(array_diff(
         $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='page' AND post_status='publish' ORDER BY ID"),
-        array_map('strval', [...array_keys(NEWS_MAP_PAGES), 6669, ...CC_PAGES, ...NEWS_PAGES_SKIP, ...NEWS_PAGES_DEFERRED]),
+        array_map('strval', [...array_keys(NEWS_MAP_PAGES), 6669, ...CC_PAGES, ...NEWS_PAGES_SKIP]),
     ));
 
     return $only ? array_values(array_intersect($ids, array_map('strval', $only))) : $ids;
@@ -1638,11 +1957,14 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
     };
     $walk($blocks);
 
-    // Every page uses Sticky Nav, as on the live site (pages without H2s just have no menu).
-    // It draws its own breadcrumbs, so the hero's would show twice.
+    // Every page uses Sticky Nav, as on the live site (pages without H2s just have no menu), which draws
+    // its own breadcrumbs. Landing pages are full width and stay on the default template.
+    $landing = in_array($id, NEWS_LANDING_PAGES, true);
+    $hero = in_array($blocks[0]['blockName'] ?? null, \App\Support\ContentHero::HERO_BLOCKS, true) ? '' : serialize_block(news_page_hero($row->post_title, $thumb, $landing)) . "\n\n";
+
     return [
-        'content' => $replaceUrls(serialize_block(news_page_hero($row->post_title, $thumb, false)) . "\n\n" . serialize_blocks($blocks)),
-        'template' => 'template-sticky-nav.blade.php',
+        'content' => $replaceUrls($hero . serialize_blocks($blocks)),
+        'template' => $landing ? '' : 'template-sticky-nav.blade.php',
         'h2s' => $h2s,
     ];
 }
@@ -1691,8 +2013,17 @@ if ($mode === 'map-pages') {
         $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
         $notes = [];
 
-        // Parents only held the old Child Page Cards block, which has no equivalent yet.
+        // Parents only held the old Child Page Cards block: a hero plus the Child Page Cards block.
         $content = '';
+        if (! $config) {
+            $content = serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n" . serialize_block(news_acf_block('acf/child-page-cards', \App\Blocks\ChildPageCards::class, [
+                'heading_text' => '',
+                'heading_level' => 'h2',
+                'heading_style' => 'match',
+                'intro_text' => '',
+                'intro_style' => 'body',
+            ], 'child_page_cards'));
+        }
         if ($config) {
             $content = news_transform($row->post_content, $src, $notes);
             // The intro sits in the archive column, already spaced by its grid — no Standfirst padding.
