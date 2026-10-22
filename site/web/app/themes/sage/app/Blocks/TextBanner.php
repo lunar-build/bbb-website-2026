@@ -172,8 +172,8 @@ class TextBanner extends Block
      * @var array
      */
     public $example = [
-        'text' => 'Healthier, faster, more sustainable.',
-        'emphasis' => 'Better by bike.',
+        'text' => '<p>Healthier, faster, more sustainable.<br><strong>Better by bike.</strong></p>',
+        'alignment' => 'centre',
     ];
 
     /**
@@ -182,9 +182,24 @@ class TextBanner extends Block
     public function with(): array
     {
         return [
-            'text' => $this->resolveField('text', ''),
-            'emphasis' => $this->resolveField('emphasis', ''),
+            'text' => $this->text(),
+            'alignment' => $this->resolveField('alignment', 'centre'),
         ];
+    }
+
+    /**
+     * The text, limited to paragraphs, line breaks, bold, italic and links.
+     */
+    public function text(): string
+    {
+        return wp_kses((string) $this->resolveField('text', ''), [
+            'p' => [],
+            'br' => [],
+            'strong' => [],
+            'b' => [],
+            'em' => [],
+            'a' => ['href' => [], 'target' => [], 'rel' => []],
+        ]);
     }
 
     /**
@@ -195,16 +210,21 @@ class TextBanner extends Block
         $fields = Builder::make('text_banner');
 
         $fields
-            ->addTextarea('text', [
+            ->addWysiwyg('text', [
                 'label' => 'Text',
-                'instructions' => 'The statement. The background colour is set in the block sidebar.',
-                'rows' => 2,
-                'new_lines' => '',
+                'instructions' => 'Select words and use Bold to make them stand out (shown bold and in blue). Shift+Enter makes a line break. The background colour is set in the block sidebar.',
+                'tabs' => 'visual',
+                'toolbar' => 'basic',
+                'media_upload' => 0,
                 'required' => 1,
             ])
-            ->addText('emphasis', [
-                'label' => 'Emphasised line',
-                'instructions' => 'Optional. Shown bold on its own line under the text, e.g. "Better by bike."',
+            ->addButtonGroup('alignment', [
+                'label' => 'Alignment',
+                'choices' => [
+                    'centre' => 'Centre',
+                    'left' => 'Left',
+                ],
+                'default_value' => 'centre',
             ]);
 
         return $fields->build();
