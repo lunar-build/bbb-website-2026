@@ -30,6 +30,17 @@
 
 .c-illustration__figure {
   position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+// The second character only has room from desktop width, as on the old site.
+.c-illustration__human--second {
+  display: none;
+
+  @include bp.respond($min: bp.$lg) {
+    display: block;
+  }
 }
 
 .c-illustration__human {

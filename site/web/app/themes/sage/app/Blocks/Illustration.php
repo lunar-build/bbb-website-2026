@@ -185,6 +185,7 @@ class Illustration extends Block
      */
     public $example = [
         'character' => 'mountain_biker',
+        'character_2' => '',
         'object_1' => 'pedal',
         'object_2' => 'helmet',
         'object_3' => '',
@@ -200,6 +201,7 @@ class Illustration extends Block
 
         return [
             'character' => $this->url(self::CHARACTERS[$character][1] ?? null),
+            'character2' => $this->url(self::CHARACTERS[$this->resolveField('character_2', '')][1] ?? null),
             'objects' => array_values(array_filter(array_map(
                 fn($n) => $this->url(self::OBJECTS[$this->resolveField("object_$n", '')][1] ?? null),
                 [1, 2, 3],
@@ -227,6 +229,14 @@ class Illustration extends Block
             'default_value' => 'mountain_biker',
             'ui' => true,
             'required' => true,
+        ]);
+
+        $fields->addSelect('character_2', [
+            'label' => 'Second character',
+            'instructions' => 'Optional. Shown beside the first from tablet width up.',
+            'choices' => $choices(self::CHARACTERS),
+            'ui' => true,
+            'allow_null' => true,
         ]);
 
         foreach ([1, 2, 3] as $n) {
