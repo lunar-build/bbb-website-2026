@@ -355,9 +355,43 @@ function news_flatten(array $blocks): array
 }
 
 /**
+ * A friendly permalink for an old-site post: this site's own permalink when the post is already
+ * imported, otherwise built from the old site's slugs (pages by their parent path, posts under the
+ * permalink structure, case studies under their rewrite slug). Only an unknown type falls back to `?p=`.
+ */
+function news_permalink(wpdb $src, int $id): string
+{
+    if (($local = get_post($id)) && $local->post_status === 'publish' && ($url = get_permalink($id))) {
+        return $url;
+    }
+    $row = $src->get_row($src->prepare("SELECT post_type, post_name, post_parent FROM {$src->posts} WHERE ID=%d", $id));
+    if (! $row) {
+        return home_url('/?p=' . $id);
+    }
+    if ($row->post_type === 'page') {
+        $path = [$row->post_name];
+        for ($parent = (int) $row->post_parent; $parent;) {
+            $up = $src->get_row($src->prepare("SELECT post_name, post_parent FROM {$src->posts} WHERE ID=%d", $parent));
+            $path[] = $up->post_name;
+            $parent = (int) $up->post_parent;
+        }
+
+        return home_url(user_trailingslashit(implode('/', array_reverse($path))));
+    }
+    if ($row->post_type === 'post' && ($structure = get_option('permalink_structure')) && str_contains($structure, '%postname%')) {
+        return home_url(user_trailingslashit(str_replace('%postname%', $row->post_name, trim($structure, '/'))));
+    }
+    if ($row->post_type === 'case_study' && ($slug = get_post_type_object('case_study')->rewrite['slug'] ?? null)) {
+        return home_url(user_trailingslashit($slug . '/' . $row->post_name));
+    }
+
+    return home_url('/?p=' . $id);
+}
+
+/**
  * Old acf/card blocks (icon or image, title, text, link) -> one Card Grid of
  * "link" cards. A card sourced from a post takes that post's title, excerpt,
- * featured image and a link by ID (IDs are kept, so `?p=` resolves).
+ * featured image and its permalink.
  */
 function news_card_grid(array $cards, wpdb $src): array
 {
@@ -370,7 +404,7 @@ function news_card_grid(array $cards, wpdb $src): array
                 'title' => $post->post_title ?? '',
                 'text' => $post->post_excerpt ?? '',
                 'image' => (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $d['content'])),
-                'link' => ['title' => '', 'url' => home_url('/?p=' . (int) $d['content']), 'target' => ''],
+                'link' => ['title' => '', 'url' => news_permalink($src, (int) $d['content']), 'target' => ''],
             ];
         }
         $fields += [
