@@ -3,7 +3,7 @@
 <div class="o-container">
   <div class="c-text-banner__inner c-text-banner__inner--{{ $alignment }}">
     @if ($heading)
-      <{{ $headingTag }} class="c-text-banner__heading">{!! $heading !!}</{{ $headingTag }}>
+      <{{ $headingTag }} class="c-text-banner__heading {{ $headingClass }}">{!! $heading !!}</{{ $headingTag }}>
     @endif
 
     @if ($body)
