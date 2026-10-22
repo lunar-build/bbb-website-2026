@@ -28,6 +28,7 @@
 }
 
 .c-text-banner__heading {
+  margin: 0; // it can be an h2-h4, which carry their own margin
   font-size: var(--wp--preset--font-size--heading-3);
   font-weight: 400;
   line-height: 1.3;

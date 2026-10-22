@@ -173,6 +173,7 @@ class TextBanner extends Block
      */
     public $example = [
         'heading' => '<p><strong>Explore</strong><br>ways to get a bike</p>',
+        'heading_level' => 'h2',
         'body' => '<p>There are so many ways to get a bike, discover one that suits you best.</p>',
         'alignment' => 'centre',
     ];
@@ -183,10 +184,32 @@ class TextBanner extends Block
     public function with(): array
     {
         return [
-            'heading' => $this->clean($this->resolveField('heading', '')),
+            'heading' => $this->heading(),
+            'headingTag' => $this->headingTag(),
             'body' => $this->clean($this->resolveField('body', '')),
             'alignment' => $this->resolveField('alignment', 'centre'),
         ];
+    }
+
+    /**
+     * The heading's inline markup: its paragraphs become line breaks, because a heading
+     * can't hold <p> elements.
+     */
+    protected function heading(): string
+    {
+        $html = $this->clean($this->resolveField('heading', ''));
+
+        return trim(preg_replace(['#</p>\s*<p>#i', '#</?p>#i'], ['<br>', ''], $html));
+    }
+
+    /**
+     * The tag the heading is output as: h2 to h4, or a plain div when it's only styled text.
+     */
+    protected function headingTag(): string
+    {
+        $level = $this->resolveField('heading_level', 'h2');
+
+        return in_array($level, ['h2', 'h3', 'h4'], true) ? $level : 'div';
     }
 
     /**
@@ -218,6 +241,18 @@ class TextBanner extends Block
                 'tabs' => 'visual',
                 'toolbar' => 'basic',
                 'media_upload' => 0,
+            ])
+            ->addSelect('heading_level', [
+                'label' => 'Heading level',
+                'instructions' => 'Use a heading level when the text introduces the content below it. Choose "Not a heading" for a standalone statement, so screen readers and the page outline don\'t treat it as a section.',
+                'choices' => [
+                    'h2' => 'Heading 2',
+                    'h3' => 'Heading 3',
+                    'h4' => 'Heading 4',
+                    'none' => 'Not a heading (just styled text)',
+                ],
+                'default_value' => 'h2',
+                'ui' => true,
             ])
             ->addWysiwyg('body', [
                 'label' => 'Body text',
