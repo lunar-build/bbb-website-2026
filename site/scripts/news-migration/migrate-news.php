@@ -802,10 +802,10 @@ function news_newsletter_form(array &$notes): ?array
     return null;
 }
 
-/** A Text Banner from its rich text, on an optional background colour slug. */
-function news_text_banner_html(string $html, string $background = ''): array
+/** A Text Banner from its heading and body rich text, on an optional background colour slug. */
+function news_text_banner_html(string $heading, string $body = '', string $background = ''): array
 {
-    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['text' => $html, 'alignment' => 'centre'], 'text_banner');
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'body' => $body, 'alignment' => 'centre'], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
@@ -816,13 +816,13 @@ function news_text_banner_html(string $html, string $background = ''): array
 /** A Text Banner (statement text, an optional bold line under it) on an optional background colour slug. */
 function news_text_banner(string $text, string $emphasis = '', string $background = ''): array
 {
-    return news_text_banner_html('<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>', $background);
+    return news_text_banner_html('<p>' . esc_html($text) . ($emphasis ? '<br><strong>' . esc_html($emphasis) . '</strong>' : '') . '</p>', '', $background);
 }
 
-/** A Text Banner with a bold lead phrase, the rest of the line under it, then a paragraph ("Explore / ways to get a bike"). */
+/** A Text Banner with a bold lead phrase, the rest of the line under it, and the body text in normal size ("Explore / ways to get a bike"). */
 function news_lead_text_banner(string $lead, string $rest, string $body): array
 {
-    return news_text_banner_html('<p><strong>' . esc_html($lead) . '</strong><br>' . esc_html($rest) . '</p>' . ($body ? '<p>' . esc_html($body) . '</p>' : ''));
+    return news_text_banner_html('<p><strong>' . esc_html($lead) . '</strong><br>' . esc_html($rest) . '</p>', $body ? '<p>' . esc_html($body) . '</p>' : '');
 }
 
 /** A centred CTA Banner with no illustrations, for a heading and the text under it. */
