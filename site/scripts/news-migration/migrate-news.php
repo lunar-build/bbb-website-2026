@@ -562,69 +562,84 @@ function news_landing_hero(array $b): array
     return $out;
 }
 
-/** "Plan a bike ride / Simply." -> a CTA Banner (the label under the old button joins the text). */
-function news_planner_cta(array $b): array
+/** An attachment in this site's media library by file name (its ID differs between sites), or 0. */
+function news_media_by_file(string $file): int
 {
-    $d = $b['attrs']['data'] ?? [];
+    global $wpdb;
 
-    return news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
-        'layout' => 'left',
-        'heading' => trim(news_plain($d['title'] ?? '') . '. ' . news_plain($d['sub_title'] ?? ''), ' .') . '.',
-        'body' => trim(news_plain($d['text'] ?? '') . ' ' . news_plain($d['cta_label'] ?? '')),
-        'link' => $d['cta_link'] ?? '',
-        'image' => '',
-    ], 'cta_banner');
+    return (int) $wpdb->get_var($wpdb->prepare("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%/' . $wpdb->esc_like($file)));
 }
 
 /**
- * Old carousel: slides with a link become Link Cards (title, text, "Find out more"); slides that are
- * only a statement ("There are 75 miles…") become a Rolling Stats Carousel.
+ * "Plan a bike ride. Simply." -> Two Column Content: the cycle planner laptop picture on the left (found
+ * in the media library by name), the text and button on the right. Without the picture it falls back to a CTA Banner.
+ */
+function news_planner_cta(array $b): array
+{
+    $d = $b['attrs']['data'] ?? [];
+    $heading = trim(news_plain($d['title'] ?? '') . '. ' . news_plain($d['sub_title'] ?? ''), ' .') . '.';
+    $body = trim(news_plain($d['text'] ?? '') . ' ' . news_plain($d['cta_label'] ?? ''));
+    $image = news_media_by_file('cycleplanner.jpg');
+
+    if (! $image) {
+        return news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, ['layout' => 'left', 'heading' => $heading, 'body' => $body, 'link' => $d['cta_link'] ?? '', 'image' => ''], 'cta_banner');
+    }
+
+    return news_acf_block('acf/two-column-content', \App\Blocks\TwoColumnContent::class, [
+        'left' => ['image'],
+        'left_0_image' => $image,
+        'right' => ['text'],
+        'right_0_heading_text' => $heading,
+        'right_0_heading_level' => 'h2',
+        'right_0_heading_style' => 'match',
+        'right_0_body_text' => $body,
+        'right_0_body_style' => 'body',
+        'right_0_link' => $d['cta_link'] ?? '',
+    ], 'two_column_content', [
+        'left_image' => 'field_two_column_content_left_image_image',
+        'right_heading_text' => 'field_two_column_content_right_text_heading_text',
+        'right_heading_level' => 'field_two_column_content_right_text_heading_level',
+        'right_heading_style' => 'field_two_column_content_right_text_heading_style',
+        'right_body_text' => 'field_two_column_content_right_text_body_text',
+        'right_body_style' => 'field_two_column_content_right_text_body_style',
+        'right_link' => 'field_two_column_content_right_text_link',
+    ]);
+}
+
+/**
+ * Old carousel -> Rolling Stats Carousel of statements (the title with its bold figures). The slide's
+ * text becomes the small source line, and a link is added after the statement.
  */
 function news_old_carousel(array $b): array
 {
     $d = $b['attrs']['data'] ?? [];
     $n = (int) ($d['slides'] ?? 0);
-    $linked = array_filter(range(0, $n - 1), fn($i) => ! empty($d["slides_{$i}_link"]['url']));
-
-    if ($linked) {
-        $fields = ['cards' => $n];
-        for ($i = 0; $i < $n; $i++) {
-            $link = $d["slides_{$i}_link"] ?? '';
-            $fields += [
-                "cards_{$i}_logo" => '',
-                "cards_{$i}_title" => news_unwrap_lines(news_plain($d["slides_{$i}_title"] ?? '')),
-                "cards_{$i}_description" => news_unwrap_lines(news_plain($d["slides_{$i}_text"] ?? '')),
-                "cards_{$i}_cta_type" => 'link',
-                "cards_{$i}_link" => $link ?: '',
-                "cards_{$i}_file" => '',
-                "cards_{$i}_cta_label" => 'Download',
-                "cards_{$i}_file_size" => '',
-            ];
-        }
-
-        return news_acf_block('acf/link-card', \App\Blocks\LinkCard::class, $fields, 'link_card');
-    }
-
     $fields = ['image_left' => '', 'image_right' => '', 'slides' => $n];
     for ($i = 0; $i < $n; $i++) {
+        $statement = str_replace(['<b>', '</b>', '&nbsp;'], ['<strong>', '</strong>', ' '], trim((string) ($d["slides_{$i}_title"] ?? '')));
+        $link = $d["slides_{$i}_link"] ?? null;
+        if (! empty($link['url'])) {
+            // The statement sits in a <p>: inline markup only.
+            $statement .= '<br><a href="' . esc_url($link['url']) . '">' . esc_html($link['title'] ?: 'Find out more') . '</a>';
+        }
         $fields += [
             "slides_{$i}_slide_type" => 'statement',
             "slides_{$i}_prefix_text" => '',
             "slides_{$i}_value" => '',
             "slides_{$i}_unit" => '',
             "slides_{$i}_caption_text" => '',
-            "slides_{$i}_statement" => '<p>' . str_replace(['<b>', '</b>', '&nbsp;'], ['<strong>', '</strong>', ' '], trim((string) ($d["slides_{$i}_title"] ?? ''))) . '</p>',
-            "slides_{$i}_source" => news_plain($d["slides_{$i}_text"] ?? ''),
+            "slides_{$i}_statement" => trim(preg_replace('/\s+/', ' ', $statement)),
+            "slides_{$i}_source" => news_unwrap_lines(news_plain($d["slides_{$i}_text"] ?? '')),
         ];
     }
 
     return news_acf_block('acf/rolling-stats-carousel', \App\Blocks\RollingStatsCarousel::class, $fields, 'rolling_stats_carousel');
 }
 
-/** The old staggered quote cards pulled case studies by relation (empty here): show the latest three. */
+/** The old staggered quote cards pulled case studies by relation (empty here): show the latest four, as the live site does. */
 function news_case_study_cards(wpdb $src): array
 {
-    $studies = news_latest($src, 'case_study', 3);
+    $studies = news_latest($src, 'case_study', 4);
     $fields = ['cards' => count($studies)];
     foreach ($studies as $i => $study) {
         $tags = $src->get_col($src->prepare("SELECT t.name FROM {$src->term_relationships} r JOIN {$src->term_taxonomy} tt USING(term_taxonomy_id) JOIN {$src->terms} t USING(term_id) WHERE r.object_id=%d AND tt.taxonomy='case_study_tag' LIMIT 2", $study->ID));
@@ -695,39 +710,40 @@ function news_events_group(array $b): array
     ];
 }
 
-/** "Get confidence, visit a cycling centre": intro, the four centres as Link Cards, then the adult training call to action. */
+/**
+ * "Get confidence, visit a cycling centre": intro, the four centres as Card Grid cards (the logo is the
+ * card image), then the adult training call to action as a CTA Banner with the cyclist either side.
+ */
 function news_visit_cycling_centre(array $b, wpdb $src): array
 {
     $d = $b['attrs']['data'] ?? [];
     $n = (int) ($d['cycle_centre_links'] ?? 0);
-    $fields = ['cards' => $n];
+    $fields = ['card_style' => 'link', 'cards' => $n];
     for ($i = 0; $i < $n; $i++) {
         $page = (int) ($d["cycle_centre_links_{$i}_cycle_centre"] ?? 0);
         $fields += [
-            "cards_{$i}_logo" => $d["cycle_centre_links_{$i}_logo"] ?? '',
-            "cards_{$i}_title" => html_entity_decode((string) $src->get_var($src->prepare("SELECT post_title FROM {$src->posts} WHERE ID=%d", $page)), ENT_QUOTES),
-            "cards_{$i}_description" => '',
-            "cards_{$i}_cta_type" => 'link',
-            "cards_{$i}_link" => news_post_link($page, 'Visit'),
-            "cards_{$i}_file" => '',
-            "cards_{$i}_cta_label" => 'Download',
-            "cards_{$i}_file_size" => '',
+            "cards_{$i}_image" => $d["cycle_centre_links_{$i}_logo"] ?? '',
+            "cards_{$i}_heading_text" => html_entity_decode((string) $src->get_var($src->prepare("SELECT post_title FROM {$src->posts} WHERE ID=%d", $page)), ENT_QUOTES),
+            "cards_{$i}_heading_level" => 'h3',
+            "cards_{$i}_heading_style" => 'match',
+            "cards_{$i}_body_text" => '',
+            "cards_{$i}_body_style" => 'body',
+            "cards_{$i}_link" => news_post_link($page, 'View more'),
         ];
     }
-    $button = news_acf_block('acf/button', \App\Blocks\ButtonBlock::class, [
-        'link' => $d['cta_link'] ?? '',
-        'button_style' => 'brand',
-        'button_size' => 'large',
-        'button_align' => 'left',
-    ], 'button');
 
     return [
         news_heading_block(esc_html(trim(news_plain($d['title'] ?? '') . ': ' . news_plain($d['sub_title'] ?? ''), ': '))),
         news_paragraph_block(esc_html(news_plain($d['introduction'] ?? ''))),
-        news_acf_block('acf/link-card', \App\Blocks\LinkCard::class, $fields, 'link_card'),
-        news_heading_block(esc_html(news_plain($d['cta_title'] ?? '')), 3),
-        news_paragraph_block(esc_html(news_unwrap_lines(news_plain($d['cta_description'] ?? '')))),
-        $button,
+        news_acf_block('acf/card-grid', \App\Blocks\CardGrid::class, $fields, 'card_grid'),
+        news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
+            'layout' => 'centred',
+            'heading' => news_plain($d['cta_title'] ?? ''),
+            'body' => news_unwrap_lines(news_plain($d['cta_description'] ?? '')),
+            'link' => $d['cta_link'] ?? '',
+            'image_left' => 'cyclist',
+            'image_right' => 'cyclist',
+        ], 'cta_banner'),
     ];
 }
 
@@ -748,6 +764,49 @@ function news_latest_news(array $b, wpdb $src): array
     }
 
     return news_acf_block('acf/card-row', \App\Blocks\CardRow::class, $fields, 'card_row');
+}
+
+/**
+ * The old landing template drew an illustration above the footer from the page's own settings
+ * (a figure, an optional second figure and up to three objects). It becomes an Illustration block at the end.
+ */
+function news_footer_illustration(wpdb $src, int $id): ?array
+{
+    $figure = news_illustration_key(news_meta($src, $id, 'illustration_figure'));
+    if (! isset(\App\Blocks\Illustration::CHARACTERS[$figure])) {
+        return null;
+    }
+    $second = news_illustration_key(news_meta($src, $id, 'illustration_figure_2'));
+    $fields = ['character' => $figure, 'character_2' => isset(\App\Blocks\Illustration::CHARACTERS[$second]) ? $second : ''];
+    foreach ([1, 2, 3] as $n) {
+        $object = news_illustration_key(news_meta($src, $id, "illustration_object_$n"));
+        $fields["object_$n"] = isset(\App\Blocks\Illustration::OBJECTS[$object]) ? $object : '';
+    }
+    $fields['remove_blue_background'] = '0';
+
+    return news_acf_block('acf/illustration', \App\Blocks\Illustration::class, $fields, 'illustration');
+}
+
+/** The newsletter sign-up that closed the old landing pages: a Form block for the site's "News letter" Gravity Form. */
+function news_newsletter_form(array &$notes): ?array
+{
+    foreach (GFAPI::get_forms(null) as $form) {
+        if ($form['title'] === 'News letter') {
+            return news_acf_block('acf/form', \App\Blocks\Form::class, [
+                'layout' => 'centred',
+                'heading_highlight' => 'Stay up to date,',
+                'heading_text' => 'with news and events in the region. Join our newsletter',
+                'heading_level' => 'h2',
+                'heading_style' => 'match',
+                'intro_text' => '',
+                'intro_style' => 'body',
+                'form_id' => (int) $form['id'],
+            ], 'form');
+        }
+    }
+    $notes[] = 'no "News letter" Gravity Form, so no newsletter sign-up was added';
+
+    return null;
 }
 
 /** Accordion from the old FAQ block (question/answer repeater). */
@@ -1040,7 +1099,7 @@ function news_merge_card_grids(array $blocks, array &$notes): array
     return $out;
 }
 
-function news_transform(string $content, wpdb $src, array &$notes, bool $keepCalendars = false, bool $linkCards = false): string
+function news_transform(string $content, wpdb $src, array &$notes, bool $keepCalendars = false, bool $linkCards = false, bool $ctaHeadings = false): string
 {
     // Old card layouts are spotted by their wrapping group, so swap those
     // first; then lift every block out of its group so the loop below
@@ -1108,7 +1167,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 break;
             case 'acf/staggered-quote-cards':
                 $out[] = news_case_study_cards($src);
-                $notes[] = 'staggered quote cards (no case studies chosen) -> Case Study Grid of the latest 3';
+                $notes[] = 'staggered quote cards (no case studies chosen) -> Case Study Grid of the latest 4';
                 break;
             case 'acf/cycle-planner-rides':
                 $out[] = news_planner_rides($b);
@@ -1127,10 +1186,11 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 while ($out && news_is_blank(end($out))) {
                     array_pop($out);
                 }
-                if ($out && end($out)['blockName'] === 'core/heading') {
+                // The intro heading, or the CTA Banner it became on pages that turn headings into banners.
+                if ($out && in_array(end($out)['blockName'], ['core/heading', 'acf/cta-banner'], true)) {
                     array_pop($out);
                 }
-                $notes[] = 'acf/instagram and its intro heading dropped';
+                $notes[] = 'acf/instagram feed and its intro heading dropped';
                 break;
             case 'acf/faq':
                 $out[] = news_faq($b);
@@ -1198,8 +1258,11 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 $title = $prev && $prev['blockName'] === 'core/heading' ? news_plain($prev['innerHTML']) : '';
                 $map = news_map_embed($b, $title);
                 if (! $map && $b['blockName'] === 'core/html' && preg_match('#^\s*<h([1-6])[^>]*>(.*)</h\1>\s*$#s', $b['innerHTML'], $h)) {
-                    // A heading pasted as raw HTML.
-                    $out[] = news_heading_block(trim($h[2]), (int) $h[1]);
+                    // A centred heading pasted as raw HTML is a banner line (the homepage's "Healthier, faster…"): a CTA Banner with no images.
+                    $text = trim(preg_replace('/\s+/', ' ', news_plain(str_replace('<br>', ' ', $h[2]))));
+                    $out[] = str_contains($h[0], 'has-text-align-center')
+                        ? news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, ['layout' => 'centred', 'heading' => $text, 'body' => '', 'link' => '', 'image_left' => '', 'image_right' => ''], 'cta_banner')
+                        : news_heading_block(trim($h[2]), (int) $h[1]);
                     break;
                 }
                 $out[] = $map ?? $b;
@@ -1208,29 +1271,31 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 }
                 break;
             case 'core/heading':
-                // The homepage's "I bike it, I like it!" heading, text and button -> one centred CTA Banner.
-                if (news_plain($b['innerHTML']) === 'I bike it, I like it!') {
+                // Landing-page headings that were really call-to-action banners: heading, the text under it
+                // and an optional button, with the illustration named in NEWS_CTA_HEADINGS (or none).
+                $cta = NEWS_CTA_HEADINGS[preg_replace('/\s+/', '', strtolower(news_plain($b['innerHTML'])))] ?? ($ctaHeadings ? '' : null);
+                if ($cta !== null) {
                     $rest = [];
                     for ($j = $i + 1; $j < count($in) && count($rest) < 2; $j++) {
                         if (! news_is_blank($in[$j])) {
                             $rest[] = $in[$j];
                         }
                     }
-                    if (($rest[0]['blockName'] ?? null) === 'core/paragraph' && ($rest[1]['blockName'] ?? null) === 'core/buttons') {
-                        $button = news_buttons($rest[1])[0] ?? null;
-                        $out[] = news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
-                            'layout' => 'centred',
-                            'heading' => news_plain($b['innerHTML']),
-                            'body' => news_unwrap_lines(news_plain($rest[0]['innerHTML'])),
-                            'link' => $button['attrs']['data']['link'] ?? '',
-                            'image_left' => 'bmx',
-                            'image_right' => '',
-                        ], 'cta_banner');
-                        while ($i < count($in) - 1 && $in[$i] !== $rest[1]) {
-                            $i++;
-                        }
-                        break;
+                    $paragraph = ($rest[0]['blockName'] ?? null) === 'core/paragraph' ? $rest[0] : null;
+                    $button = $paragraph && ($rest[1]['blockName'] ?? null) === 'core/buttons' ? (news_buttons($rest[1])[0] ?? null) : null;
+                    $out[] = news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
+                        'layout' => 'centred',
+                        'heading' => trim(preg_replace('/\s+/', ' ', news_plain(str_replace('<br>', ' ', $b['innerHTML'])))),
+                        'body' => $paragraph ? news_unwrap_lines(news_plain($paragraph['innerHTML'])) : '',
+                        'link' => $button['attrs']['data']['link'] ?? '',
+                        'image_left' => $cta,
+                        'image_right' => '',
+                    ], 'cta_banner');
+                    $last = $button ? $rest[1] : $paragraph;
+                    while ($last && $i < count($in) - 1 && $in[$i] !== $last) {
+                        $i++;
                     }
+                    break;
                 }
                 $out[] = news_clean_text($b);
                 break;
@@ -1412,6 +1477,15 @@ const NEWS_CF7_FIXES = [
     // The "Your Name" field is a textarea sharing your-message with the real message.
     3671 => ['Your Name' => ['type' => 'text', 'name' => 'your-name']],
 ];
+
+/** Landing-page headings (lower-cased, spaces removed) that become a CTA Banner with the text under them: the illustration on the left, or none. */
+const NEWS_CTA_HEADINGS = [
+    'ibikeit,ilikeit!' => 'bmx',
+    'explorewaystogetabike' => '',
+];
+
+/** Landing pages where every heading is a CTA Banner (heading, any text under it, no images). */
+const NEWS_CTA_HEADING_PAGES = [241];
 
 /** Pages whose cards are all downloads/links to elsewhere: every card layout becomes Link Cards. */
 const NEWS_LINK_CARD_PAGES = [701];
@@ -1944,7 +2018,7 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
 {
     $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
     $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
-    $blocks = parse_blocks(news_transform($row->post_content, $src, $notes, false, in_array($id, NEWS_LINK_CARD_PAGES, true)));
+    $blocks = parse_blocks(news_transform($row->post_content, $src, $notes, false, in_array($id, NEWS_LINK_CARD_PAGES, true), in_array($id, NEWS_CTA_HEADING_PAGES, true)));
 
     $h2s = 0;
     $walk = function (array $list) use (&$walk, &$h2s) {
@@ -1960,6 +2034,22 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
     // Every page uses Sticky Nav, as on the live site (pages without H2s just have no menu), which draws
     // its own breadcrumbs. Landing pages are full width and stay on the default template.
     $landing = in_array($id, NEWS_LANDING_PAGES, true);
+    // The landing template's header text and link (Why cycle: "Tell us why you like riding a bike on
+    // Instagram" / the hashtag) sat in a banner under the hero: a Row CTA Banner, like the homepage's.
+    if ($landing && ($headerText = trim(news_meta($src, $id, 'page_header_text')))) {
+        array_unshift($blocks, news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, [
+            'layout' => 'row',
+            'heading' => news_plain($headerText),
+            'body' => '',
+            'link' => maybe_unserialize(news_meta($src, $id, 'page_header_link')) ?: '',
+        ], 'cta_banner'));
+    }
+    if ($landing && ($footer = news_footer_illustration($src, $id))) {
+        $blocks[] = $footer;
+    }
+    if ($landing && ($newsletter = news_newsletter_form($notes))) {
+        $blocks[] = $newsletter;
+    }
     $hero = in_array($blocks[0]['blockName'] ?? null, \App\Support\ContentHero::HERO_BLOCKS, true) ? '' : serialize_block(news_page_hero($row->post_title, $thumb, $landing)) . "\n\n";
 
     return [

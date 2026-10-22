@@ -39,6 +39,7 @@ never touches the old site itself, and it only writes to this site's database.
 | Columns with no images | Unwrapped: the blocks keep their order but lose the side-by-side layout |
 | Heading `h3`/`h4` class, centred text | Class and alignment dropped; the heading level stays |
 | `acf/form` / Contact Form 7 selector | Form block with the form rebuilt in Gravity Forms (see below) |
+| Landing pages (Homepage 220, Why cycle 241) | Video Hero with the planner widget; Row CTA Banner for the blue strip and for Why cycle's Instagram hashtag banner; carousels become Rolling Stats Carousels (a link is added after the statement); "plan a bike ride" is Two Column Content with the cycle planner picture (found by file name); "Explore ways to get a bike", "I bike it, I like it!" and the raw-HTML "Healthier, faster…" line are CTA Banners; on Why cycle every heading is a CTA Banner; quote cards are a Case Study Grid of the latest four; rides are a route Card Row; events an Icon Link Grid; cycling centres a Card Grid then a CTA Banner; latest news a news Card Row; the page's own illustration settings become a closing Illustration; the "News letter" Gravity Form closes the page. The Instagram feed and its intro heading are dropped |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 
