@@ -56,6 +56,21 @@
           @if (! empty($slide['source']))
             <p class="c-rolling-stats-carousel__source u-body-regular">{{ $slide['source'] }}</p>
           @endif
+
+          @if (! empty($slide['link']['url']))
+            <wa-button
+              class="c-rolling-stats-carousel__cta"
+              variant="brand"
+              appearance="accent"
+              pill
+              with-end
+              href="{{ $slide['link']['url'] }}"
+              @if (($slide['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
+            >
+              {{ $slide['link']['title'] ?: __('Find out more', 'sage') }}
+              <x-icon name="arrow-right" slot="end" />
+            </wa-button>
+          @endif
         </div>
       </wa-carousel-item>
     @endforeach
