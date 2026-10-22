@@ -138,7 +138,7 @@ class Form extends Block
         'multiple' => true,
         'jsx' => true,
         'color' => [
-            'background' => false,
+            'background' => true,
             'text' => false,
             'gradients' => false,
         ],
@@ -215,8 +215,10 @@ class Form extends Block
             'heading' => $this->heading(),
             'subheading' => $this->subheading(),
             'intro' => $this->intro(),
+            'imageType' => $this->resolveField('image_type', 'photo'),
             'image' => $this->image(),
             'imagePosition' => $this->imagePosition(),
+            'illustration' => $this->illustration(),
         ];
     }
 
@@ -277,12 +279,23 @@ class Form extends Block
             ],
         ]);
 
+        $fields->addButtonGroup('image_type', [
+            'label' => 'Picture',
+            'instructions' => 'A photo, or one of the illustrations. The block\'s background colour (set in the sidebar) sits behind either.',
+            'choices' => [
+                'photo' => 'Photo',
+                'illustration' => 'Illustration',
+            ],
+            'default_value' => 'photo',
+        ]);
+
         $fields->addImage('image', [
             'label' => 'Image',
             'instructions' => 'Shown alongside the form.',
             'return_format' => 'array',
             'preview_size' => 'medium',
             'required' => 1,
+            'conditional_logic' => [[['field' => 'image_type', 'operator' => '==', 'value' => 'photo']]],
         ]);
 
         $fields->addSelect('image_position', [
@@ -291,6 +304,15 @@ class Form extends Block
             'choices' => $this->imagePositions,
             'default_value' => 'center',
             'ui' => true,
+            'conditional_logic' => [[['field' => 'image_type', 'operator' => '==', 'value' => 'photo']]],
+        ]);
+
+        $fields->addSelect('illustration', [
+            'label' => 'Illustration',
+            'choices' => array_map(fn($item) => $item[0], Illustration::CHARACTERS),
+            'default_value' => 'mountain_biker',
+            'ui' => true,
+            'conditional_logic' => [[['field' => 'image_type', 'operator' => '==', 'value' => 'illustration']]],
         ]);
 
         $fields->addTab('Form');
@@ -349,6 +371,18 @@ class Form extends Block
         $position = get_field('image_position');
 
         return isset($this->imagePositions[$position]) ? str_replace('_', ' ', $position) : 'center';
+    }
+
+    /**
+     * Retrieve the chosen illustration's URL, or null.
+     *
+     * @return string|null
+     */
+    public function illustration()
+    {
+        $file = Illustration::CHARACTERS[get_field('illustration')][1] ?? null;
+
+        return $file ? Vite::asset('resources/images/illustrations/' . $file) : null;
     }
 
     /**

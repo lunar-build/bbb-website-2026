@@ -1,11 +1,17 @@
-  <section {{ $attributes->class(['c-form', 'c-form--'.$layout]) }}>
+  <section {{ $attributes->class(['c-form', 'c-form--'.$layout, 'o-full-bleed-bg']) }}>
 
   @if ($layout === 'image')
     <div class="c-form__panel">
       <div class="o-container">
-        <div class="c-form__image">
-          <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
-        </div>
+        @if ($imageType === 'illustration' && $illustration)
+          <div class="c-form__image c-form__image--illustration">
+            <img src="{{ $illustration }}" alt="" aria-hidden="true">
+          </div>
+        @else
+          <div class="c-form__image">
+            <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
+          </div>
+        @endif
 
         <div class="c-form__inner">
           <div class="c-form__content">
