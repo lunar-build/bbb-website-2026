@@ -25,17 +25,14 @@
   }
 }
 
-// No H2s, so no menu: keep the same content column, with the menu's column left empty.
+// No H2s, so no menu: one full-width column inside the page container.
 .c-sticky-nav-template--no-menu {
   grid-template-areas:
     'crumbs'
     'content';
 
   @include bp.respond($min: bp.$lg) {
-    grid-template-areas:
-      '. crumbs'
-      '. content';
-    grid-template-columns: 16.875rem minmax(0, 1fr); // .c-sticky-page-menu's width
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

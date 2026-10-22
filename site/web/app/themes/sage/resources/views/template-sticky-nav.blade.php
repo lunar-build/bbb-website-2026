@@ -35,8 +35,8 @@
     {!! $hero !!}
 
     <div class="o-container">
-      {{-- No H2 headings means no page menu (App\Support\PageMenu returns []): the layout
-      stays, with the menu's column left empty, so these pages match the rest. --}}
+      {{-- No H2 headings means no page menu (App\Support\PageMenu returns []): the content takes
+      the full container width instead of the column beside the menu. --}}
       <div class="c-sticky-nav-template @if (! count($pageMenuItems)) c-sticky-nav-template--no-menu @endif">
         <div class="c-sticky-nav-template__crumbs">
           <x-breadcrumbs :items="App\Support\Breadcrumbs::forPost()" />
