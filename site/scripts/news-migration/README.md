@@ -96,9 +96,9 @@ linking to them survive.
 
 `pages` copies every other published page, keeping IDs, parents, menu order and
 URLs. Each gets a hero in front (an Image Hero from the featured image, else a
-Text Hero) and its content converted like a post's. Pages with four or more H2s
-move onto the Sticky Nav template, which builds its menu from them; `check`
-prints each page's H2 count. Reusable blocks (`core/block`) are inlined so their
+Text Hero) and its content converted like a post's. Every page goes on the Sticky Nav
+template, as on the live site; its menu is built from the H2s, and pages without
+any just have no menu. `check` prints each page's H2 count. Reusable blocks (`core/block`) are inlined so their
 content is converted too. Re-runs replace earlier imports in place, so nav menu
 items linking to the pages survive.
 

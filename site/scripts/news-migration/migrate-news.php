@@ -19,8 +19,8 @@
  *                IDs and URLs; featured image becomes an Image Hero; also rebuilds the bike pump
  *                fault form in Gravity Forms + its page; run after `attachments`
  *   pages        copy every other published page (optionally only comma-separated ids), keeping IDs,
- *                parents and menu order; adds a hero, picks the Sticky Nav template for pages with
- *                4+ H2s; run after `attachments`
+ *                parents and menu order; adds a hero and puts the page on the Sticky Nav template
+ *                (menu from the H2s); run after `attachments`
  *
  * Env:
  *   NEWS_SOURCE_DB        source database name (default prod_scratch)
@@ -1073,9 +1073,6 @@ const NEWS_PAGES_DEFERRED = [220, 241];
 /** Pages whose cards are all downloads/links to elsewhere: every card layout becomes Link Cards. */
 const NEWS_LINK_CARD_PAGES = [701];
 
-/** Sticky Nav suits long pages: this many H2s or more. */
-const NEWS_STICKY_NAV_H2S = 4;
-
 /**
  * Published pages the `pages` mode copies: everything except what other modes own
  * (map-pages, cycling-centre), the skip list and the held-back landing pages.
@@ -1173,7 +1170,7 @@ if ($mode === 'check') {
         echo "  $name $count\n";
     }
     $pages = news_page_ids($src, $only);
-    echo "\nPages (" . count($pages) . ") — local ID collisions, then template and H2 count (4+ H2s => Sticky Nav):\n";
+    echo "\nPages (" . count($pages) . ") — local ID collisions, then H2 count (the Sticky Nav menu's items):\n";
     $pageClash = array_filter(news_taken($pages), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     foreach ($pageClash ?: [null] as $r) {
         echo $r ? "  CLASH {$r->ID} {$r->post_type} \"{$r->post_title}\"\n" : "  no collisions\n";
@@ -1186,7 +1183,7 @@ if ($mode === 'check') {
         foreach ($ignored as $n) {
             $pageNotes[] = "$id: $n";
         }
-        echo "  $id " . ($page['template'] ? 'sticky-nav' : 'default') . " ({$page['h2s']} H2s)\n";
+        echo "  $id ({$page['h2s']} H2s)\n";
     }
     echo "\nPage transform notes:\n  " . (implode("\n  ", array_unique($pageNotes)) ?: 'none') . "\n";
     echo "\nUnknown ACF field keys:\n  " . (implode("\n  ", array_unique($bad)) ?: 'none') . "\n";
@@ -1429,7 +1426,7 @@ function news_page_hero(string $title, int $thumb, bool $breadcrumbs = true): ar
 
 /**
  * A page's converted content with its hero in front, plus the template it should use.
- * Pages with enough H2s go on Sticky Nav, which builds its menu from them.
+ * Every page goes on Sticky Nav, which builds its menu from the H2s (none = no menu).
  *
  * @return array{content: string, template: string, h2s: int}
  */
@@ -1450,12 +1447,11 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
     };
     $walk($blocks);
 
-    // Sticky Nav draws its own breadcrumbs, so the hero's would show twice.
-    $sticky = $h2s >= NEWS_STICKY_NAV_H2S;
-
+    // Every page uses Sticky Nav, as on the live site (pages without H2s just have no menu).
+    // It draws its own breadcrumbs, so the hero's would show twice.
     return [
-        'content' => $replaceUrls(serialize_block(news_page_hero($row->post_title, $thumb, ! $sticky)) . "\n\n" . serialize_blocks($blocks)),
-        'template' => $sticky ? 'template-sticky-nav.blade.php' : '',
+        'content' => $replaceUrls(serialize_block(news_page_hero($row->post_title, $thumb, false)) . "\n\n" . serialize_blocks($blocks)),
+        'template' => 'template-sticky-nav.blade.php',
         'h2s' => $h2s,
     ];
 }
