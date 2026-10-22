@@ -174,6 +174,7 @@ class TextBanner extends Block
     public $example = [
         'heading' => '<p><strong>Explore</strong><br>ways to get a bike</p>',
         'heading_level' => 'h2',
+        'heading_style' => 'h3',
         'body' => '<p>There are so many ways to get a bike, discover one that suits you best.</p>',
         'alignment' => 'centre',
     ];
@@ -186,6 +187,7 @@ class TextBanner extends Block
         return [
             'heading' => $this->heading(),
             'headingTag' => $this->headingTag(),
+            'headingClass' => $this->headingClass(),
             'body' => $this->clean($this->resolveField('body', '')),
             'alignment' => $this->resolveField('alignment', 'centre'),
         ];
@@ -203,13 +205,28 @@ class TextBanner extends Block
     }
 
     /**
-     * The tag the heading is output as: h2 to h4, or a plain div when it's only styled text.
+     * The tag the heading is output as: h1 to h6, or a plain div when it's only styled text.
      */
     protected function headingTag(): string
     {
         $level = $this->resolveField('heading_level', 'h2');
 
-        return in_array($level, ['h2', 'h3', 'h4'], true) ? $level : 'div';
+        return preg_match('/^h[1-6]$/', $level) ? $level : 'div';
+    }
+
+    /**
+     * The size class: the chosen visual style, else the level's own size (a plain div, which has no size, gets Heading 3's).
+     */
+    protected function headingClass(): string
+    {
+        $style = $this->resolveField('heading_style', 'h3');
+        $level = $this->resolveField('heading_level', 'h2');
+
+        if ($style && $style !== 'match') {
+            return 'u-heading-' . substr($style, 1);
+        }
+
+        return 'u-heading-' . (preg_match('/^h([1-6])$/', $level, $m) ? min(5, (int) $m[1]) : 3);
     }
 
     /**
@@ -237,21 +254,38 @@ class TextBanner extends Block
         $fields
             ->addWysiwyg('heading', [
                 'label' => 'Heading',
-                'instructions' => 'The large text. Select words and use Bold to make them stand out (shown bold and in blue). Shift+Enter makes a line break. The background colour is set in the block sidebar.',
+                'instructions' => 'The large text. Select words and use Bold or Italic to make them stand out (bold is shown in blue). Shift+Enter makes a line break. The background colour is set in the block sidebar.',
                 'tabs' => 'visual',
                 'toolbar' => 'basic',
                 'media_upload' => 0,
             ])
             ->addSelect('heading_level', [
                 'label' => 'Heading level',
-                'instructions' => 'Use a heading level when the text introduces the content below it. Choose "Not a heading" for a standalone statement, so screen readers and the page outline don\'t treat it as a section.',
+                'instructions' => 'Semantic HTML heading level: choose it for the page\'s outline, not for how big it should look. Choose "Not a heading" for a standalone statement, so screen readers and the page outline don\'t treat it as a section.',
                 'choices' => [
-                    'h2' => 'Heading 2',
-                    'h3' => 'Heading 3',
-                    'h4' => 'Heading 4',
+                    'h1' => 'H1',
+                    'h2' => 'H2',
+                    'h3' => 'H3',
+                    'h4' => 'H4',
+                    'h5' => 'H5',
+                    'h6' => 'H6',
                     'none' => 'Not a heading (just styled text)',
                 ],
                 'default_value' => 'h2',
+                'ui' => true,
+            ])
+            ->addSelect('heading_style', [
+                'label' => 'Visual style',
+                'instructions' => 'How big the heading looks, without changing its level, the same sizes as every other heading.',
+                'choices' => [
+                    'match' => 'Match level',
+                    'h1' => 'Heading 1 size',
+                    'h2' => 'Heading 2 size',
+                    'h3' => 'Heading 3 size',
+                    'h4' => 'Heading 4 size',
+                    'h5' => 'Heading 5 / 6 size',
+                ],
+                'default_value' => 'h3',
                 'ui' => true,
             ])
             ->addWysiwyg('body', [
