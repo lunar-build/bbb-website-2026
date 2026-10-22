@@ -45,6 +45,8 @@
     flex-direction: column;
     padding: 0 19px;
     margin-top: 28px;
+    // Gap above the button; the button's own top margin is `auto` (below), so it can't also hold this.
+    margin-bottom: 20px;
   }
 
   &__info-row {
@@ -88,7 +90,8 @@
     align-self: center;
     align-items: center;
     gap: 10px;
-    margin: 20px 0 26px;
+    // Auto top margin pins the button to the card's bottom, so buttons line up across a row of cards.
+    margin: auto 0 26px;
     padding: 10px 16px;
     border: 2px solid var(--wp--preset--color--charcoal);
     border-radius: 999px;
