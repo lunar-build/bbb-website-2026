@@ -585,7 +585,7 @@ function news_planner_cta(array $b): array
         return news_acf_block('acf/cta-banner', \App\Blocks\CtaBanner::class, ['layout' => 'left', 'heading' => $heading, 'body' => $body, 'link' => $d['cta_link'] ?? '', 'image' => ''], 'cta_banner');
     }
 
-    return news_acf_block('acf/two-column-content', \App\Blocks\TwoColumnContent::class, [
+    $banner = news_acf_block('acf/two-column-content', \App\Blocks\TwoColumnContent::class, [
         'left' => ['image'],
         'left_0_image' => $image,
         'right' => ['text'],
@@ -604,6 +604,10 @@ function news_planner_cta(array $b): array
         'right_body_style' => 'field_two_column_content_right_text_body_style',
         'right_link' => 'field_two_column_content_right_text_link',
     ]);
+    // The old section had the light blue full-width background.
+    $banner['attrs']['backgroundColor'] = 'blue-light';
+
+    return $banner;
 }
 
 /**
@@ -1507,6 +1511,9 @@ const CC_PAGES = [308, 309, 796];
 /** Pages `pages` mode leaves alone: the old News archive, and CF7 leftovers (test page, thank-you, survey). */
 const NEWS_PAGES_SKIP = [59, 1985, 1550, 1717];
 
+/** Hash of the content a page was imported with: a re-run skips pages whose content has changed since (edited by hand), unless NEWS_FORCE=1. */
+const NEWS_IMPORT_HASH_META = '_news_import_hash';
+
 /** Landing pages (Homepage, Why cycle): full-width blocks, so the default template rather than Sticky Nav. */
 const NEWS_LANDING_PAGES = [220, 241];
 
@@ -2122,8 +2129,15 @@ if ($mode === 'pages') {
 
     foreach ($ids as $id) {
         $id = (int) $id;
-        // Re-running replaces earlier imports in place (keeps nav menu items pointing at the page).
+        // Re-running replaces earlier imports in place (keeps nav menu items pointing at the page), but not
+        // a page someone has edited since: its content no longer matches the hash stored at import.
         if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            $hash = get_post_meta($id, NEWS_IMPORT_HASH_META, true);
+            if ($hash && $hash !== md5((string) get_post_field('post_content', $id, 'raw')) && ! getenv('NEWS_FORCE')) {
+                echo "skipped $id (edited since it was imported; NEWS_FORCE=1 to overwrite it)\n";
+
+                continue;
+            }
             news_remove_page_import($id);
         }
         $notes = [];
@@ -2135,6 +2149,7 @@ if ($mode === 'pages') {
             update_post_meta($id, '_wp_page_template', $page['template']);
         }
         clean_post_cache($id);
+        update_post_meta($id, NEWS_IMPORT_HASH_META, md5((string) get_post_field('post_content', $id, 'raw')));
         echo "imported $id" . ($page['template'] ? ' (sticky nav)' : '') . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
     }
     WP_CLI::success(count($ids) . ' pages imported.');

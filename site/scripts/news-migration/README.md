@@ -159,6 +159,11 @@ first. Finished events still show their date ("Date … This event has
 finished"). Sessions that `cycling-centre` imports without timetable slots
 are flagged `_event_undated`, so their placeholder date is never shown.
 
+`pages` skips a page that has been edited since it was imported: it stores a hash of the imported
+content, and a re-run leaves any page whose content no longer matches (and says so). Set
+`NEWS_FORCE=1` in front of the command to overwrite it anyway. Pages imported before this was added
+have no hash, so their first re-run replaces them.
+
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item
 or revision already uses one of the old site's IDs, `posts` and `attachments`
