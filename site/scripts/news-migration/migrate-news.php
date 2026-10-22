@@ -537,9 +537,9 @@ function news_latest(wpdb $src, string $type, int $count): array
     return $src->get_results($src->prepare("SELECT ID, post_title FROM {$src->posts} WHERE post_type=%s AND post_status='publish' ORDER BY post_date DESC LIMIT %d", $type, $count));
 }
 
-function news_post_link(int $id, string $label = ''): array
+function news_post_link(wpdb $src, int $id, string $label = ''): array
 {
-    return ['title' => $label, 'url' => home_url('/?p=' . $id), 'target' => ''];
+    return ['title' => $label, 'url' => news_permalink($src, $id), 'target' => ''];
 }
 
 function news_meta(wpdb $src, int $id, string $key): string
@@ -681,7 +681,7 @@ function news_case_study_cards(wpdb $src): array
             "cards_{$i}_quote" => news_unwrap_lines(news_plain(news_meta($src, $study->ID, 'quote'))),
             "cards_{$i}_name" => html_entity_decode($study->post_title, ENT_QUOTES),
             "cards_{$i}_info" => implode(', ', array_map('html_entity_decode', $tags)),
-            "cards_{$i}_link" => news_post_link($study->ID, 'Read more'),
+            "cards_{$i}_link" => news_post_link($src, $study->ID, 'Read more'),
         ];
     }
 
@@ -760,7 +760,7 @@ function news_visit_cycling_centre(array $b, wpdb $src): array
             "cards_{$i}_heading_style" => 'match',
             "cards_{$i}_body_text" => '',
             "cards_{$i}_body_style" => 'body',
-            "cards_{$i}_link" => news_post_link($page, 'View more'),
+            "cards_{$i}_link" => news_post_link($src, $page, 'View more'),
         ];
     }
 
@@ -790,7 +790,7 @@ function news_latest_news(array $b, wpdb $src): array
             "news_cards_{$i}_image" => news_meta($src, $post->ID, '_thumbnail_id'),
             "news_cards_{$i}_tag" => html_entity_decode((string) $category, ENT_QUOTES),
             "news_cards_{$i}_title" => html_entity_decode($post->post_title, ENT_QUOTES),
-            "news_cards_{$i}_link" => news_post_link($post->ID, 'Read more'),
+            "news_cards_{$i}_link" => news_post_link($src, $post->ID, 'Read more'),
         ];
     }
 
