@@ -286,17 +286,29 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 add_filter('get_the_archive_title_prefix', '__return_empty_string');
 
 /**
- * URL structure, pinned in code so every environment matches with no Settings → Permalinks step
- * (Settings there shows these values; saving it changes nothing).
- *
- * The structure is plain /%postname%/, so pages and custom post types (case studies, events…) keep
- * their own URLs. Only news belongs under /news/ — to keep the live betterbybike.info URLs, posts
- * (/news/{slug}/) and categories/tags (/news/category/…, /news/tag/…) get it back below. A post
- * reached at /{slug}/ redirects to its /news/ URL. Needs a rewrite flush after deploy.
+ * URL structure. Settings → Permalinks must be "Post name" (/%postname%/), set per environment, so pages
+ * and custom post types (case studies, events…) keep their own URLs. Only news belongs under /news/ — to
+ * keep the live betterbybike.info URLs, posts (/news/{slug}/) and categories/tags (/news/category/…,
+ * /news/tag/…) get it back below, which the Permalinks screen can't express (so its "sample-post" example
+ * doesn't show /news/). A post reached at /{slug}/ redirects to its /news/ URL. Needs a rewrite flush
+ * after deploy.
  */
-add_filter('pre_option_permalink_structure', fn() => '/%postname%/');
-add_filter('pre_option_category_base', fn() => 'news/category');
-add_filter('pre_option_tag_base', fn() => 'news/tag');
+$onPostName = fn() => get_option('permalink_structure') === '/%postname%/';
+
+// The category/tag bases are only right without a /news/ front, so they apply only on Post name.
+add_filter('pre_option_category_base', fn($pre) => $onPostName() ? 'news/category' : $pre);
+add_filter('pre_option_tag_base', fn($pre) => $onPostName() ? 'news/tag' : $pre);
+
+add_action('admin_notices', function () use ($onPostName) {
+    if ($onPostName() || ! current_user_can('manage_options')) {
+        return;
+    }
+
+    printf(
+        '<div class="notice notice-warning"><p>%s</p></div>',
+        wp_kses_post(__('Set <a href="options-permalink.php">Settings → Permalinks</a> to <strong>Post name</strong>. News URLs (/news/…) depend on it.', 'sage')),
+    );
+});
 
 // Core builds a post's URL from the structure alone, so this is what puts posts under /news/.
 add_filter('pre_post_link', fn($permalink, $post) => $post->post_type === 'post' ? '/news/%postname%/' : $permalink, 10, 2);

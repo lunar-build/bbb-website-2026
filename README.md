@@ -125,7 +125,7 @@ How it works:
 
 Events in the **Bristol Cycling Centre** category are served at `/cycling-centres/bristol-cycling-centre/whats-on/{slug}/`, matching the old site (`app/filters.php`), and all other events at `/events/{slug}/`. After deploying, flush permalinks (`wp rewrite flush`).
 
-The permalink structure is pinned in code (`app/filters.php`) as `/%postname%/`, with `/news/` added back for posts (`/news/{slug}/`) and categories (`/news/category/...`) and event categories at `/events/category/{slug}/`, so every URL matches the old site and Settings → Permalinks needs no setting. To compare the new site against the live sitemaps, run `php scripts/url-parity/check.php` from `/site` (`--base=` for another environment).
+Settings → Permalinks must be **Post name** on every environment; `app/filters.php` then adds `/news/` back for posts (`/news/{slug}/`) and categories (`/news/category/...`) and event categories at `/events/category/{slug}/`, so every URL matches the old site (the Permalinks screen's `sample-post` example won't show `/news/`; an admin notice warns if the structure isn't Post name). To compare the new site against the live sitemaps, run `php scripts/url-parity/check.php` from `/site` (`--base=` for another environment).
 
 **Event Status** (MEC's SEO Schema tab): *Cancelled* and *Postponed* events drop off the What's on timetable, and their page shows a notice (the cancellation reason too, if "display" is ticked). *Rescheduled* shows a notice only. **Hide Event Time** hides the time line on an event page; it no longer reads "All day". An event timetable's weekday tabs show only its weekly pattern, so one-off extras appear in the by-date view only.
 
