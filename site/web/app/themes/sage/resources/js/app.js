@@ -16,4 +16,5 @@ import './map-listing.js';
 import './rolling-stats-carousel.js';
 import './media-gallery.js';
 import './testimonial-carousel.js';
+import './gravity-forms.js';
 import '../styles/app.scss';

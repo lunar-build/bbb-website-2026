@@ -38,6 +38,7 @@ never touches the old site itself, and it only writes to this site's database.
 | Hard-wrapped text (a newline every few words, from Word) | Lines joined in card text, callouts, accordions, timelines and quotes, and mid-sentence line breaks in paragraphs. Blank lines stay paragraph breaks and address line breaks stay |
 | Columns with no images | Unwrapped: the blocks keep their order but lose the side-by-side layout |
 | Heading `h3`/`h4` class, centred text | Class and alignment dropped; the heading level stays |
+| `acf/form` / Contact Form 7 selector | Form block with the form rebuilt in Gravity Forms (see below) |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 
@@ -108,6 +109,18 @@ the pump fault page), the News archive (59), the Contact Form 7 leftovers
 (1550 Thank you, 1717 survey, 1985 test) and the two landing pages (220
 Homepage, 241 Why cycle), which wait for their own conversions. Blocks without a
 conversion yet still show in `check` under "Old-theme blocks left".
+
+**Forms.** The old site's Contact Form 7 forms are rebuilt as Gravity Forms and the Form block is put
+where the old form was (centred, no heading: the page has its own). Fields, required flags, the
+submit button text, the mail recipients, sender, subject, body and the confirmation message come from
+the old form; CF7 tags become Gravity Forms merge tags and the first email field becomes the
+reply-to. Forms are matched by title, so a re-run updates them in place (and keeps their IDs). Only
+the forms pages actually use are converted (`NEWS_CF7_FORMS`): Bristol Cycling Centre Contact,
+Register Event, Contact Page, Volunteering and School Bikeability Enquiry, plus the pump fault form
+built by `map-pages`. The old forms nothing uses (newsletter, adult cycle training, order a map, cycle
+map feedback, bike hangars, and the schools form 2420 which has duplicate field names) are left out.
+"School Bikeability Enquiry" is old form 2429, labelled TEST but the one the page uses. `check` and
+`preview` never create forms.
 
 `cycling-centre` copies the old Bristol Cycling Centre sessions
 (`cycling_centre_event`) into Modern Events Calendar as `mec-events`, keeping
