@@ -1,0 +1,56 @@
+// Figma statement banner: centred light heading text with any words the editor bolds picked out, and
+// optional normal-size body text under it. The block's background colour comes from the sidebar
+// (theme_block_background_colors()); --c-block-fg is the contrasting text colour set for it.
+.c-text-banner__inner {
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: center;
+  color: var(--c-block-fg, var(--wp--preset--color--blue-dark));
+
+  p {
+    margin: 0;
+  }
+
+  p + p {
+    margin-top: 1rem;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+.c-text-banner__inner--left {
+  margin-inline: 0;
+  text-align: left;
+}
+
+// Size comes from the heading's own u-heading-* class (level, or the chosen visual style); the
+// banner look is light text with the bold words picked out.
+.c-text-banner__heading {
+  margin: 0;
+  font-weight: 400;
+
+  strong,
+  b {
+    font-weight: 700;
+    color: var(--c-block-emphasis, var(--wp--preset--color--blue));
+  }
+}
+
+.c-text-banner__body {
+  margin-top: 1.5rem;
+
+  // Bold in the body is just bold.
+  strong,
+  b {
+    font-weight: 700;
+  }
+}
+
+// On the dark backgrounds the bold words follow the text colour: Blue on Blue wouldn't show.
+.c-text-banner:is(.has-blue-background-color, .has-blue-dark-background-color) {
+  --c-block-emphasis: var(--c-block-fg);
+}

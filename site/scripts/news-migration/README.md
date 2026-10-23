@@ -39,6 +39,7 @@ never touches the old site itself, and it only writes to this site's database.
 | Columns with no images | Unwrapped: the blocks keep their order but lose the side-by-side layout |
 | Heading `h3`/`h4` class, centred text | Class and alignment dropped; the heading level stays |
 | `acf/form` / Contact Form 7 selector | Form block with the form rebuilt in Gravity Forms (see below) |
+| Landing pages (Homepage 220, Why cycle 241) | Video Hero with the planner widget; Row CTA Banner for the blue strip and for Why cycle's Instagram hashtag banner; carousels become Rolling Stats Carousels (a slide's link becomes its button); "plan a bike ride" is Two Column Content with the cycle planner picture (found by file name); "Explore ways to get a bike", "I bike it, I like it!" and the raw-HTML "Healthier, faster…" line are CTA Banners; on Why cycle every heading is a CTA Banner; quote cards are a Case Study Grid of the latest four; rides are a route Card Row; events an Icon Link Grid; cycling centres a Card Grid then a CTA Banner; latest news a news Card Row; the page's own illustration settings become a closing Illustration; the "News letter" Gravity Form closes the page. The Instagram feed and its intro heading are dropped |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 
@@ -157,6 +158,11 @@ Bristol Cycling Centre location. With no ids it imports every event, newest
 first. Finished events still show their date ("Date … This event has
 finished"). Sessions that `cycling-centre` imports without timetable slots
 are flagged `_event_undated`, so their placeholder date is never shown.
+
+`pages` skips a page that has been edited since it was imported: it stores a hash of the imported
+content, and a re-run leaves any page whose content no longer matches (and says so). Set
+`NEWS_FORCE=1` in front of the command to overwrite it anyway. Pages imported before this was added
+have no hash, so their first re-run replaces them.
 
 Before a write mode copies rows under the old site's IDs, it deletes any local revision, auto-draft
 or trashed row sitting on those IDs (they're never content). Anything else on a clashing ID makes the
