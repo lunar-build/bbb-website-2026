@@ -15,9 +15,11 @@
 
         <div class="c-form__inner">
           <div class="c-form__content">
-            <x-heading :level="$heading['level']" :style="$heading['style']" @class(['c-form__heading', 'c-form__heading--has-highlight' => $headingHighlight])>
-              @if ($headingHighlight)<strong class="c-form__heading-highlight">{{ $headingHighlight }}</strong> @endif{{ $heading['text'] }}
-            </x-heading>
+            @if (! empty($heading['text']) || $headingHighlight)
+              <x-heading :level="$heading['level']" :style="$heading['style']" @class(['c-form__heading', 'c-form__heading--has-highlight' => $headingHighlight])>
+                @if ($headingHighlight)<strong class="c-form__heading-highlight">{{ $headingHighlight }}</strong> @endif{{ $heading['text'] }}
+              </x-heading>
+            @endif
             @if (! empty($subheading['text']))
               <x-heading :level="$subheading['level']" :style="$subheading['style']">
                 {{ $subheading['text'] }}
@@ -36,7 +38,7 @@
                 {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
               </p>
             @else
-              @php gravity_form($formId, false, false, false, null, false, 0, true); @endphp
+              @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
             @endif
           </div>
         </div>
@@ -46,9 +48,11 @@
     <div class="o-container">
       <div class="c-form__inner">
         <div class="c-form__content">
-          <x-heading :level="$heading['level']" :style="$heading['style']" @class(['c-form__heading', 'c-form__heading--has-highlight' => $headingHighlight])>
-            @if ($headingHighlight)<strong class="c-form__heading-highlight">{{ $headingHighlight }}</strong> @endif{{ $heading['text'] }}
-          </x-heading>
+          @if (! empty($heading['text']) || $headingHighlight)
+            <x-heading :level="$heading['level']" :style="$heading['style']" @class(['c-form__heading', 'c-form__heading--has-highlight' => $headingHighlight])>
+              @if ($headingHighlight)<strong class="c-form__heading-highlight">{{ $headingHighlight }}</strong> @endif{{ $heading['text'] }}
+            </x-heading>
+          @endif
           @if (! empty($subheading['text']))
             <x-heading :level="$subheading['level']" :style="$subheading['style']">
               {{ $subheading['text'] }}
@@ -67,7 +71,7 @@
               {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
             </p>
           @else
-            @php gravity_form($formId, false, false, false, null, false, 0, true); @endphp
+            @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
           @endif
         </div>
       </div>
