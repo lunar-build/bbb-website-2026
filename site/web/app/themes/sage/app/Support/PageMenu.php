@@ -4,6 +4,10 @@ namespace App\Support;
 
 class PageMenu
 {
+    protected const CACHE_VERSION = 1;
+
+    protected const CACHE_TTL = WEEK_IN_SECONDS;
+
     /**
      * @var array<int, true> Post IDs a menu was built for this request.
      */
@@ -32,13 +36,33 @@ class PageMenu
             return [];
         }
 
-        $content = get_post_field('post_content', $postId);
+        $key = static::cacheKey($postId);
+        $items = get_transient($key);
 
-        if (! $content) {
+        if (! is_array($items)) {
+            $items = static::buildItems((string) get_post_field('post_content', $postId));
+
+            set_transient($key, $items, static::CACHE_TTL);
+        }
+
+        if ($items) {
+            static::$shown[$postId] = true;
+        }
+
+        return $items;
+    }
+
+    /**
+     * Parse the post content into menu items. This is the expensive part
+     * (parse_blocks), so forPost() caches the result.
+     */
+    protected static function buildItems(string $content): array
+    {
+        if ($content === '') {
             return [];
         }
 
-        $items = collect(static::headingBlocks(parse_blocks($content)))
+        return collect(static::headingBlocks(parse_blocks($content)))
             ->map(fn($block) => [
                 'label' => trim(html_entity_decode(wp_strip_all_tags($block['innerHTML'] ?? ''), ENT_QUOTES | ENT_HTML5)),
                 'anchor' => static::anchorFor($block),
@@ -51,12 +75,18 @@ class PageMenu
             ])
             ->values()
             ->all();
+    }
 
-        if ($items) {
-            static::$shown[$postId] = true;
-        }
+    /**
+     * Keyed on the post's modified time, so saving the post rebuilds the
+     * menu with no invalidation hook. Bump CACHE_VERSION when the item
+     * shape or label/anchor logic changes.
+     */
+    protected static function cacheKey(int $postId): string
+    {
+        $modified = get_post_field('post_modified_gmt', $postId);
 
-        return $items;
+        return 'page_menu_' . static::CACHE_VERSION . '_' . $postId . '_' . md5((string) $modified);
     }
 
     /**
