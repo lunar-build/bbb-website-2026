@@ -101,14 +101,18 @@
   @endif
 
   @if ($browseAllLink)
-    <a
+    <wa-button
       class="c-card-row__browse-all"
+      variant="{{ $type === 'route' ? 'neutral' : 'brand' }}"
+      appearance="accent"
+      pill
+      with-end
       href="{{ $browseAllLink['url'] }}"
       @if (($browseAllLink['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
     >
       {{ $browseAllLink['title'] }}
-      <x-icon name="arrow-right" />
-    </a>
+      <x-icon name="arrow-right" slot="end" />
+    </wa-button>
   @endif
 </div>
 
