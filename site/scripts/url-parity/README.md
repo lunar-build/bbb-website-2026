@@ -22,6 +22,7 @@ The live site's Redirection plugin rules (exported 2026-10-23), cleaned up for t
 - Internal targets are relative paths (`/schemes-and-initiatives/…`), not `https://betterbybike.info/…`, so they work on every environment.
 - The two rules that pointed at `/cycling-centres/bristol-family-cycling-centre/` (itself redirected) now go straight to `/cycling-centres/bristol-cycling-centre/`.
 - `bikecheck` gained its missing leading slash.
+- `/community-support/free-bike-checks` now goes to `/schemes-and-initiatives/free-bike-checks/` (production sent it to the borrow-a-bike page, which looked like a mistake).
 
 Import on each environment (Redirection active, tables installed):
 
