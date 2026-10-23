@@ -189,7 +189,7 @@ class Illustration extends Block
     public function fields(): array
     {
         $fields = Builder::make('illustration');
-        $characters = $this->illustrations('instructor', 'bmx', 'girl', 'grandma', 'mountain_biker', 'wheelchair_user', 'young_girl');
+        $characters = Illustrations::characters();
 
         $fields->addSelect('character', [
             'label' => 'Character',

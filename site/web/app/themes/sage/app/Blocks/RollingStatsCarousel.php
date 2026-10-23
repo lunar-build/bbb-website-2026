@@ -215,14 +215,16 @@ class RollingStatsCarousel extends Block
         $fields
             ->addSelect('image_left', [
                 'label' => 'Left illustration',
-                'choices' => $this->illustrations('pump', 'helmet', 'bmx', 'mountain_biker', 'instructor', 'cyclist'),
+                'instructions' => $this->illustrationInstructions(),
+                'choices' => $this->illustrations(),
                 'default_value' => '',
                 'ui' => true,
                 'allow_null' => true,
             ])
             ->addSelect('image_right', [
                 'label' => 'Right illustration',
-                'choices' => $this->illustrations('pump', 'helmet', 'bmx', 'mountain_biker', 'instructor', 'cyclist'),
+                'instructions' => $this->illustrationInstructions(),
+                'choices' => $this->illustrations(),
                 'default_value' => '',
                 'ui' => true,
                 'allow_null' => true,

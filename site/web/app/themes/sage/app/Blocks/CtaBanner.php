@@ -256,14 +256,16 @@ class CtaBanner extends Block
             ])
                 ->addSelect('image_left', [
                     'label' => 'Left illustration',
-                    'choices' => $this->illustrations('bmx', 'mountain_biker', 'instructor', 'cyclist'),
+                    'instructions' => $this->illustrationInstructions(),
+                    'choices' => $this->illustrations(),
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,
                 ])
                 ->addSelect('image_right', [
                     'label' => 'Right illustration',
-                    'choices' => $this->illustrations('bmx', 'mountain_biker', 'instructor', 'cyclist'),
+                    'instructions' => $this->illustrationInstructions(),
+                    'choices' => $this->illustrations(),
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,
@@ -288,7 +290,8 @@ class CtaBanner extends Block
             ])
                 ->addSelect('image', [
                     'label' => 'Illustration',
-                    'choices' => $this->illustrations('bmx', 'mountain_biker', 'instructor', 'cyclist'),
+                    'instructions' => $this->illustrationInstructions(),
+                    'choices' => $this->illustrations(),
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,

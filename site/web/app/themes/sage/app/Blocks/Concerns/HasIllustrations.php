@@ -20,6 +20,14 @@ trait HasIllustrations
         return Illustrations::choices(...$keys);
     }
 
+    /**
+     * Field instructions for an illustration select that offers the whole set.
+     */
+    protected function illustrationInstructions(): string
+    {
+        return 'Any illustration can be chosen, but some suit a banner better than others: characters work best at the sides, and small objects (bottle, cone, lock, map, pedal) can look lost on their own.';
+    }
+
     protected function illustrationUrl(?string $key): ?string
     {
         return Illustrations::url($key);

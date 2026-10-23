@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Vite;
  * than a media upload, so the front end always renders a bundled asset. Blocks pick the ones
  * they offer with choices(), and resolve a saved key with url().
  *
- * A key is what blocks save in post content, so never rename or remove one. 'cyclist' and
- * 'girl' are the same artwork under the two keys older blocks already saved.
+ * A key is what blocks save in post content, so never rename or remove one. 'girl' is the same
+ * artwork as 'cyclist', kept so content saved with it still renders; it isn't offered in selects.
  */
 class Illustrations
 {
@@ -44,8 +44,13 @@ class Illustrations
     ];
 
     /**
+     * Keys kept only so saved content still renders; not offered in selects unless asked for.
+     */
+    public const LEGACY = ['girl'];
+
+    /**
      * Select choices (key => label) for the given keys, in the order given; every character, then
-     * every object, when none are.
+     * every object (bar the legacy keys), when none are.
      *
      * @return array<string, string>
      */
@@ -54,7 +59,7 @@ class Illustrations
         $all = self::CHARACTERS + self::OBJECTS;
         $choices = [];
 
-        foreach ($keys ?: array_keys($all) as $key) {
+        foreach ($keys ?: array_diff(array_keys($all), self::LEGACY) as $key) {
             if (isset($all[$key])) {
                 $choices[$key] = $all[$key][0];
             }
@@ -70,7 +75,7 @@ class Illustrations
      */
     public static function characters(): array
     {
-        return array_map(fn($item) => $item[0], self::CHARACTERS);
+        return self::choices(...array_diff(array_keys(self::CHARACTERS), self::LEGACY));
     }
 
     /**
@@ -78,7 +83,7 @@ class Illustrations
      */
     public static function objects(): array
     {
-        return array_map(fn($item) => $item[0], self::OBJECTS);
+        return self::choices(...array_keys(self::OBJECTS));
     }
 
     /**

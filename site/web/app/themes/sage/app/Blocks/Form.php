@@ -311,7 +311,8 @@ class Form extends Block
 
         $fields->addSelect('illustration', [
             'label' => 'Illustration',
-            'choices' => $this->illustrations('instructor', 'bmx', 'girl', 'grandma', 'mountain_biker', 'wheelchair_user', 'young_girl'),
+            'instructions' => $this->illustrationInstructions(),
+            'choices' => $this->illustrations(),
             'default_value' => 'mountain_biker',
             'ui' => true,
             'conditional_logic' => [[['field' => 'image_type', 'operator' => '==', 'value' => 'illustration']]],
