@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasIllustrations;
 use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\Copy;
 use App\Fields\Heading;
@@ -11,6 +12,7 @@ use Log1x\AcfComposer\Builder;
 
 class Form extends Block
 {
+    use HasIllustrations;
     use ResolvesFields;
 
     /**
@@ -309,7 +311,7 @@ class Form extends Block
 
         $fields->addSelect('illustration', [
             'label' => 'Illustration',
-            'choices' => array_map(fn($item) => $item[0], Illustration::CHARACTERS),
+            'choices' => $this->illustrations('instructor', 'bmx', 'girl', 'grandma', 'mountain_biker', 'wheelchair_user', 'young_girl'),
             'default_value' => 'mountain_biker',
             'ui' => true,
             'conditional_logic' => [[['field' => 'image_type', 'operator' => '==', 'value' => 'illustration']]],
@@ -380,9 +382,7 @@ class Form extends Block
      */
     public function illustration()
     {
-        $file = Illustration::CHARACTERS[get_field('illustration')][1] ?? null;
-
-        return $file ? Vite::asset('resources/images/illustrations/' . $file) : null;
+        return $this->illustrationUrl($this->resolveField('illustration', ''));
     }
 
     /**

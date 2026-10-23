@@ -2,13 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasIllustrations;
 use App\Blocks\Concerns\ResolvesFields;
-use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class RollingStatsCarousel extends Block
 {
+    use HasIllustrations;
     use ResolvesFields;
 
     /**
@@ -153,25 +154,6 @@ class RollingStatsCarousel extends Block
     public $styles = [];
 
     /**
-     * Illustration choices for the block's left/right side images — a
-     * fixed, developer-controlled set (not an open media upload), so the
-     * front end always renders a bundled resources/images/illustrations/*
-     * asset rather than an arbitrary client-uploaded image. See
-     * App\Blocks\CtaBanner, which uses the same pattern.
-     *
-     * @var array
-     */
-    protected $illustrationChoices = [
-        '' => 'None',
-        'pump' => 'Bike pump',
-        'helmet' => 'Cycling helmet',
-        'bmx' => 'BMX rider',
-        'mountain_biker' => 'Mountain biker',
-        'instructor' => 'Cycle instructor',
-        'cyclist' => 'Cyclist on bike',
-    ];
-
-    /**
      * The block preview example data.
      *
      * @var array
@@ -233,14 +215,14 @@ class RollingStatsCarousel extends Block
         $fields
             ->addSelect('image_left', [
                 'label' => 'Left illustration',
-                'choices' => $this->illustrationChoices,
+                'choices' => $this->illustrations('pump', 'helmet', 'bmx', 'mountain_biker', 'instructor', 'cyclist'),
                 'default_value' => '',
                 'ui' => true,
                 'allow_null' => true,
             ])
             ->addSelect('image_right', [
                 'label' => 'Right illustration',
-                'choices' => $this->illustrationChoices,
+                'choices' => $this->illustrations('pump', 'helmet', 'bmx', 'mountain_biker', 'instructor', 'cyclist'),
                 'default_value' => '',
                 'ui' => true,
                 'allow_null' => true,
@@ -393,22 +375,6 @@ class RollingStatsCarousel extends Block
     public function imageRight()
     {
         return $this->illustrationUrl($this->resolveField('image_right'));
-    }
-
-    /**
-     * Resolve an illustration select value to its bundled asset URL.
-     *
-     * @return string|null
-     */
-    protected function illustrationUrl(?string $key)
-    {
-        if (! $key) {
-            return null;
-        }
-
-        $file = str_replace('_', '-', $key);
-
-        return Vite::asset("resources/images/illustrations/{$file}.png");
     }
 
     /**
