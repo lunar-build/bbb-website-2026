@@ -18,6 +18,9 @@
  *   map-pages    copy the shops/BMX/pumps pages (+ parents) onto the Map Listing template, keeping
  *                IDs and URLs; featured image becomes an Image Hero; also rebuilds the bike pump
  *                fault form in Gravity Forms + its page; run after `attachments`
+ *   pages        copy every other published page (optionally only comma-separated ids), keeping IDs,
+ *                parents and menu order; adds a hero, picks the Sticky Nav template for pages with
+ *                4+ H2s; run after `attachments`
  *
  * Env:
  *   NEWS_SOURCE_DB        source database name (default prod_scratch)
@@ -435,12 +438,60 @@ function news_tighten_after_headings(array $blocks): array
     return $blocks;
 }
 
+/**
+ * Replace each reusable-block reference (core/block) with the blocks it points
+ * at, at any depth, so they're converted like the rest of the page. Reusable
+ * blocks can nest other references.
+ */
+function news_inline_reusable(array $blocks, wpdb $src, array &$notes, int $depth = 0): array
+{
+    $out = [];
+    foreach ($blocks as $b) {
+        if ($b['blockName'] === 'core/block') {
+            $ref = (int) ($b['attrs']['ref'] ?? 0);
+            $content = $depth < 5 ? $src->get_var($src->prepare("SELECT post_content FROM {$src->posts} WHERE ID=%d AND post_type='wp_block'", $ref)) : null;
+            if ($content === null) {
+                $notes[] = "reusable block $ref not inlined (missing or nested too deep)";
+                $out[] = $b;
+
+                continue;
+            }
+            $notes[] = "reusable block $ref inlined";
+            array_push($out, ...news_inline_reusable(parse_blocks($content), $src, $notes, $depth + 1));
+
+            continue;
+        }
+        if ($b['innerBlocks']) {
+            // innerContent holds a null per child; one child can become several blocks, so rebuild the slots.
+            $children = [];
+            $content = [];
+            $i = 0;
+            foreach ($b['innerContent'] as $chunk) {
+                if ($chunk !== null) {
+                    $content[] = $chunk;
+
+                    continue;
+                }
+                foreach (news_inline_reusable([$b['innerBlocks'][$i++]], $src, $notes, $depth) as $child) {
+                    $children[] = $child;
+                    $content[] = null;
+                }
+            }
+            $b['innerBlocks'] = $children;
+            $b['innerContent'] = $content;
+        }
+        $out[] = $b;
+    }
+
+    return $out;
+}
+
 function news_transform(string $content, wpdb $src, array &$notes): string
 {
     // Old card layouts are spotted by their wrapping group, so swap those
     // first; then lift every block out of its group so the loop below
     // converts blocks at any depth, not just the top level.
-    $in = news_unwrap_groups(news_replace_old_cards(parse_blocks($content), $notes));
+    $in = news_unwrap_groups(news_replace_old_cards(news_inline_reusable(parse_blocks($content), $src, $notes), $notes));
     $out = [];
     $bikes = [];
     $bikeSlot = null;
@@ -629,12 +680,75 @@ const NEWS_MAP_PAGES = [
     1292 => ['bmx', []],
 ];
 
-/** Local rows already using any of $ids. */
+/** Cycling centres > Bristol Cycling Centre > What's on, copied with their IDs and URLs by `cycling-centre`. */
+const CC_PAGES = [308, 309, 796];
+
+/** Pages `pages` mode leaves alone: the old News archive, and CF7 leftovers (test page, thank-you, survey). */
+const NEWS_PAGES_SKIP = [59, 1985, 1550, 1717];
+
+/** Landing pages, held back until their hero/carousel/card blocks have conversions. */
+const NEWS_PAGES_DEFERRED = [220, 241];
+
+/** Sticky Nav suits long pages: this many H2s or more. */
+const NEWS_STICKY_NAV_H2S = 4;
+
+/**
+ * Published pages the `pages` mode copies: everything except what other modes own
+ * (map-pages, cycling-centre), the skip list and the held-back landing pages.
+ */
+function news_page_ids(wpdb $src, ?array $only): array
+{
+    $ids = array_values(array_diff(
+        $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='page' AND post_status='publish' ORDER BY ID"),
+        array_map('strval', [...array_keys(NEWS_MAP_PAGES), 6669, ...CC_PAGES, ...NEWS_PAGES_SKIP, ...NEWS_PAGES_DEFERRED]),
+    ));
+
+    return $only ? array_values(array_intersect($ids, array_map('strval', $only))) : $ids;
+}
+
+/**
+ * Local rows already using any of $ids, apart from the harmless kind: revisions, auto-drafts and
+ * trashed rows can't be anyone's content, and `news_clear_clashes()` removes them before a write.
+ */
 function news_taken(array $ids): array
 {
     global $wpdb;
 
-    return $ids ? $wpdb->get_results('SELECT ID, post_type, post_title FROM ' . $wpdb->posts . ' WHERE ID IN (' . implode(',', array_map('intval', $ids)) . ')') : [];
+    return $ids ? $wpdb->get_results('SELECT ID, post_type, post_title FROM ' . $wpdb->posts . ' WHERE ID IN (' . implode(',', array_map('intval', $ids)) . ") AND post_type NOT IN ('revision', 'auto-draft') AND post_status NOT IN ('trash', 'auto-draft')") : [];
+}
+
+/**
+ * Before a write mode copies rows under the old site's IDs: delete local revisions, auto-drafts and
+ * trashed rows sitting on those IDs, which are never content. Anything else is left for the clash
+ * check to report, unless NEWS_REPLACE_CLASHES=1 says to delete it too (listed as it goes). A row this
+ * script imported itself is never touched here: a re-run replaces those in place.
+ */
+function news_clear_clashes(array $ids): void
+{
+    global $wpdb;
+
+    if (! $ids) {
+        return;
+    }
+    $list = implode(',', array_map('intval', $ids));
+    $harmless = $wpdb->get_results("SELECT ID FROM {$wpdb->posts} WHERE ID IN ($list) AND (post_type IN ('revision', 'auto-draft') OR post_status IN ('trash', 'auto-draft'))");
+    foreach ($harmless as $row) {
+        wp_delete_post((int) $row->ID, true);
+    }
+    if ($harmless) {
+        echo 'cleared ' . count($harmless) . " revision/auto-draft/trashed rows on the old site's IDs\n";
+    }
+
+    if (! getenv('NEWS_REPLACE_CLASHES')) {
+        return;
+    }
+    foreach (news_taken($ids) as $row) {
+        if (get_post_meta($row->ID, NEWS_MIGRATED_META, true)) {
+            continue;
+        }
+        echo "replacing {$row->ID} {$row->post_type} \"{$row->post_title}\" (NEWS_REPLACE_CLASHES)\n";
+        wp_delete_post((int) $row->ID, true);
+    }
 }
 
 /** Posts this script imported carry this flag, so a re-run may replace them — and only them. */
@@ -697,7 +811,7 @@ if ($mode === 'check') {
         }
     };
     $caseStudyIds = $src->get_col("SELECT ID FROM {$src->posts} WHERE post_type='case_study' AND post_status='publish'");
-    foreach ([...$postIds, ...$caseStudyIds, ...array_keys(array_filter(NEWS_MAP_PAGES))] as $id) {
+    foreach ([...$postIds, ...$caseStudyIds, ...array_keys(array_filter(NEWS_MAP_PAGES)), ...news_page_ids($src, $only)] as $id) {
         $ignored = [];
         $walk(parse_blocks(news_transform($src->get_var($src->prepare("SELECT post_content FROM {$src->posts} WHERE ID=%d", $id)), $src, $ignored)));
     }
@@ -711,6 +825,23 @@ if ($mode === 'check') {
     foreach ($core ?: ['none' => ''] as $name => $count) {
         echo "  $name $count\n";
     }
+    $pages = news_page_ids($src, $only);
+    echo "\nPages (" . count($pages) . ") — local ID collisions, then template and H2 count (4+ H2s => Sticky Nav):\n";
+    $pageClash = array_filter(news_taken($pages), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    foreach ($pageClash ?: [null] as $r) {
+        echo $r ? "  CLASH {$r->ID} {$r->post_type} \"{$r->post_title}\"\n" : "  no collisions\n";
+    }
+    $pageNotes = [];
+    foreach ($pages as $id) {
+        $ignored = [];
+        $page = news_page_content($src, (int) $id, $replaceUrls, $ignored);
+        $bad = array_merge($bad, news_bad_keys($page['content']));
+        foreach ($ignored as $n) {
+            $pageNotes[] = "$id: $n";
+        }
+        echo "  $id " . ($page['template'] ? 'sticky-nav' : 'default') . " ({$page['h2s']} H2s)\n";
+    }
+    echo "\nPage transform notes:\n  " . (implode("\n  ", array_unique($pageNotes)) ?: 'none') . "\n";
     echo "\nUnknown ACF field keys:\n  " . (implode("\n  ", array_unique($bad)) ?: 'none') . "\n";
 
     return;
@@ -724,7 +855,13 @@ if ($mode === 'preview') {
         $notes = [];
         file_put_contents("$dir/$id-{$post->post_name}.html", $replaceUrls(news_transform($post->post_content, $src, $notes)));
     }
-    WP_CLI::success(count($postIds) . " posts written to $dir");
+    foreach (news_page_ids($src, $only) as $id) {
+        $notes = [];
+        $page = news_page_content($src, (int) $id, $replaceUrls, $notes);
+        $name = $src->get_var($src->prepare("SELECT post_name FROM {$src->posts} WHERE ID=%d", $id));
+        file_put_contents("$dir/page-$id-$name.html", $page['content']);
+    }
+    WP_CLI::success(count($postIds) . ' posts and ' . count(news_page_ids($src, $only)) . " pages written to $dir");
 
     return;
 }
@@ -751,6 +888,7 @@ if ($mode === 'categories') {
 }
 
 if ($mode === 'attachments') {
+    news_clear_clashes($attachmentIds);
     $existing = array_map(fn($r) => (string) $r->ID, array_filter(news_taken($attachmentIds), fn($r) => $r->post_type === 'attachment'));
     if ($clash = array_filter(news_taken($attachmentIds), fn($r) => $r->post_type !== 'attachment')) {
         WP_CLI::error('Local IDs already taken, resolve first (see `check`): ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
@@ -770,6 +908,7 @@ if ($mode === 'attachments') {
 }
 
 if ($mode === 'posts') {
+    news_clear_clashes($postIds);
     if ($clash = news_post_clashes($postIds)) {
         WP_CLI::error('Local IDs already taken, resolve first (see `check`): ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
     }
@@ -806,6 +945,7 @@ if ($mode === 'case-studies') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
+    news_clear_clashes($ids);
     $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'case_study' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => $r->ID, $clash)));
@@ -943,8 +1083,69 @@ function news_page_hero(string $title, int $thumb): array
     return $hero;
 }
 
+/**
+ * A page's converted content with its hero in front, plus the template it should use.
+ * Pages with enough H2s go on Sticky Nav, which builds its menu from them.
+ *
+ * @return array{content: string, template: string, h2s: int}
+ */
+function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$notes): array
+{
+    $row = $src->get_row($src->prepare("SELECT post_title, post_content FROM {$src->posts} WHERE ID=%d", $id));
+    $thumb = (int) $src->get_var($src->prepare("SELECT meta_value FROM {$src->postmeta} WHERE post_id=%d AND meta_key='_thumbnail_id'", $id));
+    $blocks = parse_blocks(news_transform($row->post_content, $src, $notes));
+
+    $h2s = 0;
+    $walk = function (array $list) use (&$walk, &$h2s) {
+        foreach ($list as $b) {
+            if ($b['blockName'] === 'core/heading' && ($b['attrs']['level'] ?? 2) === 2) {
+                $h2s++;
+            }
+            $walk($b['innerBlocks']);
+        }
+    };
+    $walk($blocks);
+
+    return [
+        'content' => $replaceUrls(serialize_block(news_page_hero($row->post_title, $thumb)) . "\n\n" . serialize_blocks($blocks)),
+        'template' => $h2s >= NEWS_STICKY_NAV_H2S ? 'template-sticky-nav.blade.php' : '',
+        'h2s' => $h2s,
+    ];
+}
+
+if ($mode === 'pages') {
+    $ids = news_page_ids($src, $only);
+    news_clear_clashes($ids);
+    $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
+    if ($clash) {
+        WP_CLI::error('Local IDs already taken, resolve first (see `check`): ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
+    }
+
+    foreach ($ids as $id) {
+        $id = (int) $id;
+        // Re-running replaces earlier imports in place (keeps nav menu items pointing at the page).
+        if (get_post_meta($id, NEWS_MIGRATED_META, true)) {
+            news_remove_page_import($id);
+        }
+        $notes = [];
+        $page = news_page_content($src, $id, $replaceUrls, $notes);
+        news_copy_row($src, $id, $replaceUrls, ['post_content' => $page['content']]);
+        news_copy_meta($src, $id, $skipMeta, fn($k, $v) => in_array($k, ['_thumbnail_id', '_wp_old_slug'], true) || str_starts_with($k, '_yoast_wpseo_') ? $v : null);
+        update_post_meta($id, NEWS_MIGRATED_META, 1);
+        if ($page['template']) {
+            update_post_meta($id, '_wp_page_template', $page['template']);
+        }
+        clean_post_cache($id);
+        echo "imported $id" . ($page['template'] ? ' (sticky nav)' : '') . ($notes ? ' (' . implode('; ', array_unique($notes)) . ')' : '') . "\n";
+    }
+    WP_CLI::success(count($ids) . ' pages imported.');
+
+    return;
+}
+
 if ($mode === 'map-pages') {
     $pages = NEWS_MAP_PAGES;
+    news_clear_clashes([...array_keys($pages), 6669]);
     $clash = array_filter(news_taken([...array_keys($pages), 6669]), fn($r) => ! ($r->post_type === 'page' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
@@ -1027,9 +1228,6 @@ if ($mode === 'map-pages') {
 
 /** Old cycling_centre_event posts that only filled gaps in the timetable grid. */
 const CC_TIMETABLE_FILLERS = [800, 804, 2097];
-
-/** Cycling centres > Bristol Cycling Centre > What's on, copied with their IDs and URLs. */
-const CC_PAGES = [308, 309, 796];
 
 /** Session dot colours from the Figma accordion timetable, handed out in turn (MEC stores them without the #). */
 const CC_COLORS = ['ffbf47', 'f77ba0', '67dd00', '76dbe8', '1eacdb'];
@@ -1213,6 +1411,7 @@ if ($mode === 'cycling-centre') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
+    news_clear_clashes([...$ids, ...CC_PAGES]);
     $clash = array_filter(news_taken([...$ids, ...CC_PAGES]), fn($r) => ! (in_array($r->post_type, ['mec-events', 'page'], true) && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));
@@ -1395,6 +1594,7 @@ if ($mode === 'events') {
     if ($only) {
         $ids = array_values(array_intersect($ids, $only));
     }
+    news_clear_clashes($ids);
     $clash = array_filter(news_taken($ids), fn($r) => ! ($r->post_type === 'mec-events' && get_post_meta($r->ID, NEWS_MIGRATED_META, true)));
     if ($clash) {
         WP_CLI::error('Local IDs already taken, resolve first: ' . implode(',', array_map(fn($r) => "{$r->ID} {$r->post_type}", $clash)));

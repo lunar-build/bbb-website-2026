@@ -23,6 +23,7 @@ never touches the old site itself, and it only writes to this site's database.
 | `core/columns` with one image per column | Two Column Content with an Image layout on each side |
 | Group/columns holding only `acf/card` blocks | Card Grid with "link" cards (icon or image, title, text, link) |
 | `core/list` | Bullet List with no top padding and Small bottom padding (the block's own default is none). Numbered lists stay numbered, nested lists keep their depth (up to 3 levels, via each item's Indent), and bold, italic and links are kept |
+| `core/block` (reusable) | The reusable block's content, inlined and converted |
 | `core/group` | Unwrapped: the old theme's group styles mean nothing here, so its blocks are lifted out and converted like any other |
 | `core/embed`, paragraphs, headings | Unchanged (VideoBlock only takes uploaded files, not YouTube) |
 
@@ -47,6 +48,7 @@ wp eval-file scripts/news-migration/migrate-news.php attachments   # copy all at
 wp eval-file scripts/news-migration/migrate-news.php posts [1288,7070]  # copy posts; re-running replaces earlier imports
 wp eval-file scripts/news-migration/migrate-news.php case-studies [1019] # copy case studies (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php map-pages          # copy shops/BMX/pumps pages (run after attachments)
+wp eval-file scripts/news-migration/migrate-news.php pages [300,701]    # all other pages -> hero + converted content (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php cycling-centre [753] # Cycling Centre sessions -> MEC events (run after attachments)
 wp eval-file scripts/news-migration/migrate-news.php events [7065,7040,7042] # one-off events -> MEC events (run after cycling-centre)
 ```
@@ -78,6 +80,20 @@ reused by title on re-runs) and copies its page,
 `/shops-and-repair/public-bike-pumps/report-a-bike-pump-fault/`, with a Text
 Hero and a Form block. Re-runs replace the pages in place, so nav menu items
 linking to them survive.
+
+`pages` copies every other published page, keeping IDs, parents, menu order and
+URLs. Each gets a hero in front (an Image Hero from the featured image, else a
+Text Hero) and its content converted like a post's. Pages with four or more H2s
+move onto the Sticky Nav template, which builds its menu from them; `check`
+prints each page's H2 count. Reusable blocks (`core/block`) are inlined so their
+content is converted too. Re-runs replace earlier imports in place, so nav menu
+items linking to the pages survive.
+
+Left out: the pages other modes own (the map pages, the Cycling Centre pages and
+the pump fault page), the News archive (59), the Contact Form 7 leftovers
+(1550 Thank you, 1717 survey, 1985 test) and the two landing pages (220
+Homepage, 241 Why cycle), which wait for their own conversions. Blocks without a
+conversion yet still show in `check` under "Old-theme blocks left".
 
 `cycling-centre` copies the old Bristol Cycling Centre sessions
 (`cycling_centre_event`) into Modern Events Calendar as `mec-events`, keeping
@@ -114,6 +130,13 @@ Bristol Cycling Centre location. With no ids it imports every event, newest
 first. Finished events still show their date ("Date … This event has
 finished"). Sessions that `cycling-centre` imports without timetable slots
 are flagged `_event_undated`, so their placeholder date is never shown.
+
+Before a write mode copies rows under the old site's IDs, it deletes any local revision, auto-draft
+or trashed row sitting on those IDs (they're never content). Anything else on a clashing ID makes the
+mode stop and list it, so nothing real is overwritten by accident. Rows this script imported itself
+are replaced in place on a re-run. To clear the rest too (a throwaway local database, say), put
+`NEWS_REPLACE_CLASHES=1` in front of the command: each deleted row is listed as it goes. Don't use it
+on staging or production unless the clashing rows really are disposable.
 
 Imported posts are flagged with `_news_migrated` post meta. A re-run of `posts`
 deletes and re-imports only flagged posts. If any other post, page, menu item
