@@ -1,0 +1,766 @@
+{
+  "plugin": {
+    "version": "5.10.1",
+    "date": "Fri, 23 Oct 2026 12:12:24 +0000"
+  },
+  "groups": [
+    {
+      "id": 1,
+      "name": "Redirections",
+      "module_id": 1,
+      "status": "enabled"
+    }
+  ],
+  "redirects": [
+    {
+      "url": "^(?i)/familycyclingcentre(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/cycling-centres/bristol-cycling-centre/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 19464,
+      "regex": true,
+      "group_id": 1,
+      "position": 0,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/start-cycling/get-confidence/family-cycling-centre-hengrove(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/cycling-centres/bristol-cycling-centre/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 6389,
+      "regex": true,
+      "group_id": 1,
+      "position": 1,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/bike-security(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/tips-skills-advice/bike-security/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 944,
+      "regex": true,
+      "group_id": 1,
+      "position": 2,
+      "last_access": "October 4, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/brean-down-way(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "https://cycleplanner.betterbybike.info/leisure-rides/Brean%20Down%20Way"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 29,
+      "regex": true,
+      "group_id": 1,
+      "position": 3,
+      "last_access": "February 20, 2024",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/loanbikes(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/borrow-a-bike-scheme/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 6906,
+      "regex": true,
+      "group_id": 1,
+      "position": 4,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/bikepumps(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/shops-and-repair/public-bike-pumps/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 2551,
+      "regex": true,
+      "group_id": 1,
+      "position": 5,
+      "last_access": "October 19, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/festival-way(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "https://cycleplanner.betterbybike.info/leisure-rides/Festival%20Way"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 18,
+      "regex": true,
+      "group_id": 1,
+      "position": 7,
+      "last_access": "August 14, 2022",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/portishead-bristol(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "https://cycleplanner.betterbybike.info/cycle-routes/regional/northsomerset/Portishead%20to%20Bristol"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 21,
+      "regex": true,
+      "group_id": 1,
+      "position": 8,
+      "last_access": "November 11, 2020",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/route-33(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "https://cycleplanner.betterbybike.info/cycle-routes/regional/northsomerset/Route%2033"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 5,
+      "regex": true,
+      "group_id": 1,
+      "position": 9,
+      "last_access": "February 22, 2021",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/strawberry-line(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "https://cycleplanner.betterbybike.info/leisure-rides/Strawberry%20Line"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 135,
+      "regex": true,
+      "group_id": 1,
+      "position": 10,
+      "last_access": "October 12, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/loan-bike-scheme-end-of-survey(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/thank-you/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 52,
+      "regex": true,
+      "group_id": 1,
+      "position": 11,
+      "last_access": "September 28, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/cyclingbristolbooklet(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 30,
+      "regex": true,
+      "group_id": 1,
+      "position": 12,
+      "last_access": "July 12, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/bristolcyclingcentre(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/cycling-centres/bristol-cycling-centre/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 42235,
+      "regex": true,
+      "group_id": 1,
+      "position": 13,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/feedback(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/maps-and-guides/regional-cycle-maps/#cycle-map-feedback"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 2037,
+      "regex": true,
+      "group_id": 1,
+      "position": 14,
+      "last_access": "October 21, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/report-a-fault(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/community-support/report-a-road-fault-or-near-misses/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 339,
+      "regex": true,
+      "group_id": 1,
+      "position": 15,
+      "last_access": "August 17, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/cycleplanner(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "https://cycleplanner.betterbybike.info"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 1745,
+      "regex": true,
+      "group_id": 1,
+      "position": 16,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/loanbike(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/borrow-a-bike-scheme/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 6094,
+      "regex": true,
+      "group_id": 1,
+      "position": 17,
+      "last_access": "October 22, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/cycling-centres/bristol-family-cycling-centre/(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/cycling-centres/bristol-cycling-centre/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 69329,
+      "regex": true,
+      "group_id": 1,
+      "position": 18,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/borrowabike(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/borrow-a-bike-scheme/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 4,
+      "regex": true,
+      "group_id": 1,
+      "position": 19,
+      "last_access": "September 5, 2023",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/schemes-and-initiatives/loan-a-bike-scheme(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/borrow-a-bike-scheme/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 14689,
+      "regex": true,
+      "group_id": 1,
+      "position": 20,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/cycling-centres/bristol-family-cycling-centre/privacy-policy-for-bristol-cycling-centre(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/cycling-centres/bristol-cycling-centre/privacy-policy-for-bristol-cycling-centre/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 321,
+      "regex": true,
+      "group_id": 1,
+      "position": 21,
+      "last_access": "October 16, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/fixmybike(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/bike-maintenance-training/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 321,
+      "regex": true,
+      "group_id": 1,
+      "position": 22,
+      "last_access": "May 31, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/cycle-routes-download(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/maps-and-guides/guides-booklets/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 261,
+      "regex": true,
+      "group_id": 1,
+      "position": 23,
+      "last_access": "October 22, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/schemes-and-initiatives/on-street-bike-hangars(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/cycle-hangars/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 1271,
+      "regex": true,
+      "group_id": 1,
+      "position": 24,
+      "last_access": "October 22, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/bikecheck(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/free-bike-checks/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 800,
+      "regex": true,
+      "group_id": 1,
+      "position": 25,
+      "last_access": "February 27, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/drbike(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/free-bike-checks/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 106,
+      "regex": true,
+      "group_id": 1,
+      "position": 26,
+      "last_access": "October 17, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/community-support/emergency-bike-repair-kits(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/emergency-bike-repair-kits/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 1161,
+      "regex": true,
+      "group_id": 1,
+      "position": 27,
+      "last_access": "October 23, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/bikechecks(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/free-bike-checks/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 155,
+      "regex": true,
+      "group_id": 1,
+      "position": 28,
+      "last_access": "February 27, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/sparks(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/free-bike-checks/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 17,
+      "regex": true,
+      "group_id": 1,
+      "position": 29,
+      "last_access": "October 21, 2026",
+      "enabled": true
+    },
+    {
+      "url": "^(?i)/community-support/free-bike-checks(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/schemes-and-initiatives/borrow-a-bike-scheme/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 235,
+      "regex": true,
+      "group_id": 1,
+      "position": 30,
+      "last_access": "October 22, 2026",
+      "enabled": true
+    }
+  ]
+}
