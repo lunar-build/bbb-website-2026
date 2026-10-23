@@ -286,10 +286,65 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 add_filter('get_the_archive_title_prefix', '__return_empty_string');
 
 /**
- * Posts use a /news/%postname%/ permalink structure, whose /news/ "front"
- * WordPress otherwise prefixes onto every post type and taxonomy. Only news
- * (posts, categories, tags) belongs under /news/ — default everything else,
- * including plugin-registered types like events, to its own root slug.
+ * URL structure. Settings → Permalinks must be "Post name" (/%postname%/), set per environment, so pages
+ * and custom post types (case studies, events…) keep their own URLs. Only news belongs under /news/ — to
+ * keep the live betterbybike.info URLs, posts (/news/{slug}/) and categories/tags (/news/category/…,
+ * /news/tag/…) get it back below, which the Permalinks screen can't express (so its "sample-post" example
+ * doesn't show /news/). A post reached at /{slug}/ redirects to its /news/ URL. Needs a rewrite flush
+ * after deploy.
+ */
+$onPostName = fn() => get_option('permalink_structure') === '/%postname%/';
+
+// The category/tag bases are only right without a /news/ front, so they apply only on Post name.
+add_filter('pre_option_category_base', fn($pre) => $onPostName() ? 'news/category' : $pre);
+add_filter('pre_option_tag_base', fn($pre) => $onPostName() ? 'news/tag' : $pre);
+
+add_action('admin_notices', function () use ($onPostName) {
+    if ($onPostName() || ! current_user_can('manage_options')) {
+        return;
+    }
+
+    printf(
+        '<div class="notice notice-warning"><p>%s</p></div>',
+        wp_kses_post(__('Set <a href="options-permalink.php">Settings → Permalinks</a> to <strong>Post name</strong>. News URLs (/news/…) depend on it.', 'sage')),
+    );
+});
+
+// Core builds a post's URL from the structure alone, so this is what puts posts under /news/.
+add_filter('pre_post_link', fn($permalink, $post) => $post->post_type === 'post' ? '/news/%postname%/' : $permalink, 10, 2);
+
+add_action('init', function () {
+    // The rules that resolve /news/{slug}/ (and its /page/N, /feed and embed endpoints) to the post.
+    add_permastruct('news_post', 'news/%postname%/', ['with_front' => false, 'ep_mask' => EP_PERMALINK]);
+
+    // The post rule above would otherwise take /news/feed/ and /news/page/2/ for posts named "feed" and "page".
+    add_rewrite_rule('^news/feed/(feed|rdf|rss|rss2|atom)/?$', 'index.php?feed=$matches[1]', 'top');
+    add_rewrite_rule('^news/(feed|rdf|rss|rss2|atom)/?$', 'index.php?feed=$matches[1]', 'top');
+    add_rewrite_rule('^news/page/([0-9]{1,})/?$', 'index.php?pagename=news&paged=$matches[1]', 'top');
+
+    // MEC's events/[^/]+/[^/]+ attachment rule would otherwise take /events/category/{slug}/.
+    add_rewrite_rule('^events/category/([^/]+)/(feed|rdf|rss|rss2|atom)/?$', 'index.php?mec_category=$matches[1]&feed=$matches[2]', 'top');
+    add_rewrite_rule('^events/category/([^/]+)/page/([0-9]{1,})/?$', 'index.php?mec_category=$matches[1]&paged=$matches[2]', 'top');
+    add_rewrite_rule('^events/category/([^/]+)/?$', 'index.php?mec_category=$matches[1]', 'top');
+});
+
+// The structure also resolves a post at /{slug}/; send it to its /news/ URL (core doesn't).
+add_action('template_redirect', function () {
+    if (! is_singular('post') || is_preview()) {
+        return;
+    }
+
+    $request = trim((string) wp_parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+
+    if (! str_starts_with($request, 'news/')) {
+        wp_safe_redirect(get_permalink(), 301);
+        exit;
+    }
+}, 9);
+
+/**
+ * Custom post types and taxonomies keep their own root slugs. The plain /%postname%/ structure has no
+ * /news/ front to inherit, so with_front => false is just a guard against one being added later.
  */
 $withoutFront = function (array $args, string $name) {
     $builtin = in_array($name, ['post', 'page', 'attachment', 'category', 'post_tag', 'post_format'], true);
@@ -306,6 +361,18 @@ $withoutFront = function (array $args, string $name) {
 
 add_filter('register_post_type_args', $withoutFront, 10, 2);
 add_filter('register_taxonomy_args', $withoutFront, 10, 2);
+
+// Event categories are /events/category/{slug}/ on the live site (MEC's default is /mec-category/).
+add_filter('register_taxonomy_args', function (array $args, string $name) {
+    if ($name !== 'mec_category') {
+        return $args;
+    }
+
+    return array_replace($args, ['rewrite' => array_replace(is_array($args['rewrite'] ?? null) ? $args['rewrite'] : [], [
+        'slug' => 'events/category',
+        'with_front' => false,
+    ])]);
+}, 11, 2);
 
 /**
  * Cycling Centre sessions are MEC events, but the live site has them at
