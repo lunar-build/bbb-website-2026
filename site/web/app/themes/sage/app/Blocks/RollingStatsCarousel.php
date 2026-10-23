@@ -191,6 +191,7 @@ class RollingStatsCarousel extends Block
                 'value' => 1200,
                 'unit' => 'bikes',
                 'caption_text' => 'were loaned out for free across the West of England',
+                'link' => ['title' => 'Find out more', 'url' => '#', 'target' => ''],
             ],
             [
                 'prefix_text' => 'We\'ve helped train',
@@ -300,6 +301,10 @@ class RollingStatsCarousel extends Block
             ->addText('source', [
                 'label' => 'Source',
                 'instructions' => 'e.g. "BikeLife Bristol 2019". Optional.',
+            ])
+            ->addLink('link', [
+                'label' => 'Button',
+                'instructions' => 'Optional. Shown as a button under the slide, e.g. "Find out more".',
             ]);
 
         $slides->endRepeater();
@@ -322,12 +327,13 @@ class RollingStatsCarousel extends Block
 
         // The repeater's min of 1 makes ACF add a blank row on insert; drop
         // rows with nothing to show so the block still counts as empty.
-        $slides = array_filter($slides, fn ($slide) => ($slide['slide_type'] ?? 'stat') === 'statement'
+        $slides = array_filter($slides, fn($slide) => ($slide['slide_type'] ?? 'stat') === 'statement'
             ? trim(wp_strip_all_tags($slide['statement'] ?? '')) !== ''
             : ($slide['value'] ?? '') !== '');
 
         return array_map(function ($slide) {
             $source = trim($slide['source'] ?? '');
+            $link = normalize_link($slide['link'] ?? null);
 
             if (($slide['slide_type'] ?? 'stat') === 'statement') {
                 $statement = wp_kses($slide['statement'] ?? '', ['strong' => [], 'b' => [], 'em' => [], 'br' => []]);
@@ -336,6 +342,7 @@ class RollingStatsCarousel extends Block
                     'type' => 'statement',
                     'statement' => trim(preg_replace('#</?p>#i', '', $statement)),
                     'source' => $source,
+                    'link' => $link,
                 ];
             }
 
@@ -363,6 +370,7 @@ class RollingStatsCarousel extends Block
                 'caption' => $caption,
                 'accessibleText' => $accessibleText,
                 'source' => $source,
+                'link' => $link,
             ];
         }, $slides);
     }

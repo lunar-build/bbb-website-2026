@@ -9,6 +9,8 @@
 
   &__heading {
     margin: 0;
+    // Same colour as a freshly inserted Heading block.
+    color: var(--wp--preset--color--blue-medium);
   }
 
   &__intro {
