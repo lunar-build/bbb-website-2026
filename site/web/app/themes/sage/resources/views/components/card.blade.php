@@ -2,12 +2,12 @@
 
 <div {{ $attributes->class(['c-feature-card__card', 'c-feature-card--'.$cardStyle]) }}>
   @if (! empty($image['url']))
-    {{-- onerror: the URL exists but the file doesn't (e.g. uploads missing after a DB import) — swap in the placeholder panel. --}}
+    {{-- onerror: the URL exists but the file doesn't (e.g. uploads missing after a DB import) — turn it into the placeholder panel (no markup inside the attribute: wptexturize splits on `>` and mangles the quotes). --}}
     <img
       class="c-feature-card__image"
       src="{{ $image['url'] }}"
       alt="{{ $image['alt'] ?? '' }}"
-      onerror="this.onerror=null;this.outerHTML='<div class=&quot;c-feature-card__image c-feature-card__image--empty&quot; aria-hidden=&quot;true&quot;></div>'"
+      onerror="this.onerror=null;this.removeAttribute('src');this.removeAttribute('alt');this.classList.add('c-feature-card__image--empty')"
     >
   @else
     {{-- No image: a placeholder panel, not a broken <img>. --}}
