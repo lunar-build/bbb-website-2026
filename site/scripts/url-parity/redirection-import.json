@@ -276,7 +276,7 @@
       "action_code": 301,
       "action_type": "url",
       "action_data": {
-        "url": "/thank-you/"
+        "url": "/schemes-and-initiatives/borrow-a-bike-scheme/"
       },
       "match_type": "url",
       "title": "",
@@ -761,6 +761,84 @@
       "position": 30,
       "last_access": "October 22, 2026",
       "enabled": true
+    },
+    {
+      "url": "^(?i)/thank-you(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 0,
+      "regex": true,
+      "group_id": 1,
+      "position": 0,
+      "last_access": null,
+      "enabled": true,
+      "last_count": 0
+    },
+    {
+      "url": "^(?i)/bristol-cycling-centre-survey(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/cycling-centres/bristol-cycling-centre/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 0,
+      "regex": true,
+      "group_id": 1,
+      "position": 0,
+      "last_access": null,
+      "enabled": true,
+      "last_count": 0
+    },
+    {
+      "url": "^(?i)/types-of-bike-test(|/)([\\?]+.*|)$",
+      "match_url": "regex",
+      "match_data": {
+        "source": {
+          "flag_query": "exact",
+          "flag_case": false,
+          "flag_trailing": false,
+          "flag_regex": true
+        }
+      },
+      "action_code": 301,
+      "action_type": "url",
+      "action_data": {
+        "url": "/find-the-right-bike/types-of-bike/"
+      },
+      "match_type": "url",
+      "title": "",
+      "hits": 0,
+      "regex": true,
+      "group_id": 1,
+      "position": 0,
+      "last_access": null,
+      "enabled": true,
+      "last_count": 0
     }
   ]
 }
