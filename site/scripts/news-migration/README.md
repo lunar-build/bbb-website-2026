@@ -210,8 +210,9 @@ from the files on disk, and so are the image sizes.
 
 ### 5. Settings and tidy-up
 
-- Settings → Permalinks → Custom Structure: `/news/%postname%/`. This matches
-  the old site's URLs and the `/news/...` links inside post content.
+- Permalinks need no Settings step: the structure is pinned in code (`app/filters.php`), so posts
+  are at `/news/{slug}/` like the old site and the `/news/...` links inside post content work. Just
+  flush after deploy: `wp rewrite flush`.
 - Clear the ACF Composer cache if blocks look stale: `wp acorn acf:clear`.
 - Drop the scratch database and delete the uploaded files:
 
