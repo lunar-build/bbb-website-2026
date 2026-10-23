@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -96,7 +97,7 @@ class TextBanner extends Block
      *
      * @var string
      */
-    public $align_text = '';
+    public $align_text = 'center';
 
     /**
      * The default block content alignment.
@@ -124,8 +125,8 @@ class TextBanner extends Block
      * @var array
      */
     public $supports = [
-        'align' => true,
-        'align_text' => false,
+        'align' => false,
+        'align_text' => true,
         'align_content' => false,
         'full_height' => false,
         'anchor' => false,
@@ -151,32 +152,15 @@ class TextBanner extends Block
     public $styles = [];
 
     /**
-     * Illustration choices shared by every layout's image select(s) — a
-     * fixed, developer-controlled set (not an open media upload), so the
-     * front end always renders a bundled resources/images/illustrations/*
-     * asset rather than an arbitrary client-uploaded image.
-     *
-     * @var array
-     */
-    protected $illustrationChoices = [
-        '' => 'None',
-        'bmx' => 'BMX rider',
-        'mountain_biker' => 'Mountain biker',
-        'instructor' => 'Cycle instructor',
-        'cyclist' => 'Cyclist on bike',
-    ];
-
-    /**
      * The block preview example data.
      *
      * @var array
      */
     public $example = [
-        'heading' => '<p><strong>Explore</strong><br>ways to get a bike</p>',
+        'heading_text' => '<p><strong>Explore</strong><br>ways to get a bike</p>',
         'heading_level' => 'h2',
         'heading_style' => 'h3',
         'body' => '<p>There are so many ways to get a bike, discover one that suits you best.</p>',
-        'alignment' => 'centre',
     ];
 
     /**
@@ -186,47 +170,23 @@ class TextBanner extends Block
     {
         return [
             'heading' => $this->heading(),
-            'headingTag' => $this->headingTag(),
-            'headingClass' => $this->headingClass(),
             'body' => $this->clean($this->resolveField('body', '')),
-            'alignment' => $this->resolveField('alignment', 'centre'),
         ];
     }
 
     /**
-     * The heading's inline markup: its paragraphs become line breaks, because a heading
-     * can't hold <p> elements.
+     * The heading's text/level/style. The text's paragraphs become line breaks, because a
+     * heading can't hold <p> elements.
      */
-    protected function heading(): string
+    protected function heading(): array
     {
-        $html = $this->clean($this->resolveField('heading', ''));
+        $html = $this->clean($this->resolveField('heading_text', ''));
 
-        return trim(preg_replace(['#</p>\s*<p>#i', '#</?p>#i'], ['<br>', ''], $html));
-    }
-
-    /**
-     * The tag the heading is output as: h1 to h6, or a plain div when it's only styled text.
-     */
-    protected function headingTag(): string
-    {
-        $level = $this->resolveField('heading_level', 'h2');
-
-        return preg_match('/^h[1-6]$/', $level) ? $level : 'div';
-    }
-
-    /**
-     * The size class: the chosen visual style, else the level's own size (a plain div, which has no size, gets Heading 3's).
-     */
-    protected function headingClass(): string
-    {
-        $style = $this->resolveField('heading_style', 'h3');
-        $level = $this->resolveField('heading_level', 'h2');
-
-        if ($style && $style !== 'match') {
-            return 'u-heading-' . substr($style, 1);
-        }
-
-        return 'u-heading-' . (preg_match('/^h([1-6])$/', $level, $m) ? min(5, (int) $m[1]) : 3);
+        return [
+            'text' => trim(preg_replace(['#</p>\s*<p>#i', '#</?p>#i'], ['<br>', ''], $html)),
+            'level' => $this->resolveField('heading_level', 'h2'),
+            'style' => $this->resolveField('heading_style', 'h3'),
+        ];
     }
 
     /**
@@ -252,41 +212,14 @@ class TextBanner extends Block
         $fields = Builder::make('text_banner');
 
         $fields
-            ->addWysiwyg('heading', [
+            ->addPartial(Heading::class, [
+                'name' => 'heading',
                 'label' => 'Heading',
-                'instructions' => 'The large text. Select words and use Bold or Italic to make them stand out (bold is shown in blue). Shift+Enter makes a line break. The background colour is set in the block sidebar.',
-                'tabs' => 'visual',
-                'toolbar' => 'basic',
-                'media_upload' => 0,
-            ])
-            ->addSelect('heading_level', [
-                'label' => 'Heading level',
-                'instructions' => 'Semantic HTML heading level: choose it for the page\'s outline, not for how big it should look. Choose "Not a heading" for a standalone statement, so screen readers and the page outline don\'t treat it as a section.',
-                'choices' => [
-                    'h1' => 'H1',
-                    'h2' => 'H2',
-                    'h3' => 'H3',
-                    'h4' => 'H4',
-                    'h5' => 'H5',
-                    'h6' => 'H6',
-                    'none' => 'Not a heading (just styled text)',
-                ],
-                'default_value' => 'h2',
-                'ui' => true,
-            ])
-            ->addSelect('heading_style', [
-                'label' => 'Visual style',
-                'instructions' => 'How big the heading looks, without changing its level, the same sizes as every other heading.',
-                'choices' => [
-                    'match' => 'Match level',
-                    'h1' => 'Heading 1 size',
-                    'h2' => 'Heading 2 size',
-                    'h3' => 'Heading 3 size',
-                    'h4' => 'Heading 4 size',
-                    'h5' => 'Heading 5 / 6 size',
-                ],
-                'default_value' => 'h3',
-                'ui' => true,
+                'instructions' => 'The large text. Select words and use Bold or Italic to make them stand out (bold is shown in blue). Shift+Enter makes a line break. Align it with the toolbar; the background colour is set in the block sidebar.',
+                'rich' => true,
+                'allow_none' => true,
+                'default_level' => 'h2',
+                'default_style' => 'h3',
             ])
             ->addWysiwyg('body', [
                 'label' => 'Body text',
@@ -294,14 +227,6 @@ class TextBanner extends Block
                 'tabs' => 'visual',
                 'toolbar' => 'basic',
                 'media_upload' => 0,
-            ])
-            ->addButtonGroup('alignment', [
-                'label' => 'Alignment',
-                'choices' => [
-                    'centre' => 'Centre',
-                    'left' => 'Left',
-                ],
-                'default_value' => 'centre',
             ]);
 
         return $fields->build();

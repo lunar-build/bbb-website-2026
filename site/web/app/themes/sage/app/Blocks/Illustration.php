@@ -2,13 +2,15 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasIllustrations;
 use App\Blocks\Concerns\ResolvesFields;
-use Illuminate\Support\Facades\Vite;
+use App\Support\Illustrations;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class Illustration extends Block
 {
+    use HasIllustrations;
     use ResolvesFields;
 
     /**
@@ -152,33 +154,6 @@ class Illustration extends Block
     public $styles = [];
 
     /**
-     * Characters and objects, keyed by the field value, with their bundled files
-     * under resources/images/illustrations (the old theme's artwork).
-     *
-     * @var array
-     */
-    public const CHARACTERS = [
-        'instructor' => ['Instructor', 'instructor.png'],
-        'bmx' => ['BMX', 'bmx.png'],
-        'girl' => ['Girl', 'cyclist.png'],
-        'grandma' => ['Grandma', 'grandma.png'],
-        'mountain_biker' => ['Mountain Biker', 'mountain-biker.png'],
-        'wheelchair_user' => ['Wheelchair User', 'wheelchair-user.png'],
-        'young_girl' => ['Young Girl', 'young-girl.png'],
-    ];
-
-    public const OBJECTS = [
-        'bottle' => ['Bottle', 'objects/bottle.png'],
-        'cone' => ['Cone', 'objects/cone.png'],
-        'helmet' => ['Helmet', 'helmet.png'],
-        'lights' => ['Lights', 'objects/lights.png'],
-        'lock' => ['Lock', 'objects/lock.png'],
-        'map' => ['Map', 'objects/map.png'],
-        'pedal' => ['Pedal', 'objects/pedal.png'],
-        'pump' => ['Pump', 'pump.png'],
-    ];
-
-    /**
      * The block preview example data.
      *
      * @var array
@@ -197,22 +172,15 @@ class Illustration extends Block
      */
     public function with(): array
     {
-        $character = $this->resolveField('character', '');
-
         return [
-            'character' => $this->url(self::CHARACTERS[$character][1] ?? null),
-            'character2' => $this->url(self::CHARACTERS[$this->resolveField('character_2', '')][1] ?? null),
+            'character' => $this->illustrationUrl($this->resolveField('character', '')),
+            'character2' => $this->illustrationUrl($this->resolveField('character_2', '')),
             'objects' => array_values(array_filter(array_map(
-                fn($n) => $this->url(self::OBJECTS[$this->resolveField("object_$n", '')][1] ?? null),
+                fn($n) => $this->illustrationUrl($this->resolveField("object_$n", '')),
                 [1, 2, 3],
             ))),
             'removeBackground' => $this->resolveBoolField('remove_blue_background'),
         ];
-    }
-
-    protected function url(?string $file): ?string
-    {
-        return $file ? Vite::asset('resources/images/illustrations/' . $file) : null;
     }
 
     /**
@@ -221,11 +189,11 @@ class Illustration extends Block
     public function fields(): array
     {
         $fields = Builder::make('illustration');
-        $choices = fn(array $set) => array_map(fn($item) => $item[0], $set);
+        $characters = Illustrations::characters();
 
         $fields->addSelect('character', [
             'label' => 'Character',
-            'choices' => $choices(self::CHARACTERS),
+            'choices' => $characters,
             'default_value' => 'mountain_biker',
             'ui' => true,
             'required' => true,
@@ -234,7 +202,7 @@ class Illustration extends Block
         $fields->addSelect('character_2', [
             'label' => 'Second character',
             'instructions' => 'Optional. Shown beside the first from tablet width up.',
-            'choices' => $choices(self::CHARACTERS),
+            'choices' => $characters,
             'ui' => true,
             'allow_null' => true,
         ]);
@@ -242,7 +210,8 @@ class Illustration extends Block
         foreach ([1, 2, 3] as $n) {
             $fields->addSelect("object_$n", [
                 'label' => "Optional object $n",
-                'choices' => $choices(self::OBJECTS),
+                'instructions' => 'Keep to small objects: they sit beside the character as extras.',
+                'choices' => Illustrations::objects(),
                 'ui' => true,
                 'allow_null' => true,
                 'wrapper' => ['width' => 33],

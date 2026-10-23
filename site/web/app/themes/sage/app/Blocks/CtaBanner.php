@@ -2,13 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasIllustrations;
 use App\Blocks\Concerns\ResolvesFields;
-use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class CtaBanner extends Block
 {
+    use HasIllustrations;
     use ResolvesFields;
 
     /**
@@ -154,22 +155,6 @@ class CtaBanner extends Block
     public $styles = [];
 
     /**
-     * Illustration choices shared by every layout's image select(s) — a
-     * fixed, developer-controlled set (not an open media upload), so the
-     * front end always renders a bundled resources/images/illustrations/*
-     * asset rather than an arbitrary client-uploaded image.
-     *
-     * @var array
-     */
-    protected $illustrationChoices = [
-        '' => 'None',
-        'bmx' => 'BMX rider',
-        'mountain_biker' => 'Mountain biker',
-        'instructor' => 'Cycle instructor',
-        'cyclist' => 'Cyclist on bike',
-    ];
-
-    /**
      * The block preview example data.
      *
      * @var array
@@ -271,14 +256,16 @@ class CtaBanner extends Block
             ])
                 ->addSelect('image_left', [
                     'label' => 'Left illustration',
-                    'choices' => $this->illustrationChoices,
+                    'instructions' => $this->illustrationInstructions(),
+                    'choices' => $this->illustrations(),
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,
                 ])
                 ->addSelect('image_right', [
                     'label' => 'Right illustration',
-                    'choices' => $this->illustrationChoices,
+                    'instructions' => $this->illustrationInstructions(),
+                    'choices' => $this->illustrations(),
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,
@@ -303,7 +290,8 @@ class CtaBanner extends Block
             ])
                 ->addSelect('image', [
                     'label' => 'Illustration',
-                    'choices' => $this->illustrationChoices,
+                    'instructions' => $this->illustrationInstructions(),
+                    'choices' => $this->illustrations(),
                     'default_value' => '',
                     'ui' => true,
                     'allow_null' => true,
@@ -385,22 +373,6 @@ class CtaBanner extends Block
         $isLeftLayout = in_array($this->layout(), ['left', 'row'], true);
 
         return $this->illustrationUrl(get_field('image') ?: ($isLeftLayout ? $this->exampleField('image', '') : ''));
-    }
-
-    /**
-     * Resolve an illustration select value to its bundled asset URL.
-     *
-     * @return string|null
-     */
-    protected function illustrationUrl(?string $key)
-    {
-        if (! $key) {
-            return null;
-        }
-
-        $file = str_replace('_', '-', $key);
-
-        return Vite::asset("resources/images/illustrations/{$file}.png");
     }
 
     /**

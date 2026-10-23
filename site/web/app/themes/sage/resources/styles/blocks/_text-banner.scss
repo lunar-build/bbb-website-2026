@@ -1,10 +1,9 @@
-// Figma statement banner: centred light heading text with any words the editor bolds picked out, and
+// Figma statement banner: light heading text with any words the editor bolds picked out, and
 // optional normal-size body text under it. The block's background colour comes from the sidebar
 // (theme_block_background_colors()); --c-block-fg is the contrasting text colour set for it.
 .c-text-banner__inner {
-  max-width: 48rem;
+  max-width: 60rem;
   margin: 0 auto;
-  text-align: center;
   color: var(--c-block-fg, var(--wp--preset--color--blue-dark));
 
   p {
@@ -22,13 +21,23 @@
   }
 }
 
-.c-text-banner__inner--left {
-  margin-inline: 0;
+// Text alignment is the block toolbar's (WordPress puts has-text-align-* on the block): the 60rem
+// column sits at the matching side of the container.
+.c-text-banner.has-text-align-left .c-text-banner__inner {
+  margin-inline: 0 auto;
   text-align: left;
 }
 
-// Size comes from the heading's own u-heading-* class (level, or the chosen visual style); the
-// banner look is light text with the bold words picked out.
+.c-text-banner.has-text-align-center .c-text-banner__inner {
+  text-align: center;
+}
+
+.c-text-banner.has-text-align-right .c-text-banner__inner {
+  margin-inline: auto 0;
+  text-align: right;
+}
+
+// Size comes from the level or the chosen visual style (<x-heading>); the banner look is light text with the bold words picked out.
 .c-text-banner__heading {
   margin: 0;
   font-weight: 400;
