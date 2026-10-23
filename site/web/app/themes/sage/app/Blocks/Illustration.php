@@ -210,6 +210,7 @@ class Illustration extends Block
         foreach ([1, 2, 3] as $n) {
             $fields->addSelect("object_$n", [
                 'label' => "Optional object $n",
+                'instructions' => 'Keep to small objects: they sit beside the character as extras.',
                 'choices' => Illustrations::objects(),
                 'ui' => true,
                 'allow_null' => true,
