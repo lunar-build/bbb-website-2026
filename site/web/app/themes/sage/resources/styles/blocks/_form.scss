@@ -19,17 +19,22 @@
   &__content {
     // Blue dark per Figma, not the sitewide Charcoal (base/_typography.scss).
     :where(h1, h2, h3, h4, h5, h6) {
-      color: var(--wp--preset--color--blue-dark);
+      color: var(--c-block-fg, var(--wp--preset--color--blue-dark));
     }
   }
 
   // "Image with form": heading/form left, image right bleeding to the panel's edge
   // (the panel is the full-bleed element).
   &--image {
+    // Blue light unless the editor picks a background colour (the section's, which then sits behind both
+    // the photo and the illustration).
+    &:not(.has-background) {
+      background-color: var(--wp--preset--color--blue-light);
+    }
+
     .c-form__panel {
       position: relative;
       overflow: hidden;
-      background-color: var(--wp--preset--color--blue-light);
       padding-block: 3rem;
 
       @include bp.respond($min: bp.$lg) {
@@ -66,6 +71,29 @@
         object-fit: cover;
       }
     }
+
+    // An illustration sits on the background colour instead of filling the half: kept whole,
+    // standing on the bottom edge, with room round it.
+    .c-form__image--illustration {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      border-radius: 0;
+      overflow: visible;
+
+      img {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 100%;
+        object-fit: contain;
+
+        @include bp.respond($min: bp.$lg) {
+          max-width: 80%;
+          padding: 2rem 0 0;
+        }
+      }
+    }
   }
 
   // "Centred": no image, one narrower column.
@@ -100,5 +128,17 @@
       justify-content: center;
       padding-top: 1.5rem;
     }
+  }
+}
+
+// On the dark background colours the labels follow the block's contrasting text colour
+// (_forms.scss colours them Charcoal with !important, so these need it too).
+.c-form:is(.has-blue-background-color, .has-blue-dark-background-color) {
+  .gfield_label,
+  .gfield_required,
+  .gfield_description,
+  .gform-field-label,
+  legend {
+    color: var(--c-block-fg) !important;
   }
 }
