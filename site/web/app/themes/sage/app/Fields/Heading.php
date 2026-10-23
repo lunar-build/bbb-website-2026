@@ -19,7 +19,11 @@ class Heading extends Partial
      * @param  array  $args  'name' (field key prefix, default 'heading'),
      *                       'label' (default 'Heading'), 'default_level'
      *                       (default 'h2'), 'default_style' (default 'match'),
-     *                       'required' (default false).
+     *                       'required' (default false), 'instructions' (text
+     *                       field help), 'rich' (a basic rich-text field
+     *                       instead of plain text, default false),
+     *                       'allow_none' (adds a "Not a heading" level that
+     *                       outputs a styled <div>, default false).
      */
     public function fields(array $args = []): Builder
     {
@@ -28,25 +32,41 @@ class Heading extends Partial
         $defaultLevel = $args['default_level'] ?? 'h2';
         $defaultStyle = $args['default_style'] ?? 'match';
         $required = $args['required'] ?? false;
+        $levels = [
+            'h1' => 'H1',
+            'h2' => 'H2',
+            'h3' => 'H3',
+            'h4' => 'H4',
+            'h5' => 'H5',
+            'h6' => 'H6',
+        ];
+
+        if ($args['allow_none'] ?? false) {
+            $levels['none'] = 'Not a heading (just styled text)';
+        }
 
         $fields = Builder::make($name);
 
-        $fields->addText("{$name}_text", [
+        $text = [
             'label' => $label,
+            'instructions' => $args['instructions'] ?? '',
             'required' => $required,
-        ]);
+        ];
+
+        if ($args['rich'] ?? false) {
+            $fields->addWysiwyg("{$name}_text", $text + [
+                'tabs' => 'visual',
+                'toolbar' => 'basic',
+                'media_upload' => 0,
+            ]);
+        } else {
+            $fields->addText("{$name}_text", $text);
+        }
 
         $fields->addSelect("{$name}_level", [
             'label' => 'Heading level',
             'instructions' => 'Semantic HTML heading level — choose based on the page\'s document outline/SEO, not how big it should look.',
-            'choices' => [
-                'h1' => 'H1',
-                'h2' => 'H2',
-                'h3' => 'H3',
-                'h4' => 'H4',
-                'h5' => 'H5',
-                'h6' => 'H6',
-            ],
+            'choices' => $levels,
             'default_value' => $defaultLevel,
             'ui' => true,
         ]);
