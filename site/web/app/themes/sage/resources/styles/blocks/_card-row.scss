@@ -4,10 +4,16 @@
 @use '../base/typography';
 @use '../components/button';
 @use '../abstracts/spacing';
+@use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
 
 .c-card-row__heading {
   text-align: center;
+}
+
+// Extra space when no intro sits between heading and cards.
+.c-card-row__heading + .c-card-row__cards {
+  margin-top: 1rem;
 }
 
 .c-card-row__heading-highlight {
@@ -148,7 +154,6 @@
   }
 }
 
-// Route type's extra "browse by area" quick-links panel.
 .c-card-row__area-links {
   display: flex;
   flex-wrap: wrap;
@@ -158,6 +163,11 @@
   border-radius: 20px;
   background: var(--wp--preset--color--lightest-grey);
   margin-bottom: 2rem;
+
+  @include bp.respond($min: bp.$lg) {
+    max-width: 75%;
+    margin-inline: auto;
+  }
 }
 
 // The margins only space what follows inside the block; last, they'd stack on the section padding.

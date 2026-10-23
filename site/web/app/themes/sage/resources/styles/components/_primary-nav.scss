@@ -207,16 +207,26 @@
 
 // Full-bleed bg, content stays gutter-constrained via .o-container inside
 .c-primary-nav-desktop__bar {
-  background: var(--wp--preset--color--lightest-grey);
+  background: var(--wp--preset--color--blue);
 }
 
 .c-primary-nav-desktop__list {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1.5rem; // minimum gap before items overflow into the burger menu
   list-style: none;
   margin: 0;
   padding-block: 1rem;
+  // Hides un-overflowed items before primary-nav.js runs; margin keeps focus rings visible.
+  overflow: clip;
+  overflow-clip-margin: 0.5rem;
+}
+
+// Never shrink/wrap: a full bar overflows so primary-nav.js can measure it.
+.c-primary-nav-desktop__item {
+  flex: none;
+  white-space: nowrap;
 }
 
 .c-primary-nav-desktop__link {
@@ -226,7 +236,7 @@
   border: none;
   background: none;
   padding: 0;
-  color: var(--wp--preset--color--charcoal);
+  color: var(--wp--preset--color--white);
   font-family: var(--wp--preset--font-family--nata-sans);
   @extend .u-nav-link;
   text-decoration: none;
@@ -270,6 +280,9 @@
   top: 100%;
   z-index: 10;
   background: var(--wp--preset--color--blue);
+  border-block-start: 1px solid rgb(255 255 255 / 30%); // separates it from the bar above
+  white-space: normal; // the nowrap <li> it sits in would otherwise stop links wrapping
+  box-shadow: header.$site-header-shadow; // overflows the header, so its shadow doesn't reach here
   padding-block: 2rem;
 
   &[hidden] {
@@ -344,7 +357,7 @@
   border: none;
   border-radius: 50%;
   background: none;
-  color: var(--wp--preset--color--charcoal);
+  color: var(--wp--preset--color--white);
   cursor: pointer;
 
   svg {
@@ -353,6 +366,100 @@
   }
 
   @include focus.ring;
+}
+
+.c-primary-nav-desktop__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8125rem;
+  height: 2.8125rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &-icon-close {
+    display: none;
+  }
+
+  &[aria-expanded='true'] {
+    .c-primary-nav-desktop__more-icon-menu {
+      display: none;
+    }
+
+    .c-primary-nav-desktop__more-icon-close {
+      display: inline-flex;
+    }
+  }
+
+  @include focus.ring;
+}
+
+// Can hold every top-level item — scroll rather than overflow the viewport.
+.c-primary-nav-desktop__dropdown--overflow {
+  max-height: calc(100dvh - 10rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+// Content-sized so the end padding counts toward the sideways scroll width
+// (a zero-size ::after spacer doesn't).
+.c-primary-nav-desktop__dropdown--overflow .c-primary-nav-desktop__columns {
+  width: max-content;
+  min-width: 100%;
+  padding-inline-end: 3rem;
+}
+
+.c-primary-nav-desktop__overflow-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  // display:flex above beats the UA [hidden] rule, so restate it.
+  &[hidden] {
+    display: none;
+  }
+
+  // Only between visible sections: hidden (still-in-the-bar) ones sit before
+  // the first visible one, so a plain `& + &` would give it a stray divider.
+  &:not([hidden]) ~ &:not([hidden]) {
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid rgb(255 255 255 / 30%);
+  }
+}
+
+.c-primary-nav-desktop__overflow-title {
+  // Larger than the 16px group headings so the item reads as top level.
+  font-size: 1.25rem;
+  line-height: normal;
+  margin: 0;
+  color: var(--wp--preset--color--white);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.c-primary-nav-desktop__overflow-link {
+  align-self: flex-start;
+
+  &:hover > span,
+  &:focus-visible > span {
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 .c-primary-nav-desktop__list[hidden],

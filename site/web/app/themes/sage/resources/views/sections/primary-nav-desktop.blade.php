@@ -11,7 +11,7 @@
         <div class="o-container">
             <ul class="c-primary-nav-desktop__list" role="list">
                 @foreach ($items as $i => $item)
-                    <li class="c-primary-nav-desktop__item">
+                    <li class="c-primary-nav-desktop__item" data-nav-item>
                         @if (!empty($item['children']))
                             <button type="button" class="c-primary-nav-desktop__link" aria-expanded="false"
                                 aria-controls="desktop-dropdown-{{ $i }}">
@@ -22,28 +22,7 @@
                             <div id="desktop-dropdown-{{ $i }}" class="c-primary-nav-desktop__dropdown"
                                 hidden>
                                 <div class="o-container">
-                                    <div class="c-primary-nav-desktop__columns">
-                                        @foreach ($item['children'] as $group)
-                                            <div class="c-primary-nav-desktop__column">
-                                                <p class="c-primary-nav-desktop__heading">{{ $group['label'] }}</p>
-
-                                                @if (!empty($group['children']))
-                                                    <ul class="c-primary-nav-desktop__sublist" role="list">
-                                                        @foreach ($group['children'] as $link)
-                                                            <li>
-                                                                <a href="{{ $link['href'] }}"
-                                                                    class="c-primary-nav-desktop__sublink">
-                                                                    <span>{{ $link['label'] }}</span>
-                                                                    <x-icon name="chevron"
-                                                                        class="c-primary-nav-desktop__chevron c-primary-nav-desktop__chevron--sub" />
-                                                                </a>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
+                                    @include('sections.primary-nav-desktop-columns', ['groups' => $item['children'], 'idPrefix' => 'desktop-nav-group-' . $i])
                                 </div>
                             </div>
                         @else
@@ -52,6 +31,33 @@
                         @endif
                     </li>
                 @endforeach
+
+                {{-- Overflow menu: primary-nav.js hides trailing items that don't fit and
+                     reveals their sections here. All items render up front; the JS only toggles [hidden]. --}}
+                <li class="c-primary-nav-desktop__item c-primary-nav-desktop__item--more" hidden>
+                    <button type="button" class="c-primary-nav-desktop__more" aria-expanded="false"
+                        aria-controls="desktop-dropdown-overflow" aria-label="{{ __('More navigation', 'sage') }}">
+                        <x-icon name="menu" class="c-primary-nav-desktop__more-icon-menu" />
+                        <x-icon name="close" class="c-primary-nav-desktop__more-icon-close" />
+                    </button>
+
+                    <div id="desktop-dropdown-overflow"
+                        class="c-primary-nav-desktop__dropdown c-primary-nav-desktop__dropdown--overflow" hidden>
+                        <div class="o-container">
+                            @foreach ($items as $i => $item)
+                                <div class="c-primary-nav-desktop__overflow-section" data-overflow-index="{{ $i }}" hidden>
+                                    @if (!empty($item['children']))
+                                        <p class="c-primary-nav-desktop__overflow-title">{{ $item['label'] }}</p>
+                                        @include('sections.primary-nav-desktop-columns', ['groups' => $item['children'], 'idPrefix' => 'desktop-overflow-group-' . $i])
+                                    @else
+                                        <a href="{{ $item['href'] }}"
+                                            class="c-primary-nav-desktop__overflow-title c-primary-nav-desktop__overflow-link"><span>{{ $item['label'] }}</span></a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
 
                 <li class="c-primary-nav-desktop__item">
                     {{-- Replaces the list with the search form below (Figma "Desktop | Search") --}}

@@ -99,7 +99,7 @@ const desktopNav = document.querySelector('.c-primary-nav-desktop');
 if (desktopNav) {
   const triggers = [
     ...desktopNav.querySelectorAll(
-      '.c-primary-nav-desktop__link[aria-controls]',
+      '.c-primary-nav-desktop__link[aria-controls], .c-primary-nav-desktop__more',
     ),
   ];
 
@@ -147,20 +147,94 @@ if (desktopNav) {
       closeAll();
   });
 
-  // Desktop search replaces the L1 list within the same bar (Figma "Desktop | Search").
+  // Overflow ("priority+"): trailing top-level items that don't fit move into
+  // the burger's dropdown. Fit is the last visible item's right edge vs the
+  // list's, not scrollWidth — overflow:clip doesn't report through it.
+  const navList = desktopNav.querySelector('.c-primary-nav-desktop__list');
+  const navItems = [...desktopNav.querySelectorAll('[data-nav-item]')];
+  const moreItem = desktopNav.querySelector(
+    '.c-primary-nav-desktop__item--more',
+  );
+  const sections = [...desktopNav.querySelectorAll('[data-overflow-index]')];
+
+  const layoutOverflow = () => {
+    // Skip while the bar is display:none (below bp.$sm) or showing search.
+    if (!navList || !moreItem || navList.hidden || !navList.offsetWidth) return;
+
+    navItems.forEach((item) => (item.hidden = false));
+    moreItem.hidden = true;
+    sections.forEach((section) => (section.hidden = true));
+
+    const fits = () => {
+      const last = [...navList.children].reverse().find((li) => !li.hidden);
+      return (
+        !last ||
+        last.getBoundingClientRect().right <=
+          navList.getBoundingClientRect().right + 0.5
+      );
+    };
+
+    if (!fits()) {
+      moreItem.hidden = false;
+      for (let i = navItems.length - 1; i >= 0; i--) {
+        navItems[i].hidden = true;
+        sections[i].hidden = false;
+        if (fits()) break;
+      }
+    }
+
+    // Hiding the focused item would drop focus to <body> — hand it to the burger (WCAG 2.4.3).
+    const active = document.activeElement;
+    if (
+      active &&
+      navItems.some((item) => item.hidden && item.contains(active))
+    ) {
+      moreItem.querySelector('.c-primary-nav-desktop__more').focus();
+    }
+
+    // Close a dropdown whose trigger just overflowed.
+    const stale = triggers.some(
+      (trigger) =>
+        trigger.getAttribute('aria-expanded') === 'true' &&
+        trigger.closest('li').hidden,
+    );
+    if (stale) closeAll();
+  };
+
+  // Next frame: resizing observed items inside the callback logs a
+  // "ResizeObserver loop" error. Also collapses bursts into one pass.
+  let layoutFrame;
+  const scheduleLayout = () => {
+    cancelAnimationFrame(layoutFrame);
+    layoutFrame = requestAnimationFrame(layoutOverflow);
+  };
+
+  if (navList && moreItem && sections.length) {
+    const observer = new ResizeObserver(scheduleLayout);
+    // Container for viewport changes; not the list, whose size changes as items hide.
+    observer.observe(navList.closest('.o-container'));
+    // Items for text-only zoom / text spacing, which widen labels without
+    // resizing the container (WCAG 1.4.4/1.4.12). Overflow-hiding resizes
+    // them too, but the next pass lands on the same state, so it settles.
+    navItems.forEach((item) => observer.observe(item));
+    document.fonts?.ready.then(scheduleLayout);
+  }
+
+  // Desktop search (Figma "Desktop | Search") replaces the L1 list within
+  // the same bar rather than opening a separate overlay.
   const searchToggle = desktopNav.querySelector(
     '.c-primary-nav-desktop__search-toggle',
   );
   const searchForm = document.getElementById('desktop-search');
-  const list = desktopNav.querySelector('.c-primary-nav-desktop__list');
 
-  if (searchToggle && searchForm && list) {
+  if (searchToggle && searchForm && navList) {
     const setSearchOpen = (open) => {
       closeAll();
       searchToggle.setAttribute('aria-expanded', String(open));
-      list.hidden = open;
+      navList.hidden = open;
       searchForm.hidden = !open;
       if (open) searchForm.querySelector('input').focus();
+      else layoutOverflow();
     };
 
     searchToggle.addEventListener('click', () => setSearchOpen(true));
