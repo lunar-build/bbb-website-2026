@@ -2,7 +2,9 @@
 
 <div class="o-container c-card-row--{{ $type }}">
   <h2 class="c-card-row__heading">
-    <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
+    @if ($headingHighlight)
+      <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
+    @endif
     {{ $heading }}
   </h2>
 
