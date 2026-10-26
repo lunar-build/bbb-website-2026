@@ -29,7 +29,7 @@
         />
       @else
         <div class="c-link-card__cta">
-          <a class="c-link-card__cta-link u-cta-large" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+          <a class="c-link-card__cta-link u-cta-small" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
             {{ $card['link']['title'] }}
             @if (($card['link']['target'] ?? '') === '_blank')
               <span class="u-sr-only">(opens in a new tab)</span>

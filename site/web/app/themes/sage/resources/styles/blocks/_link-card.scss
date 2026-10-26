@@ -68,9 +68,11 @@
 .c-link-card__title {
   color: var(--wp--preset--color--blue-medium);
 
-  // Description is optional: a lone title's margin-bottom would throw it off-centre.
+  // No description: title steps down a size, and drops its margin so it stays centred.
   &:last-child {
     margin-bottom: 0;
+    font-size: var(--wp--preset--font-size--standfirst);
+    line-height: 1.5rem;
   }
 }
 
