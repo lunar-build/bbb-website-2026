@@ -513,3 +513,15 @@ add_filter('mec-single-event-meta-title', function ($tabs) {
 
     return $tabs;
 });
+
+/**
+ * Marker.io feedback widget → Trello. Dev and staging only, never production.
+ * The project ID is public by design (Marker proxies the onward Trello credentials).
+ */
+add_action('wp_head', function () {
+    if (! in_array(WP_ENV, ['development', 'staging'], true)) {
+        return;
+    }
+
+    echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
+});
