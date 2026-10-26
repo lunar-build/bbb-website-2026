@@ -4,17 +4,22 @@
   @foreach ($steps as $index => $step)
     @php
       $label = $step['label'] ?: $index + 1;
-      $datetime = null;
+      $date = null;
 
+      // DD/MM/YY labels stack as day / month / year; anything else shows as typed.
       if ($markerSize === 'date' && preg_match('/^(\d{2})\/(\d{2})\/(\d{2})$/', $step['label'] ?? '', $matches)) {
-        $datetime = "20{$matches[3]}-{$matches[2]}-{$matches[1]}";
+        $date = DateTimeImmutable::createFromFormat('!d/m/y', $step['label']) ?: null;
       }
     @endphp
 
     <li @class(['c-timeline__step', 'c-timeline__step--no-heading' => empty($step['heading'])])>
       <span class="c-timeline__marker-col">
-        @if ($datetime)
-          <time class="c-timeline__marker u-heading-4" datetime="{{ $datetime }}">{{ $label }}</time>
+        @if ($date)
+          <time class="c-timeline__marker c-timeline__marker--date" datetime="{{ $date->format('Y-m-d') }}">
+            <span class="c-timeline__date-day">{{ $date->format('j') }}</span>
+            <span class="c-timeline__date-month">{{ date_i18n('M', $date->getTimestamp()) }}</span>
+            <span class="c-timeline__date-year">{{ $date->format('Y') }}</span>
+          </time>
         @else
           <span class="c-timeline__marker u-heading-4">{{ $label }}</span>
         @endif

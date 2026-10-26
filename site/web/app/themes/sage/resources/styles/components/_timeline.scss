@@ -6,25 +6,32 @@
 }
 
 .c-timeline {
-  --timeline-marker-size: 3.5625rem; // 57px — fits a 2-digit step number
+  --timeline-marker-size: 3.5625rem; // 57px minimum — fits a 2-digit step number
 
+  // Steps share one grid (via subgrid) so the marker column takes the widest
+  // marker's width — a long label grows every square to fit, keeping them equal.
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.875rem; // 30px
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1.625rem; // 26px
+  row-gap: 1.875rem; // 30px
   margin: 0;
   padding: 0;
   list-style: none;
 
   // One line from first to last marker centre, behind the markers (z-index 1). Drawn on
   // the list so per-step baseline shifts (.c-timeline__step) can't skew its length.
+  // Placed in the marker column, so % margins (which resolve against its width, i.e.
+  // the square's size) inset it by half a marker at each end.
   &::before {
     content: '';
     position: absolute;
-    top: calc(var(--timeline-marker-size) / 2);
-    bottom: calc(var(--timeline-marker-size) / 2);
-    left: calc(var(--timeline-marker-size) / 2);
+    grid-column: 1 / 2; // explicit end: an absolute item's `auto` end would span the whole list
+    top: 0;
+    bottom: 0;
+    left: 50%;
     width: 0.1875rem; // 3px
+    margin-block: 50%;
     margin-left: -0.09375rem;
     background: var(--wp--preset--color--yellow);
   }
@@ -32,14 +39,15 @@
 
 // One marker size per block, so mixed numbers and dates don't mismatch.
 .c-timeline--dates {
-  --timeline-marker-size: 6rem; // 96px — fits an 8-char DD/MM/YY date
+  --timeline-marker-size: 5rem; // 80px minimum — fits the stacked day / month / year
 }
 
 .c-timeline__step {
-  display: flex;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   // First line level with the marker's text baseline, whatever its height.
   align-items: baseline;
-  gap: 1.625rem; // 26px
   margin: 0;
 }
 
@@ -49,34 +57,54 @@
 }
 
 .c-timeline__marker-col {
-  flex: none;
   display: flex;
-  justify-content: center;
-  width: var(--timeline-marker-size);
 }
 
+// Square: fills the shared column (at least --timeline-marker-size), height follows.
 .c-timeline__marker {
   position: relative;
   z-index: 1;
   display: flex;
-  flex: none;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  width: var(--timeline-marker-size);
-  height: var(--timeline-marker-size);
+  min-width: var(--timeline-marker-size);
+  aspect-ratio: 1;
   margin-bottom: 0; // override .u-heading-4's margin-bottom
-  padding-inline: 0.25rem;
+  padding-inline: 0.5rem;
   border-radius: 1.25rem; // 20px
   background: var(--wp--preset--color--yellow);
   color: var(--wp--preset--color--charcoal);
   text-align: center;
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
 
   .c-timeline--dates & {
-    font-size: 0.9375rem; // heading-4's size is tuned for 2 digits, too wide at 8 (DD/MM/YY)
+    font-size: 0.9375rem; // heading-4's size is tuned for 2 digits; for labels that aren't DD/MM/YY dates
   }
+}
+
+// Parsed DD/MM/YY dates, stacked: big day over the month and year.
+.c-timeline__marker--date {
+  flex-direction: column;
+  gap: 0.125rem;
+  font-weight: 700;
+}
+
+.c-timeline__date-day {
+  font-size: 1.75rem;
+  line-height: 1.75rem;
+}
+
+.c-timeline__date-month {
+  font-size: 1rem;
+  line-height: 1.125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.c-timeline__date-year {
+  font-size: 1rem;
+  line-height: 1.125rem;
 }
 
 .c-timeline__content {
