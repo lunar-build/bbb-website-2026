@@ -949,11 +949,23 @@ function news_map_url(string $url): string
     return html_entity_decode($url);
 }
 
-/** Map Embed from a Google map iframe (core/html) or a Google-provider core/embed; null for anything else. */
+/** Text of the heading just before the end of `$out`, or '' if the last real block isn't one (a map's title). */
+function news_previous_heading(array $out): string
+{
+    foreach (array_reverse($out) as $p) {
+        if ($p && ! news_is_blank($p)) {
+            return $p['blockName'] === 'core/heading' ? news_plain($p['innerHTML']) : '';
+        }
+    }
+
+    return '';
+}
+
+/** Map Embed from a Google map iframe (core/html, or loose HTML with no block) or a Google-provider core/embed; null for anything else. */
 function news_map_embed(array $b, string $title): ?array
 {
     $url = null;
-    if ($b['blockName'] === 'core/html' && preg_match('#<iframe[^>]+src="([^"]+)"#i', $b['innerHTML'], $m) && str_contains($m[1], 'google.com/maps')) {
+    if (in_array($b['blockName'], [null, 'core/html'], true) && preg_match('#<iframe[^>]+src="([^"]+)"#i', $b['innerHTML'], $m) && str_contains($m[1], 'google.com/maps')) {
         $url = $m[1];
         $title = preg_match('#<iframe[^>]+title="([^"]+)"#i', $b['innerHTML'], $t) ? html_entity_decode($t[1]) : $title;
     } elseif ($b['blockName'] === 'core/embed' && ($b['attrs']['providerNameSlug'] ?? '') === 'google') {
@@ -1307,16 +1319,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 break;
             case 'core/html':
             case 'core/embed':
-                $prev = null;
-                foreach (array_reverse($out) as $p) {
-                    if ($p && ! news_is_blank($p)) {
-                        $prev = $p;
-
-                        break;
-                    }
-                }
-                $title = $prev && $prev['blockName'] === 'core/heading' ? news_plain($prev['innerHTML']) : '';
-                $map = news_map_embed($b, $title);
+                $map = news_map_embed($b, news_previous_heading($out));
                 if (! $map && $b['blockName'] === 'core/html' && preg_match('#^\s*<h([1-6])[^>]*>(.*)</h\1>\s*$#s', $b['innerHTML'], $h)) {
                     // A centred heading pasted as raw HTML is a statement banner (the homepage's "Healthier, faster…"):
                     // the text before the line break, and the bold part after it as the emphasised line.
@@ -1397,6 +1400,12 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 $out[] = null; // placeholder, filled once all cards are collected
                 break;
             default:
+                if ($b['blockName'] === null && str_contains($b['innerHTML'], '<iframe') && ($map = news_map_embed($b, news_previous_heading($out)))) {
+                    $out[] = $map;
+                    $notes[] = 'Google map -> Map Embed';
+
+                    break;
+                }
                 if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/') && ! WP_Block_Type_Registry::get_instance()->is_registered($b['blockName'])) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }
