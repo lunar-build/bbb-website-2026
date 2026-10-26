@@ -41,6 +41,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  // Smaller than the shared 24px .u-short-form-link, matching Icon Link Grid.
+  font-size: 1.25rem;
+  line-height: 1.625rem;
   color: var(--wp--preset--color--blue-medium);
   text-decoration: none;
 
