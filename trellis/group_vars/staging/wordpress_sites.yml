@@ -32,3 +32,6 @@ wordpress_sites:
     xmlrpc:
       enabled: false
     deploy_keep_releases: 3
+    # Public by design (Marker.io proxies the Trello credentials), so no vault needed
+    env:
+      MARKER_PROJECT_ID: 6adf384284936c1d0de1c19e
