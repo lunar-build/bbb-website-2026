@@ -1,5 +1,7 @@
-// Bullet List block's list styling, shared with rich-text lists (e.g. Accordion
-// content) so they match. Base bullets live in base/_typography.scss.
+// The Bullet List block's list styling, shared by every place lists can appear:
+// the Bullet List block, rich-text fields (.u-rich-text) and core List blocks.
+// Include on a wrapper or on the list itself — `&:is(ol)` covers the latter.
+// Base bullets live in base/_typography.scss.
 @mixin content-list {
   li {
     margin-bottom: 0.625rem;
@@ -16,14 +18,15 @@
   }
 
   // Second-level bullets are hollow, so the hierarchy reads at a glance.
-  ul ul > li::before {
+  li > ul > li::before {
     background: transparent;
     box-shadow: inset 0 0 0 1px var(--wp--preset--color--blue);
   }
 
   // Numbers: native markers (screen readers announce them), styled to match
   // the bullets' blue. Nested levels count a., b. then i., ii.
-  ol {
+  ol,
+  &:is(ol) {
     padding-inline-start: 1.5rem;
 
     > li::marker {
@@ -32,11 +35,13 @@
     }
   }
 
-  ol ol {
+  ol li > ol,
+  &:is(ol) li > ol {
     list-style-type: lower-alpha;
   }
 
-  ol ol ol {
+  ol li > ol li > ol,
+  &:is(ol) li > ol li > ol {
     list-style-type: lower-roman;
   }
 }

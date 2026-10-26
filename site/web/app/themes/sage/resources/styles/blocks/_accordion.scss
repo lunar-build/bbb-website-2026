@@ -1,6 +1,5 @@
 @use '../base/typography';
 @use '../base/focus' as focus;
-@use '../abstracts/lists';
 
 // Figma "Accordion" (node 21:1225)
 .c-accordion__heading {
@@ -58,9 +57,6 @@ wa-accordion-item {
 .c-accordion__content {
   @extend .u-body-regular;
   color: var(--wp--preset--color--charcoal);
-
-  // Match the Bullet List block.
-  @include lists.content-list;
 
   :is(p, ul, ol):last-child {
     margin-bottom: 0;

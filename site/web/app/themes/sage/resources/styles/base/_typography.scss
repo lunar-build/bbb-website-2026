@@ -1,4 +1,5 @@
 @use '../abstracts/spacing';
+@use '../abstracts/lists';
 
 body {
   font-family: var(--wp--preset--font-family--nata-sans);
@@ -25,11 +26,13 @@ ol {
   }
 }
 
-// Custom bullet for content lists, scoped to .e-content, the Bullet List block and
-// Accordion content so it doesn't leak onto UI <ul>s (nav, pattern library chrome).
+// Custom bullet for content lists, scoped so it doesn't leak onto UI <ul>s (nav,
+// pattern library chrome): page content, core List blocks, the Bullet List block
+// and rich-text fields (.u-rich-text).
 .e-content ul,
+ul.wp-block-list,
 .c-bullet-list ul,
-.c-accordion__content ul {
+.u-rich-text ul {
   list-style: none;
   padding-inline-start: 1.3125rem;
 
@@ -39,7 +42,8 @@ ol {
     &::before {
       content: '';
       position: absolute;
-      top: 0.59375rem;
+      top: 0.59375rem; // centred on a 1.5rem line; `lh` below follows larger text
+      top: calc(0.5lh - 0.15625rem);
       left: -1.3125rem;
       width: 0.3125rem;
       height: 0.3125rem;
@@ -47,6 +51,12 @@ ol {
       background: var(--wp--preset--color--blue);
     }
   }
+}
+
+// Spacing, hollow nested bullets and numbering to match the Bullet List block.
+.wp-block-list,
+.u-rich-text {
+  @include lists.content-list;
 }
 
 h1,
