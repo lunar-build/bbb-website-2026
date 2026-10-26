@@ -518,13 +518,13 @@ function news_illustration(array $b): ?array
 {
     $d = $b['attrs']['data'] ?? [];
     $character = news_illustration_key($d['illustration_figure'] ?? '');
-    if (! isset(\App\Blocks\Illustration::CHARACTERS[$character])) {
+    if (! isset(\App\Support\Illustrations::CHARACTERS[$character])) {
         return null;
     }
     $fields = ['character' => $character];
     foreach ([1, 2, 3] as $n) {
         $object = news_illustration_key($d["illustration_object_$n"] ?? '');
-        $fields["object_$n"] = isset(\App\Blocks\Illustration::OBJECTS[$object]) ? $object : '';
+        $fields["object_$n"] = isset(\App\Support\Illustrations::OBJECTS[$object]) ? $object : '';
     }
     $fields['remove_blue_background'] = ! empty($d['remove_blue_background']) ? '1' : '0';
 
@@ -804,14 +804,14 @@ function news_latest_news(array $b, wpdb $src): array
 function news_footer_illustration(wpdb $src, int $id): ?array
 {
     $figure = news_illustration_key(news_meta($src, $id, 'illustration_figure'));
-    if (! isset(\App\Blocks\Illustration::CHARACTERS[$figure])) {
+    if (! isset(\App\Support\Illustrations::CHARACTERS[$figure])) {
         return null;
     }
     $second = news_illustration_key(news_meta($src, $id, 'illustration_figure_2'));
-    $fields = ['character' => $figure, 'character_2' => isset(\App\Blocks\Illustration::CHARACTERS[$second]) ? $second : ''];
+    $fields = ['character' => $figure, 'character_2' => isset(\App\Support\Illustrations::CHARACTERS[$second]) ? $second : ''];
     foreach ([1, 2, 3] as $n) {
         $object = news_illustration_key(news_meta($src, $id, "illustration_object_$n"));
-        $fields["object_$n"] = isset(\App\Blocks\Illustration::OBJECTS[$object]) ? $object : '';
+        $fields["object_$n"] = isset(\App\Support\Illustrations::OBJECTS[$object]) ? $object : '';
     }
     $fields['remove_blue_background'] = '0';
 
@@ -843,7 +843,7 @@ function news_newsletter_form(array &$notes): ?array
 /** A Text Banner from its heading and body rich text, on an optional background colour slug; $level is h2-h4, or none for a standalone statement. */
 function news_text_banner_html(string $heading, string $body = '', string $background = '', string $level = 'none'): array
 {
-    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'heading_level' => $level, 'heading_style' => 'h3', 'body' => $body, 'alignment' => 'centre'], 'text_banner');
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading_text' => $heading, 'heading_level' => $level, 'heading_style' => 'h3', 'body' => $body], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
