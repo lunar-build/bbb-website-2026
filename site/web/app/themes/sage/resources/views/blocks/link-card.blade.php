@@ -11,7 +11,7 @@
 
       <div class="c-link-card__content">
         @if ($card['title'])
-          <p class="c-link-card__title u-heading-4">{{ $card['title'] }}</p>
+          <p class="c-link-card__title u-heading-5">{{ $card['title'] }}</p>
         @endif
 
         @if ($card['description'])
