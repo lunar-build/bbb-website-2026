@@ -25,10 +25,11 @@ ol {
   }
 }
 
-// Custom bullet for content lists, scoped to .e-content and the Bullet List block so it
-// doesn't leak onto UI <ul>s (nav, pattern library chrome).
+// Custom bullet for content lists, scoped to .e-content, the Bullet List block and
+// Accordion content so it doesn't leak onto UI <ul>s (nav, pattern library chrome).
 .e-content ul,
-.c-bullet-list ul {
+.c-bullet-list ul,
+.c-accordion__content ul {
   list-style: none;
   padding-inline-start: 1.3125rem;
 
