@@ -518,13 +518,13 @@ function news_illustration(array $b): ?array
 {
     $d = $b['attrs']['data'] ?? [];
     $character = news_illustration_key($d['illustration_figure'] ?? '');
-    if (! isset(\App\Blocks\Illustration::CHARACTERS[$character])) {
+    if (! isset(\App\Support\Illustrations::CHARACTERS[$character])) {
         return null;
     }
     $fields = ['character' => $character];
     foreach ([1, 2, 3] as $n) {
         $object = news_illustration_key($d["illustration_object_$n"] ?? '');
-        $fields["object_$n"] = isset(\App\Blocks\Illustration::OBJECTS[$object]) ? $object : '';
+        $fields["object_$n"] = isset(\App\Support\Illustrations::OBJECTS[$object]) ? $object : '';
     }
     $fields['remove_blue_background'] = ! empty($d['remove_blue_background']) ? '1' : '0';
 
@@ -804,14 +804,14 @@ function news_latest_news(array $b, wpdb $src): array
 function news_footer_illustration(wpdb $src, int $id): ?array
 {
     $figure = news_illustration_key(news_meta($src, $id, 'illustration_figure'));
-    if (! isset(\App\Blocks\Illustration::CHARACTERS[$figure])) {
+    if (! isset(\App\Support\Illustrations::CHARACTERS[$figure])) {
         return null;
     }
     $second = news_illustration_key(news_meta($src, $id, 'illustration_figure_2'));
-    $fields = ['character' => $figure, 'character_2' => isset(\App\Blocks\Illustration::CHARACTERS[$second]) ? $second : ''];
+    $fields = ['character' => $figure, 'character_2' => isset(\App\Support\Illustrations::CHARACTERS[$second]) ? $second : ''];
     foreach ([1, 2, 3] as $n) {
         $object = news_illustration_key(news_meta($src, $id, "illustration_object_$n"));
-        $fields["object_$n"] = isset(\App\Blocks\Illustration::OBJECTS[$object]) ? $object : '';
+        $fields["object_$n"] = isset(\App\Support\Illustrations::OBJECTS[$object]) ? $object : '';
     }
     $fields['remove_blue_background'] = '0';
 
@@ -843,7 +843,7 @@ function news_newsletter_form(array &$notes): ?array
 /** A Text Banner from its heading and body rich text, on an optional background colour slug; $level is h2-h4, or none for a standalone statement. */
 function news_text_banner_html(string $heading, string $body = '', string $background = '', string $level = 'none'): array
 {
-    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading' => $heading, 'heading_level' => $level, 'heading_style' => 'h3', 'body' => $body, 'alignment' => 'centre'], 'text_banner');
+    $banner = news_acf_block('acf/text-banner', \App\Blocks\TextBanner::class, ['heading_text' => $heading, 'heading_level' => $level, 'heading_style' => 'h3', 'body' => $body], 'text_banner');
     if ($background) {
         $banner['attrs']['backgroundColor'] = $background;
     }
@@ -949,11 +949,23 @@ function news_map_url(string $url): string
     return html_entity_decode($url);
 }
 
-/** Map Embed from a Google map iframe (core/html) or a Google-provider core/embed; null for anything else. */
+/** Text of the heading just before the end of `$out`, or '' if the last real block isn't one (a map's title). */
+function news_previous_heading(array $out): string
+{
+    foreach (array_reverse($out) as $p) {
+        if ($p && ! news_is_blank($p)) {
+            return $p['blockName'] === 'core/heading' ? news_plain($p['innerHTML']) : '';
+        }
+    }
+
+    return '';
+}
+
+/** Map Embed from a Google map iframe (core/html, or loose HTML with no block) or a Google-provider core/embed; null for anything else. */
 function news_map_embed(array $b, string $title): ?array
 {
     $url = null;
-    if ($b['blockName'] === 'core/html' && preg_match('#<iframe[^>]+src="([^"]+)"#i', $b['innerHTML'], $m) && str_contains($m[1], 'google.com/maps')) {
+    if (in_array($b['blockName'], [null, 'core/html'], true) && preg_match('#<iframe[^>]+src="([^"]+)"#i', $b['innerHTML'], $m) && str_contains($m[1], 'google.com/maps')) {
         $url = $m[1];
         $title = preg_match('#<iframe[^>]+title="([^"]+)"#i', $b['innerHTML'], $t) ? html_entity_decode($t[1]) : $title;
     } elseif ($b['blockName'] === 'core/embed' && ($b['attrs']['providerNameSlug'] ?? '') === 'google') {
@@ -1307,16 +1319,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 break;
             case 'core/html':
             case 'core/embed':
-                $prev = null;
-                foreach (array_reverse($out) as $p) {
-                    if ($p && ! news_is_blank($p)) {
-                        $prev = $p;
-
-                        break;
-                    }
-                }
-                $title = $prev && $prev['blockName'] === 'core/heading' ? news_plain($prev['innerHTML']) : '';
-                $map = news_map_embed($b, $title);
+                $map = news_map_embed($b, news_previous_heading($out));
                 if (! $map && $b['blockName'] === 'core/html' && preg_match('#^\s*<h([1-6])[^>]*>(.*)</h\1>\s*$#s', $b['innerHTML'], $h)) {
                     // A centred heading pasted as raw HTML is a statement banner (the homepage's "Healthier, faster…"):
                     // the text before the line break, and the bold part after it as the emphasised line.
@@ -1397,6 +1400,12 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 $out[] = null; // placeholder, filled once all cards are collected
                 break;
             default:
+                if ($b['blockName'] === null && str_contains($b['innerHTML'], '<iframe') && ($map = news_map_embed($b, news_previous_heading($out)))) {
+                    $out[] = $map;
+                    $notes[] = 'Google map -> Map Embed';
+
+                    break;
+                }
                 if ($b['blockName'] && ! str_starts_with($b['blockName'], 'core/') && ! WP_Block_Type_Registry::get_instance()->is_registered($b['blockName'])) {
                     $notes[] = 'UNMAPPED ' . $b['blockName'];
                 }

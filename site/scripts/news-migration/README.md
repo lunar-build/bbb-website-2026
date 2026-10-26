@@ -34,7 +34,7 @@ never touches the old site itself, and it only writes to this site's database.
 | `acf/card` layouts where every card is an icon card with a link | Link Card, with the icon as the logo. The old site showed these icons small; a Card Grid image would be large |
 | `acf/card` layouts linking to an uploaded file (map, guide) | Link Card with download cards (file, label from the old link text, size). Adjacent layouts under one heading merge into one block. Regional cycle maps (701) turns every layout into Link Cards except the photo cards (title and header photo on every card), which stay a Card Grid |
 | `acf/card` outside a card layout | Card Grid with "link" cards; consecutive cards share one grid. A card sourced from a post takes its title, excerpt, image and a `?p=` link |
-| Google map iframe (`core/html`) or Google `core/embed` | Map Embed. Drive "open?id=" links become My Maps embed URLs, and the title comes from the iframe or the heading above |
+| Google map iframe (`core/html`, or loose HTML with no block) or Google `core/embed` | Map Embed. Drive "open?id=" links become My Maps embed URLs, and the title comes from the iframe or the heading above |
 | Hard-wrapped text (a newline every few words, from Word) | Lines joined in card text, callouts, accordions, timelines and quotes, and mid-sentence line breaks in paragraphs. Blank lines stay paragraph breaks and address line breaks stay |
 | Columns with no images | Unwrapped: the blocks keep their order but lose the side-by-side layout |
 | Heading `h3`/`h4` class, centred text | Class and alignment dropped; the heading level stays |
