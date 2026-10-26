@@ -103,7 +103,7 @@
         },
         {
           "slug": "standfirst",
-          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "size": "clamp(1rem, 0.948rem + 0.221vw, 1.125rem)",
           "name": "Standfirst"
         },
         { "slug": "body", "size": "1rem", "name": "Body" },
@@ -114,7 +114,7 @@
         },
         {
           "slug": "button-label",
-          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "size": "clamp(1rem, 0.948rem + 0.221vw, 1.125rem)",
           "name": "Button label"
         },
         {
