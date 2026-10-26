@@ -91,14 +91,28 @@ h4,
   margin-bottom: spacing.$base;
 }
 
-// No distinct H6 spec supplied by design — reuses H5 size until one is provided.
 h5,
-h6,
 .u-heading-5 {
   font-size: var(--wp--preset--font-size--heading-5);
   line-height: 1.875rem;
   font-weight: 700;
   margin-bottom: spacing.$base;
+}
+
+// Not in the Figma type scale — one step below H5, still clear of body text.
+h6,
+.u-heading-6 {
+  font-size: var(--wp--preset--font-size--heading-6);
+  line-height: 1.625rem;
+  font-weight: 700;
+  margin-bottom: spacing.$base;
+}
+
+// Card titles: between H5 and H6. Shared by Feature Card (Card Grid etc.) and Business Card.
+.u-card-title {
+  font-size: clamp(1.25rem, 1.198rem + 0.221vw, 1.375rem);
+  line-height: 1.75rem;
+  font-weight: 700;
 }
 
 .u-standfirst {

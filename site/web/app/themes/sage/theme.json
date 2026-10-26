@@ -102,6 +102,11 @@
           "name": "Heading 5"
         },
         {
+          "slug": "heading-6",
+          "size": "clamp(1.125rem, 1.073rem + 0.221vw, 1.25rem)",
+          "name": "Heading 6"
+        },
+        {
           "slug": "standfirst",
           "size": "clamp(1rem, 0.948rem + 0.221vw, 1.125rem)",
           "name": "Standfirst"
