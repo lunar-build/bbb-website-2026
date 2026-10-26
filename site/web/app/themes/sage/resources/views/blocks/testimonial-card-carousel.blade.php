@@ -11,6 +11,7 @@
             :info="$card['info']"
             :quote="$card['quote']"
             :link="$card['link']"
+            :portrait="$portrait"
           />
         </wa-carousel-item>
       @endforeach
