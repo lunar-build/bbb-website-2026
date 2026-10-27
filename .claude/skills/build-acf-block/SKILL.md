@@ -280,7 +280,10 @@ Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
 **Root element is always `<section>`, never `<div>`, and is never guarded by
 `@unless ($block->preview)`.** Every block is a distinct region of page content, so
 `<section>` is the correct semantic wrapper — this is a fixed convention, not a
-per-block choice. If a block's content already has its own inner `<section>` (e.g. an
+per-block choice, with one exception: a block that is purely decorative (no text, no
+heading, e.g. `illustration.blade.php`) uses a `<div aria-hidden="true">`, because a
+`<section>` with no accessible name or content isn't a meaningful region. If a block's
+content already has its own inner `<section>` (e.g. an
 "inner" wrapper), rename that inner one to `<div>` rather than nesting two `<section>`s
 (see `video-hero.blade.php`'s `.c-video-hero__inner`).
 

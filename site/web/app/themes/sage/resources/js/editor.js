@@ -1,19 +1,27 @@
 import domReady from '@wordpress/dom-ready';
-import { addFilter } from '@wordpress/hooks';
+import { dispatch, select, subscribe } from '@wordpress/data';
 import './video-background.js';
 
 // New Heading blocks start in Blue medium; editors can pick another colour.
-// Existing headings keep whatever they were saved with.
-addFilter('blocks.registerBlockType', 'sage/heading-default-colour', (settings, name) => {
-  if (name !== 'core/heading') return settings;
+// Done on insertion rather than as an attribute default: a default would apply to every
+// saved heading that has no colour, and their stored markup would then fail validation
+// ("Block contains unexpected or invalid content").
+const knownBlocks = new Set();
+subscribe(() => {
+  const editor = select('core/block-editor');
+  if (!editor?.getClientIdsWithDescendants) return;
 
-  return {
-    ...settings,
-    attributes: {
-      ...settings.attributes,
-      textColor: { ...settings.attributes?.textColor, type: 'string', default: 'blue-medium' },
-    },
-  };
+  editor.getClientIdsWithDescendants().forEach((clientId) => {
+    if (knownBlocks.has(clientId)) return;
+    knownBlocks.add(clientId);
+
+    const block = editor.getBlock(clientId);
+    const { content, textColor, style } = block?.attributes ?? {};
+    if (block?.name !== 'core/heading' || content || textColor || style?.color) return;
+
+    dispatch('core/block-editor').__unstableMarkNextChangeAsNotPersistent?.();
+    dispatch('core/block-editor').updateBlockAttributes(clientId, { textColor: 'blue-medium' });
+  });
 });
 
 // The editor canvas is an iframe with its own custom-element registry, so the

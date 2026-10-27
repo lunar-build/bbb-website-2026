@@ -1,0 +1,6 @@
+// Flow content (paragraphs, headings, lists…) can't be a grid item inside .o-container without
+// changing how its margins collapse, so inset it to the same content column instead.
+// Keep in step with .o-container in base/_container.scss.
+@mixin contained {
+  margin-inline: max(var(--o-container-gutter), calc((100% - var(--o-container-max-width)) / 2));
+}

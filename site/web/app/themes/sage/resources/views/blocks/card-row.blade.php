@@ -1,119 +1,112 @@
 <section {{ $attributes->class(['c-card-row']) }}>
 
-<div class="o-container c-card-row--{{ $type }}">
-  @if ($headingHighlight || $heading)
-    <h2 class="c-card-row__heading">
-      @if ($headingHighlight)
-        <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
-      @endif
-      {{ $heading }}
-    </h2>
-  @endif
+    <div class="o-container c-card-row--{{ $type }}">
+        @if ($headingHighlight || $heading)
+            <h2 class="c-card-row__heading">
+                @if ($headingHighlight)
+                    <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
+                @endif
+                {{ $heading }}
+            </h2>
+        @endif
 
-  @if ($intro)
-    <p class="c-card-row__intro u-body-large">{{ $intro }}</p>
-  @endif
+        @if ($intro)
+            <p class="c-card-row__intro u-body-large">{{ $intro }}</p>
+        @endif
 
-  <div class="c-card-row__cards">
-    @if ($type === 'news')
-      @foreach ($newsCards as $card)
-        <a class="c-card-row__news-card" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-          <img class="c-card-row__news-image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
+        <div class="c-card-row__cards">
+            @if ($type === 'news')
+                @foreach ($newsCards as $card)
+                    <a class="c-card-row__news-card" href="{{ $card['link']['url'] }}"
+                        @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+                        <img class="c-card-row__news-image" src="{{ $card['image']['url'] }}"
+                            alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
 
-          @if (! empty($card['tag']))
-            <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
-          @endif
-          <span class="c-card-row__news-title">{{ $card['title'] }}</span>
-          <span class="c-card-row__news-cta">
-            {{ $card['link']['title'] }}
-            <x-icon name="arrow-right" />
-          </span>
-        </a>
-      @endforeach
-    @elseif ($type === 'route')
-      @foreach ($routeCards as $card)
-        <div class="c-cycle-route-card__card c-cycle-route-card--{{ $card['difficulty'] }}">
-          <div class="c-cycle-route-card__image">
-            <img src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
-          </div>
+                        @if (!empty($card['tag']))
+                            <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
+                        @endif
+                        <span class="c-card-row__news-title">{{ $card['title'] }}</span>
+                        <span class="c-card-row__news-cta">
+                            {{ $card['link']['title'] }}
+                            <x-icon name="arrow-right" />
+                        </span>
+                    </a>
+                @endforeach
+            @elseif ($type === 'route')
+                @foreach ($routeCards as $card)
+                    <div class="c-cycle-route-card__card c-cycle-route-card--{{ $card['difficulty'] }}">
+                        <div class="c-cycle-route-card__image">
+                            <img src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}"
+                                style="object-position: {{ $imagePosition }}">
+                        </div>
 
-          <div class="c-cycle-route-card__banner">
-            <span class="c-cycle-route-card__route-name">{{ $card['route_name'] }}</span>
-          </div>
+                        <div class="c-cycle-route-card__banner">
+                            <span class="c-cycle-route-card__route-name">{{ $card['route_name'] }}</span>
+                        </div>
 
-          <div class="c-cycle-route-card__info">
-            <div class="c-cycle-route-card__info-row">
-              <span class="c-cycle-route-card__info-label">{{ __('Time needed', 'sage') }}</span>
-              <span class="c-cycle-route-card__info-value">{{ $card['time_needed'] }}</span>
-            </div>
+                        <div class="c-cycle-route-card__info">
+                            <div class="c-cycle-route-card__info-row">
+                                <span class="c-cycle-route-card__info-label">{{ __('Time needed', 'sage') }}</span>
+                                <span class="c-cycle-route-card__info-value">{{ $card['time_needed'] }}</span>
+                            </div>
 
-            <div class="c-cycle-route-card__info-row">
-              <span class="c-cycle-route-card__info-label">{{ __('Distance', 'sage') }}</span>
-              <span class="c-cycle-route-card__info-value">{{ $card['distance'] }}</span>
-            </div>
+                            <div class="c-cycle-route-card__info-row">
+                                <span class="c-cycle-route-card__info-label">{{ __('Distance', 'sage') }}</span>
+                                <span class="c-cycle-route-card__info-value">{{ $card['distance'] }}</span>
+                            </div>
 
-            <div class="c-cycle-route-card__info-row">
-              <span class="c-cycle-route-card__info-label">{{ __('Difficulty', 'sage') }}</span>
-              <span class="c-cycle-route-card__badge">{{ ucfirst($card['difficulty']) }}</span>
-            </div>
-          </div>
+                            <div class="c-cycle-route-card__info-row">
+                                <span class="c-cycle-route-card__info-label">{{ __('Difficulty', 'sage') }}</span>
+                                <span class="c-cycle-route-card__badge">{{ ucfirst($card['difficulty']) }}</span>
+                            </div>
+                        </div>
 
-          <a
-            class="c-cycle-route-card__cta"
-            href="{{ $card['link']['url'] }}"
-            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-          >
-            {{ $card['link']['title'] }}
-            <x-icon name="arrow-right" />
-          </a>
+                        <a class="c-cycle-route-card__cta" href="{{ $card['link']['url'] }}"
+                            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+                            {{ $card['link']['title'] }}
+                            <x-icon name="arrow-right" />
+                        </a>
+                    </div>
+                @endforeach
+            @else
+                @foreach ($linkCards as $card)
+                    <div class="c-card-row__link-card">
+                        <img class="c-card-row__link-image" src="{{ $card['image']['url'] }}"
+                            alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
+
+                        <span class="c-card-row__link-title">{{ $card['title'] }}</span>
+                        <p class="c-card-row__link-body">{{ $card['body'] }}</p>
+
+                        <a class="c-card-row__link-cta" href="{{ $card['link']['url'] }}"
+                            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+                            {{ $card['link']['title'] }}
+                            <x-icon name="arrow-right" />
+                        </a>
+                    </div>
+                @endforeach
+            @endif
         </div>
-      @endforeach
-    @else
-      @foreach ($linkCards as $card)
-        <div class="c-card-row__link-card">
-          <img class="c-card-row__link-image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
 
-          <span class="c-card-row__link-title">{{ $card['title'] }}</span>
-          <p class="c-card-row__link-body">{{ $card['body'] }}</p>
+        @if (!empty($areaLinks))
+            <div class="c-card-row__area-links">
+                @foreach ($areaLinks as $row)
+                    <a class="c-card-row__area-link" href="{{ $row['link']['url'] }}"
+                        @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+                        {{ $row['link']['title'] }}
+                        <x-icon name="arrow-right" />
+                    </a>
+                @endforeach
+            </div>
+        @endif
 
-          <a
-            class="c-card-row__link-cta"
-            href="{{ $card['link']['url'] }}"
-            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-          >
-            {{ $card['link']['title'] }}
-            <x-icon name="arrow-right" />
-          </a>
-        </div>
-      @endforeach
-    @endif
-  </div>
-
-  @if (! empty($areaLinks))
-    <div class="c-card-row__area-links">
-      @foreach ($areaLinks as $row)
-        <a
-          class="c-card-row__area-link"
-          href="{{ $row['link']['url'] }}"
-          @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-        >
-          {{ $row['link']['title'] }}
-          <x-icon name="arrow-right" />
-        </a>
-      @endforeach
+        @if ($browseAllLink)
+            <wa-button class="c-card-row__browse-all" variant="{{ $type === 'route' ? 'neutral' : 'brand' }}"
+                appearance="accent" pill with-end href="{{ $browseAllLink['url'] }}"
+                @if (($browseAllLink['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+                {{ $browseAllLink['title'] }}
+                <x-icon name="arrow-right" slot="end" />
+            </wa-button>
+        @endif
     </div>
-  @endif
-
-  @if ($browseAllLink)
-    <a
-      class="c-card-row__browse-all"
-      href="{{ $browseAllLink['url'] }}"
-      @if (($browseAllLink['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-    >
-      {{ $browseAllLink['title'] }}
-      <x-icon name="arrow-right" />
-    </a>
-  @endif
-</div>
 
 </section>

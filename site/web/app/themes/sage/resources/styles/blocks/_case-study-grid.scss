@@ -6,11 +6,16 @@
 
 $gap: 2.5rem; // Figma's 40px; distinct from spacing.$card-gap (1.5rem)
 $offset: 5.875rem; // 94px
+$max-width: 62rem;
 
 .c-case-study-grid {
   &__cards {
     display: grid;
     gap: $gap;
+    // The card photos are portrait (the old site's were 460x650), so cards stay narrow enough
+    // that a tall-ish image crops little; wider, they'd turn into huge cards.
+    max-width: $max-width;
+    margin-inline: auto;
 
     @include bp.respond($min: bp.$lg) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -37,9 +42,11 @@ $offset: 5.875rem; // 94px
   }
 
   &__image {
-    aspect-ratio: 750 / 450;
+    // Portrait, not Figma's 750/450 landscape: the photos are mostly portrait, and faces sit near the top.
+    aspect-ratio: 3 / 4;
     width: 100%;
     object-fit: cover;
+    object-position: center top;
   }
 
   &__quote {
