@@ -7,14 +7,17 @@
   <h2 class="c-journey-planner-widget__heading">{{ $heading }}</h2>
 
   @if ($variant === 'find_nearby')
-    <form class="c-journey-planner-widget__form" data-variant="find_nearby">
+    <form class="c-journey-planner-widget__form" data-variant="find_nearby" data-redirect-url="{{ $journeyPlannerUrl }}">
       <x-input
         label="Your location"
         name="location"
         placeholder="Enter a postcode or address…"
         icon="send"
+        icon-button-label="Use my current location"
+        icon-button-type="button"
         class="c-journey-planner-widget__field"
       />
+      <p id="location-error" class="c-input__error" hidden></p>
 
       <wa-radio-group
         class="c-journey-planner-widget__options"

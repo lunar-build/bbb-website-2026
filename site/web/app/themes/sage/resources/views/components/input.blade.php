@@ -5,6 +5,7 @@
     'placeholder' => null,
     'icon' => null,
     'iconButtonLabel' => null,
+    'iconButtonType' => 'submit',
     'required' => false,
     'textarea' => false,
     'rows' => 4,
@@ -19,7 +20,7 @@
 
 {{--
   $iconButtonLabel turns the trailing icon into a real, focusable
-  <button type="submit"> with the yellow-cap "submit" look (e.g. a search
+  <button> (type="submit" unless $iconButtonType says otherwise) with the yellow-cap "submit" look (e.g. a search
   field) instead of a decorative icon — pass it whenever the icon is
   something the user can actually click, not just a visual hint.
 
@@ -68,7 +69,7 @@
                 @if ($required) required @endif
                 @if ($error) hint="{{ $error }}" @endif
             ></wa-input>
-            <button type="submit" class="c-input__icon c-input__icon--accent" aria-label="{{ $iconButtonLabel }}">
+            <button type="{{ $iconButtonType }}" class="c-input__icon c-input__icon--accent" aria-label="{{ $iconButtonLabel }}">
                 <x-icon name="{{ $icon }}" />
             </button>
         </div>

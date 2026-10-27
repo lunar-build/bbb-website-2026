@@ -159,15 +159,15 @@ class JourneyPlannerWidget extends Block
     ];
 
     /**
-     * The "find nearby" radio options, fixed because they map to the cycle planner's feature types.
+     * The "find nearby" radio options, fixed because the keys are the cycle planner's `/near-me?type=` values.
      *
      * @var array<string, string> value => label
      */
     public const NEARBY_OPTIONS = [
-        'public-bike-pumps' => 'Public bike pumps',
-        'bike-servicing-repairs' => 'Bike servicing & repairs',
-        'secondhand-bike-shops' => 'Secondhand bike shops',
-        'cycle-hangars' => 'Cycle hangars',
+        'pumps' => 'Public bike pumps',
+        'repairs' => 'Bike servicing & repairs',
+        'secondhand' => 'Secondhand bike shops',
+        'hangars' => 'Cycle hangars',
     ];
 
     /**
@@ -213,19 +213,10 @@ class JourneyPlannerWidget extends Block
                     'label' => 'CTA button label',
                     'instructions' => 'Leave empty to use the default for the selected variant ("Plan your route" / "Search near here").',
                 ])
-            ->addTab('Plan a route')
+            ->addTab('Journey planner')
                 ->addUrl('journey_planner_url', [
                     'label' => 'Journey planner URL',
-                    'instructions' => 'Base URL the "Plan a route" variant redirects to, with a `locations` query param appended.',
-                    'conditional_logic' => [
-                        [
-                            [
-                                'field' => 'variant',
-                                'operator' => '==',
-                                'value' => 'plan_route',
-                            ],
-                        ],
-                    ],
+                    'instructions' => '"Plan a route" redirects to this URL with a `locations` query param appended. "Find nearby" redirects to `/near-me` on the same site.',
                 ])
         ;
 
