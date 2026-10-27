@@ -5,7 +5,9 @@
 // initJourneyPlannerPlaces is the Google Maps script's `callback=` (see
 // JourneyPlannerWidget::assets(), which only loads it when an API key is set).
 
-// TODO: wire up the "Find nearby feature" variant and finish Places Autocomplete.
+// TODO: wire up the "Find nearby feature" variant (Places autocomplete on "Your location" + redirect
+// using the selected `nearby_feature` radio value). Blocked on the cycle planner repo supporting a
+// "what's near you" search; until then the variant is display-only (see the submit no-op below).
 
 // TODO: check a Google Maps API key is set (Theme Options) — without one none of this runs.
 
@@ -111,3 +113,8 @@ function pointFrom(input) {
     name: input.dataset.name,
   };
 }
+
+// Find nearby is display-only until the cycle planner supports it (see TODO above).
+document
+  .querySelectorAll('.c-journey-planner-widget__form[data-variant="find_nearby"]')
+  .forEach((form) => form.addEventListener('submit', (event) => event.preventDefault()));
