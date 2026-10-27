@@ -86,16 +86,23 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    // Three across keeps the images a sensible size — from xl beside the filter
-    // sidebar (too narrow before then), from lg when there's no sidebar.
-    @include bp.respond($min: bp.$xl) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    // Events only: three across keeps the images a sensible size — from xl beside the
+    // filter sidebar (too narrow before then), from lg when there's no sidebar.
+    .post-type-archive-mec-events & {
+      @include bp.respond($min: bp.$xl) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
     }
 
-    .c-archive--no-filters & {
+    .post-type-archive-mec-events .c-archive--no-filters & {
       @include bp.respond($min: bp.$lg) {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
+    }
+
+    // News stays two across, so shorten the images instead.
+    .blog & .c-feature-card__image {
+      aspect-ratio: 16 / 9;
     }
   }
 
