@@ -65,7 +65,7 @@ function setUpNearby(form) {
   const locateButton = form.querySelector('.c-input__icon');
   const radios = form.querySelector('wa-radio-group');
 
-  setUpAutocomplete(form, input, { countryRestriction: 'gb' });
+  setUpAutocomplete(form, input);
 
   locateButton?.addEventListener('click', () => {
     if (!navigator.geolocation) {
@@ -125,7 +125,7 @@ function nearMeBase(plannerUrl) {
   }
 }
 
-function setUpAutocomplete(form, input, { countryRestriction } = {}) {
+function setUpAutocomplete(form, input) {
   if (!input) return;
 
   let autocomplete;
@@ -133,9 +133,7 @@ function setUpAutocomplete(form, input, { countryRestriction } = {}) {
   try {
     autocomplete = new google.maps.places.Autocomplete(input, {
       fields: ['geometry', 'formatted_address'],
-      ...(countryRestriction && {
-        componentRestrictions: { country: countryRestriction },
-      }),
+      componentRestrictions: { country: 'gb' },
     });
   } catch (error) {
     console.error('Google Places Autocomplete failed to initialise:', error);
