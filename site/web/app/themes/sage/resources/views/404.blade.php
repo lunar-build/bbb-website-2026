@@ -7,11 +7,11 @@
       <p class="c-not-found__intro u-standfirst">{{ __('Try one of these, or search for something else.', 'sage') }}</p>
 
       <form role="search" aria-label="{{ __('Search this site', 'sage') }}" method="get" action="{{ home_url('/') }}" class="c-not-found__search">
-        <input type="search" name="s" placeholder="{{ __('What are you looking for?', 'sage') }}"
+        <input type="search" name="s" placeholder="{{ __('Search', 'sage') }}"
           aria-label="{{ __('What are you looking for?', 'sage') }}">
         <button type="submit" class="c-not-found__search-submit">
           <x-icon name="search" />
-          <span>{{ __('Search', 'sage') }}</span>
+          <span class="c-not-found__search-label">{{ __('Search', 'sage') }}</span>
         </button>
       </form>
 

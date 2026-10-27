@@ -67,6 +67,20 @@
   @include focus.ring;
 }
 
+// Icon-only on small screens so the field keeps room for the placeholder; the label stays
+// in the accessibility tree (same clip pattern as .u-sr-only, which can't be @extended in a @media).
+.c-not-found__search-label {
+  @include bp.respond($max: bp.$sm) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
 .c-not-found__links {
   display: flex;
   flex-wrap: wrap;
