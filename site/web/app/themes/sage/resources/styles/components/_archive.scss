@@ -85,6 +85,18 @@
     @include bp.respond($min: bp.$sm) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    // Three across keeps the images a sensible size — from xl beside the filter
+    // sidebar (too narrow before then), from lg when there's no sidebar.
+    @include bp.respond($min: bp.$xl) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .c-archive--no-filters & {
+      @include bp.respond($min: bp.$lg) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
   }
 
   &__pagination ul {
