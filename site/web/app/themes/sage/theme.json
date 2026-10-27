@@ -83,7 +83,7 @@
         },
         {
           "slug": "heading-2",
-          "size": "clamp(2rem, 1.534rem + 1.989vw, 3.125rem)",
+          "size": "clamp(1.875rem, 1.527rem + 1.549vw, 2.75rem)",
           "name": "Heading 2"
         },
         {
