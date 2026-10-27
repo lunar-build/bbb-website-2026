@@ -301,6 +301,14 @@ class TwoColumnContent extends Block
 
             $flexible->addLayout('bullet_list', ['label' => 'Bullet List'])
                 ->addText('heading', ['label' => 'Heading'])
+                ->addSelect('heading_level', [
+                    'label' => 'Heading level',
+                    'instructions' => 'Semantic HTML heading level — choose based on the headings around it, not how big it should look. It always looks like a Heading 3.',
+                    'choices' => ['h2' => 'H2', 'h3' => 'H3', 'h4' => 'H4', 'h5' => 'H5', 'h6' => 'H6'],
+                    'default_value' => 'h3',
+                    'ui' => true,
+                    'conditional_logic' => [[['field' => 'heading', 'operator' => '!=empty']]],
+                ])
                 ->addRepeater('items', [
                     'label' => 'Items',
                     'button_label' => 'Add item',
@@ -358,6 +366,7 @@ class TwoColumnContent extends Block
             'bullet_list' => [
                 'type' => 'bullet_list',
                 'heading' => $row['heading'] ?? '',
+                'headingLevel' => in_array($row['heading_level'] ?? null, ['h2', 'h3', 'h4', 'h5', 'h6'], true) ? $row['heading_level'] : 'h3',
                 'items' => $row['items'] ?? [],
             ],
             default => [

@@ -17,7 +17,7 @@
     @break
 
   @case('bullet_list')
-    <x-bullet-list :heading="$slot['heading']" :items="$slot['items']" />
+    <x-bullet-list :heading="$slot['heading']" :heading-level="$slot['headingLevel']" :items="$slot['items']" />
     @break
 
   @default

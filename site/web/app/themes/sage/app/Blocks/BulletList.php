@@ -193,6 +193,7 @@ class BulletList extends Block
     {
         return [
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'ordered' => $this->listStyle() === 'numbers',
             'items' => $this->items(),
         ];
@@ -207,6 +208,20 @@ class BulletList extends Block
                 'label' => 'Heading',
                 'instructions' => 'Optional heading shown above the list.',
                 'required' => 0,
+            ])
+            ->addSelect('heading_level', [
+                'label' => 'Heading level',
+                'instructions' => 'Semantic HTML heading level — choose based on the headings around it, not how big it should look. It always looks like a Heading 3.',
+                'choices' => [
+                    'h2' => 'H2',
+                    'h3' => 'H3',
+                    'h4' => 'H4',
+                    'h5' => 'H5',
+                    'h6' => 'H6',
+                ],
+                'default_value' => 'h3',
+                'ui' => true,
+                'conditional_logic' => [[['field' => 'heading', 'operator' => '!=empty']]],
             ])
             ->addButtonGroup('list_style', [
                 'label' => 'List style',
@@ -246,6 +261,13 @@ class BulletList extends Block
     public function heading()
     {
         return $this->resolveField('heading', '');
+    }
+
+    public function headingLevel()
+    {
+        $level = $this->resolveField('heading_level', 'h3');
+
+        return in_array($level, ['h2', 'h3', 'h4', 'h5', 'h6'], true) ? $level : 'h3';
     }
 
     public function listStyle()
