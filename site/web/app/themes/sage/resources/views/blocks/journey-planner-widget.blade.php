@@ -15,6 +15,7 @@
         icon="send"
         icon-button-label="Use my current location"
         icon-button-type="button"
+        icon-inline
         class="c-journey-planner-widget__field"
       />
       <p id="location-error" class="c-input__error" hidden></p>

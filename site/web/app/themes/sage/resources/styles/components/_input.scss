@@ -68,6 +68,16 @@ wa-textarea[hint]::part(textarea-wrapper) {
   }
 }
 
+// Inline icon button (see $iconInline in input.blade.php): looks like the decorative icon, but focusable.
+.c-input__icon--inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  @include focus.ring;
+}
+
 // Icon-button variant: adjacent real element (see $iconButtonLabel in input.blade.php), squared off at the seam.
 .c-input__field--icon-button {
   display: flex;
