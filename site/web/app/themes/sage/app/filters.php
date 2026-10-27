@@ -172,6 +172,33 @@ add_filter('gform_field_content', function ($content, $field) {
 }, 10, 2);
 
 /**
+ * Single file upload (Figma "Input | File upload"): adds a "Choose a file" CTA
+ * as a second `<label>` for the native input, which stays the real (visually
+ * hidden) control — clicking the label opens the picker, and the input's focus
+ * ring is drawn on it. resources/js/file-upload.js shows the chosen file.
+ * Multi-file uploads keep GF's own uploader (its button is the drop target and
+ * GF's JS lists the files), restyled to the same layout and chips.
+ */
+add_filter('gform_field_content', function ($content, $field) {
+    if ($field->type !== 'fileupload' || $field->is_form_editor() || $field->is_entry_detail()) {
+        return $content;
+    }
+
+    if ($field->multipleFiles) {
+        $content = preg_replace('/(gform_button_select_files[^>]*>)[^<]*</', '$1' . esc_html__('Choose files', 'sage') . '<', $content, 1);
+
+        return str_replace('ginput_container_fileupload', 'ginput_container_fileupload c-file-upload c-file-upload--multiple', $content);
+    }
+
+    $inputId = "input_{$field->formId}_{$field->id}";
+    $button = '<label for="' . esc_attr($inputId) . '" class="c-file-upload__button">' . esc_html__('Choose a file', 'sage') . '</label>';
+
+    $content = preg_replace('/(<input[^>]*type=([\'"])file\2[^>]*\/?>)/', '$1' . $button, $content, 1);
+
+    return str_replace('ginput_container_fileupload', 'ginput_container_fileupload c-file-upload', $content);
+}, 10, 2);
+
+/**
  * Replace Gravity Forms' plain `<input type="submit">` with our brand
  * `<wa-button>` (yellow pill + arrow) so form CTAs match every other CTA.
  */

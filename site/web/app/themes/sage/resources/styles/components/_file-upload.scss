@@ -1,0 +1,338 @@
+@use '../base/focus' as focus;
+
+// Figma "Input | File upload" (node 524-3074): label + allowed types beside a
+// "Choose a file" CTA; once picked, a chip with the file's name, size and a
+// remove button. Markup: the gform_field_content filter in app/filters.php +
+// resources/js/file-upload.js. Multi-file uploads keep GF's uploader and file list,
+// restyled to the same layout, CTA and chips. `!important` beats GF Orbital, as in base/_forms.scss.
+
+// The theme's focus ring on a <button> inside a GF form. GF draws button outlines from
+// its --gf-local-outline-* variables in a more specific rule than ours, so override the
+// variables (GF sets them without !important) as well as the outline itself.
+@mixin gf-focus-ring {
+  &:focus-visible {
+    --gf-local-outline-style: solid !important;
+    --gf-local-outline-width: 2px !important;
+    --gf-local-outline-color: var(--focus-color) !important;
+    --gf-local-outline-offset: 2px !important;
+
+    @include focus.ring-styles;
+  }
+}
+
+// The yellow "Choose a file" CTA, shared with GF's multi-file button.
+@mixin cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 2.5rem !important;
+  padding: 0 1rem !important;
+  border: 2px solid var(--wp--preset--color--charcoal) !important;
+  border-radius: 999px !important;
+  background: var(--wp--preset--color--yellow) !important;
+  box-shadow: none !important;
+  font-family: var(--wp--preset--font-family--anonymous-pro) !important;
+  font-weight: 700 !important;
+  font-size: var(--wp--preset--font-size--cta-small) !important;
+  line-height: 1.125rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+// A chosen file: our JS chip (single) or GF's file row (multiple).
+@mixin chip {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  margin: 0.375rem 0 0 !important;
+  padding: 0.375rem 0.75rem 0.5rem !important;
+  border-radius: 0.75rem !important;
+  background: var(--wp--preset--color--white) !important;
+  box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-size: var(--wp--preset--font-size--body-regular) !important;
+  line-height: 1.5rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+// The chip's × button. GF Orbital styles every <button> in a form as its blue primary button.
+@mixin remove-button {
+  flex: none;
+  display: flex !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 0 0 auto !important;
+  padding: 0.25rem !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--wp--preset--color--charcoal) !important;
+  cursor: pointer;
+  transition: none !important;
+
+  @include gf-focus-ring;
+}
+
+// Below this field width the CTA drops under the label and rules.
+$stack-below: 24rem;
+
+// The container is flattened so the label (outside it) and the CTA/rules (inside) share one grid.
+.gfield--type-fileupload:has(.c-file-upload) {
+  position: relative;
+  // A size container fills the form's column without widening it (the rules line + CTA
+  // would otherwise set its width), and lets the CTA drop below the text when narrow.
+  container-type: inline-size;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  text-align: start;
+
+  > *,
+  .c-file-upload > * {
+    grid-column: 1;
+  }
+
+  .gfield_label {
+    margin-bottom: 0.25rem !important;
+  }
+}
+
+.c-file-upload {
+  display: contents !important;
+
+  // Still the real control (named by both labels), just not seen.
+  input[type='file'] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    opacity: 0 !important;
+  }
+
+  .gform_fileupload_rules {
+    margin: 0 !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .gfield_validation_message {
+    grid-column: 1 / -1;
+  }
+}
+
+.c-file-upload__button {
+  grid-column: 2 !important;
+  grid-row: 1 / span 2;
+  align-self: center;
+  margin-inline-start: 1.5rem;
+  @include cta;
+
+  @container (width < #{$stack-below}) {
+    // Row 3: after the label and rules, which it precedes in the markup.
+    grid-column: 1 !important;
+    grid-row: 3;
+    justify-self: start;
+    margin: 0.75rem 0 0;
+  }
+
+  input:focus-visible + & {
+    @include focus.ring-styles;
+  }
+
+  .has-file & {
+    display: none !important;
+  }
+}
+
+.c-file-upload__file {
+  grid-column: 1 / -1 !important;
+  @include chip;
+}
+
+.c-file-upload__icon {
+  display: flex;
+  flex: none;
+
+  svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}
+
+.c-file-upload__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c-file-upload__size {
+  flex: none;
+  color: var(--wp--preset--color--place-holder-grey);
+}
+
+.c-file-upload__remove {
+  @include remove-button;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// Multi-file: GF's uploader (drop area + button) takes the CTA's slot, minus the drop-zone box.
+// The button stays the drop target; the "Drop files here or" text is kept for screen readers.
+.c-file-upload--multiple {
+  > [id^='gform_multifile_upload_'] {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2;
+    align-self: center;
+    margin-inline-start: 1.5rem;
+
+    @container (width < #{$stack-below}) {
+      grid-column: 1 !important;
+      grid-row: 3;
+      margin: 0.75rem 0 0;
+    }
+  }
+
+  .gform_drop_area {
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+
+    &::before {
+      display: none !important;
+    }
+  }
+
+  .gform_drop_instructions {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+  }
+
+  .gform_button_select_files {
+    @include cta;
+    margin: 0 !important;
+    // GF fades its outline in; the theme's ring is instant.
+    transition: none !important;
+
+    @include gf-focus-ring;
+  }
+
+  .ginput_preview_list,
+  [id^='gform_multifile_messages_'] {
+    grid-column: 1 / -1 !important;
+  }
+
+  .ginput_preview_list:empty {
+    display: none !important;
+  }
+
+  // GF's file row: name, size, a progress bar while uploading, and a cancel/delete button.
+  .ginput_preview {
+    @include chip;
+
+    // The paperclip, as a mask so it takes the text colour.
+    &::before {
+      content: '';
+      flex: none;
+      width: 0.875rem;
+      height: 0.875rem;
+      background: currentColor;
+      mask: url('../../svg/paperclip.svg') center / contain no-repeat;
+    }
+  }
+
+  // GF sizes these as grid columns; here they're plain flex items like the single chip's.
+  .gfield_fileupload_filename {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0;
+    padding: 0 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 400 !important;
+  }
+
+  .gfield_fileupload_filesize {
+    flex: none;
+    width: auto !important;
+    margin: 0 !important;
+    color: var(--wp--preset--color--place-holder-grey) !important;
+  }
+
+  .gfield_fileupload_progress {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 4rem;
+    color: var(--wp--preset--color--place-holder-grey) !important;
+  }
+
+  .gfield_fileupload_progress_complete {
+    display: none !important;
+  }
+
+  .gfield_fileupload_progressbar {
+    flex: 1;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: var(--wp--preset--color--light-grey) !important;
+  }
+
+  .gfield_fileupload_progressbar_progress {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--wp--preset--color--charcoal) !important;
+  }
+
+  // Delete (uploaded) or cancel (uploading): GF's trash dashicon swapped for the chip's ×.
+  :is(.gform_delete_file, .gfield_fileupload_cancel) {
+    @include remove-button;
+    // GF pins it to the row's top corner.
+    position: static !important;
+    inset: auto !important;
+    font-size: 0 !important;
+    text-decoration: none !important;
+
+    &::before {
+      content: '' !important;
+      flex: none !important;
+      width: 1rem !important;
+      height: 1rem !important;
+      background: currentColor !important;
+      mask: url('../../svg/close-light.svg') center / contain no-repeat;
+    }
+
+    .dashicons {
+      display: none !important;
+    }
+
+    // Its accessible name ("Delete this file: …"); the theme has no .screen-reader-text of its own.
+    .screen-reader-text {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+    }
+  }
+}
