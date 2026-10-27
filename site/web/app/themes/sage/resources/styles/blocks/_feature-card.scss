@@ -48,6 +48,7 @@
 
   &__date {
     @extend .u-card-date;
+    flex-basis: 100%; // own line, tags wrap below
     margin: 0;
     color: var(--wp--preset--color--blue);
   }
