@@ -1,0 +1,141 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+@use '../base/typography';
+
+// Figma "Sample page -> Search results page" (node 521-2448). Layout comes from
+// .c-archive (components/_archive.scss); cards from the Link Card block.
+
+.c-search__title {
+  margin-bottom: 1.125rem;
+  color: var(--wp--preset--color--blue-medium);
+}
+
+.c-search__summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 3rem;
+  color: var(--wp--preset--color--blue-dark);
+
+  p {
+    margin: 0;
+  }
+}
+
+.c-search__count {
+  margin-inline-start: auto !important;
+  font-weight: 700;
+}
+
+// Same field + squared-off yellow button as the desktop nav search (_primary-nav.scss).
+.c-search__form {
+  display: flex;
+  align-items: stretch;
+
+  input {
+    // Overrides base/_forms.scss's width:100% !important so the button keeps its room.
+    width: auto !important;
+    min-width: 0;
+    flex: 1 1 auto;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    border-radius: 999px 0 0 999px !important;
+    border-right: none !important;
+  }
+}
+
+.c-search__submit {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding-inline: 1rem 1.25rem;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-left: none;
+  border-radius: 0 999px 999px 0;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  @extend .u-cta-large;
+  cursor: pointer;
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  @include focus.ring;
+}
+
+// Icon-only on small screens so the field keeps room for its placeholder (same clip as .u-sr-only).
+.c-search__submit-label {
+  @include bp.respond($max: bp.$sm) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
+// Desktop: header over the results column, filters level with the first card.
+.c-search {
+  @include bp.respond($min: bp.$lg) {
+    row-gap: 4.5rem;
+
+    .c-search__header {
+      grid-row: 1;
+    }
+
+    .c-archive__filters,
+    .c-archive__results {
+      grid-row: 2;
+    }
+  }
+}
+
+// Anchors the visually-hidden results heading (focus/scroll target after a filter swap).
+.c-search .c-archive__results {
+  position: relative;
+}
+
+.c-search__results {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  // .c-link-card__card's own stacking margin — the grid gap spaces these.
+  .c-search__result {
+    margin: 0;
+  }
+}
+
+.c-search__result .c-link-card__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+
+  @container (max-width: #{bp.$md}) {
+    align-items: center;
+  }
+}
+
+// Figma's result tag is the small variant of the Tag component.
+.c-search__tag {
+  font-size: 0.75rem;
+  line-height: 1.375rem;
+}
+
+.c-search__result-title {
+  margin: 0;
+}
+
+.c-search__empty {
+  margin: 0;
+  color: var(--wp--preset--color--blue-dark);
+}

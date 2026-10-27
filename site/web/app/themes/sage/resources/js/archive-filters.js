@@ -16,13 +16,18 @@ if (results) {
     try {
       const response = await fetch(url, { signal: controller.signal });
       const html = await response.text();
-      const next = new DOMParser()
-        .parseFromString(html, 'text/html')
-        .querySelector('[data-archive-results]');
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const next = doc.querySelector('[data-archive-results]');
 
       if (!response.ok || !next) throw new Error(`Archive fetch failed: ${response.status}`);
 
       results.innerHTML = next.innerHTML;
+
+      // Elements outside the fragment that depend on the results (e.g. search's count), matched by id.
+      document.querySelectorAll('[data-archive-sync][id]').forEach((el) => {
+        const fresh = doc.getElementById(el.id);
+        if (fresh) el.innerHTML = fresh.innerHTML;
+      });
       results.dispatchEvent(new CustomEvent('archive:updated', { bubbles: true }));
       history.pushState({ archive: true }, '', url);
       pushed = true;

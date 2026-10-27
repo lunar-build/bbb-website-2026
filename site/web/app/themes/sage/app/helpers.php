@@ -219,3 +219,20 @@ function theme_block_background_css(): string
 
     return $css;
 }
+
+/**
+ * Main query's pagination as `<a>`/`<span>` strings for archive and search results.
+ * paginate_links() carries the current query string (search term, active filters) onto each link.
+ */
+function pagination_links(): array
+{
+    $arrow = \Illuminate\Support\Facades\Blade::render('<x-icon name="arrow-right" />');
+
+    return paginate_links([
+        'type' => 'array',
+        'current' => max(1, (int) get_query_var('paged')),
+        'total' => (int) $GLOBALS['wp_query']->max_num_pages,
+        'prev_text' => $arrow . __('Previous', 'sage'),
+        'next_text' => __('Next', 'sage') . $arrow,
+    ]) ?: [];
+}

@@ -281,6 +281,17 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 });
 
 /**
+ * Search results' content-type filter (?filter_type[]=page) — see App\Support\SearchFilters.
+ */
+add_action('pre_get_posts', function (\WP_Query $query) {
+    if (is_admin() || ! $query->is_main_query() || ! $query->is_search()) {
+        return;
+    }
+
+    $query->set('post_type', Support\SearchFilters::queryPostTypes());
+});
+
+/**
  * Plain archive titles ("Case Studies", not "Archives: Case Studies").
  */
 add_filter('get_the_archive_title_prefix', '__return_empty_string');
