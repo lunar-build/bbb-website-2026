@@ -2,6 +2,9 @@
 @use '../base/focus' as focus;
 @use '../base/typography';
 
+// Result cards stack (centred) below this width; the Link Card block itself stacks below bp.$md.
+$stack-below: bp.$sm;
+
 // Figma "Sample page -> Search results page" (node 521-2448). Layout comes from
 // .c-archive (components/_archive.scss); cards from the Link Card block.
 
@@ -111,6 +114,34 @@
   // .c-link-card__card's own stacking margin — the grid gap spaces these.
   .c-search__result {
     margin: 0;
+
+    // Stacked: tighter than the block's desktop padding.
+    @container (width < #{$stack-below}) {
+      padding: 2.25rem 1.25rem;
+    }
+  }
+}
+
+// The Link Card block stacks below bp.$md; results stay side by side down to
+// $stack-below. Three classes to beat the block's own stacked rules, which load later.
+@container (#{$stack-below} <= width <= #{bp.$md}) {
+  .c-search__results .c-search__result.c-link-card__card {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: start;
+  }
+
+  .c-search__results .c-search__result .c-link-card__content {
+    flex: 1 0 20rem;
+  }
+
+  .c-search__results .c-search__result .c-link-card__cta {
+    flex: 0 1 auto;
+  }
+
+  .c-search__results .c-search__result .c-link-card__cta-link {
+    text-align: right;
   }
 }
 
@@ -120,7 +151,7 @@
   align-items: flex-start;
   gap: 0.625rem;
 
-  @container (max-width: #{bp.$md}) {
+  @container (width < #{$stack-below}) {
     align-items: center;
   }
 }
@@ -133,6 +164,11 @@
 
 .c-search__result-title {
   margin: 0;
+
+  // u-heading-5's 2.25rem is for the 26px desktop size; the clamp shrinks the font on mobile.
+  @container (width < #{$stack-below}) {
+    line-height: 1.75rem;
+  }
 }
 
 .c-search__empty {
