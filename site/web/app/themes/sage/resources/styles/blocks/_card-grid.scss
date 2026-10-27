@@ -39,10 +39,20 @@
     @include bp.respond($min: bp.$md) {
       grid-template-columns: repeat(2, 1fr);
     }
+
+    // Three across on wide screens keeps the images a sensible size.
+    @include bp.respond($min: bp.$lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   // Reserves room for the overlay &__side-image; narrower than it, some overlap is fine.
+  // Stays at two across: with the side image's padding, three would be too narrow.
   &__cards--with-side-image {
+    @include bp.respond($min: bp.$lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     @include bp.respond($min: bp.$xl) {
       padding-right: 16rem;
     }
