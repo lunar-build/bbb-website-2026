@@ -5,6 +5,7 @@
 @use '../components/button';
 @use '../abstracts/spacing';
 @use '../base/focus' as focus;
+@use '../base/links';
 
 .c-card-row__heading {
   text-align: center;
@@ -179,31 +180,8 @@
     @include button.arrow-hover;
   }
 
-  &:focus {
-    outline: none;
-  }
-}
-
-// Underline and highlight sit on the text span so the arrow stays clear of them.
-.c-card-row__area-link-text {
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-style: dashed;
-  text-decoration-thickness: 0.125rem;
-  text-underline-offset: 0.3em;
-  transition: background-color var(--wa-transition-normal, 0.15s) ease;
-  -webkit-box-decoration-break: clone; // each wrapped line gets its own highlight edges
-  box-decoration-break: clone;
-
-  // Dashed underline on any focus (not hover); the yellow highlight is keyboard only.
-  .c-card-row__area-link:focus & {
-    text-decoration-color: currentColor;
-  }
-
-  .c-card-row__area-link:focus-visible & {
-    background-color: var(--wp--preset--color--yellow);
-    color: var(--wp--preset--color--charcoal);
-  }
+  // Underline + highlight on the text span only.
+  @include links.focus-label('.c-card-row__area-link-text');
 }
 
 .c-card-row__browse-all {

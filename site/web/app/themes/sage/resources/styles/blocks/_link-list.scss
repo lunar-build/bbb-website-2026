@@ -3,7 +3,7 @@
 // links, either compact Anonymous Pro links grouped under an icon, or
 // larger headline-style links with an optional description underneath.
 
-@use '../base/focus';
+@use '../base/links';
 @use '../components/button';
 
 .c-link-list__group {
@@ -44,7 +44,7 @@
   color: var(--wp--preset--color--blue-medium);
   text-decoration: none;
 
-  @include focus.ring;
+  @include links.focus-label('.c-link-list__short-text');
 
   &:hover,
   &:focus-visible {
@@ -72,7 +72,7 @@
   color: var(--wp--preset--color--blue-medium);
   text-decoration: none;
 
-  @include focus.ring;
+  @include links.focus-label('.c-link-list__long-title-text');
 
   &:hover,
   &:focus-visible {

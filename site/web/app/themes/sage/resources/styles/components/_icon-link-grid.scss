@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
+@use '../base/links';
 
 // Figma "Icon link grid" (node 10:4389)
 .c-icon-link-grid-block {
@@ -35,32 +36,8 @@
   color: inherit;
   text-decoration: none;
 
-  // The whole item is the link, but the focus indicator sits on its title (see below).
-  &:focus {
-    outline: none;
-  }
-}
-
-// Matches Card Row's area links: dashed underline on any focus (not hover), yellow
-// highlight on keyboard focus only. On the title span so the arrow stays clear.
-.c-icon-link-grid__item-title {
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-style: dashed;
-  text-decoration-thickness: 0.125rem;
-  text-underline-offset: 0.3em;
-  transition: background-color var(--wa-transition-normal, 0.15s) ease;
-  -webkit-box-decoration-break: clone; // each wrapped line gets its own highlight edges
-  box-decoration-break: clone;
-
-  .c-icon-link-grid__item:focus & {
-    text-decoration-color: currentColor;
-  }
-
-  .c-icon-link-grid__item:focus-visible & {
-    background-color: var(--wp--preset--color--yellow);
-    color: var(--wp--preset--color--charcoal);
-  }
+  // The whole item is the link, but the focus indicator sits on its title only.
+  @include links.focus-label('.c-icon-link-grid__item-title');
 }
 
 .c-icon-link-grid__icon {

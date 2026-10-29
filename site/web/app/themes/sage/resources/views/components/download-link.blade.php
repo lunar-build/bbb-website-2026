@@ -14,7 +14,8 @@
         @if ($fileSize && $id) aria-describedby="{{ $id }}" @endif
     >
         <x-icon name="download" />
-        {{ $label }}
+        {{-- Outer span is the flex item; the inner one stays inline so a focus highlight follows each line. --}}
+        <span><span class="c-download-link__label">{{ $label }}</span></span>
         @if ($context)
             <span class="u-sr-only">({{ $context }})</span>
         @endif

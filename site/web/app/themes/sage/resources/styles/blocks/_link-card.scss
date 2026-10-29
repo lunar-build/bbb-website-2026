@@ -2,6 +2,7 @@
 
 @use '../abstracts/breakpoints' as bp;
 @use '../components/download-link';
+@use '../base/links';
 
 // Container query, not bp.respond(): the card can be far narrower than the viewport
 // (e.g. the pattern library sidebar). Cutoff still comes from bp.$md.
@@ -107,8 +108,10 @@
     text-align: center;
   }
 
-  // Right padding keeps the focus outline off the arrow as it animates right.
-  .c-icon--arrow-right {
-    padding-right: 0.5rem;
-  }
+  @include links.focus-label('.c-link-card__cta-text');
+}
+
+// Download CTA (shared component): same focus treatment, inside Link Cards only.
+.c-link-card .c-download-link__link {
+  @include links.focus-label('.c-download-link__label');
 }
