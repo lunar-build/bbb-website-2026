@@ -1,0 +1,34 @@
+// Inline links in running text (WP paragraphs, rich-text fields). Colour stays contextual;
+// this sets the underline and the hover/focus states so they match everywhere.
+//
+// Usage, for links the global rule below doesn't reach:
+//   @use '../base/links';
+//   .thing a { @include links.body; }
+
+@mixin body {
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 0.125rem;
+  text-underline-offset: 0.3em;
+  transition: background-color var(--wa-transition-normal, 0.15s) ease;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-style: dashed;
+  }
+
+  // Keyboard only: the highlight is the focus indicator, replacing the outline.
+  &:focus-visible {
+    outline: none;
+    background-color: var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+    text-decoration-color: var(--wp--preset--color--charcoal);
+  }
+}
+
+// Classless links inside text elements, which is what the editor and rich-text fields output.
+// Component links (buttons, cards, nav) all carry a class, so they're left alone.
+:where(p, li, dd, dt, td, th, figcaption, blockquote, address) a:not([class]) {
+  @include body;
+}

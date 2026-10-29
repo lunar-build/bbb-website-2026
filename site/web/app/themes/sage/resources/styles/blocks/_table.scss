@@ -1,4 +1,5 @@
 @use '../base/focus' as focus;
+@use '../base/links';
 
 // Figma "Table" (node 10:4095). Column count is author-defined, not fixed
 // to 2 — min-width + horizontal scroll (not squeeze) keeps columns legible
@@ -75,7 +76,7 @@
   tbody a {
     color: var(--wp--preset--color--charcoal);
 
-    @include focus.ring;
+    @include links.body;
   }
 }
 

@@ -1,6 +1,7 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../abstracts/column-blocks';
 @use '../base/focus';
+@use '../base/links';
 
 // Figma "Sample page -> Filter page": intro over the results column, then a
 // filter sidebar beside the results. Markup: resources/views/archive.blade.php.
@@ -180,8 +181,8 @@
 
   a {
     color: var(--wp--preset--color--blue);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+
+    @include links.body;
   }
 }
 
