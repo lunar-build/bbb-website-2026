@@ -444,17 +444,37 @@ class EventsTimetable extends Block
     }
 
     /**
+     * One entry per category on show, with the colour of its first session, so
+     * the colour on each session has a text equivalent.
+     *
+     * @param  array<string, array<int, array{category: string, color: string}>>  $weekdays
+     * @return list<array{name: string, color: string}>
+     */
+    protected static function legend(array $weekdays): array
+    {
+        $legend = [];
+        foreach (array_merge(...array_values($weekdays)) as $session) {
+            if ($session['category'] !== '') {
+                $legend[$session['category']] ??= ['name' => $session['category'], 'color' => $session['color']];
+            }
+        }
+
+        return array_values($legend);
+    }
+
+    /**
      * Each period's weekly calendar data:
      * - `weekdays`: Monday–Sunday, each weekly slot once (a timetable repeats the
      *   same week, so the calendar shows the pattern, not every date). Sessions
      *   carry `start`/`end` (minutes since midnight) and `lane`/`lanes` for
      *   overlaps;
+     * - `legend`: the categories on show, each with its colour;
      * - `grid`: the hour axis the sessions are positioned against;
      * - `today`: the weekday name when the period covers today, else null;
      * - `active`: the day shown first on small screens (today when it has sessions).
      * `empty` is true when the period has no sessions at all.
      *
-     * @return array<int, array{id: string, title: string, empty: bool, notices: array, weekdays: array, grid: array, today: ?string, active: string}>
+     * @return array<int, array{id: string, title: string, empty: bool, notices: array, weekdays: array, legend: array, grid: array, today: ?string, active: string}>
      */
     public function periods(): array
     {
@@ -483,6 +503,7 @@ class EventsTimetable extends Block
                     'title' => $occurrence->title,
                     'url' => get_permalink($occurrence->post_id),
                     'color' => EventSessions::color($occurrence->post_id),
+                    'category' => EventSessions::category($occurrence->post_id),
                     'labels' => EventSessions::labels($occurrence->post_id),
                 ];
             }
@@ -499,6 +520,7 @@ class EventsTimetable extends Block
                 'title' => $row['title'],
                 'notices' => static::notices($row),
                 'weekdays' => $weekdays,
+                'legend' => static::legend($weekdays),
                 'grid' => static::grid($weekdays),
                 'today' => $coversToday ? $today : null,
                 'active' => $coversToday && $weekdays[$today] ? $today : (array_key_first(array_filter($weekdays)) ?? 'Monday'),
@@ -516,7 +538,7 @@ class EventsTimetable extends Block
         $cyan = '#6DD6E3';
         $yellow = '#FFBF47';
 
-        $session = function (string $title, string $from, string $to, string $color) {
+        $session = function (string $title, string $from, string $to, string $color, string $category) {
             [$h1, $m1] = array_map('intval', explode(':', $from));
             [$h2, $m2] = array_map('intval', explode(':', $to));
 
@@ -527,25 +549,26 @@ class EventsTimetable extends Block
                 'title' => $title,
                 'url' => '#',
                 'color' => $color,
+                'category' => $category,
                 'labels' => [],
             ];
         };
 
         $schoolDay = [
-            $session('Schools', '10:00', '10:45', $pink),
-            $session('Schools', '10:45', '11:30', $pink),
-            $session('Schools', '11:45', '12:30', $pink),
-            $session('Schools', '13:15', '14:00', $pink),
-            $session('Learn to Ride', '14:15', '15:00', $yellow),
-            $session('Rock Up and Ride', '15:15', '16:00', $cyan),
+            $session('Schools', '10:00', '10:45', $pink, 'Schools'),
+            $session('Schools', '10:45', '11:30', $pink, 'Schools'),
+            $session('Schools', '11:45', '12:30', $pink, 'Schools'),
+            $session('Schools', '13:15', '14:00', $pink, 'Schools'),
+            $session('Learn to Ride', '14:15', '15:00', $yellow, 'Learn to Ride'),
+            $session('Rock Up and Ride', '15:15', '16:00', $cyan, 'Rock Up and Ride'),
         ];
         $weekendDay = [
-            $session('Family Cycling', '10:00', '11:00', $blue),
-            $session('Learn to Ride', '11:15', '12:15', $yellow),
-            $session('Family Disability Session', '13:00', '14:00', $pink),
-            $session('Learn to Ride', '14:30', '15:30', $yellow),
-            $session('Learn to Ride: Next Steps', '16:00', '17:00', $yellow),
-            $session('Rock Up and Ride', '17:15', '18:00', $cyan),
+            $session('Family Cycling', '10:00', '11:00', $blue, 'Family Cycling'),
+            $session('Learn to Ride', '11:15', '12:15', $yellow, 'Learn to Ride'),
+            $session('Family Disability Session', '13:00', '14:00', $pink, 'Disability Cycling'),
+            $session('Learn to Ride', '14:30', '15:30', $yellow, 'Learn to Ride'),
+            $session('Learn to Ride: Next Steps', '16:00', '17:00', $yellow, 'Learn to Ride'),
+            $session('Rock Up and Ride', '17:15', '18:00', $cyan, 'Rock Up and Ride'),
         ];
 
         $week = function (string $monday) use ($schoolDay, $weekendDay) {
@@ -560,6 +583,7 @@ class EventsTimetable extends Block
                 'notices' => [],
                 'today' => null,
                 'weekdays' => $weekdays,
+                'legend' => static::legend($weekdays),
                 'grid' => static::grid($weekdays),
                 'active' => 'Monday',
             ];

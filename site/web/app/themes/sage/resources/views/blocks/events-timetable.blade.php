@@ -32,6 +32,14 @@
               </button>
             </div>
 
+            @if ($period['legend'] ?? [])
+              <ul class="c-events-timetable__legend" role="list" aria-label="{{ __('Session types', 'sage') }}">
+                @foreach ($period['legend'] as $category)
+                  <li class="c-events-timetable__legend-item" style="--event-color: {{ $category['color'] }}">{{ $category['name'] }}</li>
+                @endforeach
+              </ul>
+            @endif
+
             <div class="c-events-timetable__calendar" style="--from: {{ $period['grid']['from'] }}; --span: {{ $period['grid']['to'] - $period['grid']['from'] }}">
               <div class="c-events-timetable__hours" aria-hidden="true">
                 @foreach ($period['grid']['hours'] as $hour)
@@ -42,11 +50,11 @@
 
               @foreach ($period['weekdays'] as $day => $sessions)
                 <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif>
-                  <h{{ $dayHeadingLevel }} class="c-events-timetable__day-name u-table-column-heading" @if ($day === ($period['today'] ?? null)) aria-current="date" @endif>
+                  <h{{ $dayHeadingLevel }} id="{{ $period['id'] }}-{{ strtolower($day) }}" class="c-events-timetable__day-name u-table-column-heading" @if ($day === ($period['today'] ?? null)) aria-current="date" @endif>
                     <span aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>
                   </h{{ $dayHeadingLevel }}>
-                  @include('partials.events-timetable-sessions', ['sessions' => $sessions])
+                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
                 </section>
               @endforeach
             </div>

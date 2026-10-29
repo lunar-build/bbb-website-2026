@@ -118,6 +118,34 @@
   }
 }
 
+/* Legend */
+
+.c-events-timetable__legend.c-events-timetable__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+
+  // Swatch is the same bar as on each session; overrides the .e-content bullet.
+  li::before {
+    content: '';
+    position: static;
+    width: 0.375rem;
+    height: 1rem;
+    border-radius: 0.375rem;
+    background: var(--event-color);
+  }
+}
+
+.c-events-timetable__legend-item {
+  @extend .u-business-service-label;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* Calendar grid */
 
 .c-events-timetable__calendar {
@@ -247,7 +275,8 @@
   font-weight: 700;
 }
 
-.c-events-timetable__time {
+.c-events-timetable__time,
+.c-events-timetable__category {
   @extend .u-business-service-label;
   line-height: 0.875rem;
 }
