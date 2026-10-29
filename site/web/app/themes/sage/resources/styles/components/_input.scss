@@ -39,14 +39,6 @@ wa-textarea::part(textarea) {
   line-height: 1.125rem;
 }
 
-// For errors managed at runtime outside the component — see #from-error/
-// #to-error in journey-planner-widget.blade.php.
-.c-input__error {
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-size: var(--wp--preset--font-size--input-label);
-  color: var(--wp--preset--color--dark-orange);
-}
-
 wa-input[hint]::part(input-wrapper),
 wa-textarea[hint]::part(textarea-wrapper) {
   border-color: var(--wp--preset--color--dark-orange);

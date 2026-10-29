@@ -180,22 +180,24 @@ function clearPoint(input) {
   delete input.dataset.name;
 }
 
-// Runtime version of <x-input>'s $error prop (components/input.blade.php).
+// Runtime version of <x-input>'s $error prop (components/input.blade.php): the message goes
+// in wa-input's `hint` (WA wires aria-describedby onto the native control, so it's read
+// when focus returns to the field, and styles the error border) plus the sr-only
+// role="alert" region so it's also announced straight away.
 function setFieldError(form, input, message) {
-  const errorEl = form.querySelector(`#${input.name}-error`);
-  if (!errorEl) return;
+  const host = input.getRootNode().host;
+  const alertEl = form.querySelector(`#${input.name}-error`);
 
-  errorEl.textContent = message;
-  errorEl.hidden = false;
-  input.setAttribute('aria-invalid', 'true');
-  input.setAttribute('aria-describedby', errorEl.id);
+  host.hint = message;
+  if (alertEl) alertEl.textContent = message;
 }
 
 function clearFieldError(form, input) {
-  const errorEl = form.querySelector(`#${input.name}-error`);
-  if (errorEl) errorEl.hidden = true;
-  input.removeAttribute('aria-invalid');
-  input.removeAttribute('aria-describedby');
+  const host = input.getRootNode().host;
+  const alertEl = form.querySelector(`#${input.name}-error`);
+
+  host.hint = '';
+  if (alertEl) alertEl.textContent = '';
 }
 
 function pointFrom(input) {

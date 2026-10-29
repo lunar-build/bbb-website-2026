@@ -18,7 +18,7 @@
         icon-inline
         class="c-journey-planner-widget__field"
       />
-      <p id="location-error" class="c-input__error" hidden></p>
+      <p id="location-error" class="u-sr-only" role="alert"></p>
 
       <wa-radio-group
         class="c-journey-planner-widget__options"
@@ -45,7 +45,7 @@
         icon="send"
         class="c-journey-planner-widget__field"
       />
-      <p id="from-error" class="c-input__error" hidden></p>
+      <p id="from-error" class="u-sr-only" role="alert"></p>
 
       <x-input
         label="To"
@@ -54,7 +54,7 @@
         icon="send"
         class="c-journey-planner-widget__field"
       />
-      <p id="to-error" class="c-input__error" hidden></p>
+      <p id="to-error" class="u-sr-only" role="alert"></p>
 
       <wa-button type="submit" variant="neutral" appearance="accent" pill with-end class="c-journey-planner-widget__cta">
         {{ $ctaLabel }}
