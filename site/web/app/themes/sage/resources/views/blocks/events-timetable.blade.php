@@ -20,6 +20,7 @@
                 class="c-events-timetable__current u-table-column-heading"
                 aria-live="polite"
                 data-events-timetable-current
+                @if ($period['active'] === ($period['today'] ?? null)) data-today @endif
                 data-label-none="{{ __('No sessions', 'sage') }}"
                 data-label-one="{{ __('1 session', 'sage') }}"
                 data-label-many="{{ __('%d sessions', 'sage') }}"
@@ -49,7 +50,7 @@
               <div class="c-events-timetable__lines" aria-hidden="true"></div>
 
               @foreach ($period['weekdays'] as $day => $sessions)
-                <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif>
+                <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif @if ($day === ($period['today'] ?? null)) data-today @endif>
                   <h{{ $dayHeadingLevel }} id="{{ $period['id'] }}-{{ strtolower($day) }}" class="c-events-timetable__day-name u-table-column-heading" @if ($day === ($period['today'] ?? null)) aria-current="date" @endif>
                     <span aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>

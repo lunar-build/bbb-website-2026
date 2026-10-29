@@ -87,6 +87,12 @@
   }
 }
 
+// Same underline as today's heading in the desktop calendar.
+.c-events-timetable__current[data-today] [data-events-timetable-day] {
+  text-decoration: underline;
+  text-underline-offset: 0.5rem;
+}
+
 // Carousel arrow glyph, scaled down for phones; 2.75rem tap target.
 .c-events-timetable__step {
   display: grid;
