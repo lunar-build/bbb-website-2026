@@ -3,7 +3,6 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
-use App\Fields\Copy;
 use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
@@ -262,7 +261,23 @@ class TwoColumnContent extends Block
 
             $text = $flexible->addLayout('text', ['label' => 'Text']);
             $text->addPartial(Heading::class, ['name' => 'heading', 'label' => 'Heading', 'default_level' => 'h3']);
-            $text->addPartial(Copy::class, ['name' => 'body', 'label' => 'Body copy', 'default_style' => 'body']);
+            // Rich text (not the Copy partial's plain textarea) so words can be bold or italic.
+            $text->addWysiwyg('body_text', [
+                'label' => 'Body copy',
+                'instructions' => 'Use Bold and Italic to emphasise words. Enter starts a new paragraph, Shift+Enter a line break.',
+                'tabs' => 'visual',
+                'toolbar' => 'basic',
+                'media_upload' => 0,
+            ]);
+            $text->addSelect('body_style', [
+                'label' => 'Visual style',
+                'choices' => [
+                    'body' => 'Body copy',
+                    'standfirst' => 'Standfirst / intro (larger)',
+                ],
+                'default_value' => 'body',
+                'ui' => true,
+            ]);
             $text->addLink('link', [
                 'label' => 'CTA link',
                 'instructions' => 'Optional — shown as a button below the text if filled in.',
@@ -353,12 +368,40 @@ class TwoColumnContent extends Block
                     'style' => $row['heading_style'] ?? 'match',
                 ],
                 'body' => [
-                    'text' => $row['body_text'] ?? '',
+                    'text' => $this->bodyHtml($row['body_text'] ?? ''),
                     'style' => $row['body_style'] ?? 'body',
                 ],
                 'link' => $this->normalizeLink($row['link'] ?? null),
             ],
         };
+    }
+
+    /**
+     * Body copy as safe HTML: paragraphs, line breaks, bold, italic, links and lists. Older rows were plain
+     * text with blank lines between paragraphs, so those are wrapped in paragraphs first.
+     */
+    protected function bodyHtml(string $text): string
+    {
+        if (trim($text) === '') {
+            return '';
+        }
+
+        if (! preg_match('#<(p|ul|ol)[\s>]#i', $text)) {
+            $text = wpautop($text);
+        }
+
+        return wp_kses($text, [
+            'p' => [],
+            'br' => [],
+            'strong' => [],
+            'b' => [],
+            'em' => [],
+            'i' => [],
+            'a' => ['href' => [], 'target' => [], 'rel' => []],
+            'ul' => [],
+            'ol' => [],
+            'li' => [],
+        ]);
     }
 
     /**

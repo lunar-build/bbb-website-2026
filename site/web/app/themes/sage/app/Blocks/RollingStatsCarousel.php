@@ -2,13 +2,14 @@
 
 namespace App\Blocks;
 
+use App\Blocks\Concerns\HasIllustrations;
 use App\Blocks\Concerns\ResolvesFields;
-use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
 class RollingStatsCarousel extends Block
 {
+    use HasIllustrations;
     use ResolvesFields;
 
     /**
@@ -153,25 +154,6 @@ class RollingStatsCarousel extends Block
     public $styles = [];
 
     /**
-     * Illustration choices for the block's left/right side images — a
-     * fixed, developer-controlled set (not an open media upload), so the
-     * front end always renders a bundled resources/images/illustrations/*
-     * asset rather than an arbitrary client-uploaded image. See
-     * App\Blocks\CtaBanner, which uses the same pattern.
-     *
-     * @var array
-     */
-    protected $illustrationChoices = [
-        '' => 'None',
-        'pump' => 'Bike pump',
-        'helmet' => 'Cycling helmet',
-        'bmx' => 'BMX rider',
-        'mountain_biker' => 'Mountain biker',
-        'instructor' => 'Cycle instructor',
-        'cyclist' => 'Cyclist on bike',
-    ];
-
-    /**
      * The block preview example data.
      *
      * @var array
@@ -191,6 +173,7 @@ class RollingStatsCarousel extends Block
                 'value' => 1200,
                 'unit' => 'bikes',
                 'caption_text' => 'were loaned out for free across the West of England',
+                'link' => ['title' => 'Find out more', 'url' => '#', 'target' => ''],
             ],
             [
                 'prefix_text' => 'We\'ve helped train',
@@ -232,14 +215,16 @@ class RollingStatsCarousel extends Block
         $fields
             ->addSelect('image_left', [
                 'label' => 'Left illustration',
-                'choices' => $this->illustrationChoices,
+                'instructions' => $this->illustrationInstructions(),
+                'choices' => $this->illustrations(),
                 'default_value' => '',
                 'ui' => true,
                 'allow_null' => true,
             ])
             ->addSelect('image_right', [
                 'label' => 'Right illustration',
-                'choices' => $this->illustrationChoices,
+                'instructions' => $this->illustrationInstructions(),
+                'choices' => $this->illustrations(),
                 'default_value' => '',
                 'ui' => true,
                 'allow_null' => true,
@@ -300,6 +285,10 @@ class RollingStatsCarousel extends Block
             ->addText('source', [
                 'label' => 'Source',
                 'instructions' => 'e.g. "BikeLife Bristol 2019". Optional.',
+            ])
+            ->addLink('link', [
+                'label' => 'Button',
+                'instructions' => 'Optional. Shown as a button under the slide, e.g. "Find out more".',
             ]);
 
         $slides->endRepeater();
@@ -322,12 +311,13 @@ class RollingStatsCarousel extends Block
 
         // The repeater's min of 1 makes ACF add a blank row on insert; drop
         // rows with nothing to show so the block still counts as empty.
-        $slides = array_filter($slides, fn ($slide) => ($slide['slide_type'] ?? 'stat') === 'statement'
+        $slides = array_filter($slides, fn($slide) => ($slide['slide_type'] ?? 'stat') === 'statement'
             ? trim(wp_strip_all_tags($slide['statement'] ?? '')) !== ''
             : ($slide['value'] ?? '') !== '');
 
         return array_map(function ($slide) {
             $source = trim($slide['source'] ?? '');
+            $link = normalize_link($slide['link'] ?? null);
 
             if (($slide['slide_type'] ?? 'stat') === 'statement') {
                 $statement = wp_kses($slide['statement'] ?? '', ['strong' => [], 'b' => [], 'em' => [], 'br' => []]);
@@ -336,6 +326,7 @@ class RollingStatsCarousel extends Block
                     'type' => 'statement',
                     'statement' => trim(preg_replace('#</?p>#i', '', $statement)),
                     'source' => $source,
+                    'link' => $link,
                 ];
             }
 
@@ -363,6 +354,7 @@ class RollingStatsCarousel extends Block
                 'caption' => $caption,
                 'accessibleText' => $accessibleText,
                 'source' => $source,
+                'link' => $link,
             ];
         }, $slides);
     }
@@ -385,22 +377,6 @@ class RollingStatsCarousel extends Block
     public function imageRight()
     {
         return $this->illustrationUrl($this->resolveField('image_right'));
-    }
-
-    /**
-     * Resolve an illustration select value to its bundled asset URL.
-     *
-     * @return string|null
-     */
-    protected function illustrationUrl(?string $key)
-    {
-        if (! $key) {
-            return null;
-        }
-
-        $file = str_replace('_', '-', $key);
-
-        return Vite::asset("resources/images/illustrations/{$file}.png");
     }
 
     /**

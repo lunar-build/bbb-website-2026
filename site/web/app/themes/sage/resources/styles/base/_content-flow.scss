@@ -1,5 +1,13 @@
+@use '../abstracts/container';
 @use '../abstracts/spacing';
 
+
+// Pages put core blocks straight in .e-content; only the blocks (sections) manage their own
+// width, so keep everything else inside the container. Posts already make .e-content a container.
+// The Illustration block is a decorative div (not a section) that bleeds full width like one.
+.e-content:not(.o-container) > :not(section, .alignfull, .wp-block-illustration) {
+  @include container.contained;
+}
 
 // Full-bleed-background blocks (.o-full-bleed-bg, or any section.has-background) only
 // pad inside their coloured area. Margin only on the edge touching a paragraph, so
@@ -19,6 +27,12 @@
 
 // Headings only carry margin-bottom, so flow content would run straight into them.
 .e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image, .c-bullet-list-block) + .wp-block-heading {
+  margin-top: var(--wp--preset--spacing--small);
+}
+
+// A heading after a block belongs to what follows it, so it needs clear space above.
+// Also covers the Sticky Nav column, whose blocks aren't inside .e-content.
+:is(.e-content, .c-sticky-nav-template__content) > :is(section, .wp-block-illustration, .wp-block-embed) + .wp-block-heading {
   margin-top: var(--wp--preset--spacing--small);
 }
 

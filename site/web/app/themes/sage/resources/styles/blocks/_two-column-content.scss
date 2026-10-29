@@ -24,6 +24,21 @@
     > * + * {
       margin-top: 1rem;
     }
+
+    // The button sits a little further from the text than the text blocks do from each other.
+    > * + .c-two-column-content__cta {
+      margin-top: 1.5rem;
+    }
+
+    // Inside the body copy (one div holding several paragraphs/lists) the resets above also
+    // zeroed the gaps between them: put the paragraph spacing back.
+    :where(p, ul, ol) + :where(p, ul, ol) {
+      margin-top: 1rem;
+    }
+
+    :where(ul, ol) {
+      padding-inline-start: 1.25rem;
+    }
   }
 
   &__image {

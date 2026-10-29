@@ -35,10 +35,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  width: 305px;
-  padding-bottom: 20px;
-  border-radius: 12px;
+  gap: 1rem;
+  width: 19.0625rem;
+  padding-bottom: 1.25rem;
+  border-radius: 0.75rem;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   background: var(--wp--preset--color--white);
   text-decoration: none;
@@ -51,22 +51,22 @@
   width: 100%;
   aspect-ratio: 305 / 183;
   object-fit: cover;
-  border-radius: 12px 12px 0 0;
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 
 .c-card-row__news-tag {
   @extend .u-news-tag;
   align-self: flex-start;
-  margin-inline-start: 18px;
+  margin-inline-start: 1.125rem;
   color: var(--wp--preset--color--charcoal);
-  border-top: 3px solid var(--wp--preset--color--yellow);
-  border-bottom: 3px solid var(--wp--preset--color--yellow);
-  padding-bottom: 3px;
+  border-top: 0.1875rem solid var(--wp--preset--color--yellow);
+  border-bottom: 0.1875rem solid var(--wp--preset--color--yellow);
+  padding-bottom: 0.1875rem;
 }
 
 .c-card-row__news-title {
   @extend .u-news-row-card-title;
-  padding-inline: 18px;
+  padding-inline: 1.125rem;
   color: var(--wp--preset--color--charcoal);
   text-align: left;
 }
@@ -75,10 +75,10 @@
   @extend .u-cta-small;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   // Pins the CTA to the card bottom (see .c-card-row__link-cta).
   margin-top: auto;
-  padding: 10px 16px;
+  padding: 0.625rem 1rem;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   color: var(--wp--preset--color--charcoal);
@@ -96,10 +96,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  width: 300px;
-  padding-bottom: 24px;
-  border-radius: 20px;
+  gap: 0.75rem;
+  width: 18.75rem;
+  padding-bottom: 1.5rem;
+  border-radius: 1.25rem;
   background: var(--wp--preset--color--lightest-grey);
   text-align: center;
 }
@@ -109,20 +109,20 @@
   width: 100%;
   aspect-ratio: 300 / 180;
   object-fit: cover;
-  border-radius: 20px 20px 0 0;
+  border-radius: 1.25rem 1.25rem 0 0;
 }
 
 .c-card-row__link-title {
   @extend .u-heading-5;
   margin-bottom: 0; // the card's flex gap already spaces it
   color: var(--wp--preset--color--blue-medium);
-  padding-inline: 13px;
+  padding-inline: 0.8125rem;
 }
 
 .c-card-row__link-body {
   @extend .u-body-regular;
   margin: 0;
-  padding-inline: 13px;
+  padding-inline: 0.8125rem;
   color: var(--wp--preset--color--charcoal);
 }
 
@@ -130,11 +130,11 @@
   @extend .u-cta-small;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   // Pins the CTA to the bottom so side-by-side cards' CTAs line up (cards stretch to
   // the tallest via the row's default align-items).
   margin-top: auto;
-  padding: 10px 16px;
+  padding: 0.625rem 1rem;
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   color: var(--wp--preset--color--charcoal);
@@ -155,7 +155,7 @@
   justify-content: center;
   gap: 1.5rem 3rem;
   padding: 2rem;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   background: var(--wp--preset--color--lightest-grey);
   margin-bottom: 2rem;
 }
@@ -172,7 +172,7 @@
   @extend .u-short-form-link;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
   color: var(--wp--preset--color--blue-dark);
   text-decoration: none;
 
@@ -185,23 +185,9 @@
 }
 
 .c-card-row__browse-all {
-  @extend .u-cta-large;
-  display: flex;
+  display: block;
   width: fit-content;
   margin-inline: auto;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 26px;
-  border: 2px solid var(--wp--preset--color--charcoal);
-  border-radius: 999px;
-  text-decoration: none;
-
-  @include focus.ring;
-
-  &:hover,
-  &:focus-visible {
-    @include button.arrow-hover;
-  }
 }
 
 // "Latest news" is one continuous phrase in Figma, so the highlight span matches the heading.
@@ -215,20 +201,11 @@
     color: var(--wp--preset--color--blue-dark);
   }
 
-  .c-card-row__browse-all {
-    background: var(--wp--preset--color--yellow);
-    color: var(--wp--preset--color--charcoal);
-  }
 }
 
 .c-card-row--route {
   .c-card-row__heading {
     color: var(--wp--preset--color--blue-dark);
-  }
-
-  .c-card-row__browse-all {
-    background: var(--wp--preset--color--charcoal);
-    color: var(--wp--preset--color--white);
   }
 }
 

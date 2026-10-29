@@ -143,3 +143,32 @@ input[type='checkbox'] {
 
   @include focus.ring;
 }
+
+// Gravity Forms "message" confirmation (any form): a Blue light panel with a tick, so a sent
+// form is unmistakable. Styled here rather than in each form's confirmation text.
+.gform_confirmation_wrapper {
+  margin: 0;
+}
+
+.gform_confirmation_message {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.25rem !important;
+  padding: 1.5rem 2rem !important;
+  border-radius: 1.25rem !important;
+  background: var(--wp--preset--color--blue-light) !important;
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 700 !important;
+  font-size: var(--wp--preset--font-size--body) !important;
+  line-height: 1.5rem !important;
+  color: var(--wp--preset--color--blue-dark) !important;
+
+  // Blue medium circle, white tick.
+  &::before {
+    content: '';
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23136084'/%3E%3Cpath d='M11 20.5l6 6 12-13' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}

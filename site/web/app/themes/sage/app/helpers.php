@@ -23,7 +23,8 @@ function menu_items_to_array(string $location): array
 
     $build = function (int $parent_id) use (&$build, $by_parent): array {
         return array_map(fn($item) => [
-            'label' => $item->title,
+            // Page-linked items take the page title, which wptexturize turns into `&#038;`; Blade escapes it again.
+            'label' => html_entity_decode($item->title, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'href' => $item->url,
             'current' => (bool) $item->current,
             'children' => $build((int) $item->ID),

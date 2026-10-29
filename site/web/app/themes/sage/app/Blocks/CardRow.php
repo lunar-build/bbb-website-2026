@@ -285,8 +285,8 @@ class CardRow extends Block
                 ])
                 ->addText('heading_highlight', [
                     'label' => 'Heading (highlighted phrase)',
-                    'instructions' => 'Short lead phrase, shown in a lighter blue.',
-                    'required' => 1,
+                    'instructions' => 'Optional. Short lead phrase, shown in a lighter blue above the rest of the heading.',
+                    'required' => 0,
                 ])
                 ->addText('heading', [
                     'label' => 'Heading (rest)',
