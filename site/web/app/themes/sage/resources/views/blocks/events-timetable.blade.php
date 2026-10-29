@@ -34,11 +34,14 @@
             </div>
 
             @if ($period['legend'] ?? [])
-              <ul class="c-events-timetable__legend" role="list" aria-label="{{ __('Session types', 'sage') }}">
-                @foreach ($period['legend'] as $event)
-                  <li class="c-events-timetable__legend-item" style="--event-color: {{ $event['color'] }}">{{ $event['name'] }}</li>
-                @endforeach
-              </ul>
+              <div class="c-events-timetable__legend">
+                <p class="c-events-timetable__legend-title" id="{{ $period['id'] }}-legend">{{ __('Key', 'sage') }}</p>
+                <ul class="c-events-timetable__legend-list" role="list" aria-labelledby="{{ $period['id'] }}-legend">
+                  @foreach ($period['legend'] as $event)
+                    <li class="c-events-timetable__legend-item" style="--event-color: {{ $event['color'] }}">{{ $event['name'] }}</li>
+                  @endforeach
+                </ul>
+              </div>
             @endif
 
             <div class="c-events-timetable__calendar" style="--from: {{ $period['grid']['from'] }}; --span: {{ $period['grid']['to'] - $period['grid']['from'] }}">
@@ -52,8 +55,9 @@
               @foreach ($period['weekdays'] as $day => $sessions)
                 <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif @if ($day === ($period['today'] ?? null)) data-today @endif>
                   <h{{ $dayHeadingLevel }} id="{{ $period['id'] }}-{{ strtolower($day) }}" class="c-events-timetable__day-name u-table-column-heading" @if ($day === ($period['today'] ?? null)) aria-current="date" @endif>
-                    <span aria-hidden="true">{{ $short[$day] }}</span>
+                    <span class="c-events-timetable__day-abbr" aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>
+                    <span class="c-events-timetable__count" aria-hidden="true">{{ count($sessions) === 0 ? __('No sessions', 'sage') : sprintf(_n('%d session', '%d sessions', count($sessions), 'sage'), count($sessions)) }}</span>
                   </h{{ $dayHeadingLevel }}>
                   @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'showCategory' => $period['mixedCategories'] ?? false, 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
                 </section>
