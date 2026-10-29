@@ -294,8 +294,13 @@ class EventsTimetable extends Block
      */
     public function with(): array
     {
+        $headingLevel = (int) (get_field('heading_level') ?: 2);
+
         return [
             'periods' => $this->periods(),
+            'headingLevel' => $headingLevel,
+            // Each day's name sits one level below its period title.
+            'dayHeadingLevel' => min($headingLevel + 1, 6),
         ];
     }
 
@@ -315,6 +320,17 @@ class EventsTimetable extends Block
                 ],
                 'default_value' => 'timetables',
                 'instructions' => 'Automatic shows every current and upcoming published timetable from Events → Event timetables, so new timetables appear here by themselves.',
+            ])
+            ->addSelect('heading_level', [
+                'label' => 'Period heading level',
+                'choices' => [
+                    2 => 'H2',
+                    3 => 'H3',
+                    4 => 'H4',
+                    5 => 'H5',
+                ],
+                'default_value' => 2,
+                'instructions' => 'Heading level for each period title. Choose the level one below the nearest heading above this block, so the page outline stays in order (e.g. H2 if the block sits straight under the page title). The day names inside the timetable use the next level down.',
             ])
             ->addTaxonomy('category', [
                 'label' => 'Event category',

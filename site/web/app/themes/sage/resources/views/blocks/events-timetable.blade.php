@@ -5,7 +5,7 @@
       @foreach ($periods as $period)
         @php($short = ['Monday' => 'Mon', 'Tuesday' => 'Tues', 'Wednesday' => 'Weds', 'Thursday' => 'Thurs', 'Friday' => 'Fri', 'Saturday' => 'Sat', 'Sunday' => 'Sun'])
         <div class="c-events-timetable__period" data-events-timetable>
-          <h3 class="c-events-timetable__title u-heading-5">{{ $period['title'] }}</h3>
+          <h{{ $headingLevel }} class="c-events-timetable__title u-heading-5">{{ $period['title'] }}</h{{ $headingLevel }}>
           @if ($period['empty'] ?? false)
             <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
           @else
@@ -31,10 +31,10 @@
 
               @foreach ($period['weekdays'] as $day => $sessions)
                 <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif>
-                  <h4 class="c-events-timetable__day-name u-table-column-heading">
+                  <h{{ $dayHeadingLevel }} class="c-events-timetable__day-name u-table-column-heading">
                     <span aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>
-                  </h4>
+                  </h{{ $dayHeadingLevel }}>
                   @include('partials.events-timetable-sessions', ['sessions' => $sessions])
                 </section>
               @endforeach
