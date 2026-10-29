@@ -92,22 +92,27 @@
 
 // Explicit size: slotted content under wa-carousel's display:contents wrapper
 // collapses to 0 width in some browsers (same as the other carousels' nav icons).
-// Colour comes from the button (see ::part(navigation-button) below).
+// Dark orange, as in Quote Carousel's white variant.
 .c-media-gallery__nav-icon {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  color: inherit;
+  width: 1.75rem;
+  height: 1.125rem;
+  color: var(--wp--preset--color--dark-orange);
 
-  .c-icon {
-    display: block;
-  }
-
+  .c-icon,
   svg {
     display: block;
-    width: 1.375rem;
-    height: 0.875rem;
+    width: 100%;
+    height: 100%;
+  }
+
+  // ::part() can't reach the slotted arrow, so the button passes the extended path down
+  // (see ::part(navigation-button):hover below). Same shape as button.arrow-hover.
+  .c-icon__arrow {
+    d: var(--c-media-gallery-arrow, path('M1 7H20M20 7L14 1M20 7L14 13'));
   }
 }
 
@@ -145,40 +150,39 @@
   grid-row: 2;
 }
 
-// Charcoal dots (matching the arrows) — solid when active, a ring otherwise.
+// Theme-blue dots — solid when active, a ring otherwise.
 .c-media-gallery__carousel::part(pagination-item) {
   width: 0.75rem;
   height: 0.75rem;
   box-sizing: border-box;
-  border: 2px solid var(--wp--preset--color--charcoal);
+  border: 2px solid var(--wp--preset--color--blue);
   background-color: transparent;
 }
 
 .c-media-gallery__carousel::part(pagination-item-active) {
-  background-color: var(--wp--preset--color--charcoal);
+  background-color: var(--wp--preset--color--blue);
 }
 
-// Yellow circle, charcoal border and arrow; hover swaps to charcoal with a white arrow.
-// The border stays charcoal in both states so the size never changes.
+// Keyboard focus: card ring, no extension. Hover: the arrow extends (not while focused,
+// where it would poke through the ring).
+// Fixed square + 50% radius so the focus ring is a circle around the arrow.
 .c-media-gallery__carousel::part(navigation-button) {
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 50%;
-  background: var(--wp--preset--color--yellow);
-  color: var(--wp--preset--color--charcoal);
-  transition:
-    background-color var(--wa-transition-normal, 0.15s) ease,
-    color var(--wa-transition-normal, 0.15s) ease;
 
-  @include focus.ring;
+  @include focus.card-ring;
 }
 
 .c-media-gallery__carousel::part(navigation-button):hover {
-  background: var(--wp--preset--color--charcoal);
-  color: var(--wp--preset--color--white);
+  --c-media-gallery-arrow: path('M1 7H28M28 7L22 1M28 7L22 13');
+}
+
+// After :hover so it wins when both apply (::part() doesn't reliably take :not()).
+.c-media-gallery__carousel::part(navigation-button):focus-visible {
+  --c-media-gallery-arrow: initial;
 }
 
 .c-media-gallery__carousel::part(pagination-item),
