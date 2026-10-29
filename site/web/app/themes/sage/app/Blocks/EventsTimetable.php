@@ -444,21 +444,33 @@ class EventsTimetable extends Block
     }
 
     /**
-     * One entry per category on show, with the colour of its first session.
+     * One entry per event on show with its colour, so the colour on each
+     * session has a text equivalent.
      *
-     * @param  array<string, array<int, array{category: string, color: string}>>  $weekdays
+     * @param  array<string, array<int, array{title: string, color: string}>>  $weekdays
      * @return list<array{name: string, color: string}>
      */
     protected static function legend(array $weekdays): array
     {
         $legend = [];
         foreach (array_merge(...array_values($weekdays)) as $session) {
-            if ($session['category'] !== '') {
-                $legend[$session['category']] ??= ['name' => $session['category'], 'color' => $session['color']];
-            }
+            $legend[$session['title']] ??= ['name' => $session['title'], 'color' => $session['color']];
         }
 
         return array_values($legend);
+    }
+
+    /**
+     * Whether the sessions span more than one category, the only time a
+     * category line on each session adds anything.
+     *
+     * @param  array<string, array<int, array{category: string}>>  $weekdays
+     */
+    protected static function hasMixedCategories(array $weekdays): bool
+    {
+        $categories = array_filter(array_column(array_merge(...array_values($weekdays)), 'category'));
+
+        return count(array_unique($categories)) > 1;
     }
 
     /**
@@ -467,7 +479,7 @@ class EventsTimetable extends Block
      *   same week, so the calendar shows the pattern, not every date). Sessions
      *   carry `start`/`end` (minutes since midnight) and `lane`/`lanes` for
      *   overlaps;
-     * - `legend`: the categories on show, each with its colour;
+     * - `legend`: the events on show, each with its colour;
      * - `grid`: the hour axis the sessions are positioned against;
      * - `today`: the weekday name when the period covers today, else null;
      * - `active`: the day shown first on small screens (today when it has sessions).
@@ -520,6 +532,7 @@ class EventsTimetable extends Block
                 'notices' => static::notices($row),
                 'weekdays' => $weekdays,
                 'legend' => static::legend($weekdays),
+                'mixedCategories' => static::hasMixedCategories($weekdays),
                 'grid' => static::grid($weekdays),
                 'today' => $coversToday ? $today : null,
                 'active' => $coversToday && $weekdays[$today] ? $today : (array_key_first(array_filter($weekdays)) ?? 'Monday'),
@@ -583,6 +596,7 @@ class EventsTimetable extends Block
                 'today' => null,
                 'weekdays' => $weekdays,
                 'legend' => static::legend($weekdays),
+                'mixedCategories' => static::hasMixedCategories($weekdays),
                 'grid' => static::grid($weekdays),
                 'active' => 'Monday',
             ];

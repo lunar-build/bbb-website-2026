@@ -35,8 +35,8 @@
 
             @if ($period['legend'] ?? [])
               <ul class="c-events-timetable__legend" role="list" aria-label="{{ __('Session types', 'sage') }}">
-                @foreach ($period['legend'] as $category)
-                  <li class="c-events-timetable__legend-item" style="--event-color: {{ $category['color'] }}">{{ $category['name'] }}</li>
+                @foreach ($period['legend'] as $event)
+                  <li class="c-events-timetable__legend-item" style="--event-color: {{ $event['color'] }}">{{ $event['name'] }}</li>
                 @endforeach
               </ul>
             @endif
@@ -55,7 +55,7 @@
                     <span aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>
                   </h{{ $dayHeadingLevel }}>
-                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'showCategory' => count($period['legend'] ?? []) > 1, 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
+                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'showCategory' => $period['mixedCategories'] ?? false, 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
                 </section>
               @endforeach
             </div>
