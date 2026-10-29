@@ -39,37 +39,34 @@ class SingleCaseStudy extends Composer
     /**
      * Split the content into the Q&A rows the design shows and anything else.
      *
-     * Migrated case studies are a run of Heading (h3) + Paragraph blocks —
-     * each heading is a question, the blocks after it are the answer. Content
-     * that doesn't start with a heading isn't that shape, so it renders as
-     * plain content instead of being forced into rows.
+     * Case studies use the classic editor: a run of headings + paragraphs,
+     * where each heading is a question and the content after it is the answer.
+     * Content that doesn't start with a heading isn't that shape, so it renders
+     * as plain content instead of being forced into rows.
      *
      * @return array{rows: array<int, array{question: string, answer: string}>, body: string}
      */
     public function details(): array
     {
-        $blocks = array_values(array_filter(
-            parse_blocks(get_post_field('post_content', get_the_ID())),
-            fn($block) => $block['blockName'] !== null,
-        ));
+        // Migrated posts still carry block comments; classic content has none.
+        $content = trim(preg_replace('/<!--\s*\/?wp:.*?-->/s', '', get_post_field('post_content', get_the_ID())));
 
-        if (($blocks[0]['blockName'] ?? null) !== 'core/heading') {
-            return ['rows' => [], 'body' => apply_filters('the_content', serialize_blocks($blocks))];
+        $parts = preg_split('/(<h[1-6][^>]*>.*?<\/h[1-6]>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        if (! $parts || ! preg_match('/^<h[1-6]/i', $parts[0])) {
+            return ['rows' => [], 'body' => apply_filters('the_content', $content)];
         }
 
         $rows = [];
 
-        foreach ($blocks as $block) {
-            if ($block['blockName'] === 'core/heading') {
-                $rows[] = [
-                    'question' => $this->question(render_block($block)),
-                    'answer' => '',
-                ];
+        foreach ($parts as $part) {
+            if (preg_match('/^<h[1-6]/i', $part)) {
+                $rows[] = ['question' => $this->question($part), 'answer' => ''];
 
                 continue;
             }
 
-            $rows[array_key_last($rows)]['answer'] .= render_block($block);
+            $rows[array_key_last($rows)]['answer'] .= apply_filters('the_content', $part);
         }
 
         return ['rows' => $rows, 'body' => ''];
@@ -90,7 +87,7 @@ class SingleCaseStudy extends Composer
         ]);
 
         return array_map(function ($post) use ($placeholder) {
-            $imageId = (int) get_field('card_image', $post->ID) ?: get_post_thumbnail_id($post);
+            $imageId = get_post_thumbnail_id($post);
 
             return [
                 'image' => [
