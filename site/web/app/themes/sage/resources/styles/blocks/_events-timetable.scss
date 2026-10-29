@@ -189,6 +189,8 @@
 
   @include bp.respond($max: bp.$md) {
     grid-template-columns: var(--gutter) minmax(0, 1fr);
+    // No day-name row here, so the first hour label (centred on its line) would sit against the legend.
+    padding-top: 1rem;
   }
 }
 
