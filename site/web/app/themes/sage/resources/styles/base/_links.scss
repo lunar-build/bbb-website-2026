@@ -5,17 +5,23 @@
 //   @use '../base/links';
 //   .thing a { @include links.body; }
 
+$thickness: 0.125rem;
+$offset: 0.3em;
+
 @mixin body {
   font-weight: 600;
   text-decoration-line: underline;
   text-decoration-style: solid;
-  text-decoration-thickness: 0.125rem;
-  text-underline-offset: 0.3em;
+  text-decoration-thickness: $thickness;
+  text-underline-offset: $offset;
   transition: background-color var(--wa-transition-normal, 0.15s) ease;
 
+  // Chrome draws dashed underlines half their thickness higher than solid ones, so the
+  // line visibly jumps up; the extra offset keeps it in place.
   &:hover,
   &:focus-visible {
     text-decoration-style: dashed;
+    text-underline-offset: calc(#{$offset} + #{$thickness} / 2);
   }
 
   // Keyboard only: the highlight is the focus indicator, replacing the outline.

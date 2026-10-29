@@ -93,7 +93,7 @@
           href="{{ $row['link']['url'] }}"
           @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
         >
-          {{ $row['link']['title'] }}
+          <span class="c-card-row__area-link-text">{{ $row['link']['title'] }}</span>
           <x-icon name="arrow-right" />
         </a>
       @endforeach
