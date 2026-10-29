@@ -8,7 +8,7 @@
         <span class="c-events-timetable__time">
           <time datetime="{{ $from }}">{{ $from }}</time> — <time datetime="{{ $to }}">{{ $to }}</time>
         </span>
-        @if ($session['category'] !== '')
+        @if ($showCategory && $session['category'] !== '')
           <span class="c-events-timetable__category">{{ $session['category'] }}</span>
         @endif
       </a>
