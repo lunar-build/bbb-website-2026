@@ -55,7 +55,7 @@
                     <span aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>
                   </h{{ $dayHeadingLevel }}>
-                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'showCategory' => ! empty($period['legend']), 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
+                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'showCategory' => count($period['legend'] ?? []) > 1, 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
                 </section>
               @endforeach
             </div>

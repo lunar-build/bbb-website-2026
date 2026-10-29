@@ -445,9 +445,6 @@ class EventsTimetable extends Block
 
     /**
      * One entry per category on show, with the colour of its first session.
-     * Empty unless there is more than one: a single category (e.g. the page's
-     * own centre) tells the reader nothing, and the session titles already
-     * name what each colour stands for.
      *
      * @param  array<string, array<int, array{category: string, color: string}>>  $weekdays
      * @return list<array{name: string, color: string}>
@@ -461,7 +458,7 @@ class EventsTimetable extends Block
             }
         }
 
-        return count($legend) > 1 ? array_values($legend) : [];
+        return array_values($legend);
     }
 
     /**
