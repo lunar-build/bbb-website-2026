@@ -142,6 +142,11 @@
   padding-bottom: 1.5rem;
   text-align: center;
 
+  &[aria-current] {
+    text-decoration: underline;
+    text-underline-offset: 0.5rem;
+  }
+
   @include bp.respond($max: bp.$md) {
     // The switcher already names the day.
     display: none;

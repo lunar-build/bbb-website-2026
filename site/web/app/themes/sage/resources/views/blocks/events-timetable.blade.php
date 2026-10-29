@@ -31,7 +31,7 @@
 
               @foreach ($period['weekdays'] as $day => $sessions)
                 <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif>
-                  <h{{ $dayHeadingLevel }} class="c-events-timetable__day-name u-table-column-heading">
+                  <h{{ $dayHeadingLevel }} class="c-events-timetable__day-name u-table-column-heading" @if ($day === ($period['today'] ?? null)) aria-current="date" @endif>
                     <span aria-hidden="true">{{ $short[$day] }}</span>
                     <span class="u-sr-only">{{ $day }}</span>
                   </h{{ $dayHeadingLevel }}>
