@@ -87,6 +87,19 @@
   }
 }
 
+// Visible under the day name; also read out by the live region.
+.c-events-timetable__current {
+  text-align: center;
+}
+
+.c-events-timetable__count {
+  @extend .u-business-service-label;
+  display: block;
+  margin-top: 0.25rem;
+  font-weight: 400;
+  text-transform: none;
+}
+
 // Same underline as today's heading in the desktop calendar.
 .c-events-timetable__current[data-today] [data-events-timetable-day] {
   text-decoration: underline;

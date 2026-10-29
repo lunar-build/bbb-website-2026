@@ -26,7 +26,7 @@
                 data-label-many="{{ __('%d sessions', 'sage') }}"
               >
                 <span data-events-timetable-day>{{ $period['active'] }}</span>
-                <span class="u-sr-only" data-events-timetable-count>, {{ $activeCount === 0 ? __('No sessions', 'sage') : sprintf(_n('%d session', '%d sessions', $activeCount, 'sage'), $activeCount) }}</span>
+                <span class="c-events-timetable__count" data-events-timetable-count>{{ $activeCount === 0 ? __('No sessions', 'sage') : sprintf(_n('%d session', '%d sessions', $activeCount, 'sage'), $activeCount) }}</span>
               </span>
               <button type="button" class="c-events-timetable__step c-events-timetable__step--next" data-events-timetable-step="1" aria-label="{{ __('Next day', 'sage') }}">
                 <x-icon name="arrow-right" />

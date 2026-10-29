@@ -32,7 +32,7 @@ document.querySelectorAll('[data-events-timetable]').forEach((period) => {
     days.forEach((day, i) => day.toggleAttribute('data-active', i === index));
     currentDay.textContent = days[index].dataset.day;
     current.toggleAttribute('data-today', days[index].hasAttribute('data-today'));
-    currentCount.textContent = `, ${countLabel(days[index])}`;
+    currentCount.textContent = countLabel(days[index]);
     updateSteps();
   };
 
