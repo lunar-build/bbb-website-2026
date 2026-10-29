@@ -328,7 +328,7 @@ class CardRow extends Block
                     ],
                 ])
                 ->addSelect('image_position', [
-                    'label' => 'Image position',
+                    'label' => 'Image focal point',
                     'instructions' => 'Which part of each card image stays visible when it\'s cropped to fit. Images at a 5:3 ratio (e.g. 900×540px) are not cropped at all.',
                     'choices' => $this->imagePositions,
                     'default_value' => 'center',
