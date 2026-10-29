@@ -192,6 +192,8 @@
   text-decoration-thickness: 0.125rem;
   text-underline-offset: 0.3em;
   transition: background-color var(--wa-transition-normal, 0.15s) ease;
+  -webkit-box-decoration-break: clone; // each wrapped line gets its own highlight edges
+  box-decoration-break: clone;
 
   // Dashed underline on any focus (not hover); the yellow highlight is keyboard only.
   .c-card-row__area-link:focus & {

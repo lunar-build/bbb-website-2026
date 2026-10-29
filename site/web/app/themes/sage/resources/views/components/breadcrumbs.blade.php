@@ -12,7 +12,7 @@
         <span slot="separator" aria-hidden="true"><x-icon name="arrow-right" /></span>
         @foreach ($items as $item)
             <wa-breadcrumb-item @if ($item['url'] ?? null) href="{{ $item['url'] }}" @endif>
-                {{ $item['label'] }}
+                <span class="c-breadcrumbs__label">{{ $item['label'] }}</span>
             </wa-breadcrumb-item>
         @endforeach
     </wa-breadcrumb>

@@ -93,7 +93,8 @@
           href="{{ $row['link']['url'] }}"
           @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
         >
-          <span class="c-card-row__area-link-text">{{ $row['link']['title'] }}</span>
+          {{-- Outer span is the flex item; the inner one stays inline so its highlight follows each line. --}}
+          <span><span class="c-card-row__area-link-text">{{ $row['link']['title'] }}</span></span>
           <x-icon name="arrow-right" />
         </a>
       @endforeach
