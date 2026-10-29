@@ -1,6 +1,7 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
 @use '../base/focus' as focus;
+@use '../base/utilities' as utilities;
 
 // Figma "Events Timetable" (node 497:5333)
 // Events carry --start/--end (minutes) and --lane/--lanes; the calendar carries --from/--span (minutes).
@@ -100,6 +101,12 @@
 
   @include focus.ring;
 
+  // aria-disabled, not disabled, so focus isn't lost when the end of the week is reached.
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
   .c-icon svg {
     display: block;
     width: 1.75rem;
@@ -148,8 +155,8 @@
   }
 
   @include bp.respond($max: bp.$md) {
-    // The switcher already names the day.
-    display: none;
+    // The switcher names the day visually; the heading stays in the accessibility tree.
+    @include utilities.sr-only;
   }
 }
 

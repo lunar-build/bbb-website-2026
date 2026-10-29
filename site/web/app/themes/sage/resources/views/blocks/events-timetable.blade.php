@@ -9,13 +9,24 @@
           @if ($period['empty'] ?? false)
             <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
           @else
-            @include('partials.events-timetable-notices', ['notices' => $period['notices'] ?? []])
+            @include('partials.events-timetable-notices', ['notices' => $period['notices'] ?? [], 'headingLevel' => $dayHeadingLevel])
 
             <div class="c-events-timetable__switcher">
               <button type="button" class="c-events-timetable__step c-events-timetable__step--prev" data-events-timetable-step="-1" aria-label="{{ __('Previous day', 'sage') }}">
                 <x-icon name="arrow-right" />
               </button>
-              <span class="c-events-timetable__current u-table-column-heading" aria-live="polite" data-events-timetable-current>{{ $period['active'] }}</span>
+              @php($activeCount = count($period['weekdays'][$period['active']]))
+              <span
+                class="c-events-timetable__current u-table-column-heading"
+                aria-live="polite"
+                data-events-timetable-current
+                data-label-none="{{ __('No sessions', 'sage') }}"
+                data-label-one="{{ __('1 session', 'sage') }}"
+                data-label-many="{{ __('%d sessions', 'sage') }}"
+              >
+                <span data-events-timetable-day>{{ $period['active'] }}</span>
+                <span class="u-sr-only" data-events-timetable-count>, {{ $activeCount === 0 ? __('No sessions', 'sage') : sprintf(_n('%d session', '%d sessions', $activeCount, 'sage'), $activeCount) }}</span>
+              </span>
               <button type="button" class="c-events-timetable__step c-events-timetable__step--next" data-events-timetable-step="1" aria-label="{{ __('Next day', 'sage') }}">
                 <x-icon name="arrow-right" />
               </button>
