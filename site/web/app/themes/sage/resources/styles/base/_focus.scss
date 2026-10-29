@@ -24,6 +24,19 @@
   }
 }
 
+// Whole-card links: 2px charcoal hugging the card, 2px yellow outside it. Box-shadows,
+// not outlines, so both rings stack with no gap and follow the card's radius. The
+// transparent outline is what Windows High Contrast shows, since it drops box-shadows.
+// Replaces the card's own box-shadow while focused.
+@mixin card-ring {
+  &:focus-visible {
+    outline: 2px solid transparent;
+    box-shadow:
+      0 0 0 2px var(--wp--preset--color--charcoal),
+      0 0 0 4px var(--wp--preset--color--yellow);
+  }
+}
+
 // The declarations alone, for selectors ring() can't build:
 //   wa-tab:focus-visible::part(tab) { @include focus.ring-styles; }
 @mixin ring-styles($color: var(--focus-color)) {

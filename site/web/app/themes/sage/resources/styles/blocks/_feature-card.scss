@@ -32,8 +32,9 @@
     position: absolute;
     inset: 0;
     z-index: 1;
+    border-radius: inherit; // so the focus ring follows the card's corners
 
-    @include focus.ring;
+    @include focus.card-ring;
   }
 
   &__body {

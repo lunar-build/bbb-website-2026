@@ -43,7 +43,7 @@
   background: var(--wp--preset--color--white);
   text-decoration: none;
 
-  @include focus.ring;
+  @include focus.card-ring;
 }
 
 .c-card-row__news-image {
@@ -82,13 +82,11 @@
   border: 2px solid var(--wp--preset--color--charcoal);
   border-radius: 999px;
   color: var(--wp--preset--color--charcoal);
+}
 
-  @include focus.ring;
-
-  &:hover,
-  &:focus-visible {
-    @include button.arrow-hover;
-  }
+// The CTA is a <span> inside the card link, so its arrow follows the card's hover/focus.
+.c-card-row__news-card:is(:hover, :focus-visible) .c-card-row__news-cta {
+  @include button.arrow-hover;
 }
 
 // Link cards — Figma "Link card row": wider, centred text, grey background.
