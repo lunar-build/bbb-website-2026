@@ -255,7 +255,9 @@ class TestimonialCardCarousel extends Block
     protected function hasLongQuote(array $cards): bool
     {
         foreach ($cards as $card) {
-            if (mb_strlen(trim(wp_strip_all_tags($card['quote']))) > self::PORTRAIT_QUOTE_LENGTH) {
+            $quoteText = trim(wp_strip_all_tags($card['quote']));
+
+            if (mb_strlen($quoteText) > self::PORTRAIT_QUOTE_LENGTH) {
                 return true;
             }
         }
