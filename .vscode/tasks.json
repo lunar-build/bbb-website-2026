@@ -27,17 +27,6 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "ssh:sage",
-			"type": "shell",
-			"command": "ddev ssh -d /var/www/html/web/app/themes/sage",
-			"presentation": {
-				"group": "ssh"
-			},
-			"options": {
-				"cwd": "${workspaceFolder}/site"
-			}
-		},
-		{
 			"label": "npm:dev",
 			"type": "shell",
 			"command": "ddev exec -d /var/www/html/web/app/themes/sage npm run dev",
@@ -55,7 +44,6 @@
 			"type": "shell",
 			"dependsOn": [
 				"ssh:site",
-				"ssh:sage",
 				"npm:dev"
 			],
 			"dependsOrder": "parallel",
