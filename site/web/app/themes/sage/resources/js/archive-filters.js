@@ -22,6 +22,7 @@ if (results) {
       if (!response.ok || !next) throw new Error(`Archive fetch failed: ${response.status}`);
 
       results.innerHTML = next.innerHTML;
+      document.title = doc.title;
 
       // Elements outside the fragment that depend on the results (e.g. search's count), matched by id.
       document.querySelectorAll('[data-archive-sync][id]').forEach((el) => {

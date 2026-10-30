@@ -292,6 +292,28 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 });
 
 /**
+ * Result count in the search page title. Submitting a search reloads the page, and the
+ * title is what screen readers announce on load (the count's live region only speaks on
+ * archive-filters.js swaps, which sync the title too).
+ */
+add_filter('document_title_parts', function (array $title) {
+    if (! is_search()) {
+        return $title;
+    }
+
+    $found = (int) $GLOBALS['wp_query']->found_posts;
+    $query = get_search_query(false);
+
+    $title['title'] = $query === ''
+        /* translators: %d: number of search results */
+        ? sprintf(_n('%d search result', '%d search results', $found, 'sage'), $found)
+        /* translators: 1: number of search results, 2: the search term */
+        : sprintf(_n('%1$d result for “%2$s”', '%1$d results for “%2$s”', $found, 'sage'), $found, $query);
+
+    return $title;
+});
+
+/**
  * Plain archive titles ("Case Studies", not "Archives: Case Studies").
  */
 add_filter('get_the_archive_title_prefix', '__return_empty_string');
