@@ -29,7 +29,7 @@ class EventsTimetable extends Block
      *
      * @var string
      */
-    public $description = 'A timetable of event sessions, grouped into periods (e.g. term, half term) and shown by weekday tabs or as a day-by-day accordion. Sessions come from the Events calendar.';
+    public $description = 'A weekly calendar of event sessions, grouped into periods (e.g. term, half term), with each session placed by its start and end time. Sessions come from the Events calendar.';
 
     /**
      * The block category.
@@ -169,10 +169,6 @@ class EventsTimetable extends Block
     }
 
     /**
-     * Published event timetables (App\EventTimetable) that haven't ended, in
-     * date order, as period rows — limited to the block's category if set.
-     */
-    /**
      * Closure date ranges as ['Y-m-d' => reason]; "Closed" when no reason was given.
      */
     protected static function closedDates(array $closures): array
@@ -189,16 +185,16 @@ class EventsTimetable extends Block
 
     /**
      * Cancelled sessions as ['date', 'start', 'end', 'event', 'reason'], for
-     * showing in the by-date list. MEC has no cancelled state per date, so
-     * these come from the timetable rather than MEC. Dates a closure covers
-     * are left out: the day already says why nothing runs.
+     * the notices. MEC has no cancelled state per date, so these come from
+     * the timetable rather than MEC. Dates a closure covers are left out: the
+     * closure notice already says why nothing runs.
      */
-    protected static function cancelledSessions(array $s): array
+    protected static function cancelledSessions(array $schedule): array
     {
-        $closed = static::closedDates($s['closures']);
-        $sessions = array_column($s['sessions'], null, 'id');
+        $closed = static::closedDates($schedule['closures']);
+        $sessions = array_column($schedule['sessions'], null, 'id');
         $out = [];
-        foreach ($s['cancellations'] as $cancellation) {
+        foreach ($schedule['cancellations'] as $cancellation) {
             $session = $sessions[$cancellation['session'] ?? ''] ?? null;
             $date = $cancellation['date'] ?? '';
             if (! $session || isset($closed[$date]) || (int) gmdate('N', strtotime($date . ' UTC')) !== (int) $session['weekday']) {
@@ -217,8 +213,8 @@ class EventsTimetable extends Block
     }
 
     /**
-     * Upcoming closures, cancellations and extra sessions as short lines, for
-     * the weekday-tabs layout (which shows the weekly pattern, not dates).
+     * Upcoming closures, cancellations and extra sessions as short lines. The
+     * calendar shows the weekly pattern, not dates, so these carry the changes.
      *
      * @return list<array{type: string, when: string, text: string}>
      */
@@ -228,42 +224,42 @@ class EventsTimetable extends Block
         $day = fn(string $ymd) => gmdate('D j M', strtotime($ymd . ' UTC'));
         $out = [];
 
-        foreach ($row['closures'] ?? [] as $c) {
-            if (($c['to'] ?? '') < $today) {
+        foreach ($row['closures'] ?? [] as $closure) {
+            if (($closure['to'] ?? '') < $today) {
                 continue;
             }
             $out[] = [
-                'sort' => $c['from'] . ' 00:00',
+                'sort' => $closure['from'] . ' 00:00',
                 'type' => 'closed',
-                'when' => $c['from'] === $c['to'] ? $day($c['from']) : $day($c['from']) . ' – ' . $day($c['to']),
-                'text' => trim($c['label'] ?? '') ?: __('Closed', 'sage'),
+                'when' => $closure['from'] === $closure['to'] ? $day($closure['from']) : $day($closure['from']) . ' – ' . $day($closure['to']),
+                'text' => trim($closure['label'] ?? '') ?: __('Closed', 'sage'),
             ];
         }
-        foreach ($row['cancelled'] ?? [] as $c) {
-            if ($c['date'] < $today) {
+        foreach ($row['cancelled'] ?? [] as $cancellation) {
+            if ($cancellation['date'] < $today) {
                 continue;
             }
             $out[] = [
-                'sort' => $c['date'] . ' ' . $c['start'],
+                'sort' => $cancellation['date'] . ' ' . $cancellation['start'],
                 'type' => 'cancelled',
-                'when' => $day($c['date']) . ', ' . EventSessions::timeRange(strtotime("{$c['date']} {$c['start']} UTC"), strtotime("{$c['date']} {$c['end']} UTC")),
-                'text' => sprintf(__('%s cancelled', 'sage'), html_entity_decode(get_the_title($c['event']), ENT_QUOTES)) . ($c['reason'] ? ': ' . $c['reason'] : ''),
+                'when' => $day($cancellation['date']) . ', ' . EventSessions::timeRange(strtotime("{$cancellation['date']} {$cancellation['start']} UTC"), strtotime("{$cancellation['date']} {$cancellation['end']} UTC")),
+                'text' => sprintf(__('%s cancelled', 'sage'), html_entity_decode(get_the_title($cancellation['event']), ENT_QUOTES)) . ($cancellation['reason'] ? ': ' . $cancellation['reason'] : ''),
             ];
         }
-        foreach ($row['extras'] ?? [] as $x) {
-            if (($x['date'] ?? '') < $today || get_post_status((int) $x['event']) !== 'publish') {
+        foreach ($row['extras'] ?? [] as $extra) {
+            if (($extra['date'] ?? '') < $today || get_post_status((int) $extra['event']) !== 'publish') {
                 continue;
             }
             $out[] = [
-                'sort' => $x['date'] . ' ' . $x['start'],
+                'sort' => $extra['date'] . ' ' . $extra['start'],
                 'type' => 'extra',
-                'when' => $day($x['date']) . ', ' . EventSessions::timeRange(strtotime("{$x['date']} {$x['start']} UTC"), strtotime("{$x['date']} {$x['end']} UTC")),
-                'text' => sprintf(__('Extra session: %s', 'sage'), html_entity_decode(get_the_title((int) $x['event']), ENT_QUOTES)),
+                'when' => $day($extra['date']) . ', ' . EventSessions::timeRange(strtotime("{$extra['date']} {$extra['start']} UTC"), strtotime("{$extra['date']} {$extra['end']} UTC")),
+                'text' => sprintf(__('Extra session: %s', 'sage'), html_entity_decode(get_the_title((int) $extra['event']), ENT_QUOTES)),
             ];
         }
-        usort($out, fn($a, $b) => strcmp($a['sort'], $b['sort']));
+        usort($out, fn($first, $second) => strcmp($first['sort'], $second['sort']));
 
-        return array_map(fn($n) => array_diff_key($n, ['sort' => 1]), $out);
+        return array_map(fn($notice) => array_diff_key($notice, ['sort' => 1]), $out);
     }
 
     protected function timetableRows(?int $category): array
@@ -271,55 +267,40 @@ class EventsTimetable extends Block
         $today = current_time('Y-m-d');
         $rows = [];
         foreach (get_posts(['post_type' => EventTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1]) as $timetable) {
-            $s = Schedule::normalise(get_post_meta($timetable->ID, EventTimetable::META, true));
-            if (! $s['start'] || $s['end'] < $today || ($category && (int) $s['category'] !== (int) $category)) {
+            $schedule = Schedule::normalise(get_post_meta($timetable->ID, EventTimetable::META, true));
+            if (! $schedule['start'] || $schedule['end'] < $today || ($category && (int) $schedule['category'] !== (int) $category)) {
                 continue;
             }
             $rows[] = [
                 'title' => html_entity_decode(get_the_title($timetable), ENT_QUOTES) . ': '
-                    . gmdate('l jS F', strtotime($s['start'] . ' UTC')) . ' – ' . gmdate('l jS F', strtotime($s['end'] . ' UTC')),
-                'start_date' => $s['start'],
-                'end_date' => $s['end'],
-                'closed' => static::closedDates($s['closures']),
-                'cancelled' => static::cancelledSessions($s),
-                'closures' => $s['closures'],
-                'extras' => $s['extras'],
-                'weekly' => array_map(fn($x) => $x['weekday'] . '|' . $x['start'] . '|' . $x['end'] . '|' . $x['event'], $s['sessions']),
+                    . gmdate('l jS F', strtotime($schedule['start'] . ' UTC')) . ' – ' . gmdate('l jS F', strtotime($schedule['end'] . ' UTC')),
+                'start_date' => $schedule['start'],
+                'end_date' => $schedule['end'],
+                'closed' => static::closedDates($schedule['closures']),
+                'cancelled' => static::cancelledSessions($schedule),
+                'closures' => $schedule['closures'],
+                'extras' => $schedule['extras'],
+                'weekly' => array_map(fn($session) => $session['weekday'] . '|' . $session['start'] . '|' . $session['end'] . '|' . $session['event'], $schedule['sessions']),
             ];
         }
-        usort($rows, fn($a, $b) => strcmp($a['start_date'], $b['start_date']));
+        usort($rows, fn($first, $second) => strcmp($first['start_date'], $second['start_date']));
 
         return $rows;
     }
 
     /**
-     * Pattern-library fixture. Only the layout is a field; the sessions come
-     * from MEC, so examplePeriods() supplies them already shaped.
-     *
-     * @var array
-     */
-    public $example = [
-        'layout' => 'tabs',
-    ];
-
-    /**
-     * Both layouts on the pattern library.
-     *
-     * @var array
-     */
-    public $examples = [
-        'Weekday tabs' => ['layout' => 'tabs'],
-        'Day-by-day accordion (alt)' => ['layout' => 'accordion'],
-    ];
-
-    /**
-     * Data to be passed to the block before rendering.
+     * Data to be passed to the block before rendering. The sessions come from
+     * MEC rather than fields, so the pattern-library fixture is examplePeriods().
      */
     public function with(): array
     {
+        $headingLevel = (int) (get_field('heading_level') ?: 2);
+
         return [
-            'layout' => get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'tabs'),
             'periods' => $this->periods(),
+            'headingLevel' => $headingLevel,
+            // Each day's name sits one level below its period title.
+            'dayHeadingLevel' => min($headingLevel + 1, 6),
         ];
     }
 
@@ -331,15 +312,6 @@ class EventsTimetable extends Block
         $fields = Builder::make('events_timetable');
 
         $fields
-            ->addButtonGroup('layout', [
-                'label' => 'Layout',
-                'choices' => [
-                    'tabs' => 'Weekday tabs',
-                    'accordion' => 'Day-by-day accordion',
-                ],
-                'default_value' => 'tabs',
-                'instructions' => 'Weekday tabs show each period\'s weekly pattern. The accordion lists every date in the period.',
-            ])
             ->addButtonGroup('source', [
                 'label' => 'Periods',
                 'choices' => [
@@ -348,6 +320,17 @@ class EventsTimetable extends Block
                 ],
                 'default_value' => 'timetables',
                 'instructions' => 'Automatic shows every current and upcoming published timetable from Events → Event timetables, so new timetables appear here by themselves.',
+            ])
+            ->addSelect('heading_level', [
+                'label' => 'Period heading level',
+                'choices' => [
+                    2 => 'H2',
+                    3 => 'H3',
+                    4 => 'H4',
+                    5 => 'H5',
+                ],
+                'default_value' => 2,
+                'instructions' => 'Heading level for each period title. Choose the level one below the nearest heading above this block, so the page outline stays in order (e.g. H2 if the block sits straight under the page title). The day names inside the timetable use the next level down.',
             ])
             ->addTaxonomy('category', [
                 'label' => 'Event category',
@@ -392,13 +375,117 @@ class EventsTimetable extends Block
     }
 
     /**
-     * Each period's sessions, grouped two ways:
+     * Minutes since midnight for a MEC timestamp (wall-clock stored as UTC).
+     */
+    protected static function minutes(int $timestamp): int
+    {
+        return (int) gmdate('G', $timestamp) * 60 + (int) gmdate('i', $timestamp);
+    }
+
+    /**
+     * Sets `lane` and `lanes` on a day's sessions so ones that overlap in time
+     * sit side by side instead of on top of each other. Sessions in the same
+     * run of overlaps share a `lanes` count; a lone session gets 1 of 1.
+     *
+     * @param  array<int, array{start: int, end: int}>  $sessions
+     */
+    protected static function placeLanes(array $sessions): array
+    {
+        usort($sessions, fn($a, $b) => [$a['start'], $a['end']] <=> [$b['start'], $b['end']]);
+
+        $run = [];
+        $runEnd = 0;
+        $laneEnds = [];
+        $flush = function () use (&$run, &$laneEnds, &$sessions) {
+            foreach ($run as $i) {
+                $sessions[$i]['lanes'] = count($laneEnds);
+            }
+            $run = [];
+            $laneEnds = [];
+        };
+
+        foreach ($sessions as $i => $session) {
+            if ($run && $session['start'] >= $runEnd) {
+                $flush();
+                $runEnd = 0;
+            }
+            $lane = array_search(true, array_map(fn($end) => $end <= $session['start'], $laneEnds), true);
+            $lane = $lane === false ? count($laneEnds) : $lane;
+            $laneEnds[$lane] = $session['end'];
+            $sessions[$i]['lane'] = $lane;
+            $run[] = $i;
+            $runEnd = max($runEnd, $session['end']);
+        }
+        $flush();
+
+        return $sessions;
+    }
+
+    /**
+     * The calendar's time axis for a period: whole hours from just before the
+     * earliest session to just after the latest, defaulting to 10:00–16:00
+     * when there are none.
+     *
+     * @param  array<string, array<int, array{start: int, end: int}>>  $weekdays
+     * @return array{from: int, to: int, hours: array<int, array{minutes: int, label: string}>}
+     */
+    protected static function grid(array $weekdays): array
+    {
+        $sessions = array_merge(...array_values($weekdays));
+        $from = $sessions ? (int) floor(min(array_column($sessions, 'start')) / 60) * 60 : 600;
+        $to = $sessions ? (int) ceil(max(array_column($sessions, 'end')) / 60) * 60 : 960;
+
+        $hours = [];
+        for ($m = $from; $m <= $to; $m += 60) {
+            $hours[] = ['minutes' => $m, 'label' => sprintf('%02d:00', intdiv($m, 60))];
+        }
+
+        return ['from' => $from, 'to' => $to, 'hours' => $hours];
+    }
+
+    /**
+     * One entry per event on show with its colour, so the colour on each
+     * session has a text equivalent.
+     *
+     * @param  array<string, array<int, array{title: string, color: string}>>  $weekdays
+     * @return list<array{name: string, color: string}>
+     */
+    protected static function legend(array $weekdays): array
+    {
+        $legend = [];
+        foreach (array_merge(...array_values($weekdays)) as $session) {
+            $legend[$session['title']] ??= ['name' => $session['title'], 'color' => $session['color']];
+        }
+
+        return array_values($legend);
+    }
+
+    /**
+     * Whether the sessions span more than one category, the only time a
+     * category line on each session adds anything.
+     *
+     * @param  array<string, array<int, array{category: string}>>  $weekdays
+     */
+    protected static function hasMixedCategories(array $weekdays): bool
+    {
+        $categories = array_filter(array_column(array_merge(...array_values($weekdays)), 'category'));
+
+        return count(array_unique($categories)) > 1;
+    }
+
+    /**
+     * Each period's weekly calendar data:
      * - `weekdays`: Monday–Sunday, each weekly slot once (a timetable repeats the
-     *   same week, so the tabs show the pattern, not every date);
-     * - `dates`: every date in the period, for the accordion.
+     *   same week, so the calendar shows the pattern, not every date). Sessions
+     *   carry `start`/`end` (minutes since midnight) and `lane`/`lanes` for
+     *   overlaps;
+     * - `legend`: the events on show, each with its colour;
+     * - `grid`: the hour axis the sessions are positioned against;
+     * - `today`: the weekday name when the period covers today, else null;
+     * - `active`: the day shown first on small screens (today when it has sessions).
      * `empty` is true when the period has no sessions at all.
      *
-     * @return array<int, array{id: string, title: string, empty: bool, weekdays: array, dates: array}>
+     * @return array<int, array{id: string, title: string, empty: bool, notices: array, weekdays: array, legend: array, grid: array, today: ?string, active: string}>
      */
     public function periods(): array
     {
@@ -410,97 +497,112 @@ class EventsTimetable extends Block
 
         return array_map(function (array $row) use ($category) {
             $weekdays = array_fill_keys(self::WEEKDAYS, []);
-            $dates = [];
 
-            $extras = [];
-            foreach ($row['extras'] ?? [] as $x) {
-                $extras[($x['date'] ?? '') . '|' . ($x['start'] ?? '') . '|' . ($x['event'] ?? '')] = true;
-            }
-
-            // List every date in the period, so the accordion shows quiet days too.
-            $last = strtotime($row['end_date'] . ' UTC');
-            for ($day = strtotime($row['start_date'] . ' UTC'); $day <= $last; $day += DAY_IN_SECONDS) {
-                $dates[gmdate('Y-m-d', $day)] = [
-                    'label' => gmdate('l jS F', $day),
-                    'today' => gmdate('Y-m-d', $day) === current_time('Y-m-d'),
-                    'sessions' => [],
-                    'closed' => $row['closed'][gmdate('Y-m-d', $day)] ?? null,
-                ];
-            }
-
-            foreach (EventSessions::between($row['start_date'], $row['end_date'], $category) as $s) {
-                $session = [
-                    'time' => EventSessions::timeRange($s->tstart, $s->tend),
-                    'title' => $s->title,
-                    'url' => get_permalink($s->post_id),
-                    'color' => EventSessions::color($s->post_id),
-                    'labels' => EventSessions::labels($s->post_id),
-                ];
-                // A timetable's weekday tabs show its weekly pattern; one-off extras only appear by date.
-                if (! isset($row['weekly']) || in_array(gmdate('N', $s->tstart) . '|' . gmdate('H:i', $s->tstart) . '|' . gmdate('H:i', $s->tend) . '|' . $s->post_id, $row['weekly'], true)) {
-                    $weekdays[gmdate('l', $s->tstart)][$session['time'] . $s->post_id] = $session;
-                }
-                $session['sort'] = gmdate('H:i', $s->tstart);
-                $session['extra'] = isset($extras[gmdate('Y-m-d|H:i|', $s->tstart) . $s->post_id]);
-                $dates[gmdate('Y-m-d', $s->tstart)]['sessions'][] = $session;
-            }
-
-            foreach ($row['cancelled'] ?? [] as $c) {
-                if (! isset($dates[$c['date']]) || get_post_status($c['event']) !== 'publish') {
+            foreach (EventSessions::between($row['start_date'], $row['end_date'], $category) as $occurrence) {
+                // A timetable's calendar shows its weekly pattern; one-off extras are listed in the notices.
+                $weeklySlot = gmdate('N', $occurrence->tstart) . '|' . gmdate('H:i', $occurrence->tstart) . '|' . gmdate('H:i', $occurrence->tend) . '|' . $occurrence->post_id;
+                if (isset($row['weekly']) && ! in_array($weeklySlot, $row['weekly'], true)) {
                     continue;
                 }
-                $dates[$c['date']]['sessions'][] = [
-                    'time' => EventSessions::timeRange(strtotime("{$c['date']} {$c['start']} UTC"), strtotime("{$c['date']} {$c['end']} UTC")),
-                    'title' => html_entity_decode(get_the_title($c['event']), ENT_QUOTES),
-                    'url' => get_permalink($c['event']),
-                    'color' => EventSessions::color($c['event']),
-                    'labels' => EventSessions::labels($c['event']),
-                    'cancelled' => true,
-                    'reason' => $c['reason'],
-                    'sort' => $c['start'],
+                $time = EventSessions::timeRange($occurrence->tstart, $occurrence->tend);
+                $start = static::minutes($occurrence->tstart);
+                $weekdays[gmdate('l', $occurrence->tstart)][$time . $occurrence->post_id] = [
+                    'time' => $time,
+                    'start' => $start,
+                    // A session running past midnight stops at the end of its day.
+                    'end' => max($start + 1, $occurrence->tend > $occurrence->tstart && gmdate('Y-m-d', $occurrence->tend) === gmdate('Y-m-d', $occurrence->tstart) ? static::minutes($occurrence->tend) : 1440),
+                    'title' => $occurrence->title,
+                    'url' => get_permalink($occurrence->post_id),
+                    'color' => EventSessions::color($occurrence->post_id),
+                    'category' => EventSessions::category($occurrence->post_id),
+                    'labels' => EventSessions::labels($occurrence->post_id),
                 ];
-                usort($dates[$c['date']]['sessions'], fn($a, $b) => strcmp($a['sort'] ?? '', $b['sort'] ?? ''));
             }
+
+            $weekdays = array_map(fn($sessions) => static::placeLanes(array_values($sessions)), $weekdays);
+
+            // Open on today when the period covers it and sessions run that day, else the first day that has any.
+            $today = current_time('l');
+            $coversToday = $row['start_date'] <= current_time('Y-m-d') && current_time('Y-m-d') <= $row['end_date'];
 
             return [
                 'id' => wp_unique_id('events-timetable-'),
                 'empty' => ! array_filter($weekdays),
                 'title' => $row['title'],
                 'notices' => static::notices($row),
-                'weekdays' => array_map('array_values', $weekdays),
-                'dates' => array_values($dates),
+                'weekdays' => $weekdays,
+                'legend' => static::legend($weekdays),
+                'mixedCategories' => static::hasMixedCategories($weekdays),
+                'grid' => static::grid($weekdays),
+                'today' => $coversToday ? $today : null,
+                'active' => $coversToday && $weekdays[$today] ? $today : (array_key_first(array_filter($weekdays)) ?? 'Monday'),
             ];
         }, $rows);
     }
 
     /**
-     * Pattern-library fixture: two holiday weeks, as in the Figma timetables.
+     * Pattern-library fixture: two holiday weeks, as in the Figma timetable.
      */
     protected function examplePeriods(): array
     {
-        $sessions = [
-            ['time' => '09:45 — 10:30', 'title' => 'Family Cycling', 'url' => '#', 'color' => '#1EACDB'],
-            ['time' => '10:45 — 11:30', 'title' => 'Learn to Ride', 'url' => '#', 'color' => '#F77BA0'],
-            ['time' => '11:45 — 12:30', 'title' => 'Family Disability Session', 'url' => '#', 'color' => '#67DD00'],
-            ['time' => '13:15 — 14:00', 'title' => 'Learn to Ride', 'url' => '#', 'color' => '#F77BA0'],
-            ['time' => '14:15 — 15:00', 'title' => 'Learn to Ride: Next Steps', 'url' => '#', 'color' => '#76DBE8'],
-            ['time' => '15:15 — 16:00', 'title' => 'Rock Up and Ride', 'url' => '#', 'color' => '#FFBF47'],
-        ];
-        $week = function (string $monday) use ($sessions) {
-            $dates = [];
-            foreach (self::WEEKDAYS as $i => $day) {
-                $dates[] = ['label' => gmdate('l jS F', strtotime("$monday +$i days UTC")), 'sessions' => $sessions];
-            }
+        $pink = '#F47096';
+        $blue = '#23A3D2';
+        $cyan = '#6DD6E3';
+        $yellow = '#FFBF47';
+
+        $session = function (string $title, string $from, string $to, string $color, string $category) {
+            [$h1, $m1] = array_map('intval', explode(':', $from));
+            [$h2, $m2] = array_map('intval', explode(':', $to));
 
             return [
-                'id' => wp_unique_id('events-timetable-example-'),
-                'title' => 'Summer Holidays: ' . $dates[0]['label'] . ' – ' . $dates[6]['label'],
-                'weekdays' => array_fill_keys(self::WEEKDAYS, $sessions),
-                'dates' => $dates,
+                'time' => $from . ' — ' . $to,
+                'start' => $h1 * 60 + $m1,
+                'end' => $h2 * 60 + $m2,
+                'title' => $title,
+                'url' => '#',
+                'color' => $color,
+                'category' => $category,
+                'labels' => [],
             ];
         };
 
-        return [$week('2026-08-17'), $week('2026-08-24')];
+        $schoolDay = [
+            $session('Schools', '10:00', '10:45', $pink, 'Schools'),
+            $session('Schools', '10:45', '11:30', $pink, 'Schools'),
+            $session('Schools', '11:45', '12:30', $pink, 'Schools'),
+            $session('Schools', '13:15', '14:00', $pink, 'Schools'),
+            $session('Learn to Ride', '14:15', '15:00', $yellow, 'Learn to Ride'),
+            $session('Rock Up and Ride', '15:15', '16:00', $cyan, 'Rock Up and Ride'),
+        ];
+        $weekendDay = [
+            $session('Family Cycling', '10:00', '11:00', $blue, 'Family Cycling'),
+            $session('Learn to Ride', '11:15', '12:15', $yellow, 'Learn to Ride'),
+            $session('Family Disability Session', '13:00', '14:00', $pink, 'Disability Cycling'),
+            $session('Learn to Ride', '14:30', '15:30', $yellow, 'Learn to Ride'),
+            $session('Learn to Ride: Next Steps', '16:00', '17:00', $yellow, 'Learn to Ride'),
+            $session('Rock Up and Ride', '17:15', '18:00', $cyan, 'Rock Up and Ride'),
+        ];
+
+        $week = function (string $monday) use ($schoolDay, $weekendDay) {
+            $weekdays = array_fill_keys(self::WEEKDAYS, $schoolDay);
+            $weekdays['Saturday'] = $weekdays['Sunday'] = $weekendDay;
+            $weekdays = array_map(fn($sessions) => static::placeLanes($sessions), $weekdays);
+
+            return [
+                'id' => wp_unique_id('events-timetable-example-'),
+                'empty' => false,
+                'title' => 'Summer Holidays: ' . gmdate('l jS F', strtotime("$monday UTC")) . ' – ' . gmdate('l jS F', strtotime("$monday +6 days UTC")),
+                'notices' => [],
+                'today' => null,
+                'weekdays' => $weekdays,
+                'legend' => static::legend($weekdays),
+                'mixedCategories' => static::hasMixedCategories($weekdays),
+                'grid' => static::grid($weekdays),
+                'active' => 'Monday',
+            ];
+        };
+
+        return [$week('2026-08-24'), $week('2026-08-31')];
     }
 
     /**

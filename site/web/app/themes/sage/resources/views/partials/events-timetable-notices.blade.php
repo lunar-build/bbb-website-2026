@@ -1,7 +1,7 @@
-{{-- Closures, cancellations and extra sessions, for the weekday-tabs layout (the accordion shows them on their dates). --}}
+{{-- Date-specific changes; the calendar only shows the weekly pattern. --}}
 @if ($notices)
   <div class="c-events-timetable__notices" role="note" aria-label="{{ __('Changes to this timetable', 'sage') }}">
-    <h4 class="c-events-timetable__notices-title">{{ __('Changes to this timetable', 'sage') }}</h4>
+    <h{{ $headingLevel }} class="c-events-timetable__notices-title">{{ __('Changes to this timetable', 'sage') }}</h{{ $headingLevel }}>
     <ul role="list">
       @foreach ($notices as $notice)
         <li class="c-events-timetable__notice c-events-timetable__notice--{{ $notice['type'] }}">

@@ -1,60 +1,71 @@
-<section {{ $attributes->class(['c-events-timetable', 'c-events-timetable--'.$layout]) }}>
+<section {{ $attributes->class(['c-events-timetable']) }}>
   @if ($periods)
     <div class="o-container">
-      @if ($layout === 'accordion')
-        {{-- Figma "Events timetable (alt)" (node 63:2406) --}}
-        <wa-accordion class="c-events-timetable__periods" appearance="plain" multiple>
-          @foreach ($periods as $period)
-            <wa-accordion-item class="c-events-timetable__period" label="{{ $period['title'] }}" heading-level="3" @if ($loop->first) expanded @endif>
-              <x-icon name="chevron" slot="icon" class="c-events-timetable__chevron" />
-              @php
-                // Open on today when it falls in this period, otherwise the first day with sessions.
-                $open = array_search(true, array_column($period['dates'], 'today'), true);
-                $open = $open !== false ? $open : (array_key_first(array_filter(array_column($period['dates'], 'sessions'))) ?? 0);
-              @endphp
-              @if ($period['empty'] ?? false)
-                <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
-              @else
-              <wa-accordion class="c-events-timetable__days" appearance="plain" multiple>
-                @foreach ($period['dates'] as $date)
-                  <wa-accordion-item class="c-events-timetable__day" label="{{ $date['label'] }}" heading-level="4" @if ($loop->index === $open) expanded @endif>
-                    <x-icon name="chevron" slot="icon" class="c-events-timetable__chevron" />
-                    @include('partials.events-timetable-sessions', ['sessions' => $date['sessions'], 'closed' => $date['closed'] ?? null, 'dots' => true])
-                  </wa-accordion-item>
-                @endforeach
-              </wa-accordion>
-              @endif
-            </wa-accordion-item>
-          @endforeach
-        </wa-accordion>
-      @else
-        {{-- Figma "Events timetable" (node 26:1172) --}}
-        @foreach ($periods as $period)
-          @php
-            // Open on the first day that has sessions, so a panel never starts empty.
-            $active = array_key_first(array_filter($period['weekdays'])) ?? 'Monday';
-          @endphp
-          <div class="c-events-timetable__panel">
-            <h3 class="c-events-timetable__title u-heading-5">{{ $period['title'] }}</h3>
-            @if ($period['empty'] ?? false)
-              <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
-            @else
-            @include('partials.events-timetable-notices', ['notices' => $period['notices'] ?? []])
-            <wa-tab-group class="c-events-timetable__tabs" active="{{ strtolower($active) }}">
-              @foreach ($period['weekdays'] as $day => $sessions)
-                {{-- wa-tab-group only applies `active` once scrolled into view, so set it in markup too. --}}
-                <wa-tab slot="nav" panel="{{ strtolower($day) }}" @if ($day === $active) active @endif>{{ $day }}</wa-tab>
-              @endforeach
-              @foreach ($period['weekdays'] as $day => $sessions)
-                <wa-tab-panel name="{{ strtolower($day) }}" @if ($day === $active) active @endif>
-                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'dots' => false])
-                </wa-tab-panel>
-              @endforeach
-            </wa-tab-group>
+      {{-- Figma "Events Timetable" (node 497:5333) --}}
+      @foreach ($periods as $period)
+        @php($short = ['Monday' => 'Mon', 'Tuesday' => 'Tues', 'Wednesday' => 'Weds', 'Thursday' => 'Thurs', 'Friday' => 'Fri', 'Saturday' => 'Sat', 'Sunday' => 'Sun'])
+        <div class="c-events-timetable__period" data-events-timetable>
+          <h{{ $headingLevel }} class="c-events-timetable__title u-heading-5">{{ $period['title'] }}</h{{ $headingLevel }}>
+          @if ($period['empty'] ?? false)
+            <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
+          @else
+            @include('partials.events-timetable-notices', ['notices' => $period['notices'] ?? [], 'headingLevel' => $dayHeadingLevel])
+
+            <div class="c-events-timetable__switcher">
+              <button type="button" class="c-events-timetable__step c-events-timetable__step--prev" data-events-timetable-step="-1" aria-label="{{ __('Previous day', 'sage') }}">
+                <x-icon name="arrow-right" />
+              </button>
+              @php($activeCount = count($period['weekdays'][$period['active']]))
+              <span
+                class="c-events-timetable__current u-table-column-heading"
+                aria-live="polite"
+                data-events-timetable-current
+                @if ($period['active'] === ($period['today'] ?? null)) data-today @endif
+                data-label-none="{{ __('No sessions', 'sage') }}"
+                data-label-one="{{ __('1 session', 'sage') }}"
+                data-label-many="{{ __('%d sessions', 'sage') }}"
+              >
+                <span data-events-timetable-day>{{ $period['active'] }}</span>
+                <span class="c-events-timetable__count" data-events-timetable-count>{{ $activeCount === 0 ? __('No sessions', 'sage') : sprintf(_n('%d session', '%d sessions', $activeCount, 'sage'), $activeCount) }}</span>
+              </span>
+              <button type="button" class="c-events-timetable__step c-events-timetable__step--next" data-events-timetable-step="1" aria-label="{{ __('Next day', 'sage') }}">
+                <x-icon name="arrow-right" />
+              </button>
+            </div>
+
+            @if ($period['legend'] ?? [])
+              <div class="c-events-timetable__legend">
+                <p class="c-events-timetable__legend-title" id="{{ $period['id'] }}-legend">{{ __('Key', 'sage') }}</p>
+                <ul class="c-events-timetable__legend-list" role="list" aria-labelledby="{{ $period['id'] }}-legend">
+                  @foreach ($period['legend'] as $event)
+                    <li class="c-events-timetable__legend-item" style="--event-color: {{ $event['color'] }}">{{ $event['name'] }}</li>
+                  @endforeach
+                </ul>
+              </div>
             @endif
-          </div>
-        @endforeach
-      @endif
+
+            <div class="c-events-timetable__calendar" style="--from: {{ $period['grid']['from'] }}; --span: {{ $period['grid']['to'] - $period['grid']['from'] }}">
+              <div class="c-events-timetable__hours" aria-hidden="true">
+                @foreach ($period['grid']['hours'] as $hour)
+                  <span class="c-events-timetable__hour" style="--at: {{ $hour['minutes'] - $period['grid']['from'] }}">{{ $hour['label'] }}</span>
+                @endforeach
+              </div>
+              <div class="c-events-timetable__lines" aria-hidden="true"></div>
+
+              @foreach ($period['weekdays'] as $day => $sessions)
+                <section class="c-events-timetable__day" style="--col: {{ $loop->iteration + 1 }}" data-day="{{ $day }}" @if ($day === $period['active']) data-active @endif @if ($day === ($period['today'] ?? null)) data-today @endif>
+                  <h{{ $dayHeadingLevel }} id="{{ $period['id'] }}-{{ strtolower($day) }}" class="c-events-timetable__day-name u-table-column-heading" @if ($day === ($period['today'] ?? null)) aria-current="date" @endif>
+                    <span class="c-events-timetable__day-abbr" aria-hidden="true">{{ $short[$day] }}</span>
+                    <span class="u-sr-only">{{ $day }}</span>
+                    <span class="c-events-timetable__count" aria-hidden="true">{{ count($sessions) === 0 ? __('No sessions', 'sage') : sprintf(_n('%d session', '%d sessions', count($sessions), 'sage'), count($sessions)) }}</span>
+                  </h{{ $dayHeadingLevel }}>
+                  @include('partials.events-timetable-sessions', ['sessions' => $sessions, 'showCategory' => $period['mixedCategories'] ?? false, 'day' => $day, 'headingId' => $period['id'] . '-' . strtolower($day)])
+                </section>
+              @endforeach
+            </div>
+          @endif
+        </div>
+      @endforeach
     </div>
   @endif
 </section>
