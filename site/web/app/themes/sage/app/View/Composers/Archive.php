@@ -37,7 +37,7 @@ class Archive extends Composer
             'formAction' => ArchiveFilters::baseUrl($postType),
             'resultsHeading' => get_post_type_object($postType)->labels->name ?? '',
             'foundPosts' => (int) $GLOBALS['wp_query']->found_posts,
-            'cards' => array_map(fn($post) => PostCard::fromPost($post, 'h4'), $GLOBALS['wp_query']->posts),
+            'cards' => array_map(fn($post) => PostCard::fromPost($post, 'match'), $GLOBALS['wp_query']->posts),
             'paginationLinks' => pagination_links(),
         ];
     }

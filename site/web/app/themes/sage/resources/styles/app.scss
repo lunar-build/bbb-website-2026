@@ -28,10 +28,12 @@
 @use 'components/media-thumbnail';
 @use 'components/download-link';
 @use 'components/single-post';
+@use 'components/single-case-study';
 @use 'components/archive';
 @use 'components/search';
 @use 'components/event';
 @use 'components/label';
+@use 'components/not-found';
 @use 'base/utilities';
 @use 'base/pattern-library';
 @use 'base/sticky-nav-template';
@@ -39,6 +41,7 @@
 @use 'blocks/video-hero';
 @use 'blocks/text-hero';
 @use 'blocks/cta-banner';
+@use 'blocks/instagram-feed';
 @use 'blocks/text-banner';
 @use 'blocks/journey-planner-widget';
 @use 'blocks/feature-card';

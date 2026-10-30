@@ -5,6 +5,8 @@
     'placeholder' => null,
     'icon' => null,
     'iconButtonLabel' => null,
+    'iconButtonType' => 'submit',
+    'iconInline' => false,
     'required' => false,
     'textarea' => false,
     'rows' => 4,
@@ -19,9 +21,12 @@
 
 {{--
   $iconButtonLabel turns the trailing icon into a real, focusable
-  <button type="submit"> with the yellow-cap "submit" look (e.g. a search
+  <button> (type="submit" unless $iconButtonType says otherwise) with the yellow-cap "submit" look (e.g. a search
   field) instead of a decorative icon — pass it whenever the icon is
   something the user can actually click, not just a visual hint.
+
+  $iconInline moves that button inside the pill as a plain icon (needs
+  $iconButtonLabel).
 
   $ariaLabel covers fields rendered without a visible $label (icon +
   placeholder only, e.g. a compact search field) — a placeholder alone
@@ -52,6 +57,23 @@
             @if ($required) required @endif
             @if ($error) hint="{{ $error }}" @endif
         ></wa-textarea>
+    @elseif ($icon && $iconButtonLabel && $iconInline)
+        {{-- Inline variant: the real button sits inside the pill (slot="end"), plain
+             like the decorative icon, instead of the adjacent yellow cap below. --}}
+        <wa-input
+            pill
+            type="{{ $type }}"
+            @if ($id) id="{{ $id }}" @endif
+            @if ($name) name="{{ $name }}" @endif
+            @if ($labelText) label="{{ $labelText }}" @endif
+            @if ($placeholder) placeholder="{{ $placeholder }}" @endif
+            @if ($required) required @endif
+            @if ($error) hint="{{ $error }}" @endif
+        >
+            <button type="{{ $iconButtonType }}" slot="end" class="c-input__icon c-input__icon--inline" aria-label="{{ $iconButtonLabel }}">
+                <x-icon name="{{ $icon }}" />
+            </button>
+        </wa-input>
     @elseif ($icon && $iconButtonLabel)
         {{-- Icon-button variant: a real adjacent button, not a slotted overlay —
              squared off where it meets wa-input so the two read as one
@@ -68,7 +90,7 @@
                 @if ($required) required @endif
                 @if ($error) hint="{{ $error }}" @endif
             ></wa-input>
-            <button type="submit" class="c-input__icon c-input__icon--accent" aria-label="{{ $iconButtonLabel }}">
+            <button type="{{ $iconButtonType }}" class="c-input__icon c-input__icon--accent" aria-label="{{ $iconButtonLabel }}">
                 <x-icon name="{{ $icon }}" />
             </button>
         </div>

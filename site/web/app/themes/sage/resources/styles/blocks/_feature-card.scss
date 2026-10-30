@@ -48,6 +48,7 @@
 
   &__date {
     @extend .u-card-date;
+    flex-basis: 100%; // own line, tags wrap below
     margin: 0;
     color: var(--wp--preset--color--blue);
   }
@@ -78,8 +79,13 @@
     :where(h1, h2, h3, h4, h5, h6) {
       margin: 0;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--wp--preset--color--blue-medium);
       color: var(--wp--preset--color--blue);
+    }
+
+    // "Match level" would size an H3 title at Heading 3 — far too big for a card,
+    // so default to the card title size. A visual style picked in the editor still wins.
+    :where(h1, h2, h3, h4, h5, h6):not([class*='u-heading-']) {
+      @extend .u-card-title;
     }
 
     p {
@@ -113,9 +119,13 @@
     justify-content: center;
     margin-left: auto;
     color: var(--wp--preset--color--blue);
+    --c-feature-card-arrow-width: 1.75rem;
+    // The hover arrow grows 8 units past the 22-wide viewBox — reserve that room
+    // so it stays inside the content edge.
+    margin-inline-end: calc(var(--c-feature-card-arrow-width) * 8 / 22);
 
     svg {
-      width: 38px;
+      width: var(--c-feature-card-arrow-width);
       height: auto;
     }
   }

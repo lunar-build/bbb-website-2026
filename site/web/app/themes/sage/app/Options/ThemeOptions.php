@@ -102,6 +102,20 @@ class ThemeOptions extends Field
                     'required' => true,
                 ])
             ->endRepeater()
+            ->addTab('not_found', [
+                'label' => '404 page',
+            ])
+            ->addRepeater('not_found_links', [
+                'label' => 'Quick links',
+                'instructions' => 'Buttons shown under the search field on the 404 page (e.g. Home, Journey planner, What\'s on, News). Leave empty to show those four.',
+                'button_label' => 'Add Link',
+                'max' => 6,
+            ])
+                ->addLink('link', [
+                    'label' => 'Link',
+                    'required' => true,
+                ])
+            ->endRepeater()
             ->addTab('integrations', [
                 'label' => 'Integrations',
             ])

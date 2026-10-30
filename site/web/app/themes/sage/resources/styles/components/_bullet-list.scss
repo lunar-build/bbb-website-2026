@@ -1,47 +1,13 @@
+@use '../abstracts/lists';
+
 .c-bullet-list {
+  @include lists.content-list;
+
   &__heading {
     margin-bottom: 1rem;
   }
 
   &__list {
     margin-bottom: 0;
-
-    li {
-      margin-bottom: 0.625rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  // Nested levels (App\Support\ListItems): tucked under their parent item.
-  &__list &__list {
-    margin-top: 0.625rem;
-  }
-
-  // Second-level bullets are hollow, so the hierarchy reads at a glance.
-  ul ul > li::before {
-    background: transparent;
-    box-shadow: inset 0 0 0 1px var(--wp--preset--color--blue);
-  }
-
-  // Numbers: native markers (screen readers announce them), styled to match
-  // the bullets' blue. Nested levels count a., b. then i., ii.
-  ol {
-    padding-inline-start: 1.5rem;
-
-    > li::marker {
-      color: var(--wp--preset--color--blue);
-      font-weight: 700;
-    }
-  }
-
-  ol ol {
-    list-style-type: lower-alpha;
-  }
-
-  ol ol ol {
-    list-style-type: lower-roman;
   }
 }

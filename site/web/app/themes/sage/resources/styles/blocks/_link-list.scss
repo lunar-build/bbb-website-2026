@@ -4,6 +4,7 @@
 // larger headline-style links with an optional description underneath.
 
 @use '../base/focus';
+@use '../base/typography';
 @use '../components/button';
 
 .c-link-list__group {
@@ -82,6 +83,11 @@
 
 .c-link-list__long-title {
   margin: 0;
+}
+
+// Just links: a step down from the Heading 5 used with descriptions.
+.c-link-list--long-just-links .c-link-list__long-title {
+  @extend .u-card-title;
 }
 
 .c-link-list__long-description {
