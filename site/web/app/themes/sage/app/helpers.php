@@ -251,3 +251,24 @@ function theme_block_background_css(): string
 
     return $css;
 }
+
+/**
+ * Main query's pagination as `<a>`/`<span>` strings for archive and search results.
+ * paginate_links() carries the current query string (search term, active filters) onto each link.
+ * Hidden text gives the accessible names "Page 2", "Previous page" and "Next page"; the
+ * spaces outside it don't render, as the links are inline-flex.
+ */
+function pagination_links(): array
+{
+    $arrow = \Illuminate\Support\Facades\Blade::render('<x-icon name="arrow-right" />');
+    $hidden = fn(string $text) => '<span class="u-sr-only">' . esc_html($text) . '</span>';
+
+    return paginate_links([
+        'type' => 'array',
+        'current' => max(1, (int) get_query_var('paged')),
+        'total' => (int) $GLOBALS['wp_query']->max_num_pages,
+        'before_page_number' => $hidden(__('Page', 'sage')) . ' ',
+        'prev_text' => $arrow . __('Previous', 'sage') . ' ' . $hidden(__('page', 'sage')),
+        'next_text' => __('Next', 'sage') . ' ' . $hidden(__('page', 'sage')) . $arrow,
+    ]) ?: [];
+}

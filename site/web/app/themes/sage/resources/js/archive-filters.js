@@ -16,21 +16,27 @@ if (results) {
     try {
       const response = await fetch(url, { signal: controller.signal });
       const html = await response.text();
-      const next = new DOMParser()
-        .parseFromString(html, 'text/html')
-        .querySelector('[data-archive-results]');
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const next = doc.querySelector('[data-archive-results]');
 
       if (!response.ok || !next) throw new Error(`Archive fetch failed: ${response.status}`);
 
       results.innerHTML = next.innerHTML;
+      document.title = doc.title;
+
+      // Elements outside the fragment that depend on the results (e.g. search's count), matched by id.
+      document.querySelectorAll('[data-archive-sync][id]').forEach((el) => {
+        const fresh = doc.getElementById(el.id);
+        if (fresh) el.innerHTML = fresh.innerHTML;
+      });
       results.dispatchEvent(new CustomEvent('archive:updated', { bubbles: true }));
       history.pushState({ archive: true }, '', url);
       pushed = true;
 
       if (focus) {
-        const heading = results.querySelector('[data-archive-results-heading]');
-        heading?.focus({ preventScroll: true });
-        heading?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const target = results.querySelector('[data-archive-focus]');
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } catch (error) {
       if (error.name !== 'AbortError') window.location.href = url;
