@@ -2,6 +2,7 @@
 
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/typography';
 
 // Container query (like Link Card) — the row's own width, not the viewport's, decides when it stacks.
 .c-video-block {
@@ -114,8 +115,7 @@ $header-clearance: calc(var(--site-header-height, 6rem) + 1rem);
   // Matches a description-less Link Card title (_link-card.scss). Doubled class beats
   // the heading field's .u-heading-* size, which suits a standalone heading, not this row.
   &#{&} {
-    font-size: var(--wp--preset--font-size--standfirst);
-    line-height: 1.5rem;
+    @extend .u-standfirst-compact;
   }
 }
 

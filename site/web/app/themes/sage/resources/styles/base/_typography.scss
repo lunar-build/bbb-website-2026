@@ -121,6 +121,12 @@ h6,
   font-weight: 400;
 }
 
+// Standfirst size on a tighter line, for short one-line text (card titles, quote names).
+.u-standfirst-compact {
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 1.5rem;
+}
+
 .u-input-label {
   font-size: var(--wp--preset--font-size--input-label);
   line-height: 1.625rem;

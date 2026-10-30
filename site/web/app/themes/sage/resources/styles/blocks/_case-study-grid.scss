@@ -3,6 +3,7 @@
 // card is always dropped by exactly $offset — independent flex columns let
 // card heights drift and the stagger shrink or vanish.
 @use '../abstracts/breakpoints' as bp;
+@use '../base/typography';
 
 $gap: 2.5rem; // Figma's 40px; distinct from spacing.$card-gap (1.5rem)
 $offset: 5.875rem; // 94px
@@ -67,8 +68,7 @@ $max-width: 62rem;
 
     // Name matches the quote text's size (bold); role steps down below it.
     .c-quote__attribution-name {
-      font-size: var(--wp--preset--font-size--standfirst);
-      line-height: 1.5rem;
+      @extend .u-standfirst-compact;
     }
 
     .c-quote__attribution-role {

@@ -2,6 +2,7 @@
 
 @use '../abstracts/breakpoints' as bp;
 @use '../components/download-link';
+@use '../base/typography';
 
 // Container query, not bp.respond(): the card can be far narrower than the viewport
 // (e.g. the pattern library sidebar). Cutoff still comes from bp.$md.
@@ -71,8 +72,7 @@
   // No description: title steps down a size, and drops its margin so it stays centred.
   &:last-child {
     margin-bottom: 0;
-    font-size: var(--wp--preset--font-size--standfirst);
-    line-height: 1.5rem;
+    @extend .u-standfirst-compact;
   }
 }
 
