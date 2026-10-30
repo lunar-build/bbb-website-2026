@@ -25,12 +25,4 @@
   <p class="c-archive__empty">{{ __('Sorry, nothing matches those filters.', 'sage') }}</p>
 @endif
 
-@if (count($paginationLinks))
-  <nav class="c-archive__pagination" aria-label="{{ __('Pagination', 'sage') }}">
-    <ul>
-      @foreach ($paginationLinks as $link)
-        <li>{!! $link !!}</li>
-      @endforeach
-    </ul>
-  </nav>
-@endif
+@include('partials.pagination')

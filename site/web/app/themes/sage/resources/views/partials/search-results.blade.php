@@ -24,12 +24,4 @@
   <p class="c-search__empty u-standfirst">{{ __('Sorry, nothing matched your search. Try different words, or fewer filters.', 'sage') }}</p>
 @endif
 
-@if (count($paginationLinks))
-  <nav class="c-archive__pagination" aria-label="{{ __('Pagination', 'sage') }}">
-    <ul>
-      @foreach ($paginationLinks as $link)
-        <li>{!! $link !!}</li>
-      @endforeach
-    </ul>
-  </nav>
-@endif
+@include('partials.pagination')

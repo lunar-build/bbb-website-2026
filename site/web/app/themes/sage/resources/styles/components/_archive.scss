@@ -91,7 +91,7 @@
 
   // Figma (search results page): light-blue ringed page numbers, yellow
   // current page, charcoal CTA-small Previous/Next with the arrow.
-  &__pagination ul {
+  &__pagination {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -102,11 +102,7 @@
     list-style: none;
   }
 
-  &__pagination li {
-    margin: 0;
-  }
-
-  &__pagination li > :is(a, span) {
+  &__pagination > :is(a, span) {
     @extend .u-cta-small;
     display: inline-flex;
     align-items: center;
@@ -157,11 +153,11 @@
     }
   }
 
-  &__pagination li:has(.next) {
+  &__pagination .next {
     margin-inline-start: 1.375rem;
   }
 
-  &__pagination li:has(.prev) {
+  &__pagination .prev {
     margin-inline-end: 1.375rem;
   }
 
