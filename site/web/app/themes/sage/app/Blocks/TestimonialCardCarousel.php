@@ -16,7 +16,7 @@ class TestimonialCardCarousel extends Block
      *
      * @var string
      */
-    public $name = 'Testimonial Card Carousel';
+    public $name = 'Card Carousel';
 
     /**
      * The block slug.
@@ -30,7 +30,7 @@ class TestimonialCardCarousel extends Block
      *
      * @var string
      */
-    public $description = 'A carousel of testimonial cards — person photo, name, quote, and a "Read more" CTA pill — using Web Awesome\'s carousel for pagination, arrows, swipe and loop.';
+    public $description = 'A carousel of cards, each either a testimonial (photo, name, quote) or a general content card (photo, title, text) with an optional CTA pill — using Web Awesome\'s carousel for pagination, arrows, swipe and loop.';
 
     /**
      * The block category.
@@ -162,6 +162,7 @@ class TestimonialCardCarousel extends Block
     public $example = [
         'cards' => [
             [
+                'card_type' => 'testimonial',
                 'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
                 'name' => 'Rachel',
                 'info' => 'Cycling through Portishead.',
@@ -176,6 +177,7 @@ class TestimonialCardCarousel extends Block
                 'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
             ],
             [
+                'card_type' => 'testimonial',
                 'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
                 'name' => 'Tom',
                 'info' => 'Cycling to work in Bath.',
@@ -187,13 +189,41 @@ class TestimonialCardCarousel extends Block
 
     /**
      * Variants for the pattern library (see App\View\Composers\PatternLibrary::render()),
-     * each merged onto $example. Portrait: Franciska's quote runs past
-     * PORTRAIT_QUOTE_LENGTH, so every card stacks.
+     * each merged onto $example, so they only need to override what differs.
+     * Portrait: Franciska's quote runs past PORTRAIT_QUOTE_LENGTH, so every card stacks.
      *
      * @var array
      */
     public $examples = [
         'Landscape (short quotes)' => [],
+        'Content' => [
+            'cards' => [
+                [
+                    'card_type' => 'content',
+                    'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                    'name' => 'Loan bikes',
+                    'info' => 'Try before you buy.',
+                    'body' => 'Borrow a bike for up to a month to find out whether cycling is right for you.',
+                    'link' => ['title' => 'Find out more', 'url' => '#', 'target' => ''],
+                ],
+                [
+                    'card_type' => 'content',
+                    'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                    'name' => 'Cycle training',
+                    'info' => 'For all ages and abilities.',
+                    'body' => 'Friendly one-to-one and group sessions to build your skills and confidence on the road.',
+                    'link' => ['title' => 'Find out more', 'url' => '#', 'target' => ''],
+                ],
+                [
+                    'card_type' => 'content',
+                    'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                    'name' => 'Bristol Cycle Centre sessions',
+                    'info' => 'Drop in or book ahead.',
+                    'body' => 'Maintenance workshops, led rides and advice sessions run throughout the year.',
+                    'link' => ['title' => 'Find out more', 'url' => '#', 'target' => ''],
+                ],
+            ],
+        ],
         'Portrait (a quote over 200 characters)' => [
             'cards' => [
                 [
@@ -277,31 +307,59 @@ class TestimonialCardCarousel extends Block
             'layout' => 'block',
         ]);
 
+        $isType = fn(string $type) => [
+            [
+                [
+                    'field' => 'card_type',
+                    'operator' => '==',
+                    'value' => $type,
+                ],
+            ],
+        ];
+
         $cards
+            ->addSelect('card_type', [
+                'label' => 'Card type',
+                'instructions' => 'Testimonial shows a pull-quote. Content shows a short text description, for e.g. a case study, loan bikes, cycle training or sessions.',
+                'choices' => [
+                    'testimonial' => 'Testimonial',
+                    'content' => 'Content',
+                ],
+                'default_value' => 'testimonial',
+                'ui' => true,
+            ])
             ->addImage('photo', [
                 'label' => 'Photo',
-                'instructions' => 'Photo of the person giving the testimonial.',
+                'instructions' => 'Photo of the person giving the testimonial, or an image for the content card.',
                 'return_format' => 'array',
                 'preview_size' => 'medium',
                 'required' => 1,
             ])
             ->addText('name', [
-                'label' => 'Name',
+                'label' => 'Name / title',
                 'required' => 1,
             ])
             ->addText('info', [
                 'label' => 'Additional info',
-                'instructions' => 'Shown under the name, e.g. "Cycling through Portishead". Optional.',
+                'instructions' => 'Shown under the name or title, e.g. "Cycling through Portishead". Optional.',
             ])
             ->addTextarea('quote', [
                 'label' => 'Quote',
                 'required' => 1,
                 'rows' => 4,
                 'new_lines' => 'wpautop', // wraps each line in <p> — matches .c-quote__body's p + p spacing
+                'conditional_logic' => $isType('testimonial'),
+            ])
+            ->addTextarea('body', [
+                'label' => 'Text',
+                'required' => 1,
+                'rows' => 4,
+                'new_lines' => 'wpautop',
+                'conditional_logic' => $isType('content'),
             ])
             ->addLink('link', [
-                'label' => 'Read more link',
-                'instructions' => 'Text + URL for the "Read more" CTA pill.',
+                'label' => 'CTA link',
+                'instructions' => 'Text + URL for the CTA pill. Defaults to "Read more" if no text is set.',
                 'required' => false,
             ]);
 
@@ -333,24 +391,25 @@ class TestimonialCardCarousel extends Block
                 $photo = ['url' => $placeholder, 'alt' => $photo['alt'] ?? ''];
             }
 
-            $quote = $card['quote'] ?? '';
+            // Rows saved before `card_type` existed are all testimonials.
+            $type = ($card['card_type'] ?? '') === 'content' ? 'content' : 'testimonial';
 
-            // Real ACF data is already wpautop-formatted (the `quote` sub-field's
-            // own `new_lines` setting); the plain-text $example fallback isn't,
+            // Real ACF data is already wpautop-formatted (the sub-fields' own
+            // `new_lines` setting); the plain-text $example fallback isn't,
             // so it needs the same pass manually — checked for, not assumed,
             // to avoid double-wrapping already-formatted content.
-            if ($quote !== '' && stripos($quote, '<p') === false) {
-                $quote = wpautop($quote);
-            }
+            $format = fn($text) => $text !== '' && stripos($text, '<p') === false ? wpautop($text) : $text;
 
             return [
+                'type' => $type,
                 'photo' => [
                     'url' => $photo['url'],
                     'alt' => $photo['alt'] ?: $name,
                 ],
                 'name' => $name,
                 'info' => $card['info'] ?? '',
-                'quote' => $quote,
+                'quote' => $format($card['quote'] ?? ''),
+                'body' => $format($card['body'] ?? ''),
                 'link' => normalize_link($card['link'] ?? null),
             ];
         }, $cards);
