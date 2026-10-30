@@ -7,53 +7,67 @@
 
 .c-timeline {
   --timeline-marker-size: 3.5625rem; // 57px minimum — fits a 2-digit step number
+  --timeline-gap: 1.875rem; // 30px
 
   // Steps share one grid (via subgrid) so the marker column takes the widest
   // marker's width — a long label grows every square to fit, keeping them equal.
-  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   column-gap: 1.625rem; // 26px
-  row-gap: 1.875rem; // 30px
+  row-gap: var(--timeline-gap);
   margin: 0;
   padding: 0;
   list-style: none;
-
-  // One line from first to last marker centre, behind the markers (z-index 1). Drawn on
-  // the list so per-step baseline shifts (.c-timeline__step) can't skew its length.
-  // Placed in the marker column, so % margins (which resolve against its width, i.e.
-  // the square's size) inset it by half a marker at each end.
-  &::before {
-    content: '';
-    position: absolute;
-    grid-column: 1 / 2; // explicit end: an absolute item's `auto` end would span the whole list
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 0.1875rem; // 3px
-    margin-block: 50%;
-    margin-left: -0.09375rem;
-    background: var(--wp--preset--color--yellow);
-  }
-}
-
-// One marker size per block, so mixed numbers and dates don't mismatch.
-.c-timeline--dates {
-  --timeline-marker-size: 5rem; // 80px minimum — fits the stacked day / month / year
 }
 
 .c-timeline__step {
+  position: relative;
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
   // First line level with the marker's text baseline, whatever its height.
   align-items: baseline;
   margin: 0;
+
+  // The connecting line, behind the markers (z-index 1). Each step draws its own stretch,
+  // through the gap below, so the line starts and stops at the first and last marker
+  // centres however tall the step's text is.
+  &::after {
+    content: '';
+    position: absolute;
+    grid-column: 1 / 2; // explicit end: an absolute item's `auto` end would span the whole step
+    top: 0;
+    bottom: calc(-1 * var(--timeline-gap));
+    left: 50%;
+    width: 0.1875rem; // 3px
+    margin-left: -0.09375rem;
+    background: var(--wp--preset--color--yellow);
+  }
+
+  // Markers sit at the top of a step with a heading.
+  &:first-child::after {
+    top: calc(var(--timeline-marker-size) / 2);
+  }
+
+  &:last-child::after {
+    bottom: auto;
+    height: calc(var(--timeline-marker-size) / 2);
+  }
 }
 
 // No heading: centre on the marker so a two-line wrap still centres.
 .c-timeline__step--no-heading {
   align-items: center;
+
+  // ...so its marker centre is the step's centre.
+  &:first-child::after {
+    top: 50%;
+  }
+
+  &:last-child::after {
+    bottom: 50%;
+    height: auto;
+  }
 }
 
 .c-timeline__marker-col {
@@ -78,33 +92,19 @@
   text-align: center;
   white-space: nowrap;
 
+  // Custom labels (years, ranges): same height as number markers, widened to fit the longest.
+  // A step smaller on phones so the text column keeps its room.
   .c-timeline--dates & {
-    font-size: 0.9375rem; // heading-4's size is tuned for 2 digits; for labels that aren't DD/MM/YY dates
+    aspect-ratio: auto;
+    height: var(--timeline-marker-size);
+    padding-inline: 0.75rem;
+    font-size: var(--wp--preset--font-size--heading-6);
+
+    @include bp.respond($min: bp.$md) {
+      padding-inline: 1rem;
+      font-size: var(--wp--preset--font-size--heading-5);
+    }
   }
-}
-
-// Parsed DD/MM/YY dates, stacked: big day over the month and year.
-.c-timeline__marker--date {
-  flex-direction: column;
-  gap: 0.125rem;
-  font-weight: 700;
-}
-
-.c-timeline__date-day {
-  font-size: 1.75rem;
-  line-height: 1.75rem;
-}
-
-.c-timeline__date-month {
-  font-size: 1rem;
-  line-height: 1.125rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.c-timeline__date-year {
-  font-size: 1rem;
-  line-height: 1.125rem;
 }
 
 .c-timeline__content {
