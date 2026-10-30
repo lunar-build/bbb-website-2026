@@ -40,8 +40,32 @@ class SingleMecEvent extends Composer
             'labels' => EventSessions::labels(get_the_ID()),
             'organizer' => $this->organizer(),
             'upcoming' => $this->upcoming(),
+            'booking' => $this->booking(),
             'jsonLd' => $this->jsonLd(),
         ];
+    }
+
+    /**
+     * MEC's own booking form (tickets, attendee details, payment), unstyled for now.
+     * Empty when booking is off or the event has no tickets.
+     */
+    public function booking(): string
+    {
+        if (! class_exists(\MEC_skin_single::class)) {
+            return '';
+        }
+
+        $skin = new \MEC_skin_single;
+        $skin->initialize(['id' => get_the_ID(), 'maximum_dates' => 6]);
+        $events = $skin->search();
+        if (! $events) {
+            return '';
+        }
+
+        ob_start();
+        $skin->display_booking_widget($events[0], $events);
+
+        return trim(ob_get_clean());
     }
 
     /**

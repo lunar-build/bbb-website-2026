@@ -96,6 +96,13 @@
             </div>
           </div>
 
+          @if ($booking)
+            <section class="c-event__booking" aria-labelledby="c-event-booking">
+              <h2 id="c-event-booking" class="u-heading-5">{{ __('Book your place', 'sage') }}</h2>
+              {!! $booking !!}
+            </section>
+          @endif
+
           {!! $body !!}
 
           @if ($upcoming)
