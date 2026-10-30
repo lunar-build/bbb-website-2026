@@ -115,6 +115,9 @@ if (desktopNav) {
     overflowPanels.forEach((panel) => {
       panel.hidden = panel.dataset.overflowPanel !== String(index);
     });
+    desktopNav.querySelectorAll('[data-overflow-open]').forEach((button) => {
+      button.setAttribute('aria-expanded', String(button.dataset.overflowOpen === String(index)));
+    });
   }
 
   const closeAll = (except) => {

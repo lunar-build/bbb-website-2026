@@ -25,14 +25,7 @@
                             <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
                         @endif
                         <h3 class="c-card-row__news-title">{{ $card['title'] }}</h3>
-                        <a class="c-card-row__news-cta" href="{{ $card['link']['url'] }}"
-                            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-                            {{ $card['link']['title'] }}
-                            <x-icon name="arrow-right" />
-                            @if (($card['link']['target'] ?? '') === '_blank')
-                                <span class="u-sr-only">({{ __('opens in a new tab', 'sage') }})</span>
-                            @endif
-                        </a>
+                        <x-link class="c-card-row__news-cta" :link="$card['link']" />
                     </article>
                 @endforeach
             @elseif ($type === 'route')
@@ -47,7 +40,8 @@
                             <h3 class="c-cycle-route-card__route-name">{{ $card['route_name'] }}</h3>
                         </div>
 
-                        <dl class="c-cycle-route-card__info">
+                        <dl class="c-cycle-route-card__info"
+                            aria-label="{{ sprintf(__('Details for %s', 'sage'), $card['route_name']) }}">
                             <div class="c-cycle-route-card__info-row">
                                 <dt class="c-cycle-route-card__info-label">{{ __('Time needed', 'sage') }}</dt>
                                 <dd class="c-cycle-route-card__info-value">{{ $card['time_needed'] }}</dd>
@@ -64,51 +58,8 @@
                             </div>
                         </dl>
 
-                        <a class="c-cycle-route-card__cta" href="{{ $card['link']['url'] }}"
-                            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-                            {{ $card['link']['title'] }}
-                            <x-icon name="arrow-right" />
-                            @if (($card['link']['target'] ?? '') === '_blank')
-                                <span class="u-sr-only">({{ __('opens in a new tab', 'sage') }})</span>
-                            @endif
-                        </a>
+                        <x-link class="c-cycle-route-card__cta" :link="$card['link']" />
                     </article>
-                @endforeach
-            @elseif ($type === 'route')
-                @foreach ($routeCards as $card)
-                    <div class="c-cycle-route-card__card c-cycle-route-card--{{ $card['difficulty'] }}">
-                        <div class="c-cycle-route-card__image">
-                            <img src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}"
-                                style="object-position: {{ $imagePosition }}">
-                        </div>
-
-                        <div class="c-cycle-route-card__banner">
-                            <span class="c-cycle-route-card__route-name">{{ $card['route_name'] }}</span>
-                        </div>
-
-                        <div class="c-cycle-route-card__info">
-                            <div class="c-cycle-route-card__info-row">
-                                <span class="c-cycle-route-card__info-label">{{ __('Time needed', 'sage') }}</span>
-                                <span class="c-cycle-route-card__info-value">{{ $card['time_needed'] }}</span>
-                            </div>
-
-                            <div class="c-cycle-route-card__info-row">
-                                <span class="c-cycle-route-card__info-label">{{ __('Distance', 'sage') }}</span>
-                                <span class="c-cycle-route-card__info-value">{{ $card['distance'] }}</span>
-                            </div>
-
-                            <div class="c-cycle-route-card__info-row">
-                                <span class="c-cycle-route-card__info-label">{{ __('Difficulty', 'sage') }}</span>
-                                <span class="c-cycle-route-card__badge">{{ ucfirst($card['difficulty']) }}</span>
-                            </div>
-                        </div>
-
-                        <a class="c-cycle-route-card__cta" href="{{ $card['link']['url'] }}"
-                            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-                            {{ $card['link']['title'] }}
-                            <x-icon name="arrow-right" />
-                        </a>
-                    </div>
                 @endforeach
             @else
                 @foreach ($linkCards as $card)
@@ -119,14 +70,7 @@
                         <h3 class="c-card-row__link-title">{{ $card['title'] }}</h3>
                         <p class="c-card-row__link-body">{{ $card['body'] }}</p>
 
-                        <a class="c-card-row__link-cta" href="{{ $card['link']['url'] }}"
-                            @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-                            {{ $card['link']['title'] }}
-                            <x-icon name="arrow-right" />
-                            @if (($card['link']['target'] ?? '') === '_blank')
-                                <span class="u-sr-only">({{ __('opens in a new tab', 'sage') }})</span>
-                            @endif
-                        </a>
+                        <x-link class="c-card-row__link-cta" :link="$card['link']" />
                     </article>
                 @endforeach
             @endif
@@ -135,14 +79,7 @@
         @if (!empty($areaLinks))
             <div class="c-card-row__area-links">
                 @foreach ($areaLinks as $row)
-                    <a class="c-card-row__area-link" href="{{ $row['link']['url'] }}"
-                        @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-                        {{ $row['link']['title'] }}
-                        <x-icon name="arrow-right" />
-                        @if (($row['link']['target'] ?? '') === '_blank')
-                            <span class="u-sr-only">({{ __('opens in a new tab', 'sage') }})</span>
-                        @endif
-                    </a>
+                    <x-link class="c-card-row__area-link" :link="$row['link']" />
                 @endforeach
             </div>
         @endif

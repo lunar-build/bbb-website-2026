@@ -53,7 +53,8 @@
                                         @if (!empty($item['children']))
                                             <button type="button"
                                                 class="c-primary-nav-desktop__link c-primary-nav-desktop__overflow-link"
-                                                data-overflow-open="{{ $i }}">
+                                                data-overflow-open="{{ $i }}" aria-expanded="false"
+                                                aria-controls="desktop-overflow-panel-{{ $i }}">
                                                 <span>{{ $item['label'] }}</span>
                                                 <x-icon name="chevron"
                                                     class="c-primary-nav-desktop__chevron c-primary-nav-desktop__chevron--sub" />
@@ -68,7 +69,8 @@
 
                             @foreach ($items as $i => $item)
                                 @if (!empty($item['children']))
-                                    <div class="c-primary-nav-desktop__overflow-panel" data-overflow-panel="{{ $i }}" hidden>
+                                    <div id="desktop-overflow-panel-{{ $i }}" class="c-primary-nav-desktop__overflow-panel"
+                                        data-overflow-panel="{{ $i }}" hidden>
                                         <button type="button" class="c-primary-nav-desktop__back" data-overflow-back>
                                             <x-icon name="arrow-right" class="c-primary-nav-desktop__back-icon" />
                                             {{ __('Back', 'sage') }}
