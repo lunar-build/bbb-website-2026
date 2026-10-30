@@ -172,6 +172,71 @@ add_filter('gform_field_content', function ($content, $field) {
 }, 10, 2);
 
 /**
+ * Single file upload (Figma "Input | File upload"): adds a "Choose a file" CTA
+ * as a second `<label>` for the native input, which stays the real (visually
+ * hidden) control — clicking the label opens the picker, and the input's focus
+ * ring is drawn on it. resources/js/file-upload.js shows the chosen file.
+ * Multi-file uploads keep GF's own uploader (its button is the drop target and
+ * GF's JS lists the files), restyled to the same layout and chips.
+ * Post Image fields get the same single-file treatment.
+ */
+add_filter('gform_field_content', function ($content, $field) {
+    if (! in_array($field->type, ['fileupload', 'post_image'], true) || $field->is_form_editor() || $field->is_entry_detail()) {
+        return $content;
+    }
+
+    $container = $field->type === 'post_image' ? 'ginput_container_post_image' : 'ginput_container_fileupload';
+
+    if ($field->multipleFiles) {
+        $content = preg_replace('/(gform_button_select_files[^>]*>)[^<]*</', '$1' . esc_html__('Choose files', 'sage') . '<', $content, 1);
+
+        return str_replace($container, "{$container} c-file-upload c-file-upload--multiple", $content);
+    }
+
+    $inputId = "input_{$field->formId}_{$field->id}";
+    $button = '<label for="' . esc_attr($inputId) . '" class="c-file-upload__button">' . esc_html__('Choose a file', 'sage') . '</label>';
+
+    $content = preg_replace('/(<input[^>]*type=([\'"])file\2[^>]*\/?>)/', '$1' . $button, $content, 1);
+
+    return str_replace($container, "{$container} c-file-upload", $content);
+}, 10, 2);
+
+/**
+ * Autocomplete (WCAG 1.3.5) for Paragraph Text and Date fields. GF's "Enable
+ * Autocomplete" setting (field → Advanced) only exists for its personal-data
+ * fields (Name, Email, Address, Phone, Text, Number, Website, Drop Down), but
+ * these can hold personal data too: an address, or a date of birth (`bday`,
+ * or `bday-month`/`bday-day`/`bday-year` per box when the date isn't a picker).
+ * This adds the setting to them in the editor and the attribute on the front end.
+ */
+$autocompleteFieldTypes = ['textarea', 'date'];
+
+add_action('gform_editor_js', function () use ($autocompleteFieldTypes) {
+    $js = implode('', array_map(fn($type) => "fieldSettings.{$type} += ', .autocomplete_setting';", $autocompleteFieldTypes));
+
+    echo "<script>{$js}</script>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+});
+
+add_filter('gform_field_content', function ($content, $field) use ($autocompleteFieldTypes) {
+    if (! in_array($field->type, $autocompleteFieldTypes, true) || ! $field->enableAutocomplete || $field->is_form_editor() || $field->is_entry_detail()) {
+        return $content;
+    }
+
+    // Element id => `autocomplete="…"`. A date picker is one input; separate boxes/dropdowns have one per part.
+    $attributes = $field->type === 'date' && $field->dateType !== 'datepicker' && is_array($field->inputs)
+        ? collect($field->inputs)->mapWithKeys(fn($input) => [
+            "input_{$field->formId}_" . str_replace('.', '_', $input['id']) => $field->get_input_autocomplete_attribute($input),
+        ])
+        : collect(["input_{$field->formId}_{$field->id}" => $field->get_field_autocomplete_attribute()]);
+
+    foreach ($attributes->filter() as $id => $attribute) {
+        $content = preg_replace('/(<(?:input|textarea|select)\b[^>]*\bid=([\'"])' . preg_quote($id, '/') . '\2)/', '$1 ' . $attribute, $content, 1);
+    }
+
+    return $content;
+}, 10, 2);
+
+/**
  * Replace Gravity Forms' plain `<input type="submit">` with our brand
  * `<wa-button>` (yellow pill + arrow) so form CTAs match every other CTA.
  */

@@ -172,3 +172,367 @@ input[type='checkbox'] {
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23136084'/%3E%3Cpath d='M11 20.5l6 6 12-13' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 }
+
+// Dropdowns match the text inputs' pill, with the theme's chevron (charcoal, inlined —
+// `currentColor` doesn't reach a background image). Scoped to GF so other selects keep theirs.
+.gform_wrapper select {
+  width: 100% !important;
+  height: auto !important;
+  padding: 0.625rem 2.75rem 0.625rem 1.25rem !important;
+  background: var(--wp--preset--color--white)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 6.5'%3E%3Cpath d='M1 1l3.757 4.174a1 1 0 0 0 1.486 0L10 1' fill='none' stroke='%23363636' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 1.25rem center / 0.6875rem auto !important;
+  border: 2px solid var(--wp--preset--color--charcoal) !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 500 !important;
+  font-size: var(--wp--preset--font-size--input-placeholder) !important;
+  line-height: 1.125rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+  cursor: pointer;
+
+  @include focus.ring;
+}
+
+// Multi-select lists its options, so it takes the textarea's shape instead.
+.gform_wrapper select[multiple] {
+  padding: 0.625rem 1.25rem !important;
+  background-image: none !important;
+  border-radius: 1.25rem !important;
+}
+
+// Sub-labels of multi-input fields (Name's "First"/"Last", Email's "Confirm Email").
+.gform-field-label--type-sub {
+  margin-bottom: 0.25rem !important;
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 500 !important;
+  font-size: var(--wp--preset--font-size--body-regular) !important;
+  line-height: 1.5rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+// Errors: dark-orange message and border, as <x-input>'s (components/_input.scss). Labels stay charcoal.
+.gform_wrapper .gfield_description.validation_message,
+.gform_wrapper .gfield_validation_message {
+  padding: 0 !important;
+  // Always above the field (gform_pre_render in app/filters.php), so the gap goes below.
+  margin: 0 0 0.375rem !important;
+  border: none !important;
+  background: none !important;
+  font-weight: 500 !important;
+  color: var(--wp--preset--color--dark-orange) !important;
+}
+
+.gform_wrapper .gfield_error {
+  :is(input:not([type='checkbox'], [type='radio'], [type='file'], [type='hidden']), textarea, select) {
+    border-color: var(--wp--preset--color--dark-orange) !important;
+  }
+}
+
+// Summary above an invalid form: a rounded panel, like the confirmation message below.
+.gform_wrapper .gform_validation_errors {
+  margin-bottom: 2rem !important;
+  padding: 1.5rem 2rem !important;
+  border: 2px solid var(--wp--preset--color--dark-orange) !important;
+  border-radius: 1.25rem !important;
+  background: var(--wp--preset--color--white) !important;
+  box-shadow: none !important;
+
+  // GF focuses the summary on a failed submit — the theme's ring, not the browser's.
+  &:focus {
+    @include focus.ring-styles;
+  }
+
+  .gform_submission_error {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin: 0 !important;
+    font-family: var(--wp--preset--font-family--nata-sans) !important;
+    font-weight: 700 !important;
+    font-size: var(--wp--preset--font-size--body) !important;
+    line-height: 1.5rem !important;
+    color: var(--wp--preset--color--dark-orange) !important;
+  }
+
+  .gform-icon {
+    color: var(--wp--preset--color--dark-orange) !important;
+    border-color: currentColor !important;
+  }
+
+  ol {
+    margin: 0.75rem 0 0 !important;
+    padding-inline-start: 2.25rem !important;
+  }
+
+  li {
+    margin-bottom: 0.25rem !important;
+    color: var(--wp--preset--color--dark-orange) !important;
+  }
+
+  a {
+    font-family: var(--wp--preset--font-family--nata-sans) !important;
+    font-size: var(--wp--preset--font-size--body-regular) !important;
+    line-height: 1.5rem !important;
+    color: var(--wp--preset--color--dark-orange) !important;
+    text-decoration: underline !important;
+    text-underline-offset: 0.2em;
+
+    @include focus.ring;
+  }
+}
+
+// Hidden fields still take a row (and its gap) in GF's grid.
+.gform_wrapper .gfield--type-hidden {
+  display: none !important;
+}
+
+// Checkbox/radio/image-choice option labels, matching <wa-checkbox>/<wa-radio> (components/_choice.scss).
+.gform_wrapper .gform-field-label--type-inline {
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 500 !important;
+  font-size: var(--wp--preset--font-size--input-label) !important;
+  line-height: 1.625rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+}
+
+// Image choice: GF's grey card swapped for the theme's outlined card.
+// GF draws the card from its --gf-local-* variables, so those are overridden too.
+.gform_wrapper .gfield--type-image_choice {
+  .gchoice {
+    --gf-local-border-color: var(--wp--preset--color--charcoal) !important;
+    --gf-local-border-width: 2px !important;
+    --gf-local-radius: 0.75rem !important;
+    --gf-local-shadow: none !important;
+    --gf-local-outline-color: transparent !important;
+    border: 2px solid var(--wp--preset--color--charcoal) !important;
+    border-radius: 0.75rem !important;
+    background-color: var(--wp--preset--color--white) !important;
+    box-shadow: none !important;
+    cursor: pointer;
+
+    // The ticked badge in the corner.
+    &:has(input:checked)::after {
+      background-color: var(--wp--preset--color--charcoal) !important;
+      color: var(--wp--preset--color--white) !important;
+    }
+
+    // The radio/checkbox inside draws the focus ring; the card shows it too, for the whole target.
+    &:has(input:focus-visible) {
+      @include focus.ring-styles;
+    }
+  }
+
+  .gfield-choice-image-wrapper {
+    border-radius: 0.5rem !important;
+  }
+
+  .gfield-choice-image-no-image {
+    background-color: var(--wp--preset--color--lightest-grey) !important;
+    color: var(--wp--preset--color--place-holder-grey) !important;
+  }
+}
+
+// Phone: the country picker joins the number input as one pill, like <x-input>'s icon button.
+.gform_wrapper .gfield--type-phone {
+  .gform-phone__input-wrapper {
+    align-items: end;
+  }
+
+  button.gform-phone__country-selector {
+    // GF sizes the number input at 38px; the button matches so the two read as one pill.
+    height: 2.375rem !important;
+    margin-inline-end: -2px !important;
+    padding: 0 1rem 0 1.25rem !important;
+    border: 2px solid var(--wp--preset--color--charcoal) !important;
+    border-radius: 999px 0 0 999px !important;
+    background: var(--wp--preset--color--white) !important;
+    box-shadow: none !important;
+    font-family: var(--wp--preset--font-family--nata-sans) !important;
+    font-weight: 500 !important;
+    font-size: var(--wp--preset--font-size--input-placeholder) !important;
+    line-height: 1.125rem !important;
+    color: var(--wp--preset--color--charcoal) !important;
+    transition: none !important;
+
+    // Same chevron as the dropdowns.
+    &::after {
+      width: 0.6875rem !important;
+      height: 0.40625rem !important;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 6.5'%3E%3Cpath d='M1 1l3.757 4.174a1 1 0 0 0 1.486 0L10 1' fill='none' stroke='%23363636' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+        center / contain no-repeat !important;
+    }
+
+    // GF draws its blue ring from these variables (set without !important).
+    &:focus {
+      --gf-local-outline-color: transparent !important;
+      outline: none !important;
+    }
+
+    &:focus-visible {
+      z-index: 2;
+      outline: 2px solid var(--focus-color) !important;
+      outline-offset: 2px !important;
+    }
+  }
+
+  .gform-phone__dial-code {
+    font-size: inherit !important;
+  }
+
+  .gform-phone__input {
+    border-radius: 0 999px 999px 0 !important;
+  }
+
+  .gform-phone__dropdown {
+    overflow: hidden;
+    border: 2px solid var(--wp--preset--color--charcoal) !important;
+    border-radius: 1.25rem !important;
+    box-shadow: none !important;
+  }
+
+  .gform-phone__search-wrapper input[type='text'] {
+    padding-inline-start: 2.75rem !important;
+    background: var(--wp--preset--color--white) url('../../svg/search.svg') no-repeat 1.25rem center / 1rem auto !important;
+  }
+
+  .gform-phone__country-item {
+    font-family: var(--wp--preset--font-family--nata-sans) !important;
+    font-size: var(--wp--preset--font-size--body-regular) !important;
+    color: var(--wp--preset--color--charcoal) !important;
+
+    &:hover,
+    &.gform-phone__country-item--focused,
+    &.gform-phone__country-item--active {
+      background-color: var(--wp--preset--color--blue-light) !important;
+      box-shadow: none !important;
+    }
+
+    &.gform-phone__country-item--active {
+      font-weight: 700 !important;
+    }
+  }
+}
+
+// List: GF's blue round +/− buttons in charcoal. GF sizes them from these variables.
+.gform_wrapper .gfield--type-list {
+  --gf-field-list-btn-size: 1.5rem;
+  --gf-field-list-btn-font-size: 1.5rem;
+
+  button.add_list_item,
+  button.delete_list_item {
+    --gf-local-outline-color: transparent !important;
+    border: none !important;
+    // The icon is the ::before; the visible "Add"/"Remove" text stays hidden, as in GF.
+    font-size: 0 !important;
+    background-color: var(--wp--preset--color--charcoal) !important;
+    color: var(--wp--preset--color--white) !important;
+    box-shadow: none !important;
+    transition: none !important;
+
+    &::before {
+      font-size: var(--gf-field-list-btn-font-size) !important;
+      color: inherit !important;
+    }
+
+    // !important to beat GF's own (transparent) outline rule.
+    &:focus-visible {
+      outline: 2px solid var(--focus-color) !important;
+      outline-offset: 2px !important;
+    }
+  }
+
+  .gfield_list_icons {
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+    width: auto !important;
+  }
+
+  .gfield_list_header {
+    font-family: var(--wp--preset--font-family--nata-sans) !important;
+    font-weight: 500 !important;
+    font-size: var(--wp--preset--font-size--body-regular) !important;
+    color: var(--wp--preset--color--charcoal) !important;
+  }
+}
+
+// Pricing fields' read-only values (Product price, Shipping, Total) are calculated, not typed —
+// shown as text, not as an input pill.
+.gform_wrapper input.gform-text-input-reset[readonly] {
+  width: auto !important;
+  padding: 0 !important;
+  border: none !important;
+  // Only seen on the focus ring.
+  border-radius: 0.25rem !important;
+  background: none !important;
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-weight: 700 !important;
+  font-size: var(--wp--preset--font-size--body) !important;
+  line-height: 1.5rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+
+  // Still focusable: the theme's ring, not GF's blue one.
+  &:focus {
+    outline: none !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-color) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+.gform_wrapper .ginput_product_price_wrapper {
+  display: flex !important;
+  align-items: baseline;
+  gap: 0.5rem;
+
+  .ginput_product_price_label {
+    margin: 0 !important;
+    font-family: var(--wp--preset--font-family--nata-sans) !important;
+    font-weight: 500 !important;
+    font-size: var(--wp--preset--font-size--body) !important;
+    line-height: 1.5rem !important;
+    color: var(--wp--preset--color--charcoal) !important;
+  }
+}
+
+// Date picker's calendar button, inside the input: the theme's ring, not GF's blue one.
+.gform_wrapper .gform-datepicker-toggle {
+  --gf-local-outline-color: transparent !important;
+  border-radius: 0.25rem !important;
+  color: var(--wp--preset--color--charcoal) !important;
+
+  &:focus {
+    outline: none !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-color) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+// The calendar's selected day (today until one's picked): charcoal with white text, not GF's blue.
+.gform_wrapper .gform-datepicker-calendar table.calendar td.dayMarked span {
+  --gf-local-bg-color: var(--wp--preset--color--charcoal) !important;
+  --gf-local-color: var(--wp--preset--color--white) !important;
+  background-color: var(--wp--preset--color--charcoal) !important;
+  color: var(--wp--preset--color--white) !important;
+}
+
+// Keyboard focus moves between day cells (the <td>); GF marks it with a blue border on the
+// day inside. The theme's ring instead.
+.gform_wrapper .gform-datepicker-calendar table.calendar td.day:focus {
+  outline: none !important;
+}
+
+.gform_wrapper .gform-datepicker-calendar table.calendar td.day:focus span {
+  --gf-local-border: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--focus-color) !important;
+  outline-offset: 2px !important;
+}
