@@ -61,10 +61,7 @@
   // flex-start: a wrapped heading's arrow stays level with the first line.
   align-items: flex-start;
   gap: 0.75rem;
-  @extend .u-short-form-link;
-  // Smaller than the shared 24px short-form-link size.
-  font-size: 1.25rem;
-  line-height: 1.625rem;
+  @extend .u-short-form-link-small;
   letter-spacing: 0.06rem;
   text-transform: uppercase;
   color: var(--c-block-fg, var(--wp--preset--color--blue-medium));

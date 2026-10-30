@@ -203,6 +203,14 @@ h6,
   font-weight: 700;
 }
 
+// Short-form link a step down, for links grouped in a list or grid.
+.u-short-form-link-small {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: 1.25rem;
+  line-height: 1.625rem;
+  font-weight: 700;
+}
+
 .u-quote {
   font-size: var(--wp--preset--font-size--quote);
   line-height: 2.125rem;
