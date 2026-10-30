@@ -8,28 +8,31 @@
   <h2 id="{{ $headingId }}" class="c-journey-planner-widget__heading">{{ $heading }}</h2>
 
   @if ($variant === 'find_nearby')
-    <form class="c-journey-planner-widget__form" aria-labelledby="{{ $headingId }}" data-variant="find_nearby">
+    <form class="c-journey-planner-widget__form" aria-labelledby="{{ $headingId }}" data-variant="find_nearby" data-redirect-url="{{ $journeyPlannerUrl }}">
       <x-input
         label="Your location"
         name="location"
         placeholder="Enter a postcode or address…"
         icon="send"
+        icon-button-label="Use my current location"
+        icon-button-type="button"
+        icon-inline
         class="c-journey-planner-widget__field"
       />
+      <p id="location-error" class="u-sr-only" role="alert"></p>
 
       <wa-radio-group
         class="c-journey-planner-widget__options"
         label="What are you looking for?"
         name="nearby_feature"
-        value="{{ \Illuminate\Support\Str::slug($nearbyOptions[0]['label'] ?? '') }}"
+        value="{{ array_key_first($nearbyOptions) }}"
       >
-        @foreach ($nearbyOptions as $option)
-          <x-radio label="{{ $option['label'] }}" value="{{ \Illuminate\Support\Str::slug($option['label']) }}" />
+        @foreach ($nearbyOptions as $value => $label)
+          <x-radio :label="$label" :value="$value" />
         @endforeach
       </wa-radio-group>
 
-      {{-- TODO: wire up the "find nearby" redirect once the real endpoint/param shape is confirmed. --}}
-      <wa-button variant="neutral" appearance="accent" pill with-end disabled class="c-journey-planner-widget__cta">
+      <wa-button type="submit" variant="neutral" appearance="accent" pill with-end class="c-journey-planner-widget__cta">
         {{ $ctaLabel }}
         <x-icon name="arrow-right" slot="end" />
       </wa-button>
@@ -43,7 +46,7 @@
         icon="send"
         class="c-journey-planner-widget__field"
       />
-      <p id="from-error" class="c-input__error" hidden></p>
+      <p id="from-error" class="u-sr-only" role="alert"></p>
 
       <x-input
         label="To"
@@ -52,7 +55,7 @@
         icon="send"
         class="c-journey-planner-widget__field"
       />
-      <p id="to-error" class="c-input__error" hidden></p>
+      <p id="to-error" class="u-sr-only" role="alert"></p>
 
       <wa-button type="submit" variant="neutral" appearance="accent" pill with-end class="c-journey-planner-widget__cta">
         {{ $ctaLabel }}
