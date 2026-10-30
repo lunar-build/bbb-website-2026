@@ -1,13 +1,17 @@
 <section {{ $attributes->class(['c-instagram-feed', 'o-full-bleed-bg']) }}>
   <div class="o-container">
-    @if ($heading || $intro)
+    @if (! empty($heading['text']) || ! empty($intro['text']))
       <div class="c-instagram-feed__text">
-        @if ($heading)
-          <h2 class="c-instagram-feed__heading u-heading-1">{{ $heading }}</h2>
+        @if (! empty($heading['text']))
+          <x-heading :level="$heading['level']" :style="$heading['style']" class="c-instagram-feed__heading">
+            {{ $heading['text'] }}
+          </x-heading>
         @endif
 
-        @if ($intro)
-          <p class="c-instagram-feed__intro u-standfirst">{{ $intro }}</p>
+        @if (! empty($intro['text']))
+          <x-copy :style="$intro['style']" class="c-instagram-feed__intro">
+            {!! $intro['text'] !!}
+          </x-copy>
         @endif
       </div>
     @endif

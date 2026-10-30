@@ -3,6 +3,8 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\Copy;
+use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -157,8 +159,11 @@ class InstagramFeed extends Block
      * @var array
      */
     public $example = [
-        'heading' => 'Love cycling? Tag yourself #ibikeitilikeit',
-        'intro' => 'Tag your photos with #betterbybike and #ibikeitilikeit for a chance to be featured here.',
+        'heading_text' => 'Love cycling? Tag yourself #ibikeitilikeit',
+        'heading_level' => 'h2',
+        'heading_style' => 'h1',
+        'intro_text' => 'Tag your photos with #betterbybike and #ibikeitilikeit for a chance to be featured here.',
+        'intro_style' => 'standfirst',
         'feed_id' => '',
     ];
 
@@ -181,43 +186,54 @@ class InstagramFeed extends Block
     {
         $fields = Builder::make('instagram_feed');
 
-        $fields
-            ->addText('heading', [
-                'label' => 'Heading',
-            ])
-            ->addTextarea('intro', [
-                'label' => 'Intro text',
-                'rows' => 3,
-            ])
-            ->addNumber('feed_id', [
-                'label' => 'Feed ID',
-                'instructions' => 'The feed number from Instagram Feed → All Feeds. Leave empty to use the plugin\'s default feed.',
-                'min' => 1,
-                'step' => 1,
-            ])
-        ;
+        $fields->addPartial(Heading::class, [
+            'name' => 'heading',
+            'label' => 'Heading',
+            'default_level' => 'h2',
+            'default_style' => 'h1',
+        ]);
+
+        $fields->addPartial(Copy::class, [
+            'name' => 'intro',
+            'label' => 'Intro text',
+            'default_style' => 'standfirst',
+        ]);
+
+        $fields->addNumber('feed_id', [
+            'label' => 'Feed ID',
+            'instructions' => 'The feed number from Instagram Feed → All Feeds. Leave empty to use the plugin\'s default feed.',
+            'min' => 1,
+            'step' => 1,
+        ]);
 
         return $fields->build();
     }
 
     /**
-     * Retrieve the heading.
+     * Retrieve the heading text/level/style. Empty text is valid — the heading is optional.
      *
-     * @return string
+     * @return array
      */
     public function heading()
     {
-        return $this->resolveField('heading', '');
+        return [
+            'text' => $this->resolveField('heading_text', ''),
+            'level' => $this->resolveField('heading_level', 'h2'),
+            'style' => $this->resolveField('heading_style', 'h1'),
+        ];
     }
 
     /**
-     * Retrieve the intro text.
+     * Retrieve the intro text/style. Empty text is valid — the intro is optional.
      *
-     * @return string
+     * @return array
      */
     public function intro()
     {
-        return $this->resolveField('intro', '');
+        return [
+            'text' => $this->resolveField('intro_text', ''),
+            'style' => $this->resolveField('intro_style', 'standfirst'),
+        ];
     }
 
     /**

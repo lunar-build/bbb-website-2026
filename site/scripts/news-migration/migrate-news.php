@@ -1261,7 +1261,7 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 if ($out && in_array(end($out)['blockName'], ['core/heading', 'acf/cta-banner', 'acf/text-banner'], true)) {
                     array_pop($out);
                 }
-                $out[] = news_acf_block('acf/instagram-feed', \App\Blocks\InstagramFeed::class, ['heading' => 'Love cycling? Tag yourself #ibikeitilikeit', 'intro' => '', 'feed_id' => ''], 'instagram_feed');
+                $out[] = news_acf_block('acf/instagram-feed', \App\Blocks\InstagramFeed::class, ['heading_text' => 'Love cycling? Tag yourself #ibikeitilikeit', 'heading_level' => 'h2', 'heading_style' => 'h1', 'intro_text' => '', 'intro_style' => 'standfirst', 'feed_id' => ''], 'instagram_feed');
                 $notes[] = 'acf/instagram -> Instagram Feed (default feed); intro heading dropped';
                 break;
             case 'acf/faq':
