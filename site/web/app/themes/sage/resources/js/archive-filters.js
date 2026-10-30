@@ -33,9 +33,9 @@ if (results) {
       pushed = true;
 
       if (focus) {
-        const heading = results.querySelector('[data-archive-results-heading]');
-        heading?.focus({ preventScroll: true });
-        heading?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const target = results.querySelector('[data-archive-focus]');
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } catch (error) {
       if (error.name !== 'AbortError') window.location.href = url;

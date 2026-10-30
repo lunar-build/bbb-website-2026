@@ -23,7 +23,7 @@
           </p>
         </div>
 
-        <form role="search" method="get" action="{{ home_url('/') }}" class="c-search__form">
+        <form role="search" method="get" action="{{ home_url('/') }}" class="c-search__form" aria-label="{{ __('Refine search', 'sage') }}">
           <input type="search" name="s" value="{{ $query }}"
             placeholder="{{ __('Search', 'sage') }}"
             aria-label="{{ __('Search this site', 'sage') }}">
@@ -35,7 +35,7 @@
       </div>
 
       @if (count($filterGroups))
-        <form class="c-archive__filters" method="get" action="{{ home_url('/') }}" data-archive-filters>
+        <form class="c-archive__filters" method="get" action="{{ home_url('/') }}" data-archive-filters aria-label="{{ __('Filter results', 'sage') }}">
           <input type="hidden" name="s" value="{{ $query }}">
           <x-filter-checkboxes id="search-filters" :groups="$filterGroups" />
         </form>

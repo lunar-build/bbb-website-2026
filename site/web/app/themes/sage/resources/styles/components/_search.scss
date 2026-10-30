@@ -99,17 +99,17 @@ $stack-below: bp.$sm;
   }
 }
 
-// Anchors the visually-hidden results heading (focus/scroll target after a filter swap).
-.c-search .c-archive__results {
-  position: relative;
-}
-
 .c-search__results {
   display: grid;
   gap: 1.25rem;
   margin: 0;
   padding: 0;
   list-style: none;
+
+  // Focused by archive-filters.js after a pagination swap; not interactive itself.
+  &:focus {
+    outline: none;
+  }
 
   // .c-link-card__card's own stacking margin — the grid gap spaces these.
   .c-search__result {

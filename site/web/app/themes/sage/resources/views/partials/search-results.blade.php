@@ -1,7 +1,5 @@
-<h2 class="u-sr-only" tabindex="-1" data-archive-results-heading>{{ __('Results', 'sage') }}</h2>
-
 @if (count($results))
-  <ol class="c-search__results c-link-card" role="list">
+  <ol class="c-search__results c-link-card" role="list" tabindex="-1" data-archive-focus aria-label="{{ $resultsLabel }}">
     @foreach ($results as $result)
       <li class="c-link-card__card c-link-card__card--no-logo c-search__result">
         <div class="c-link-card__content">

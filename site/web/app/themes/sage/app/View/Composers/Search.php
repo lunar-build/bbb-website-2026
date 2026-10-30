@@ -22,13 +22,33 @@ class Search extends Composer
      */
     public function with(): array
     {
+        $foundPosts = (int) $GLOBALS['wp_query']->found_posts;
+
         return [
             'query' => get_search_query(false),
             'filterGroups' => SearchFilters::groups(),
-            'foundPosts' => (int) $GLOBALS['wp_query']->found_posts,
+            'foundPosts' => $foundPosts,
             'results' => array_map([$this, 'result'], $GLOBALS['wp_query']->posts),
+            'resultsLabel' => $this->resultsLabel($foundPosts),
             'paginationLinks' => pagination_links(),
         ];
+    }
+
+    /**
+     * Accessible name for the results list, which takes focus after a pagination swap.
+     */
+    protected function resultsLabel(int $foundPosts): string
+    {
+        // translators: %d: total number of search results
+        $label = sprintf(_n('%d search result', '%d search results', $foundPosts, 'sage'), $foundPosts);
+        $totalPages = (int) $GLOBALS['wp_query']->max_num_pages;
+
+        if ($totalPages < 2) {
+            return $label;
+        }
+
+        // translators: 1: "N search results", 2: current page number, 3: total pages
+        return sprintf(__('%1$s, page %2$d of %3$d', 'sage'), $label, max(1, (int) get_query_var('paged')), $totalPages);
     }
 
     /**
