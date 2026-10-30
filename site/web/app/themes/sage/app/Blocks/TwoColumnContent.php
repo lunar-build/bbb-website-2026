@@ -214,7 +214,7 @@ class TwoColumnContent extends Block
             ],
             'right' => [
                 'type' => 'bullet_list',
-                'heading' => 'What you get',
+                'heading_text' => 'What you get',
                 'items' => [
                     ['text' => 'Balance bikes'],
                     ['text' => 'Trailers'],
@@ -299,16 +299,14 @@ class TwoColumnContent extends Block
                     'required' => true,
                 ]);
 
-            $flexible->addLayout('bullet_list', ['label' => 'Bullet List'])
-                ->addText('heading', ['label' => 'Heading'])
-                ->addSelect('heading_level', [
-                    'label' => 'Heading level',
-                    'instructions' => 'Semantic HTML heading level — choose based on the headings around it, not how big it should look. It always looks like a Heading 3.',
-                    'choices' => ['h2' => 'H2', 'h3' => 'H3', 'h4' => 'H4', 'h5' => 'H5', 'h6' => 'H6'],
-                    'default_value' => 'h3',
-                    'ui' => true,
-                    'conditional_logic' => [[['field' => 'heading', 'operator' => '!=empty']]],
-                ])
+            $bulletList = $flexible->addLayout('bullet_list', ['label' => 'Bullet List']);
+            $bulletList->addPartial(Heading::class, [
+                'name' => 'heading',
+                'label' => 'Heading',
+                'default_level' => 'h3',
+                'default_style' => 'h3',
+            ]);
+            $bulletList
                 ->addRepeater('items', [
                     'label' => 'Items',
                     'button_label' => 'Add item',
@@ -365,8 +363,12 @@ class TwoColumnContent extends Block
             ],
             'bullet_list' => [
                 'type' => 'bullet_list',
-                'heading' => $row['heading'] ?? '',
-                'headingLevel' => in_array($row['heading_level'] ?? null, ['h2', 'h3', 'h4', 'h5', 'h6'], true) ? $row['heading_level'] : 'h3',
+                // Rows saved before the Heading partial stored the text as `heading`.
+                'heading' => [
+                    'text' => ($row['heading_text'] ?? '') ?: ($row['heading'] ?? ''),
+                    'level' => $row['heading_level'] ?? 'h3',
+                    'style' => $row['heading_style'] ?? 'h3',
+                ],
                 'items' => $row['items'] ?? [],
             ],
             default => [

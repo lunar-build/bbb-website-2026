@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -158,7 +159,7 @@ class BulletList extends Block
      * @var array
      */
     public $example = [
-        'heading' => 'Example of non-urgent',
+        'heading_text' => 'Example of non-urgent',
         'list_style' => 'bullets',
         'items' => [
             ['text' => 'Missing cycle signage', 'level' => 0],
@@ -177,7 +178,7 @@ class BulletList extends Block
     public $examples = [
         'Bullets' => [],
         'Numbers, nested' => [
-            'heading' => 'How to report a fault',
+            'heading_text' => 'How to report a fault',
             'list_style' => 'numbers',
             'items' => [
                 ['text' => 'Find the pump on the map', 'level' => 0],
@@ -193,7 +194,6 @@ class BulletList extends Block
     {
         return [
             'heading' => $this->heading(),
-            'headingLevel' => $this->headingLevel(),
             'ordered' => $this->listStyle() === 'numbers',
             'items' => $this->items(),
         ];
@@ -204,24 +204,12 @@ class BulletList extends Block
         $fields = Builder::make('bullet_list');
 
         $fields
-            ->addText('heading', [
+            ->addPartial(Heading::class, [
+                'name' => 'heading',
                 'label' => 'Heading',
                 'instructions' => 'Optional heading shown above the list.',
-                'required' => 0,
-            ])
-            ->addSelect('heading_level', [
-                'label' => 'Heading level',
-                'instructions' => 'Semantic HTML heading level — choose based on the headings around it, not how big it should look. It always looks like a Heading 3.',
-                'choices' => [
-                    'h2' => 'H2',
-                    'h3' => 'H3',
-                    'h4' => 'H4',
-                    'h5' => 'H5',
-                    'h6' => 'H6',
-                ],
-                'default_value' => 'h3',
-                'ui' => true,
-                'conditional_logic' => [[['field' => 'heading', 'operator' => '!=empty']]],
+                'default_level' => 'h3',
+                'default_style' => 'h3',
             ])
             ->addButtonGroup('list_style', [
                 'label' => 'List style',
@@ -258,16 +246,17 @@ class BulletList extends Block
         return $fields->build();
     }
 
-    public function heading()
+    /**
+     * The heading's text/level/style. Blocks saved before the Heading partial
+     * stored the text as `heading`, so that's the fallback.
+     */
+    public function heading(): array
     {
-        return $this->resolveField('heading', '');
-    }
-
-    public function headingLevel()
-    {
-        $level = $this->resolveField('heading_level', 'h3');
-
-        return in_array($level, ['h2', 'h3', 'h4', 'h5', 'h6'], true) ? $level : 'h3';
+        return [
+            'text' => $this->resolveField('heading_text') ?: (string) get_field('heading'),
+            'level' => $this->resolveField('heading_level', 'h3'),
+            'style' => $this->resolveField('heading_style', 'h3'),
+        ];
     }
 
     public function listStyle()
