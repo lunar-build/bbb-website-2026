@@ -103,6 +103,20 @@ if (desktopNav) {
     ),
   ];
 
+  // Overflow dropdown drills down like the mobile menu: root list of the overflowed
+  // items, or one item's panel. Function declarations: closeAll runs before these consts.
+  const moreTrigger = desktopNav.querySelector('.c-primary-nav-desktop__more');
+  const overflowRoot = desktopNav.querySelector('[data-overflow-root]');
+  const overflowPanels = [...desktopNav.querySelectorAll('[data-overflow-panel]')];
+
+  function showOverflowPanel(index) {
+    if (!overflowRoot) return;
+    overflowRoot.hidden = index !== null;
+    overflowPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.overflowPanel !== String(index);
+    });
+  }
+
   const closeAll = (except) => {
     triggers.forEach((trigger) => {
       if (trigger === except) return;
@@ -111,6 +125,7 @@ if (desktopNav) {
         trigger.getAttribute('aria-controls'),
       );
       if (dropdown) dropdown.hidden = true;
+      if (trigger === moreTrigger) showOverflowPanel(null);
     });
   };
 
@@ -120,6 +135,26 @@ if (desktopNav) {
     document.getElementById(trigger.getAttribute('aria-controls')).hidden =
       false;
   };
+
+  desktopNav.addEventListener('click', (event) => {
+    const open = event.target.closest('[data-overflow-open]');
+    if (open) {
+      showOverflowPanel(open.dataset.overflowOpen);
+      // The panel title, not Back: lands the reader on the new content's heading.
+      desktopNav
+        .querySelector(`[data-overflow-panel="${open.dataset.overflowOpen}"] .c-primary-nav-desktop__overflow-title`)
+        .focus();
+      return;
+    }
+
+    if (event.target.closest('[data-overflow-back]')) {
+      const panel = overflowPanels.find((p) => !p.hidden);
+      showOverflowPanel(null);
+      overflowRoot
+        .querySelector(`[data-overflow-open="${panel.dataset.overflowPanel}"]`)
+        .focus();
+    }
+  });
 
   triggers.forEach((trigger) => {
     trigger.addEventListener('click', () => {
@@ -157,6 +192,7 @@ if (desktopNav) {
   );
   const sections = [...desktopNav.querySelectorAll('[data-overflow-index]')];
 
+
   const layoutOverflow = () => {
     // Skip while the bar is display:none (below bp.$sm) or showing search.
     if (!navList || !moreItem || navList.hidden || !navList.offsetWidth) return;
@@ -190,6 +226,12 @@ if (desktopNav) {
       navItems.some((item) => item.hidden && item.contains(active))
     ) {
       moreItem.querySelector('.c-primary-nav-desktop__more').focus();
+    }
+
+    // Back to the list if the open panel's item is no longer overflowed.
+    const openPanel = overflowPanels.find((panel) => !panel.hidden);
+    if (openPanel && sections[openPanel.dataset.overflowPanel].hidden) {
+      showOverflowPanel(null);
     }
 
     // Close a dropdown whose trigger just overflowed.

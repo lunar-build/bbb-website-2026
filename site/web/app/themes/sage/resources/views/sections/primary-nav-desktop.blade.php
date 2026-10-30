@@ -44,16 +44,39 @@
                     <div id="desktop-dropdown-overflow"
                         class="c-primary-nav-desktop__dropdown c-primary-nav-desktop__dropdown--overflow" hidden>
                         <div class="o-container">
+                            {{-- Drill-down, like the mobile menu: a list of the overflowed items, each opening
+                                 its own panel with a Back button. --}}
+                            <ul class="c-primary-nav-desktop__overflow-list" role="list" data-overflow-root
+                                aria-label="{{ __('More navigation', 'sage') }}">
+                                @foreach ($items as $i => $item)
+                                    <li data-overflow-index="{{ $i }}" hidden>
+                                        @if (!empty($item['children']))
+                                            <button type="button"
+                                                class="c-primary-nav-desktop__link c-primary-nav-desktop__overflow-link"
+                                                data-overflow-open="{{ $i }}">
+                                                <span>{{ $item['label'] }}</span>
+                                                <x-icon name="chevron"
+                                                    class="c-primary-nav-desktop__chevron c-primary-nav-desktop__chevron--sub" />
+                                            </button>
+                                        @else
+                                            <a href="{{ $item['href'] }}"
+                                                class="c-primary-nav-desktop__link c-primary-nav-desktop__overflow-link"><span>{{ $item['label'] }}</span></a>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+
                             @foreach ($items as $i => $item)
-                                <div class="c-primary-nav-desktop__overflow-section" data-overflow-index="{{ $i }}" hidden>
-                                    @if (!empty($item['children']))
-                                        <p class="c-primary-nav-desktop__overflow-title">{{ $item['label'] }}</p>
+                                @if (!empty($item['children']))
+                                    <div class="c-primary-nav-desktop__overflow-panel" data-overflow-panel="{{ $i }}" hidden>
+                                        <button type="button" class="c-primary-nav-desktop__back" data-overflow-back>
+                                            <x-icon name="arrow-right" class="c-primary-nav-desktop__back-icon" />
+                                            {{ __('Back', 'sage') }}
+                                        </button>
+                                        <p class="c-primary-nav-desktop__overflow-title" tabindex="-1">{{ $item['label'] }}</p>
                                         @include('sections.primary-nav-desktop-columns', ['groups' => $item['children'], 'idPrefix' => 'desktop-overflow-group-' . $i])
-                                    @else
-                                        <a href="{{ $item['href'] }}"
-                                            class="c-primary-nav-desktop__overflow-title c-primary-nav-desktop__overflow-link"><span>{{ $item['label'] }}</span></a>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
                     </div>
