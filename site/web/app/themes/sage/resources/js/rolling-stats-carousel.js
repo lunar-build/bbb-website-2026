@@ -66,10 +66,10 @@ const countUp = (item) => {
 
   const start = performance.now();
   const tick = (now) => {
-    const t = Math.min(1, (now - start) / DURATION);
-    render(reels, target * easeOutCubic(t));
+    const progress = Math.min(1, (now - start) / DURATION);
+    render(reels, target * easeOutCubic(progress));
 
-    if (t < 1) {
+    if (progress < 1) {
       frames.set(item, requestAnimationFrame(tick));
     } else {
       render(reels, target);
