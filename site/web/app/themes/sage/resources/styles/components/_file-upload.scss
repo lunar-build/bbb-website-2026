@@ -79,7 +79,7 @@
 $stack-below: 24rem;
 
 // The container is flattened so the label (outside it) and the CTA/rules (inside) share one grid.
-.gfield--type-fileupload:has(.c-file-upload) {
+.gfield:has(> .c-file-upload) {
   position: relative;
   // A size container fills the form's column without widening it (the rules line + CTA
   // would otherwise set its width), and lets the CTA drop below the text when narrow.
@@ -90,7 +90,8 @@ $stack-below: 24rem;
   text-align: start;
 
   > *,
-  .c-file-upload > * {
+  .c-file-upload > *,
+  .c-file-upload > .ginput_full > * {
     grid-column: 1;
   }
 
@@ -101,6 +102,11 @@ $stack-below: 24rem;
 
 .c-file-upload {
   display: contents !important;
+
+  // Post Image wraps its input and rules in a span; flatten it into the same grid.
+  > .ginput_full:has(input[type='file']) {
+    display: contents !important;
+  }
 
   // Still the real control (named by both labels), just not seen.
   input[type='file'] {
