@@ -4,10 +4,11 @@
 <div class="o-container">
 @endif
 <div class="c-journey-planner-widget__card">
-  <h2 class="c-journey-planner-widget__heading">{{ $heading }}</h2>
+  @php $headingId = 'c-journey-planner-widget__heading-'.uniqid(); @endphp
+  <h2 id="{{ $headingId }}" class="c-journey-planner-widget__heading">{{ $heading }}</h2>
 
   @if ($variant === 'find_nearby')
-    <form class="c-journey-planner-widget__form" data-variant="find_nearby" data-redirect-url="{{ $journeyPlannerUrl }}">
+    <form class="c-journey-planner-widget__form" aria-labelledby="{{ $headingId }}" data-variant="find_nearby" data-redirect-url="{{ $journeyPlannerUrl }}">
       <x-input
         label="Your location"
         name="location"
@@ -37,7 +38,7 @@
       </wa-button>
     </form>
   @else
-    <form class="c-journey-planner-widget__form" data-variant="plan_route" data-redirect-url="{{ $journeyPlannerUrl }}">
+    <form class="c-journey-planner-widget__form" aria-labelledby="{{ $headingId }}" data-variant="plan_route" data-redirect-url="{{ $journeyPlannerUrl }}">
       <x-input
         label="From"
         name="from"
