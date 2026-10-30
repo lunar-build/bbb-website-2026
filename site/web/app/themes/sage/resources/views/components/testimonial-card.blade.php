@@ -14,9 +14,10 @@
     'quote' => null,
     'body' => null,
     'link' => null,
+    'portrait' => false,
 ])
 
-<div {{ $attributes->class(['c-testimonial-card']) }}>
+<div {{ $attributes->class(['c-testimonial-card', 'c-testimonial-card--portrait' => $portrait]) }}>
     <div class="c-testimonial-card__photo">
         <img src="{{ $photo['url'] }}" alt="{{ $photo['alt'] ?? $name }}">
     </div>

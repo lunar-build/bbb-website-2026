@@ -2,6 +2,7 @@
 
 @use '../abstracts/breakpoints' as bp;
 @use '../components/download-link';
+@use '../base/typography';
 
 // Container query, not bp.respond(): the card can be far narrower than the viewport
 // (e.g. the pattern library sidebar). Cutoff still comes from bp.$md.
@@ -68,9 +69,10 @@
 .c-link-card__title {
   color: var(--wp--preset--color--blue-medium);
 
-  // Description is optional: a lone title's margin-bottom would throw it off-centre.
+  // No description: title steps down a size, and drops its margin so it stays centred.
   &:last-child {
     margin-bottom: 0;
+    @extend .u-standfirst-compact;
   }
 }
 

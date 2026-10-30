@@ -25,7 +25,7 @@ ddev exec "npm --prefix web/app/themes/sage install"
 ddev exec "composer --working-dir web/app/themes/sage install"
 ```
 
-Theme front-end build (run from `/site/web/app/themes/sage`, typically via the `ssh:sage` DDEV shell):
+Theme front-end build (run from `/site/web/app/themes/sage`, `npm run dev` is auto-started by the `npm:dev` VS Code task on folder open):
 
 ```bash
 npm run dev      # Vite dev server with HMR

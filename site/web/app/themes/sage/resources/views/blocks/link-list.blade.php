@@ -10,7 +10,7 @@
 
     @foreach ($links as $row)
       @if (str_starts_with($layout, 'short_'))
-        <a class="c-link-list__short-link u-short-form-link" href="{{ $row['link']['url'] }}" @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+        <a class="c-link-list__short-link u-short-form-link-small" href="{{ $row['link']['url'] }}" @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
           {{ $row['link']['title'] }}
           <x-icon name="arrow-right" />
         </a>

@@ -1254,15 +1254,15 @@ function news_transform(string $content, wpdb $src, array &$notes, bool $keepCal
                 $out[] = news_latest_news($b, $src);
                 break;
             case 'acf/instagram':
-                // Held back until the client decides about Instagram: drop the block and the heading that introduces it.
+                // The old block carried its own fixed heading; the heading (or banner) above it is dropped as before.
                 while ($out && news_is_blank(end($out))) {
                     array_pop($out);
                 }
-                // The intro heading, or the banner it became on pages that turn headings into banners.
                 if ($out && in_array(end($out)['blockName'], ['core/heading', 'acf/cta-banner', 'acf/text-banner'], true)) {
                     array_pop($out);
                 }
-                $notes[] = 'acf/instagram feed and its intro heading dropped';
+                $out[] = news_acf_block('acf/instagram-feed', \App\Blocks\InstagramFeed::class, ['heading_text' => 'Love cycling? Tag yourself #ibikeitilikeit', 'heading_level' => 'h2', 'heading_style' => 'h1', 'intro_text' => '', 'intro_style' => 'standfirst', 'feed_id' => ''], 'instagram_feed');
+                $notes[] = 'acf/instagram -> Instagram Feed (default feed); intro heading dropped';
                 break;
             case 'acf/faq':
                 $out[] = news_faq($b);
