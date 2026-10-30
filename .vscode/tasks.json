@@ -38,11 +38,25 @@
 			}
 		},
 		{
+			"label": "npm:dev",
+			"type": "shell",
+			"command": "ddev exec -d /var/www/html/web/app/themes/sage npm run dev",
+			"isBackground": true,
+			"presentation": {
+				"group": "ssh"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/site"
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "ssh:panels",
 			"type": "shell",
 			"dependsOn": [
 				"ssh:site",
-				"ssh:sage"
+				"ssh:sage",
+				"npm:dev"
 			],
 			"dependsOrder": "parallel",
 			"options": {
