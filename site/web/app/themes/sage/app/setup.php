@@ -260,7 +260,7 @@ add_action('init', function () {
         'public' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-analytics',
-        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'supports' => ['title', 'thumbnail', 'excerpt'],
         'has_archive' => true,
         'rewrite' => ['slug' => 'ibikeitilikeit'],
     ]);

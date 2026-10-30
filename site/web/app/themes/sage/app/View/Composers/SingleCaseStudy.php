@@ -37,39 +37,29 @@ class SingleCaseStudy extends Composer
     }
 
     /**
-     * Split the content into the Q&A rows the design shows and anything else.
-     *
-     * Case studies use the classic editor: a run of headings + paragraphs,
-     * where each heading is a question and the content after it is the answer.
-     * Content that doesn't start with a heading isn't that shape, so it renders
-     * as plain content instead of being forced into rows.
+     * The Q&A rows the design shows. A case study with no rows yet falls back
+     * to its old content as plain text.
      *
      * @return array{rows: array<int, array{question: string, answer: string}>, body: string}
      */
     public function details(): array
     {
-        // Migrated posts still carry block comments; classic content has none.
-        $content = trim(preg_replace('/<!--\s*\/?wp:.*?-->/s', '', get_post_field('post_content', get_the_ID())));
-
-        $parts = preg_split('/(<h[1-6][^>]*>.*?<\/h[1-6]>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
-        if (! $parts || ! preg_match('/^<h[1-6]/i', $parts[0])) {
-            return ['rows' => [], 'body' => apply_filters('the_content', $content)];
-        }
-
         $rows = [];
 
-        foreach ($parts as $part) {
-            if (preg_match('/^<h[1-6]/i', $part)) {
-                $rows[] = ['question' => $this->question($part), 'answer' => ''];
-
-                continue;
-            }
-
-            $rows[array_key_last($rows)]['answer'] .= apply_filters('the_content', $part);
+        foreach ((array) get_field('rows') as $row) {
+            $rows[] = [
+                'question' => (string) ($row['question'] ?? ''),
+                'answer' => wpautop((string) ($row['answer'] ?? '')),
+            ];
         }
 
-        return ['rows' => $rows, 'body' => ''];
+        if ($rows) {
+            return ['rows' => $rows, 'body' => ''];
+        }
+
+        $content = preg_replace('/<!--\s*\/?wp:.*?-->/s', '', get_post_field('post_content', get_the_ID()));
+
+        return ['rows' => [], 'body' => apply_filters('the_content', trim($content))];
     }
 
     /**
@@ -104,16 +94,6 @@ class SingleCaseStudy extends Composer
                 ],
             ];
         }, $posts);
-    }
-
-    /**
-     * Figma's "Why?" has a question mark; the migrated heading is just "Why".
-     */
-    protected function question(string $headingHtml): string
-    {
-        $question = trim(wp_strip_all_tags($headingHtml));
-
-        return strcasecmp($question, 'why') === 0 ? $question . '?' : $question;
     }
 
     protected function name(): string

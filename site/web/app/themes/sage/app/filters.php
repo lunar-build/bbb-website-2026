@@ -525,23 +525,3 @@ add_action('wp_head', function () {
 
     echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
 });
-
-/**
- * Case studies are a fixed Q&A layout (heading = question, content = answer),
- * so the classic editor suits them better than free-form blocks.
- */
-add_filter('use_block_editor_for_post_type', fn($use, $postType) => $postType === 'case_study' ? false : $use, 10, 2);
-
-/**
- * Tell editors how the content becomes the Q&A rows on the front end.
- */
-add_action('edit_form_after_title', function ($post) {
-    if ($post->post_type !== 'case_study') {
-        return;
-    }
-
-    echo '<div class="notice notice-info inline"><p><strong>' . esc_html__('How to enter content', 'sage') . '</strong><br>'
-        . esc_html__('Each Heading 3 is a question, and the paragraphs under it are its answer. Together they show as one row on the page.', 'sage')
-        . '<br>' . esc_html__('Start with a heading, add the answer below, then repeat for the next question. Content that doesn\'t start with a heading is shown as plain text instead.', 'sage')
-        . '</p></div>';
-});
