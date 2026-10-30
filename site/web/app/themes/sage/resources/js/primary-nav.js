@@ -99,7 +99,7 @@ const desktopNav = document.querySelector('.c-primary-nav-desktop');
 if (desktopNav) {
   const triggers = [
     ...desktopNav.querySelectorAll(
-      '.c-primary-nav-desktop__link[aria-controls], .c-primary-nav-desktop__more',
+      '.c-primary-nav-desktop__link[aria-controls]:not([data-overflow-open]), .c-primary-nav-desktop__more',
     ),
   ];
 

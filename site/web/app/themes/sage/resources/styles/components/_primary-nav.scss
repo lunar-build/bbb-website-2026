@@ -433,6 +433,12 @@
   li[hidden] {
     display: none;
   }
+
+  // Drills forward into a panel, so the chevron points right. The nudge optically
+  // centres it on the text, which sits below its line box's centre.
+  .c-primary-nav-desktop__chevron svg {
+    transform: translateY(0.125rem) rotate(-90deg);
+  }
 }
 
 // Drill-down panel for one overflowed item — same idea as the mobile menu's L1 panels.
