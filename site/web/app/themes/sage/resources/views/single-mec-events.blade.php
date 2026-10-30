@@ -87,7 +87,7 @@
                 @endif
               </div>
 
-              @if ($priceLines)
+              @if ($priceLines && ! $booking)
                 <div class="c-event__info-column">
                   <h2 class="c-event__info-heading u-heading-5">{{ __('Price', 'sage') }}</h2>
                   <x-bullet-list class="c-event__price" :items="$priceLines" />

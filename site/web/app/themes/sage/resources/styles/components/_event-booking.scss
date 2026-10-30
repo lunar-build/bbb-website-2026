@@ -1,0 +1,109 @@
+@use '../base/focus' as focus;
+@use '../base/typography';
+
+// MEC's booking form (tickets → attendees → payment) inside the event page.
+// MEC supplies the markup and JS; this restyles its buttons to match <wa-button>
+// (components/_button.scss) and hides what the page already says.
+
+.c-event__booking {
+  margin-bottom: 3rem;
+
+  // MEC's own step titles ("Book Event", "Attendee's Form", "Checkout").
+  h3,
+  h4 {
+    margin: 1.5rem 0 1rem;
+    font-family: var(--wp--preset--font-family--nata-sans);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  // "Book your place" above already titles step 1.
+  .mec-booking > form:not(.mec-booking-form-container) > h4:first-child {
+    display: none;
+  }
+
+  // Decorative icons; the labels carry the meaning.
+  .mec-ticket-icon-wrapper,
+  .mec-field-icon,
+  .mec-book-price-detail-icon,
+  .mec-book-form-gateway-option-svg,
+  .mec-ssl-protection-message img {
+    display: none;
+  }
+
+  // Running subtotals repeat the total shown at checkout and the ticket prices in step 1.
+  .mec-ticket-subtotal-wrapper,
+  .mec-ticket-detail .mec-ticket-price-wrapper,
+  .mec-events-meta-group-booking .mec-book-price-details li.mec-book-price-detail.mec-book-price-detail-type-tickets {
+    display: none;
+  }
+
+  // Attendee and total lists are layout, not content lists.
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mec-book-price-total {
+    font-weight: 700;
+  }
+
+  // "For free bookings, there is no payment step." above the confirmation.
+  .warning-msg:has(+ .mec-event-book-message) {
+    display: none;
+  }
+}
+
+// Buttons: Back is the outlined small CTA, everything else the filled brand CTA.
+.c-event__booking :is(.mec-book-form-next-button, .mec-book-form-back-button) {
+  @extend .u-cta-large;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 2px solid var(--wp--preset--color--yellow);
+  border-radius: 999px;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:is(:hover, :focus-visible) {
+    border-color: var(--wp--preset--color--charcoal);
+    background: var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  @include focus.ring;
+
+  img,
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+
+  // MEC's arrow is cyan; follow the label colour like our CTAs.
+  svg * {
+    stroke: currentColor;
+  }
+}
+
+.c-event__booking .mec-book-form-back-button {
+  border-color: var(--wp--preset--color--charcoal);
+  background: transparent;
+}
+
+.c-event__booking .mec-book-form-btn-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
