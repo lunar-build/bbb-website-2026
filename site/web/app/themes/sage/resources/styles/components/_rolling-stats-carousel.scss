@@ -137,7 +137,7 @@
   align-items: baseline;
 }
 
-// One digit's "reel" window (0-9 strip x3, see component Blade view); JS translateY()s it.
+// One digit's "reel" window (0-9 then 0, see component Blade view); JS translateY()s it.
 .c-rolling-stats-carousel__reel {
   display: inline-block;
   overflow: hidden;

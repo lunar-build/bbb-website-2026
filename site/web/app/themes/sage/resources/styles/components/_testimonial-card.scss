@@ -57,7 +57,27 @@
     max-width: none; // .c-quote's own 46rem cap isn't needed at card width
   }
 
+  &__body p + p {
+    margin-top: 1rem;
+  }
+
   &__cta {
     margin-top: auto;
+  }
+}
+
+// Long quotes (see TestimonialCardCarousel::PORTRAIT_QUOTE_LENGTH): photo stacks on top
+// at every width, as on mobile.
+.c-testimonial-card--portrait {
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: none;
+    grid-template-rows: auto 1fr;
+  }
+
+  .c-testimonial-card__photo {
+    @include bp.respond($min: bp.$md) {
+      aspect-ratio: 3 / 2;
+      height: auto;
+    }
   }
 }
