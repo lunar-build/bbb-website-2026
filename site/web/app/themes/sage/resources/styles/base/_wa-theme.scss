@@ -35,8 +35,7 @@ wa-input,
 wa-textarea,
 wa-radio,
 wa-radio-group,
-wa-checkbox,
-wa-checkbox-group {
+wa-checkbox {
   --wa-color-focus: var(--focus-color);
   --wa-focus-ring-width: 2px;
   --wa-focus-ring-offset: 2px;
@@ -46,8 +45,7 @@ wa-checkbox-group {
 // doesn't update it — re-declare the composite here.
 wa-radio,
 wa-radio-group,
-wa-checkbox,
-wa-checkbox-group {
+wa-checkbox {
   --wa-focus-ring: 2px solid var(--focus-color);
 }
 
