@@ -30,11 +30,9 @@
                 @else
                   <span class="c-rolling-stats-carousel__reel" data-rolling-stats-reel data-digit="{{ $digit }}">
                     <span class="c-rolling-stats-carousel__reel-track">
-                      {{-- 0-9 x3 so the reel visibly spins before landing on the target set. --}}
-                      @for ($set = 0; $set < 3; $set++)
-                        @for ($n = 0; $n <= 9; $n++)
-                          <span class="c-rolling-stats-carousel__reel-digit">{{ $n }}</span>
-                        @endfor
+                      {{-- 0-9 then a trailing 0, so the roll from 9 back to 0 has a row to land on. --}}
+                      @for ($n = 0; $n <= 10; $n++)
+                        <span class="c-rolling-stats-carousel__reel-digit">{{ $n % 10 }}</span>
                       @endfor
                     </span>
                   </span>

@@ -65,7 +65,10 @@
 }
 
 .c-card-row__news-title {
-  @extend .u-news-row-card-title;
+  @extend .u-card-title;
+  // A step smaller than other card titles.
+  font-size: var(--wp--preset--font-size--heading-6);
+  line-height: 1.625rem;
   padding-inline: 1.125rem;
   color: var(--wp--preset--color--charcoal);
   text-align: left;

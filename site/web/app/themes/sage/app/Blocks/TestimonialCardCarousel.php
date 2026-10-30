@@ -186,6 +186,42 @@ class TestimonialCardCarousel extends Block
     ];
 
     /**
+     * Variants for the pattern library (see App\View\Composers\PatternLibrary::render()),
+     * each merged onto $example. Portrait: Franciska's quote runs past
+     * PORTRAIT_QUOTE_LENGTH, so every card stacks.
+     *
+     * @var array
+     */
+    public $examples = [
+        'Landscape (short quotes)' => [],
+        'Portrait (a quote over 200 characters)' => [
+            'cards' => [
+                [
+                    'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                    'name' => 'Rachel',
+                    'info' => 'Cycling through Portishead.',
+                    'quote' => 'I ride to avoid the cost and stress of driving and parking plus getting some extra fitness in.',
+                    'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
+                ],
+                [
+                    'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                    'name' => 'Franciska',
+                    'info' => 'Cycling through The Arches, Bristol.',
+                    'quote' => "It keeps me healthy. I don't feel tired like I used to. I used to get very bad headaches but I don't get them anymore since I started cycling. It's also become the best part of my day — I see more of the city, I've made friends on the group rides, and I save money every week.",
+                    'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
+                ],
+                [
+                    'photo' => ['url' => 'https://betterbybike.info/wp-content/uploads/placeholder.jpg', 'alt' => ''],
+                    'name' => 'Tom',
+                    'info' => 'Cycling to work in Bath.',
+                    'quote' => 'Cycling to work means I never have to worry about parking, and I arrive feeling ready for the day.',
+                    'link' => ['title' => 'Read more', 'url' => '#', 'target' => ''],
+                ],
+            ],
+        ],
+    ];
+
+    /**
      * Fallback example data requiring a non-constant expression (Vite::asset).
      *
      * @return array
@@ -199,11 +235,34 @@ class TestimonialCardCarousel extends Block
         ];
     }
 
+    /**
+     * Quotes longer than this (characters, tags stripped) switch the whole
+     * carousel to portrait cards. Cards stretch to the tallest one, so a single
+     * long quote would otherwise leave short landscape cards mostly empty.
+     */
+    public const PORTRAIT_QUOTE_LENGTH = 200;
+
     public function with(): array
     {
+        $cards = $this->cards();
+
         return [
-            'cards' => $this->cards(),
+            'cards' => $cards,
+            'portrait' => $this->hasLongQuote($cards),
         ];
+    }
+
+    protected function hasLongQuote(array $cards): bool
+    {
+        foreach ($cards as $card) {
+            $quoteText = trim(wp_strip_all_tags($card['quote']));
+
+            if (mb_strlen($quoteText) > self::PORTRAIT_QUOTE_LENGTH) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function fields(): array
