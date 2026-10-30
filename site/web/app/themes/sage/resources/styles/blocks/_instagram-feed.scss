@@ -1,0 +1,20 @@
+// Wraps Smash Balloon's Instagram Feed Pro output; the feed's own layout (columns,
+// post count, header) is configured in the plugin, so only the heading and spacing live here.
+.c-instagram-feed__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 48rem;
+  margin-bottom: 2rem;
+}
+
+.c-instagram-feed__heading,
+.c-instagram-feed__intro {
+  margin: 0;
+  color: var(--c-block-fg, inherit);
+}
+
+// The plugin adds its own bottom padding; the block's padding support already spaces it.
+.c-instagram-feed__feed #sb_instagram {
+  padding-bottom: 0 !important;
+}
