@@ -15,20 +15,18 @@
         </button>
       </form>
 
-      <ul class="c-not-found__links" role="list">
+      <nav class="c-not-found__links" aria-label="{{ __('Suggested pages', 'sage') }}">
         @foreach (not_found_links_from_options() as $link)
-          <li>
-            <wa-button variant="brand" appearance="accent" pill with-end href="{{ $link['href'] }}"
-              @if ($link['target'] === '_blank') target="_blank" rel="noopener" @endif>
-              {{ $link['label'] }}
-              @if ($link['target'] === '_blank')
-                <span class="u-sr-only">({{ __('opens in a new tab', 'sage') }})</span>
-              @endif
-              <x-icon name="arrow-right" slot="end" />
-            </wa-button>
-          </li>
+          <wa-button variant="brand" appearance="accent" pill with-end href="{{ $link['href'] }}"
+            @if ($link['target'] === '_blank') target="_blank" rel="noopener" @endif>
+            {{ $link['label'] }}
+            @if ($link['target'] === '_blank')
+              <span class="u-sr-only">({{ __('opens in a new tab', 'sage') }})</span>
+            @endif
+            <x-icon name="arrow-right" slot="end" />
+          </wa-button>
         @endforeach
-      </ul>
+      </nav>
     </div>
   </section>
 @endsection
