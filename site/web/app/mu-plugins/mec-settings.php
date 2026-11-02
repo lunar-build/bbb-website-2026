@@ -27,6 +27,14 @@ add_filter('option_mec_options', function ($options) {
             . "<a class=\"bbb-button\" href=\"%%verification_link%%\">Verify your booking</a>\r\n\r\n"
             . "Regards,\r\n%%blog_name%%";
 
+        // Cancelled and rejected bookings (including every booking on a cancelled session)
+        // must tell the booker. Both emails ship disabled, and cancellation is admin-only.
+        foreach (['cancellation_notification', 'booking_rejection'] as $notification) {
+            $options['notifications'][$notification]['status'] = 1;
+            $options['notifications'][$notification]['send_to_user'] = 1;
+            $options['notifications'][$notification]['send_to_admin'] = 1;
+        }
+
         // The default says "we will check and confirm your booking", which is wrong for an
         // auto-confirmed one. This reads correctly either way: the confirmed email follows.
         $options['notifications']['booking_notification']['content'] = "Hello %%name%%,\r\n\r\n"
