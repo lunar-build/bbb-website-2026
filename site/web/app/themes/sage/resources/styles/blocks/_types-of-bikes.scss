@@ -7,12 +7,9 @@
     display: grid;
     gap: spacing.$card-gap;
 
-    @include bp.respond($min: bp.$sm) {
+    // Two across: four columns made the cards too tall.
+    @include bp.respond($min: bp.$md) {
       grid-template-columns: repeat(2, 1fr);
-    }
-
-    @include bp.respond($min: bp.$xl) {
-      grid-template-columns: repeat(4, 1fr);
     }
   }
 
