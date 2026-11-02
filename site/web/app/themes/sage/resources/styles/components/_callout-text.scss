@@ -1,8 +1,49 @@
 // Figma node 9:2537 — single emphasised line of callout text, reuses the
 // pattern-library's existing `.u-callout` pill style (base/_typography.scss)
 // as its visual base, hardcodable into other blocks via <x-callout-text>.
+// `type` (info, success, warning, error) swaps the colours, using only the brand blues,
+// leaf green and greys: the palette has no red, so error inverts to solid dark blue.
+
+// Colours for each tone. A mixin so markup we don't render ourselves (MEC's booking
+// messages) can wear the same tones.
+@mixin tone($tone) {
+  @if $tone == success {
+    --callout-bg: color-mix(in srgb, var(--wp--preset--color--leaf) 35%, var(--wp--preset--color--white));
+    --callout-border: var(--wp--preset--color--leaf);
+    --callout-fg: var(--wp--preset--color--blue-dark);
+  } @else if $tone == warning {
+    --callout-bg: var(--wp--preset--color--light-grey);
+    --callout-border: var(--wp--preset--color--charcoal);
+    --callout-fg: var(--wp--preset--color--charcoal);
+  } @else if $tone == error {
+    --callout-bg: var(--wp--preset--color--blue-dark);
+    --callout-border: var(--wp--preset--color--blue-dark);
+    --callout-fg: var(--wp--preset--color--white);
+  } @else {
+    --callout-bg: var(--wp--preset--color--blue-light);
+    --callout-border: var(--wp--preset--color--blue-light);
+    --callout-fg: var(--wp--preset--color--blue-dark);
+  }
+}
 
 .c-callout-text {
+  @include tone(info);
+  box-shadow: inset 0 0 0 2px var(--callout-border);
+  background: var(--callout-bg);
+  color: var(--callout-fg);
+
+  &--success {
+    @include tone(success);
+  }
+
+  &--warning {
+    @include tone(warning);
+  }
+
+  &--error {
+    @include tone(error);
+  }
+
   // .u-callout is a pill sized to its content; a callout used inline in
   // article copy needs to span the full measure instead.
   width: 100%;
