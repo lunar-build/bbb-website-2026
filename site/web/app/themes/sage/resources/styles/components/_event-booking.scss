@@ -267,3 +267,18 @@
     margin: 0;
   }
 }
+
+// Result of a verify/cancel link, placed above the booking form. Errors keep the
+// callout shape but take the brand's warning colour.
+.c-event__booking-notice {
+  margin-bottom: 1.5rem;
+  scroll-margin-top: 2rem;
+
+  &--error {
+    border: 2px solid var(--wp--preset--color--dark-orange);
+
+    .c-callout-text__icon {
+      color: var(--wp--preset--color--dark-orange);
+    }
+  }
+}

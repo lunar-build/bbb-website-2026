@@ -41,8 +41,36 @@ class SingleMecEvent extends Composer
             'organizer' => $this->organizer(),
             'upcoming' => $this->upcoming(),
             'booking' => $this->booking(),
+            'bookingNotice' => $this->bookingNotice(),
             'jsonLd' => $this->jsonLd(),
         ];
+    }
+
+    /**
+     * MEC runs the /verify/{key}/ and /cancel/{key}/ links, and payment-gateway
+     * returns, from an action our template doesn't otherwise fire. Calling it does the
+     * work and returns MEC's one-line result ("Your booking has been verified…"), or
+     * null when the page wasn't reached through one of those links.
+     *
+     * @return array{text: string, type: 'success'|'error'}|null
+     */
+    public function bookingNotice(): ?array
+    {
+        ob_start();
+        do_action('mec_before_main_content');
+        $html = ob_get_clean();
+
+        $text = trim(wp_strip_all_tags($html));
+        if ($text === '') {
+            // An unknown key makes MEC bail without a word; say so rather than show a bare event page.
+            if (! get_query_var('verify') && ! get_query_var('cancel')) {
+                return null;
+            }
+
+            return ['text' => __('This booking link is not valid, or has expired.', 'sage'), 'type' => 'error'];
+        }
+
+        return ['text' => $text, 'type' => str_contains($html, 'mec-error') ? 'error' : 'success'];
     }
 
     /**

@@ -25,3 +25,12 @@ if (document.querySelector(COUNTER)) {
   window.jQuery?.(document).on('change', `${COUNTER} input.in-num`, (e) => syncCounter(e.target));
   document.addEventListener('input', (e) => e.target.matches?.(`${COUNTER} input.in-num`) && syncCounter(e.target));
 }
+
+// A verify/cancel link lands on the event page with its result well below the title;
+// bring it into view and announce it, as gravity-forms.js does for a sent form.
+const notice = document.querySelector('[data-booking-notice]');
+if (notice) {
+  notice.setAttribute('tabindex', '-1');
+  notice.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  notice.focus({ preventScroll: true });
+}
