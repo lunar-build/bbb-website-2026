@@ -67,6 +67,25 @@ class EventSessions
     }
 
     /**
+     * IDs of events with a session that hasn't ended, soonest first. A session
+     * running now counts; one that has finished doesn't.
+     *
+     * @return int[]
+     */
+    public static function upcomingEventIds(): array
+    {
+        global $wpdb;
+
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+
+        return array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->prefix}mec_dates
+            WHERE tend >= %d GROUP BY post_id ORDER BY MIN(tstart)",
+            $now,
+        )));
+    }
+
+    /**
      * An event's next sessions from now (the first included), soonest first.
      *
      * @return array<int, object{tstart: int, tend: int}>

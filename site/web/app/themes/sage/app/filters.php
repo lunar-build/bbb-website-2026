@@ -272,6 +272,13 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 
     $postType = Support\ArchiveFilters::postType();
 
+    // Events whose sessions have all passed aren't listed; the rest run soonest first.
+    // [0] matches nothing, so no events left shows the archive's empty state, not every event.
+    if ($postType === 'mec-events') {
+        $query->set('post__in', Support\EventSessions::upcomingEventIds() ?: [0]);
+        $query->set('orderby', 'post__in');
+    }
+
     if (! $taxQuery = Support\ArchiveFilters::taxQuery($postType)) {
         return;
     }

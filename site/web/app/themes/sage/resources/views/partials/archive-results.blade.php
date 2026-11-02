@@ -1,8 +1,10 @@
 <div class="c-archive__results-header">
   <h2 class="c-archive__results-heading u-heading-3" tabindex="-1" data-archive-results-heading>{{ $resultsHeading }}</h2>
-  <p class="c-archive__count" aria-live="polite" aria-atomic="true">
-    {{ sprintf(_n('%d result found', '%d results found', $foundPosts, 'sage'), $foundPosts) }}
-  </p>
+  @unless ($noCurrentEvents ?? false)
+    <p class="c-archive__count" aria-live="polite" aria-atomic="true">
+      {{ sprintf(_n('%d result found', '%d results found', $foundPosts, 'sage'), $foundPosts) }}
+    </p>
+  @endunless
 </div>
 
 @if (count($cards))
@@ -21,6 +23,8 @@
       />
     @endforeach
   </div>
+@elseif ($noCurrentEvents ?? false)
+  <x-callout-text>{{ __('Sorry, there are no current events. Please check back soon.', 'sage') }}</x-callout-text>
 @else
   <p class="c-archive__empty">{{ __('Sorry, nothing matches those filters.', 'sage') }}</p>
 @endif
