@@ -1,7 +1,8 @@
 <div class="c-archive__results-header">
   <h2 class="c-archive__results-heading u-heading-3" tabindex="-1" data-archive-results-heading>{{ $resultsHeading }}</h2>
-  {{-- With no events the callout says it, so the count is for screen readers only. --}}
-  <p @class(['c-archive__count', 'u-sr-only' => $noCurrentEvents ?? false]) aria-live="polite" aria-atomic="true">
+  {{-- With no events the callout says it, so the count is for screen readers only. Announced by
+       the page's [data-archive-status] region after a filter update (archive-filters.js). --}}
+  <p @class(['c-archive__count', 'u-sr-only' => $noCurrentEvents ?? false]) data-archive-count>
     {{ sprintf(_n('%d result found', '%d results found', $foundPosts, 'sage'), $foundPosts) }}
   </p>
 </div>
