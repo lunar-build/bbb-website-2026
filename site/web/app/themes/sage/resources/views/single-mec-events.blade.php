@@ -98,7 +98,7 @@
 
           {{-- Result of a /verify/ or /cancel/ link, level with the form so it's seen. --}}
           @if ($bookingNotice)
-            <x-callout-text class="c-event__booking-notice c-event__booking-notice--{{ $bookingNotice['type'] }}" data-booking-notice>{{ $bookingNotice['text'] }}</x-callout-text>
+            <x-callout-text :type="$bookingNotice['type']" class="c-event__booking-notice" data-booking-notice>{{ $bookingNotice['text'] }}</x-callout-text>
           @endif
 
           @if ($booking)

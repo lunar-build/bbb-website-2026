@@ -1,5 +1,6 @@
 @use '../base/focus' as focus;
 @use '../base/typography';
+@use 'callout-text' as callout;
 
 // MEC's booking form (tickets → attendees → payment) inside the event page.
 // MEC supplies the markup and JS; this restyles its buttons to match <wa-button>
@@ -268,17 +269,54 @@
   }
 }
 
-// Result of a verify/cancel link, placed above the booking form. Errors keep the
-// callout shape but take the brand's warning colour.
+// Every message in the booking flow (sold out, no tickets, coupon result, booked, errors)
+// wears the callout component's shape and tones in place of MEC's stock pastel boxes.
+.c-event__booking :is(.info-msg, .warning-msg, .mec-error, .mec-success) {
+  @include callout.tone(info);
+  margin: 0;
+  padding: 0.625rem 1rem;
+  box-shadow: inset 0 0 0 2px var(--callout-border);
+  border-radius: 1.375rem;
+  background: var(--callout-bg);
+  color: var(--callout-fg);
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 1.5rem;
+
+  // The component's icon, redrawn as a mask since MEC's markup has no slot for it.
+  --callout-icon: url('../../svg/info.svg');
+  position: relative;
+  padding-left: 2.875rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0.75rem;
+    left: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: currentColor;
+    mask: var(--callout-icon) center / contain no-repeat;
+  }
+}
+
+.c-event__booking .warning-msg {
+  @include callout.tone(warning);
+  --callout-icon: url('../../svg/alert.svg');
+}
+
+.c-event__booking .mec-success {
+  @include callout.tone(success);
+  --callout-icon: url('../../svg/circle-check.svg');
+}
+
+.c-event__booking .mec-error {
+  @include callout.tone(error);
+  --callout-icon: url('../../svg/alert.svg');
+  color: var(--callout-fg) !important; // MEC forces its red with !important
+}
+
+// Result of a verify/cancel link, above the form (an <x-callout-text>).
 .c-event__booking-notice {
   margin-bottom: 1.5rem;
   scroll-margin-top: 2rem;
-
-  &--error {
-    border: 2px solid var(--wp--preset--color--dark-orange);
-
-    .c-callout-text__icon {
-      color: var(--wp--preset--color--dark-orange);
-    }
-  }
 }
