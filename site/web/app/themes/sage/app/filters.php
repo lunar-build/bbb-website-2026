@@ -534,3 +534,29 @@ add_action('wp_head', function () {
 
     echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
 });
+
+/**
+ * Branded wrapper for MEC's booking emails. MEC's own template is switched off in
+ * mu-plugins/mec-settings.php (notif_template_disable), which makes it hand the
+ * message to this filter instead.
+ */
+add_filter('mec_email_template', function (string $content) {
+    // Email clients ignore stylesheets: style links (and any `bbb-button` link, e.g. the
+    // verify one) inline. Placeholders can carry booker-typed text, so sanitise first.
+    $content = preg_replace_callback('/<a\s+([^>]*?)>/i', function (array $match) {
+        $attributes = preg_replace('/\s*style="[^"]*"/i', '', $match[1]);
+        $style = str_contains($attributes, 'bbb-button')
+            ? 'display:inline-block;background-color:#FFBF47;color:#363636;font-weight:bold;text-decoration:none;padding:12px 24px;border-radius:999px;'
+            : 'color:#1878A5;text-decoration:underline;';
+
+        return '<a ' . trim($attributes) . ' style="' . $style . '">';
+    }, wp_kses_post($content));
+
+    // Paragraphs need their own margins and colour: clients reset them.
+    $content = str_replace('<p>', '<p style="margin:0 0 16px;">', $content);
+
+    return view('emails.booking', [
+        'content' => $content,
+        'logo' => get_theme_file_uri('resources/images/email/logo-white.png'),
+    ])->render();
+});
