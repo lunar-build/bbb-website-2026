@@ -272,11 +272,10 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 
     $postType = Support\ArchiveFilters::postType();
 
-    // Events whose sessions have all passed aren't listed; the rest run soonest first.
-    // [0] matches nothing, so no events left shows the archive's empty state, not every event.
+    // Events whose sessions have all passed aren't listed. [0] matches nothing, so no events
+    // left shows the archive's empty state, not every event. (Order: the posts_clauses below.)
     if ($postType === 'mec-events') {
         $query->set('post__in', Support\EventSessions::upcomingEventIds() ?: [0]);
-        $query->set('orderby', 'post__in');
     }
 
     if (! $taxQuery = Support\ArchiveFilters::taxQuery($postType)) {
@@ -500,9 +499,10 @@ add_action('pre_get_posts', function (\WP_Query $query) {
         global $wpdb;
 
         // MEC stores wall-clock times as UTC timestamps; see App\Support\EventSessions.
+        // A session that hasn't ended counts, so one running now sorts first.
         $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
         $clauses['join'] .= $wpdb->prepare(
-            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tstart >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
+            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tend >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
             $now,
         );
         $clauses['orderby'] = "mec_next.next_session IS NULL, mec_next.next_session ASC, {$wpdb->posts}.post_title ASC";

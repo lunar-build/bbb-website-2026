@@ -68,7 +68,8 @@ class EventSessions
 
     /**
      * IDs of events with a session that hasn't ended, soonest first. A session
-     * running now counts; one that has finished doesn't.
+     * running now counts; one that has finished doesn't. `_event_undated` events
+     * are skipped: they keep a placeholder date that can sit in the future.
      *
      * @return int[]
      */
@@ -80,7 +81,9 @@ class EventSessions
 
         return array_map('intval', $wpdb->get_col($wpdb->prepare(
             "SELECT post_id FROM {$wpdb->prefix}mec_dates
-            WHERE tend >= %d GROUP BY post_id ORDER BY MIN(tstart)",
+            WHERE tend >= %d
+                AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} u WHERE u.post_id = {$wpdb->prefix}mec_dates.post_id AND u.meta_key = '_event_undated')
+            GROUP BY post_id ORDER BY MIN(tstart)",
             $now,
         )));
     }
