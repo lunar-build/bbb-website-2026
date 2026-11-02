@@ -539,10 +539,17 @@ add_action('wp_head', function () {
  * Branded wrapper for MEC's booking emails. MEC's own template is switched off in
  * mu-plugins/mec-settings.php (notif_template_disable), which makes it hand the
  * message to this filter instead.
+ *
+ * MEC runs wpautop() on whatever this returns. So paragraphs are built here, and the
+ * result is collapsed to one line: wpautop only acts on newlines, and otherwise
+ * leaves a `Hi Sam,</p>` with no opening tag and un-styled paragraphs.
  */
 add_filter('mec_email_template', function (string $content) {
-    // Email clients ignore stylesheets: style links (and any `bbb-button` link, e.g. the
-    // verify one) inline. Placeholders can carry booker-typed text, so sanitise first.
+    // Placeholders can carry booker-typed text, so sanitise first. Bare URLs (the admin link) become links.
+    $content = make_clickable(wpautop(wp_kses_post($content)));
+
+    // Email clients ignore stylesheets: style links (and any `bbb-button` link, e.g. the verify
+    // one) and paragraphs inline.
     $content = preg_replace_callback('/<a\s+([^>]*?)>/i', function (array $match) {
         $attributes = preg_replace('/\s*style="[^"]*"/i', '', $match[1]);
         $style = str_contains($attributes, 'bbb-button')
@@ -550,13 +557,24 @@ add_filter('mec_email_template', function (string $content) {
             : 'color:#1878A5;text-decoration:underline;';
 
         return '<a ' . trim($attributes) . ' style="' . $style . '">';
-    }, wp_kses_post($content));
-
-    // Paragraphs need their own margins and colour: clients reset them.
+    }, $content);
     $content = str_replace('<p>', '<p style="margin:0 0 16px;">', $content);
 
-    return view('emails.booking', [
+    $html = view('emails.booking', [
         'content' => $content,
         'logo' => get_theme_file_uri('resources/images/email/logo-white.png'),
     ])->render();
+
+    return trim(preg_replace('/>\s+</', '><', $html));
+});
+
+/**
+ * Settings → Notifications lists each email's placeholders; add the one rule our email wrapper
+ * (above) adds: a `bbb-button` link becomes a yellow button. The action fires inside that list.
+ */
+add_action('mec_extra_field_notifications', function () {
+    printf(
+        '<li><span>class="bbb-button"</span>: %s</li>',
+        esc_html__('Add to a link, in the editor\'s Text view, to make it a yellow button, e.g. <a class="bbb-button" href="%%event_link%%">View event details</a>. Links without it are blue and underlined.', 'sage'),
+    );
 });

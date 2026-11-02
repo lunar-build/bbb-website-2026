@@ -21,12 +21,6 @@ add_filter('option_mec_options', function ($options) {
         // filter in the theme's filters.php) is used instead.
         $options['settings']['notif_template_disable'] = 1;
 
-        // Verify link as a button (the theme's email wrapper styles `bbb-button` links).
-        $options['notifications']['email_verification']['content'] = "Hi %%name%%,\r\n\r\n"
-            . "Please verify your booking by clicking the button below.\r\n\r\n"
-            . "<a class=\"bbb-button\" href=\"%%verification_link%%\">Verify your booking</a>\r\n\r\n"
-            . "Regards,\r\n%%blog_name%%";
-
         // Cancelled and rejected bookings (including every booking on a cancelled session)
         // must tell the booker. Both emails ship disabled, and cancellation is admin-only.
         foreach (['cancellation_notification', 'booking_rejection'] as $notification) {
@@ -34,12 +28,6 @@ add_filter('option_mec_options', function ($options) {
             $options['notifications'][$notification]['send_to_user'] = 1;
             $options['notifications'][$notification]['send_to_admin'] = 1;
         }
-
-        // The default says "we will check and confirm your booking", which is wrong for an
-        // auto-confirmed one. This reads correctly either way: the confirmed email follows.
-        $options['notifications']['booking_notification']['content'] = "Hello %%name%%,\r\n\r\n"
-            . "Thanks for your booking. You'll get another email as soon as it's confirmed.\r\n\r\n"
-            . "Regards,\r\n%%blog_name%%";
 
         // MEC's settings screens read these unchecked; until its settings are
         // first saved, each is a warning that Acorn turns into a 500.
@@ -51,3 +39,80 @@ add_filter('option_mec_options', function ($options) {
 
     return $options;
 });
+
+/*
+ * MEC's emails print dates and times in WordPress's general date and time formats, which
+ * default to "7 November 2026" and 24-hour "13:00". The event pages read "Saturday 7th
+ * November 2026" and "1.00pm", so the emails match. (Shown, locked, on Settings → General.)
+ */
+add_filter('option_date_format', fn() => 'l jS F Y');
+add_filter('option_time_format', fn() => 'g.ia');
+
+/*
+ * Starting wording for the booking emails. MEC's defaults never name the event, give no time, and
+ * leave "calling ." when an event has no organiser phone. Written to the database once per
+ * environment (below), so after that the client edits it under Events → Settings → Notifications.
+ * Bump BBB_MEC_EMAILS_VERSION to write it again, which overwrites their edits to these six.
+ *
+ * The theme's email wrapper (`mec_email_template` in filters.php) styles `bbb-button` links, so
+ * give a link that class to make it a button. MEC's calendar placeholders are ready-made links.
+ */
+const BBB_MEC_EMAILS_VERSION = 1;
+
+function bbb_mec_email_wording(): array
+{
+    $event = "<strong>%%event_title%%</strong>\r\nWhen: %%book_date%%, %%book_time%%\r\nWhere: %%event_location_address%%";
+    $emails = [
+        'email_verification' => [
+            'Please verify your booking for %%event_title%%',
+            "Hi %%name%%,\r\n\r\nPlease verify your booking by clicking the button below.\r\n\r\n$event\r\n\r\n"
+            . "<a class=\"bbb-button\" href=\"%%verification_link%%\">Verify your booking</a>",
+        ],
+        'booking_notification' => [
+            'We have received your booking for %%event_title%%',
+            "Hi %%name%%,\r\n\r\nThanks for your booking. You'll get another email as soon as it's confirmed.\r\n\r\n$event",
+        ],
+        'booking_confirmation' => [
+            'Your booking for %%event_title%% is confirmed',
+            "Hi %%name%%,\r\n\r\nYour booking is confirmed. We look forward to seeing you!\r\n\r\n$event\r\n\r\n"
+            . "<a class=\"bbb-button\" href=\"%%event_link%%\">View event details</a>\r\n\r\n"
+            . "Add to your calendar:\r\n%%google_calendar_link%%\r\n%%ics_link%%",
+        ],
+        'cancellation_notification' => [
+            'Your booking for %%event_title%% was cancelled',
+            "Hi %%name%%,\r\n\r\nYour booking has been cancelled.\r\n\r\n$event\r\n\r\n"
+            . "You can see what else is on from <a href=\"%%event_link%%\">the event page</a>.",
+        ],
+        'booking_rejection' => [
+            "We couldn't take your booking for %%event_title%%",
+            "Hi %%name%%,\r\n\r\nSorry, we couldn't accept your booking.\r\n\r\n$event\r\n\r\n"
+            . "You can see what else is on from <a href=\"%%event_link%%\">the event page</a>.",
+        ],
+        'admin_notification' => [
+            'New booking: %%event_title%%',
+            "A new booking has been made.\r\n\r\n$event\r\n\r\n%%attendees_full_info%%\r\n\r\n"
+            . "<a class=\"bbb-button\" href=\"%%admin_link%%\">View bookings</a>",
+        ],
+    ];
+
+    return $emails;
+}
+
+add_action('init', function () {
+    if ((int) get_option('bbb_mec_emails_version') >= BBB_MEC_EMAILS_VERSION) {
+        return;
+    }
+
+    $options = get_option('mec_options');
+    if (! is_array($options)) {
+        return;
+    }
+
+    foreach (bbb_mec_email_wording() as $key => [$subject, $body]) {
+        $options['notifications'][$key]['subject'] = $subject;
+        $options['notifications'][$key]['content'] = $body . "\r\n\r\nRegards,\r\n%%blog_name%%";
+    }
+
+    update_option('mec_options', $options);
+    update_option('bbb_mec_emails_version', BBB_MEC_EMAILS_VERSION);
+}, 20);
