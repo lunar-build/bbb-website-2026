@@ -67,5 +67,10 @@
         </div>
       @endforeach
     </div>
+  @else
+    {{-- Every timetable has ended (or none exist yet), so say so rather than leave a gap under the page's heading. --}}
+    <div class="o-container">
+      <p class="c-events-timetable__empty">{{ __('There are no timetables running at the moment. Please check back soon.', 'sage') }}</p>
+    </div>
   @endif
 </section>
