@@ -1,12 +1,6 @@
 <section {{ $attributes->class(['c-types-of-bikes']) }}>
 
 <div class="o-container">
-  @if (! empty($heading['text']))
-    <x-heading :level="$heading['level']" :style="$heading['style']" class="c-types-of-bikes__heading">
-      {{ $heading['text'] }}
-    </x-heading>
-  @endif
-
   <div class="c-types-of-bikes__cards">
     @foreach ($bikes as $bike)
       <article class="c-types-of-bikes__card">

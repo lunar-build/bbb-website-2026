@@ -3,14 +3,6 @@
 @use '../abstracts/spacing';
 
 .c-types-of-bikes {
-  // Figma underlines the heading with a full-width blue rule.
-  &__heading {
-    margin-bottom: 2rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--wp--preset--color--blue);
-    color: var(--wp--preset--color--blue);
-  }
-
   &__cards {
     display: grid;
     gap: spacing.$card-gap;

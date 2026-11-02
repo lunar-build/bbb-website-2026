@@ -3,7 +3,6 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
-use App\Fields\Heading;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
@@ -31,7 +30,7 @@ class TypesOfBikes extends Block
      *
      * @var string
      */
-    public $description = 'A section heading over a row of bike cards, each with an illustration, description and an "Includes" list of icons.';
+    public $description = 'A row of bike cards, each with an illustration, description and an "Includes" list of icons.';
 
     /**
      * The block category.
@@ -186,9 +185,6 @@ class TypesOfBikes extends Block
      * @var array
      */
     public $example = [
-        'heading_text' => 'Bike types',
-        'heading_level' => 'h2',
-        'heading_style' => 'match',
         'bikes' => [
             [
                 'illustration' => 'regular-bike',
@@ -245,7 +241,6 @@ class TypesOfBikes extends Block
     public function with(): array
     {
         return [
-            'heading' => $this->heading(),
             'bikes' => $this->bikes(),
         ];
     }
@@ -256,12 +251,6 @@ class TypesOfBikes extends Block
     public function fields(): array
     {
         $fields = Builder::make('types_of_bikes');
-
-        $fields->addPartial(Heading::class, [
-            'name' => 'heading',
-            'label' => 'Heading',
-            'default_level' => 'h2',
-        ]);
 
         $bikes = $fields->addRepeater('bikes', [
             'label' => 'Bikes',
@@ -307,20 +296,6 @@ class TypesOfBikes extends Block
         $bikes->endRepeater();
 
         return $fields->build();
-    }
-
-    /**
-     * Retrieve the section heading text/level/style.
-     *
-     * @return array
-     */
-    public function heading()
-    {
-        return [
-            'text' => $this->resolveField('heading_text', ''),
-            'level' => $this->resolveField('heading_level', 'h2'),
-            'style' => $this->resolveField('heading_style', 'match'),
-        ];
     }
 
     /**
