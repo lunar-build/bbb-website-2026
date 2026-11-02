@@ -107,3 +107,89 @@
   justify-content: space-between;
   margin-top: 1.5rem;
 }
+
+// Ticket counter: [−] [ n ] [+] in a row. MEC absolutely positions stacked
+// up/down arrows over the input and puts "+" first in the markup.
+.c-event__booking .mec-event-tickets-list .mec-ticket-style-row .mec-event-ticket-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  :is(.plus, .minus) {
+    position: relative;
+    inset: auto; // MEC offsets these 5px from the top/bottom/right
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 2px solid var(--wp--preset--color--charcoal);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--wp--preset--color--charcoal);
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+
+    &:is(:hover, :focus-visible):not(.dis) {
+      background: var(--wp--preset--color--yellow);
+    }
+
+    &.dis {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    @include focus.ring;
+
+    // MEC's up/down chevrons don't suit a sideways counter; the bars are drawn
+    // as shapes (not text) so they centre exactly in the circle.
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 1rem;
+      height: 2px;
+      background: currentColor;
+    }
+
+    &::after {
+      display: none;
+    }
+
+    img {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+
+  .minus {
+    order: 1;
+  }
+
+  .mec-book-ticket-limit {
+    order: 2;
+    width: 4rem !important; // MEC sets 80px !important
+    height: 2.75rem;
+    margin: 0; // MEC: 0 0 10px auto, which lifts it off the buttons' centre line
+    text-align: center;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
+
+  .plus {
+    order: 3;
+
+    &::after {
+      display: block;
+      transform: rotate(90deg);
+    }
+  }
+}
