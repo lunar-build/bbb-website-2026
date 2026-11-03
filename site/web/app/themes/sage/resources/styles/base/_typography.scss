@@ -26,10 +26,11 @@ ol {
   }
 }
 
-// Custom bullet for content lists, scoped so it doesn't leak onto UI <ul>s (nav,
-// pattern library chrome): page content, core List blocks, the Bullet List block
-// and rich-text fields (.u-rich-text).
-.e-content ul,
+// Custom bullet for content lists, scoped so it doesn't leak onto UI <ul>s (nav, pattern
+// library chrome) or lists inside blocks (Image Block, Business Card, Events Timetable):
+// unclassed lists in page content, core List blocks, the Bullet List block and rich-text
+// fields (.u-rich-text).
+.e-content ul:not([class]),
 ul.wp-block-list,
 .c-bullet-list ul,
 .u-rich-text ul {

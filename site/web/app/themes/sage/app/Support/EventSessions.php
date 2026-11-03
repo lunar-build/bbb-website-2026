@@ -160,6 +160,16 @@ class EventSessions
     }
 
     /**
+     * The event's first MEC category name (Events → Categories), or '' when it has none.
+     */
+    public static function category(int $postId): string
+    {
+        $terms = get_the_terms($postId, 'mec_category');
+
+        return $terms && ! is_wp_error($terms) ? html_entity_decode($terms[0]->name, ENT_QUOTES) : '';
+    }
+
+    /**
      * The colour editors pick per event in MEC (stored without the #).
      */
     public static function color(int $postId): string
