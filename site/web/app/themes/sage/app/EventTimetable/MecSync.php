@@ -61,9 +61,14 @@ class MecSync
         $published = ! $deleting && get_post_status($timetableId) === 'publish';
         $wanted = [];
         $notices = [];
+        $schedule = [];
+        $removed = [];
 
         if ($published) {
             $schedule = Schedule::normalise(get_post_meta($timetableId, EventTimetable::META, true));
+            // Bookings are only cancelled by an edit to a timetable that stays published: unpublishing
+            // or deleting is a separate choice (the editor warns), and a first publish removes nothing.
+            $removed = static::removedDays($timetableId, $schedule);
             foreach (Schedule::expand($schedule) as $event => $sessions) {
                 if (get_post_type($event) !== 'mec-events' || get_post_status($event) === 'trash') {
                     $notices[] = sprintf(__('An event (#%d) no longer exists, so its sessions were skipped.', 'sage'), $event);
@@ -95,9 +100,42 @@ class MecSync
         } else {
             delete_post_meta($timetableId, static::TIMETABLE_GENERATED);
         }
+
+        if ($removed && ($cancelled = BookingCancellations::cancel(BookingCancellations::sessions($removed, $schedule)))) {
+            $notices[] = sprintf(_n('%d booking was cancelled and the booker emailed, because this timetable no longer runs its session.', '%d bookings were cancelled and the bookers emailed, because this timetable no longer runs their sessions.', $cancelled, 'sage'), $cancelled);
+        }
         update_post_meta($timetableId, static::TIMETABLE_NOTICES, $notices);
 
         return $notices;
+    }
+
+    /**
+     * Sessions this timetable ran before and a save of $schedule drops, as MEC day strings
+     * per event. Ones another published timetable also generates stay, and so do events
+     * this timetable can't change (gone, or on their own repeat rule).
+     *
+     * @return array<int, list<string>>
+     */
+    public static function removedDays(int $timetableId, array $schedule): array
+    {
+        $previous = (array) get_post_meta($timetableId, static::TIMETABLE_GENERATED, true);
+        $wanted = [];
+        foreach (Schedule::expand($schedule) as $event => $sessions) {
+            $wanted[$event] = array_map([static::class, 'dayString'], $sessions);
+        }
+
+        $removed = [];
+        foreach ($previous as $event => $days) {
+            if (get_post_type($event) !== 'mec-events' || static::hasOtherRepeat($event)) {
+                continue;
+            }
+            $gone = array_values(array_diff((array) $days, $wanted[$event] ?? [], static::otherTimetablesDays($timetableId, $event)));
+            if ($gone) {
+                $removed[(int) $event] = $gone;
+            }
+        }
+
+        return $removed;
     }
 
     /** ['date' => '2027-01-02', 'start' => '10:45', 'end' => '11:30'] → "2027-01-02:2027-01-02:10-45-AM:11-30-AM", MEC's custom-days format. */

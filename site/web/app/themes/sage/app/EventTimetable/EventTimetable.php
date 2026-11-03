@@ -28,6 +28,7 @@ class EventTimetable
         add_action('admin_post_bbb_duplicate_timetable', [static::class, 'duplicate']);
 
         MecSync::boot();
+        BookingCancellations::boot();
         EventEditGuard::boot();
         EventDeletionWarnings::boot();
         RestController::boot();

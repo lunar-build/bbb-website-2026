@@ -17,6 +17,15 @@ add_filter('option_mec_options', function ($options) {
         // for auto-confirmed ones unless this is on, leaving customers with only "received".
         $options['settings']['booking_auto_confirm_send_email'] = 1;
 
+        // Bookers aren't site users. With this on (MEC's default) every booking creates a WordPress
+        // account for the booker; off, MEC keeps their details on the booking itself.
+        $options['settings']['booking_registration'] = 0;
+
+        // The "Select Date" dropdown on the booking form defaults to "2026-11-14 10.00am - 2026-11-14
+        // 11.00am". Read like the rest of the site ("Saturday 14th November") and drop the repeated end date.
+        $options['settings']['booking_date_format1'] = 'l jS F';
+        $options['settings']['booking_omit_end_date'] = 1;
+
         // MEC's grey default wrapper off, so the theme's branded one (the `mec_email_template`
         // filter in the theme's filters.php) is used instead.
         $options['settings']['notif_template_disable'] = 1;
@@ -57,7 +66,7 @@ add_filter('option_time_format', fn() => 'g.ia');
  * The theme's email wrapper (`mec_email_template` in filters.php) styles `bbb-button` links, so
  * give a link that class to make it a button. MEC's calendar placeholders are ready-made links.
  */
-const BBB_MEC_EMAILS_VERSION = 1;
+const BBB_MEC_EMAILS_VERSION = 2;
 
 function bbb_mec_email_wording(): array
 {
@@ -80,7 +89,7 @@ function bbb_mec_email_wording(): array
         ],
         'cancellation_notification' => [
             'Your booking for %%event_title%% was cancelled',
-            "Hi %%name%%,\r\n\r\nYour booking has been cancelled.\r\n\r\n$event\r\n\r\n"
+            "Hi %%name%%,\r\n\r\nYour booking has been cancelled. %%cancellation_reason%%\r\n\r\n$event\r\n\r\n"
             . "You can see what else is on from <a href=\"%%event_link%%\">the event page</a>.",
         ],
         'booking_rejection' => [

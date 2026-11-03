@@ -68,7 +68,7 @@ export default function ExceptionsPanel({ schedule, events, eventsById, problems
         <h2 id="bbb-tt-closures">
           Closures <Count n={schedule.closures.length} />
         </h2>
-        <p className="bbb-tt-hint">Shut for a day or more (bank holiday, staff training, a break)? Add the dates and, if you like, a message. Nothing runs on those dates, and What’s on shows “Closed” with your message.</p>
+        <p className="bbb-tt-hint">Shut for a day or more (bank holiday, staff training, a break)? Add the dates and, if you like, a message. Nothing runs on those dates, and What’s on shows “Closed” with your message. Anyone who has booked a session on those dates is emailed and their booking cancelled when you update the timetable.</p>
         {!schedule.closures.length && <Empty>No closures yet.</Empty>}
         {schedule.closures.map((row) => (
           <div key={row.id} className="bbb-tt-row" data-ref={row.id}>
@@ -90,13 +90,13 @@ export default function ExceptionsPanel({ schedule, events, eventsById, problems
         <h2 id="bbb-tt-cancellations">
           Cancelled sessions <Count n={schedule.cancellations.length} />
         </h2>
-        <p className="bbb-tt-hint">One session off on one date; the rest of the day runs as normal. It stays on What’s on, struck through and marked “Cancelled” with your reason. You do this here, not in the events calendar.</p>
+        <p className="bbb-tt-hint">One session off on one date; the rest of the day runs as normal. It stays on What’s on, struck through and marked “Cancelled” with your reason, and is listed on the event’s own page. You do this here, not in the events calendar. If anyone has booked that session, they’re emailed (with your reason) and their booking is cancelled when you update the timetable.</p>
         {!schedule.cancellations.length && <Empty>No cancelled sessions yet. Add the session that’s off, then pick the date.</Empty>}
         {schedule.cancellations.map((row) => (
           <div key={row.id} className="bbb-tt-row" data-ref={row.id}>
             <SelectControl __nextHasNoMarginBottom label="Session" value={row.session} options={[{ value: '', label: 'Choose…' }, ...sessionOptions]} onChange={(session) => update('cancellations', row.id, { session })} />
             <TextControl __nextHasNoMarginBottom label="Date" type="date" value={row.date} min={schedule.start} max={schedule.end} onChange={(date) => update('cancellations', row.id, { date })} />
-            <TextControl __nextHasNoMarginBottom label="Reason (optional)" placeholder="e.g. Instructor ill" value={row.reason ?? ''} onChange={(reason) => update('cancellations', row.id, { reason })} />
+            <TextControl __nextHasNoMarginBottom label="Reason (optional)" placeholder="e.g. Instructor ill, or Moved to Sunday 22 November" value={row.reason ?? ''} onChange={(reason) => update('cancellations', row.id, { reason })} />
             <Button variant="tertiary" isDestructive onClick={() => remove('cancellations', row.id)}>
               Remove
             </Button>

@@ -577,4 +577,8 @@ add_action('mec_extra_field_notifications', function () {
         '<li><span>class="bbb-button"</span>: %s</li>',
         esc_html__('Add to a link, in the editor\'s Text view, to make it a yellow button, e.g. <a class="bbb-button" href="%%event_link%%">View event details</a>. Links without it are blue and underlined.', 'sage'),
     );
+    printf(
+        '<li><span>%%%%cancellation_reason%%%%</span>: %s</li>',
+        esc_html__('Cancellation email only: "Reason: …" with the reason given in the event timetable (blank if none).', 'sage'),
+    );
 });

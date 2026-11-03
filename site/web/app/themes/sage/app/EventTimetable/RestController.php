@@ -88,16 +88,28 @@ class RestController
             }
         }
 
+        // Two timetables can overlap in dates: they often schedule different things. It only needs a
+        // look when both schedule the same event, as the sessions of each then run side by side.
         if ($schedule['start'] && $schedule['end']) {
+            $eventsIn = fn(array $s) => array_unique(array_filter(array_map('intval', array_merge(array_column($s['sessions'], 'event'), array_column($s['extras'], 'event')))));
+            $mine = $eventsIn($schedule);
             foreach (get_posts(['post_type' => EventTimetable::POST_TYPE, 'post_status' => 'publish', 'numberposts' => -1, 'exclude' => array_filter([$timetableId])]) as $other) {
                 $o = Schedule::normalise(get_post_meta($other->ID, EventTimetable::META, true));
-                if ((int) $o['category'] === (int) $schedule['category'] && $o['start'] <= $schedule['end'] && $o['end'] >= $schedule['start']) {
-                    $check['warnings'][] = ['message' => sprintf(__('These dates overlap “%s”. Both will run.', 'sage'), get_the_title($other)), 'ref' => 'dates'];
+                $shared = array_intersect($mine, $eventsIn($o));
+                if ($shared && $o['start'] <= $schedule['end'] && $o['end'] >= $schedule['start']) {
+                    $names = implode(', ', array_map(fn($id) => html_entity_decode(get_the_title($id), ENT_QUOTES), $shared));
+                    $check['warnings'][] = ['message' => sprintf(__('These dates overlap “%1$s”, which also schedules %2$s. Both timetables\' sessions will run.', 'sage'), get_the_title($other), $names), 'ref' => 'dates'];
                 }
             }
         }
 
-        return $check + ['counts' => (object) $counts, 'total' => array_sum($counts)];
+        // Saving a published timetable cancels bookings on sessions it stops running; say which.
+        $bookings = [];
+        if ($timetableId && get_post_status($timetableId) === 'publish') {
+            $bookings = BookingCancellations::impact(BookingCancellations::sessions(MecSync::removedDays($timetableId, $schedule), $schedule));
+        }
+
+        return $check + ['counts' => (object) $counts, 'total' => array_sum($counts), 'bookings' => $bookings, 'bookingsTotal' => array_sum(array_column($bookings, 'count'))];
     }
 
     /** A timetable can be saved as a draft whatever state it's in, but not published with errors. */

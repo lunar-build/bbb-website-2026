@@ -588,3 +588,24 @@
     gap: 0.5rem;
   }
 }
+
+.bbb-tt-bookings ul {
+  margin: 0.5rem 0 0 1.25rem;
+  list-style: disc;
+}
+
+.bbb-tt-confirm {
+  width: min(32rem, 100%);
+
+  ul {
+    margin: 0 0 1rem 1.25rem;
+    list-style: disc;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+}
