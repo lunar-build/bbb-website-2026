@@ -19,6 +19,16 @@ add_filter('option_mec_options', function ($options) {
             'breadcrumbs_events_page' => '',
             'fes_event_link_target' => '',
         ];
+
+        // Colours MEC's generated CSS (.mec-color, buttons, dots) follows; mirrors the theme palette.
+        $options['styling'] = array_merge($options['styling'] ?? [], [
+            'color' => '#1878A5', // blue
+            'title_color' => '#363636', // charcoal
+            'title_color_hover' => '#1878A5',
+            'content_color' => '#363636',
+            'primary_border_radius' => '20',
+            'secondary_border_radius' => '8',
+        ]);
     }
 
     return $options;

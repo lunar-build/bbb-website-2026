@@ -1,0 +1,586 @@
+@use '../base/focus' as focus;
+@use '../abstracts/mec';
+
+// Modern Events Calendar's other skins (list, grid, tile, carousel, slider, countdown) and the
+// pieces they share (daily and weekly are left as MEC draws them), restyled to the theme. The monthly calendar and the filters are in
+// components/_mec-calendar.scss. As there, MEC sets type on many deep selectors, so `type()` is
+// !important; everything else is scoped under .mec-wrap and a class or two deeper than MEC where it
+// has to be.
+
+.mec-wrap {
+  // Cards: grid items, list rows, slider and carousel slides.
+  .mec-event-grid-modern .mec-event-article,
+  .mec-event-list-standard .mec-event-article,
+  .mec-slider-t1-wrap {
+    border: 1px solid var(--wp--preset--color--light-grey);
+    border-radius: 0.75rem;
+    background: var(--wp--preset--color--white);
+    box-shadow: none;
+  }
+
+  // Share rows: the theme's event pages have none. Footers: flat, and gone when they held only the
+  // share toggle (the "View detail" button lives in some of them).
+  .mec-event-sharing-wrap,
+  .mec-event-sharing {
+    display: none;
+  }
+
+  .mec-event-footer {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+
+    &:not(:has(.mec-booking-button)) {
+      display: none;
+    }
+  }
+
+  // Titles
+  .mec-event-title,
+  .mec-event-title a,
+  .mec-event-carousel-title,
+  .mec-event-carousel-title a,
+  .mec-slider-t1-content .mec-event-title {
+    color: var(--wp--preset--color--charcoal);
+    @include mec.type(var(--wp--preset--font-size--card-title-small), 700, 1.5rem);
+    text-decoration: none;
+  }
+
+  .mec-event-title a:hover,
+  .mec-event-carousel-title a:hover {
+    color: var(--wp--preset--color--blue);
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+
+  .mec-event-title a,
+  .mec-event-carousel-title a {
+    @include focus.ring;
+  }
+
+  // Everything that's body text in these skins: times, places, descriptions, dates.
+  .mec-event-time,
+  .mec-event-loc-place,
+  .mec-event-detail,
+  .mec-event-description,
+  .mec-event-content,
+  .mec-carousel-event-location,
+  .mec-grid-event-location,
+  .mec-start-date-label {
+    color: var(--wp--preset--color--charcoal) !important;
+    @include mec.type(var(--wp--preset--font-size--body-regular), 400, 1.25rem);
+  }
+
+  .mec-event-detail *,
+  .mec-event-description * {
+    color: inherit !important;
+  }
+
+  .mec-event-time {
+    font-weight: 500 !important;
+  }
+
+  // Date blocks: MEC draws these thin, uppercase and pale grey; give them weight and the theme's blue.
+  .mec-event-date,
+  .mec-event-date .event-d,
+  .mec-event-date .event-da,
+  .mec-event-date .event-f,
+  .mec-event-month,
+  .mec-event-day,
+  .mec-event-date-info,
+  .mec-event-date-info-year {
+    color: var(--wp--preset--color--blue-dark) !important;
+    @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+  }
+
+  .mec-event-date .event-d,
+  .mec-event-date .event-da,
+  .mec-event-date-carousel .mec-event-date-info:first-child {
+    @include mec.type(var(--wp--preset--font-size--heading-4), 700, 1.1);
+  }
+
+  // Month dividers in the lists ("NOVEMBER 2026" between rules).
+  .mec-month-divider {
+    margin-block: 2rem 1rem;
+
+    span {
+      color: var(--wp--preset--color--blue-dark);
+      @include mec.type(var(--wp--preset--font-size--heading-6), 700, 1.5rem);
+    }
+
+    &::before,
+    &::after,
+    &:before,
+    &:after {
+      border-color: var(--wp--preset--color--light-grey);
+    }
+  }
+
+  // Buttons: "View detail", "Load more" and the like take the theme's small outlined button.
+  .mec-booking-button,
+  .mec-load-more-button,
+  .mec-event-list-standard .mec-booking-button,
+  .mec-event-grid-modern .mec-booking-button {
+    @include mec.cta-outlined;
+  }
+
+  .mec-load-more-wrap {
+    margin-block: 2rem;
+    text-align: center;
+  }
+
+  // List (modern/standard) rows
+  .mec-event-list-modern .mec-event-article {
+    margin: 0;
+    padding-block: 1.25rem;
+    border: 0;
+    border-bottom: 1px solid var(--wp--preset--color--light-grey);
+    border-radius: 0;
+    background: none;
+  }
+
+  .mec-event-list-standard .mec-event-article {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  // Grid cards. MEC floats Bootstrap-style columns with no vertical gap, so a taller card (a long title)
+  // pushes its row out of line and some rows touch. A real grid gives even gaps and equal-height cards.
+  .mec-event-grid-modern .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    margin: 0 0 1.5rem;
+
+    // MEC puts three cards in each .row, so cap the columns at three (auto-fill would add empty ones).
+    @container mec (min-width: 40rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @container mec (min-width: 64rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    &::before,
+    &::after {
+      display: none; // the clearfix would become two empty grid cells
+    }
+  }
+
+  .mec-event-grid-modern .row > [class*='col-'] {
+    float: none;
+    width: auto;
+    padding: 0;
+  }
+
+  .mec-event-grid-modern .mec-event-article {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    padding: 1.5rem;
+
+    // Keep the "View detail" button at the foot of every card.
+    .mec-event-footer {
+      margin-top: auto;
+    }
+  }
+
+  // Event images: the theme rounds its photos; MEC's placeholder (events with no photo) is a grey
+  // icon, so quieten it into a plain tinted block instead of a stock picture.
+  .mec-event-image img,
+  .mec-event-carousel-image img,
+  .mec-slider-t1-img img {
+    border-radius: 0.5rem;
+  }
+
+  // MEC's stock "no image" picture (a grey photo icon) reads as broken; show a quiet tinted block.
+  img[src*='no-image'] {
+    object-fit: cover;
+    opacity: 0;
+    background: var(--wp--preset--color--blue-light);
+  }
+
+  .mec-event-carousel-image:has(img[src*='no-image']),
+  .mec-slider-t1-img:has(img[src*='no-image']),
+  .mec-event-image:has(img[src*='no-image']) {
+    background: var(--wp--preset--color--blue-light);
+  }
+
+  // Tile: text sits on the photo or the event colour, so it needs the bigger scale to read.
+  .mec-tile-event-content,
+  .mec-tile-event-content .mec-event-title,
+  .mec-tile-event-content .mec-event-title a {
+    color: var(--wp--preset--color--white) !important;
+  }
+
+  .mec-tile-event-content .mec-event-title,
+  .mec-tile-event-content .mec-event-title a {
+    @include mec.type(var(--wp--preset--font-size--body), 700, 1.5rem);
+  }
+
+  .mec-tile-item .mec-event-time,
+  .mec-tile-item .mec-event-time i,
+  .mec-tile-event-content .mec-event-loc-place,
+  .mec-tile-event-content .mec-event-time {
+    color: var(--wp--preset--color--white) !important;
+    @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+  }
+
+  // Tile's month navigator (the monthly calendar's is in _mec-calendar.scss; daily and weekly keep MEC's).
+  .mec-skin-tile-month-navigator-container .mec-previous-month,
+  .mec-skin-tile-month-navigator-container .mec-next-month {
+    color: var(--wp--preset--color--charcoal) !important;
+    @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      @include focus.ring;
+    }
+
+    i {
+      color: inherit !important;
+    }
+  }
+
+  .mec-skin-tile-month-navigator-container .mec-calendar-header h2 {
+    color: var(--wp--preset--color--blue-dark);
+    @include mec.type(var(--wp--preset--font-size--heading-5), 700, 1.2);
+  }
+
+  // Carousel and slider controls: owl dots and arrows.
+  .owl-dots .owl-dot span {
+    background: var(--wp--preset--color--light-grey);
+  }
+
+  .owl-dots .owl-dot.active span {
+    background: var(--wp--preset--color--blue);
+  }
+
+  .owl-nav button,
+  .mec-slider-t1 .owl-nav button {
+    border: 2px solid var(--wp--preset--color--charcoal);
+    border-radius: 999px;
+    background: var(--wp--preset--color--white);
+    color: var(--wp--preset--color--charcoal);
+    @include focus.ring;
+  }
+
+  // Slider and carousel: the slide is the card, so border it once (the content half for the carousel,
+  // whose photo sits above it) and drop MEC's shadows.
+  .mec-event-carousel-type1 .mec-event-article {
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .mec-event-carousel-content {
+    padding: 1.5rem;
+    border: 1px solid var(--wp--preset--color--light-grey);
+    border-top: 0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    background: var(--wp--preset--color--white);
+    box-shadow: none;
+  }
+
+  .mec-slider-t1-content {
+    padding: 1.5rem;
+    box-shadow: none;
+  }
+
+  .mec-event-date-carousel {
+    background: var(--wp--preset--color--blue);
+
+    .mec-event-date-info,
+    .mec-event-date-info:first-child,
+    .mec-event-date-info-year,
+    .mec-event-date-info span,
+    > .mec-start-date-label {
+      color: var(--wp--preset--color--white) !important;
+    }
+
+    > .mec-start-date-label {
+      @include mec.type(var(--wp--preset--font-size--heading-4), 700, 1.1);
+    }
+  }
+
+  // Countdown ("Next upcoming event"): a dark theme panel, the event on the left, the clock in the
+  // middle and the button at the right, stacking when the calendar is narrow. MEC sets its colours from
+  // an id selector and gives each part its own background, so those are !important.
+  .mec-event-countdown-style1 {
+    --focus-color: var(--wp--preset--color--white);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) auto;
+    align-items: center;
+    gap: 2rem;
+    float: none;
+    width: auto;
+    margin: 0 0 2rem;
+    padding: 2rem !important; // MEC zeroes it with a deeper selector
+    position: relative;
+    isolation: isolate;
+    overflow: hidden; // the parts' own backgrounds must not poke out of the rounded corners
+    border: 0;
+    border-radius: 1.25rem;
+    box-shadow: none;
+    color: var(--wp--preset--color--white);
+
+    // MEC colours the panel with an !important rule that out-ranks any class selector, so lay the theme
+    // colour over it with a pseudo-element (which that rule doesn't match).
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--wp--preset--color--blue-dark);
+    }
+
+    @include mec.narrow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+      padding: 1.5rem !important;
+    }
+
+    // Reset MEC's three Bootstrap columns and the arrow notch between them.
+    .mec-event-countdown-part1,
+    .mec-event-countdown-part2,
+    .mec-event-countdown-part3 {
+      float: none;
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none !important;
+      box-shadow: none;
+
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+
+    .mec-event-countdown-part1,
+    .mec-event-countdown-part2,
+    .mec-event-countdown-part3 {
+      *,
+      a {
+        color: inherit;
+      }
+    }
+
+    // Left: label and event title
+    .mec-event-upcoming,
+    .mec-event-upcoming * {
+      margin: 0;
+      color: var(--wp--preset--color--yellow) !important;
+      @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+    }
+
+    .mec-event-upcoming {
+      margin-bottom: 0.5rem;
+    }
+
+    .mec-event-countdown-part1 .mec-event-title {
+      margin: 0;
+      color: var(--wp--preset--color--white);
+      @include mec.type(var(--wp--preset--font-size--heading-4), 700, 1.2);
+    }
+
+    // Middle: date and place, then the clock
+    .mec-event-date-place {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 0.5rem;
+      margin: 0 0 1rem;
+      @include mec.type(var(--wp--preset--font-size--body), 500, 1.5rem);
+
+      .mec-event-date,
+      .mec-event-place {
+        margin: 0;
+        color: var(--wp--preset--color--white) !important;
+        @include mec.type(var(--wp--preset--font-size--body), 500, 1.5rem);
+      }
+
+      // MEC's leading "- " before the place reads as a stray dash on its own line.
+      .mec-event-place {
+        font-weight: 400 !important;
+      }
+    }
+
+    .mec-event-countdown {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .clockdiv {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    // `ul li` outranks the content-list bullet (base/_typography.scss).
+    .clockdiv li {
+      width: auto;
+      height: auto !important; // MEC fixes the tile's height, leaving the unit label hanging below it
+      min-width: 0;
+      margin: 0;
+      padding: 0.75rem 0.25rem 0.625rem;
+      border-radius: 0.75rem !important; // MEC squares one side of some tiles
+      background: color-mix(in srgb, var(--wp--preset--color--white) 12%, transparent);
+      text-align: center;
+
+      &::before {
+        content: none;
+      }
+
+      span {
+        display: block;
+        color: var(--wp--preset--color--white) !important;
+        @include mec.type(var(--wp--preset--font-size--heading-3), 700, 1.1);
+      }
+
+      p {
+        display: block !important; // MEC hides the unit labels in some layouts
+        margin: 0.5rem 0 0;
+        color: var(--wp--preset--color--white) !important;
+        @include mec.type(var(--wp--preset--font-size--body), 400, 1.5rem);
+
+        // "minutes" and "seconds" don't fit four-across in a narrow calendar.
+        @include mec.narrow {
+          @include mec.type(0.75rem, 400, 1rem);
+        }
+      }
+    }
+
+    // Right: the primary yellow button, as on the rest of the site.
+    .mec-event-countdown-part3 {
+      text-align: end;
+
+      @include mec.narrow {
+        text-align: start;
+      }
+    }
+
+    // The theme's small brand button (yellow, charcoal text). MEC's button colour is an !important id
+    // rule too, so the yellow is a pseudo-element under the label.
+    .mec-event-countdown-part3 .mec-event-button {
+      @include mec.cta-shape;
+      position: relative;
+      isolation: isolate;
+      border-color: var(--wp--preset--color--yellow);
+      color: var(--wp--preset--color--charcoal) !important;
+      transition: border-color 0.15s;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: var(--wp--preset--color--yellow);
+        transition: background-color 0.15s;
+      }
+
+      &:hover {
+        border-color: var(--wp--preset--color--white);
+
+        &::before {
+          background: var(--wp--preset--color--white);
+        }
+      }
+
+      @include focus.ring;
+    }
+  }
+
+  // Daily and weekly keep MEC's look but not its packing: room around the event list and between
+  // rows. (The headers and day strips are MEC's own, see the note at the top.)
+  .mec-calendar-daily,
+  .mec-calendar-weekly {
+    margin-bottom: 2rem;
+
+    .mec-daily-view-dates-events,
+    .mec-weekly-view-dates-events {
+      margin: 0 !important;
+      padding: 1.5rem 0 2rem !important;
+    }
+
+    // !important: MEC zeroes these with selectors three classes deep.
+    .mec-event-article {
+      gap: 1.5rem;
+      margin: 0 !important;
+      padding: 1.5rem 0 !important;
+      border-bottom: 1px solid var(--wp--preset--color--light-grey) !important;
+    }
+
+    // Each day is its own <li> holding its articles, so first/last mean the whole list's.
+    .mec-daily-view-dates-events > li:first-child .mec-event-article:first-child,
+    .mec-weekly-view-dates-events > li:first-child .mec-event-article:first-child {
+      padding-top: 0 !important;
+    }
+
+    .mec-daily-view-dates-events > li:last-child .mec-event-article:last-child,
+    .mec-weekly-view-dates-events > li:last-child .mec-event-article:last-child {
+      border-bottom: 0 !important;
+    }
+
+    .mec-event-image,
+    .mec-event-list-weekly-date {
+      margin: 0;
+    }
+
+    .mec-weekly-contents-wrapper {
+      display: flex;
+      flex: 1;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mec-weekly-contents {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0 !important;
+    }
+
+    .mec-event-time,
+    .mec-event-title,
+    .mec-event-detail {
+      margin: 0 !important;
+    }
+
+    .mec-event-title {
+      margin-block: 0.125rem 0.25rem !important;
+    }
+
+    .mec-daily-view-no-event,
+    .mec-no-event {
+      padding: 1rem 0;
+    }
+  }
+
+  // Icons: MEC draws these from its own icon font; the theme has its own set (resources/svg), so the
+  // few that match are swapped for those, coloured by the text around them.
+  .mec-sl-clock::before,
+  .mec-sl-clock-o::before {
+    @include mec.theme-icon(url('../../svg/clock.svg'));
+  }
+
+  .mec-sl-location-pin::before {
+    @include mec.theme-icon(url('../../svg/map-pin.svg'));
+  }
+
+  .mec-sl-calendar::before {
+    @include mec.theme-icon(url('../../svg/calendar.svg'));
+  }
+}

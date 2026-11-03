@@ -92,6 +92,20 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
+ * MEC's calendars and lists show a cancelled or postponed event like any other (only the single page
+ * says so). Say it in the title; this filter is the one place all its skins get a title from.
+ */
+add_filter('mec_occurrence_event_title', function ($title, $event) {
+    $status = $event->data->meta['mec_event_status'] ?? '';
+    $label = [
+        'EventCancelled' => __('Cancelled', 'sage'),
+        'EventPostponed' => __('Postponed', 'sage'),
+    ][$status] ?? null;
+
+    return $label ? sprintf('%s (%s)', $title, $label) : $title;
+}, 10, 2);
+
+/**
  * MEC forces the classic editor on events, which strips our ACF blocks on save. Use the
  * block editor (MEC's panels still load as meta boxes) — priority 20, after MEC's filter.
  */

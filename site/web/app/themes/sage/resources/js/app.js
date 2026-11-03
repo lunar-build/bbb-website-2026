@@ -17,6 +17,7 @@ import './rolling-stats-carousel.js';
 import './media-gallery.js';
 import './testimonial-carousel.js';
 import './events-timetable.js';
+import './mec-calendar.js';
 import './gravity-forms.js';
 import './file-upload.js';
 import './marker.js';

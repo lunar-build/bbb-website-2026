@@ -1,0 +1,909 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/focus' as focus;
+@use '../abstracts/mec';
+
+// Modern Events Calendar (monthly view, "modern" style) restyled to the theme.
+// MEC's own colours come from its Styling settings (mu-plugins/mec-settings.php);
+// this overrides the markup and the bits those settings don't reach. Everything is
+// scoped under .mec-wrap so it beats frontend.min.css without !important, except for type: MEC sets
+// size, weight, case and spacing on many deep selectors (and in its generated CSS), so `type()`
+// declares them !important rather than chasing each one.
+
+.mec-wrap {
+  container: mec / inline-size;
+  --mec-tile: 3.5rem;
+  --mec-gap: 0.5rem;
+  --mec-dot: 0.375rem; // one size for every day dot: MEC's fallback and the per-colour ones
+
+  font-family: var(--wp--preset--font-family--nata-sans);
+  color: var(--wp--preset--color--charcoal);
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  a,
+  dt,
+  dd,
+  span,
+  button,
+  input {
+    font-family: inherit;
+  }
+
+  // Filter as simple checkboxes (MEC's "simple-checkboxes" category type): a row of labelled
+  // checkboxes under a "Show events for" lead-in, like the Figma.
+  .mec-simple-checkboxes-search:not(:has(li)) {
+    display: none; // a group with nothing to pick (no organizers with events, say)
+  }
+
+  .mec-simple-checkboxes-search {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+
+    > i {
+      display: none;
+    }
+
+    .mec-searchbar-category-wrap {
+      border: 0;
+      background: none;
+    }
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem 1.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      // One lead-in per filter group (category, location, ...), keyed on MEC's list id.
+      &[id^='mec_sf_category']::before { content: 'Show events for:'; }
+      &[id^='mec_sf_location']::before { content: 'Where:'; }
+      &[id^='mec_sf_organizer']::before { content: 'Run by:'; }
+      &[id^='mec_sf_speaker']::before { content: 'Speaker:'; }
+      &[id^='mec_sf_label']::before { content: 'Label:'; }
+      &[id^='mec_sf_tag']::before { content: 'Tag:'; }
+
+      &::before {
+        flex-basis: 100%;
+        color: var(--wp--preset--color--charcoal);
+        @include mec.type;
+
+        @include bp.respond($min: bp.$md) {
+          flex-basis: auto;
+        }
+      }
+    }
+
+    // `ul li` to outrank the content-list bullet (base/_typography.scss).
+    ul li {
+      display: flex;
+      align-items: center;
+      height: 1.5rem;
+      margin: 0;
+      padding: 0;
+
+      &::before {
+        content: none;
+      }
+    }
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 !important; // MEC gives labels a 15px bottom margin
+      padding: 0;
+      color: var(--wp--preset--color--charcoal);
+      @include mec.type;
+      cursor: pointer;
+    }
+
+    input {
+      margin: 0;
+      vertical-align: middle;
+    }
+  }
+
+  // Dropdown filters (category, location, label, search, month, year): one grid so every bar lines up.
+  // Three dropdowns across (2 of 6 columns each), then search and month/year as halves (3 + 3).
+  // The monthly calendar's form carries the class itself; the full calendar wraps its <form> in a div that does.
+  form.mec-search-form:has(.mec-dropdown-search),
+  .mec-search-form > form:has(.mec-dropdown-search) {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .mec-dropdown-wrap {
+      display: contents;
+    }
+
+    .mec-dropdown-search {
+      grid-column: span 2;
+    }
+
+    .mec-text-input-search,
+    .mec-date-search {
+      grid-column: span 3;
+    }
+
+    // The full calendar wraps its fields in extra divs; flatten them so every field is a grid item of this
+    // form, as on the monthly calendar, and the view pills (Monthly, Weekly...) get their own row below.
+    > div:has(> .mec-dropdown-wrap),
+    .mec-full-calendar-search-ends {
+      display: contents;
+    }
+
+    .mec-full-calendar-search-ends .mec-tab-loader {
+      grid-column: 1 / -1;
+      width: auto;
+      margin: 0.5rem 0 0;
+      float: none;
+    }
+
+    .mec-full-calendar-search-ends .mec-totalcal-view {
+      float: none; // MEC floats the pills right
+      justify-content: flex-start;
+      margin-left: 0 !important;
+    }
+
+    // Phones and narrow columns: one per row.
+    @include mec.narrow {
+      .mec-dropdown-search,
+      .mec-text-input-search,
+      .mec-date-search {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
+  .mec-dropdown-search,
+  .mec-date-search,
+  .mec-text-input-search {
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 1rem;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+
+    > i {
+      position: absolute;
+      top: 1.5rem; // middle of the 3rem field
+      left: 1.125rem;
+      z-index: 1;
+      display: block;
+      width: auto;
+      height: auto;
+      margin: 0;
+      border: 0; // MEC rules the icon off from the field
+      background: none;
+      color: var(--wp--preset--color--blue);
+      font-size: 1rem;
+      line-height: 1;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    select {
+      appearance: none;
+      flex: 1 1 0;
+      min-width: 0;
+      width: 100% !important; // MEC leaves room beside it for its own icon cell
+      min-height: 3rem;
+      margin: 0;
+      padding: 0.5rem 2.75rem !important;
+      border: 2px solid var(--wp--preset--color--charcoal) !important; // MEC squares the left corners
+      border-radius: 1.25rem !important;
+      background: var(--wp--preset--color--white)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23363636' stroke-width='2'/%3E%3C/svg%3E")
+        no-repeat right 1.125rem center;
+      color: var(--wp--preset--color--charcoal);
+      @include mec.type;
+      cursor: pointer;
+      @include focus.ring;
+    }
+  }
+
+  // The search box: the same bar, with MEC's magnifier inside its left edge like the other icons.
+  .mec-text-input-search {
+    width: 100% !important; // MEC's col-md-6, and its padding
+    max-width: none;
+    padding: 0 !important;
+    float: none;
+
+    input {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: 3rem;
+      margin: 0;
+      padding: 0.5rem 1.25rem 0.5rem 2.75rem !important;
+      border: 2px solid var(--wp--preset--color--charcoal) !important;
+      border-radius: 1.25rem !important;
+      background: var(--wp--preset--color--white) !important;
+      @include mec.type;
+    }
+  }
+
+  // MEC sizes the month/year pair as one joined control (100% - 106px, then 70px, with a square left
+  // edge). Make them two matching selects. One class deeper than MEC's selectors, which it also loads later.
+  .mec-search-form.mec-totalcal-box .mec-date-search select,
+  .mec-search-form.mec-totalcal-box .mec-date-search select:last-child {
+    flex: 1 1 8rem;
+    width: auto !important;
+    min-height: 3rem;
+    padding: 0.5rem 2.75rem !important; // MEC's 8px 44px 3px sat the text low
+    border: 2px solid var(--wp--preset--color--charcoal) !important;
+    border-radius: 1.25rem !important;
+  }
+
+  .mec-search-form.mec-totalcal-box .mec-date-search select:last-child {
+    padding-left: 1.25rem !important; // no icon before the year
+  }
+
+  // Filter (select2 multi-select). The global input styles were stretching the search field
+  // inside it, so reset that and restyle the box like the theme's inputs.
+  .mec-search-form {
+    overflow: visible; // MEC clips it, which cut off the view tabs' focus ring
+    margin-bottom: 2rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .mec-checkboxes-search {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+
+    > i {
+      position: static;
+      color: var(--wp--preset--color--blue);
+      font-size: 1.25rem;
+    }
+  }
+
+  .mec-search-form .mec-searchbar-category-wrap {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  // One class deeper than MEC's own selector (it sets height: 0 !important on the closed box, and its sheet loads after ours).
+  .mec-search-form .mec-checkboxes-search .mec-searchbar-category-wrap .select2-container {
+    width: 100% !important; // select2 sets an inline pixel width
+
+    .select2-selection--multiple {
+      width: 100%;
+      height: auto !important;
+      min-height: 3rem;
+      padding: 0.25rem 0.75rem;
+      border: 2px solid var(--wp--preset--color--charcoal);
+      border-radius: 1.25rem;
+      background: var(--wp--preset--color--white);
+      cursor: text;
+    }
+
+    &.select2-container--focus .select2-selection--multiple,
+    &.select2-container--open .select2-selection--multiple {
+      outline: 2px solid var(--focus-color);
+      outline-offset: 2px;
+    }
+
+    .select2-selection--multiple ul {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.375rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .select2-selection--multiple ul li {
+      width: auto;
+      max-height: none !important;
+      margin: 0;
+      line-height: inherit !important;
+    }
+
+    .select2-search--inline {
+      flex: 1;
+      min-width: 8rem;
+    }
+
+    // Selected categories: a pill like the rest of the site.
+    .select2-selection--multiple .select2-selection__choice {
+      display: inline-flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 0.375rem;
+      float: none;
+      margin: 0;
+      padding: 0.125rem 0.625rem;
+      border: 0;
+      border-radius: 999px;
+      background: var(--wp--preset--color--blue-light);
+      color: var(--wp--preset--color--blue-dark);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: none;
+    }
+
+    .select2-selection--multiple .select2-selection__choice__remove {
+      position: static;
+      margin: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font-size: 1.125rem;
+      line-height: 1;
+    }
+  }
+
+  // The global textarea rule (base/_forms.scss) is !important, so this reset has to be too: it gave
+  // select2's search field (a <textarea> in 4.1) a 2px border, a pill radius and a 72px height.
+  .mec-search-form .select2-search--inline textarea.select2-search__field {
+    width: 100% !important;
+    height: 1.75rem !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 0.25rem !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none;
+    outline: 0;
+    resize: none !important;
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  // The full calendar's view switcher sits in a zero-height wrapper inside the form, so it overflows
+  // onto the filter. Stack the form's blocks with a gap instead.
+  form.mec-search-form,
+  .mec-search-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    > :not(:has(*)):not(.mec-screen-reader-text) {
+      display: none; // empty spacer divs would add a gap each
+    }
+  }
+
+  .mec-full-calendar-search-ends,
+  .mec-full-calendar-search-ends .mec-tab-loader {
+    display: block;
+    float: none;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  // Full calendar's view switcher (Monthly / Weekly / ...): a row of outlined pills.
+  .mec-totalcal-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none;
+
+    span,
+    span:first-child,
+    span:last-child {
+      float: none;
+      height: auto !important; // MEC sets height/padding per tab with a deeper selector
+      padding: 0.5rem 1rem !important;
+      border: 2px solid var(--wp--preset--color--charcoal) !important; // MEC rounds only the first/last tab, with a deeper selector
+      border-radius: 999px !important;
+      background: var(--wp--preset--color--white);
+      color: var(--wp--preset--color--charcoal) !important;
+      @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+      cursor: pointer;
+      transition:
+        background-color 0.15s,
+        color 0.15s;
+
+      &:hover {
+        background: var(--wp--preset--color--blue-light);
+      }
+
+      &.mec-totalcalview-selected {
+        border-color: var(--wp--preset--color--blue) !important;
+        background: var(--wp--preset--color--blue);
+        color: var(--wp--preset--color--white) !important;
+      }
+
+      @include focus.ring;
+    }
+  }
+
+  // The calendar box
+  .mec-calendar {
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .mec-calendar-topsec,
+  .mec-skin-monthly-view-month-navigator-container {
+    background: none;
+  }
+
+  .mec-calendar-side {
+    padding: 0;
+  }
+
+  // Month heading + prev/next. Scoped to the monthly skin: daily, weekly and tile reuse these MEC class
+  // names (month-navigator, calendar-header) for their own, different headers.
+  .mec-skin-monthly-view-month-navigator-container .mec-month-navigator,
+  .mec-skin-monthly-view-month-navigator-container .mec-calendar-header {
+    border: 0;
+    background: none;
+  }
+
+  .mec-skin-monthly-view-month-navigator-container .mec-calendar-header h2 {
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+    color: var(--wp--preset--color--blue-dark);
+    font-size: var(--wp--preset--font-size--heading-5);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  // MEC absolutely positions the prev/next pills over the title; a flex row keeps them apart.
+  .mec-skin-monthly-view-month-navigator-container .mec-month-navigator {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; // equal outer columns keep the title centred over the grid
+    align-items: center;
+    gap: 0.75rem;
+    height: auto;
+    margin-bottom: 1rem; // clear of the table's top rule
+  }
+
+  .mec-skin-monthly-view-month-navigator-container .mec-calendar-header {
+    grid-column: 2;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  // Prev/next: plain text and a chevron, no outline or fill. The focusable bit is the <a>.
+  .mec-calendar .mec-calendar-side .mec-previous-month,
+  .mec-calendar .mec-calendar-side .mec-next-month {
+    position: static;
+    display: flex;
+    flex: none;
+    min-width: 0;
+    height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--wp--preset--color--charcoal);
+
+    &,
+    a,
+    i {
+      transition: none; // MEC fades the colour in on load, which flashes grey
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      min-height: 2.75rem; // touch target
+      padding-inline: 0; // flush with the grid's edges
+      color: inherit;
+      text-decoration: none;
+      @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1);
+      @include focus.ring;
+    }
+
+    a:hover {
+      color: var(--wp--preset--color--blue);
+      text-decoration: underline;
+      text-underline-offset: 0.25rem;
+    }
+
+    i {
+      display: inline-flex;
+      align-items: center;
+      color: inherit !important; // MEC's generated CSS colours the previous chevron only, more specifically
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+
+    // Month names are too wide for a narrow calendar: keep the arrow only (the text stays in the a11y tree).
+    @include mec.narrow {
+      .mec-load-month-link {
+        justify-content: center;
+        min-width: 2.75rem;
+        font-size: 0 !important;
+      }
+
+      i {
+        font-size: 1.25rem !important;
+      }
+    }
+  }
+
+  .mec-calendar .mec-calendar-side .mec-previous-month {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .mec-calendar .mec-calendar-side .mec-next-month {
+    grid-column: 3;
+    justify-self: end;
+  }
+
+  // Weekday heads
+  .mec-calendar .mec-calendar-table-head,
+  .mec-calendar dl.mec-calendar-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--mec-gap);
+  }
+
+  .mec-calendar .mec-calendar-table-head {
+    margin-block: 1.5rem 0.5rem;
+  }
+
+  .mec-calendar .mec-calendar-table-head .mec-calendar-day-head {
+    height: auto;
+    padding: 0.5rem 0;
+    border: 0;
+    background: none;
+    color: var(--wp--preset--color--charcoal);
+    @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+  }
+
+  // Day tiles
+  .mec-calendar dl.mec-calendar-row {
+    margin: 0 0 var(--mec-gap);
+  }
+
+  .mec-calendar .mec-calendar-day,
+  .mec-calendar .mec-table-nullday {
+    display: block;
+    width: auto;
+    height: var(--mec-tile);
+    border: 1px solid var(--wp--preset--color--light-grey);
+    background: var(--wp--preset--color--white);
+    color: var(--wp--preset--color--charcoal);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: var(--mec-tile);
+    transition: background-color 0.15s;
+  }
+
+  .mec-calendar .mec-table-nullday {
+    border-color: transparent;
+    background: none;
+    color: var(--wp--preset--color--place-holder-grey);
+    opacity: 0.6;
+  }
+
+  .mec-calendar .mec-calendar-day:hover {
+    background: var(--wp--preset--color--blue-light);
+  }
+
+  // Days with events: tinted tile + a dot (a coloured dot per category is a TODO, MEC's markup
+  // doesn't carry the category per day).
+  .mec-calendar .mec-has-event {
+    background: var(--wp--preset--color--blue-light);
+
+    a {
+      color: var(--wp--preset--color--blue-dark);
+      font-weight: 700;
+      text-decoration: none;
+    }
+  }
+
+  // Number sits above the dot instead of centred through it.
+  .mec-calendar .mec-has-event {
+    line-height: calc(var(--mec-tile) - 0.75rem);
+  }
+
+  // The dot: MEC's own pseudo-element until mec-calendar.js swaps in one per event colour.
+  .mec-calendar .mec-has-event:after {
+    bottom: 0.5rem;
+    left: calc(50% - var(--mec-dot) / 2);
+    width: var(--mec-dot);
+    height: var(--mec-dot);
+    background-color: var(--wp--preset--color--blue);
+  }
+
+  .mec-calendar .mec-has-event[data-dots]:has(.mec-day-dots):after {
+    display: none;
+  }
+
+  .mec-day-dots {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.1875rem;
+    line-height: 0;
+
+    span {
+      width: var(--mec-dot);
+      height: var(--mec-dot);
+      border-radius: 50%;
+    }
+
+    span[data-light] {
+      box-shadow: inset 0 0 0 1px var(--wp--preset--color--charcoal); // pale colours vanish on the tile
+    }
+
+    // "+" for colours beyond the cap: out of the dots' flow, at the right end of their row (it's
+    // positioned against .mec-day-dots, so `bottom: 0` lines it up with the dots), in the tile's own
+    // text colour (white on the selected day).
+    .mec-day-dots__more {
+      position: absolute;
+      right: 0.375rem;
+      bottom: 0;
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: none;
+      box-shadow: none !important; // it is a span in the dots row, so it picks up their ring on the selected day
+      color: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+  }
+
+  // A month with no events: nothing is "selected", and the heading would only say "Events for 3rd March".
+  .mec-calendar[data-empty] {
+    .mec-selected-day,
+    .mec-selected-day:hover {
+      // !important: MEC's generated CSS colours the selected day with the same specificity.
+      border-color: var(--wp--preset--color--light-grey) !important;
+      background: var(--wp--preset--color--white) !important;
+      color: var(--wp--preset--color--charcoal) !important;
+    }
+
+    .mec-table-side-title {
+      display: none;
+    }
+
+    .mec-event-article {
+      border: 0;
+      padding-block: 0;
+    }
+
+    .mec-event-detail {
+      @include mec.type(var(--wp--preset--font-size--body), 400, 1.5rem);
+    }
+  }
+
+  .mec-calendar .mec-selected-day,
+  .mec-calendar .mec-selected-day:hover {
+    border-color: var(--wp--preset--color--blue);
+    background: var(--wp--preset--color--blue);
+    color: var(--wp--preset--color--white);
+
+    a {
+      color: var(--wp--preset--color--white);
+    }
+  }
+
+  .mec-calendar .mec-selected-day:after {
+    background-color: var(--wp--preset--color--white);
+  }
+
+  .mec-calendar .mec-selected-day .mec-day-dots span {
+    box-shadow: 0 0 0 1px var(--wp--preset--color--white);
+  }
+
+  .mec-calendar .mec-calendar-day.mec-today,
+  .mec-calendar .mec-calendar-day.mec-today-container {
+    box-shadow: inset 0 0 0 2px var(--wp--preset--color--yellow);
+  }
+
+  // The link is just the number, so ring the whole tile.
+  .mec-calendar-day:has(a:focus-visible) {
+    @include focus.ring-styles;
+  }
+
+  .mec-calendar-day a:focus-visible {
+    outline: 0;
+  }
+
+  // MEC's footer bar is an empty grey strip in this skin.
+  .mec-calendar > .mec-event-footer:not(:has(*)) {
+    display: none;
+  }
+
+  // Grid and day list: stacked, side by side once the calendar is wide enough. MEC uses table cells
+  // (and viewport media queries), which squash the list in a narrow column.
+  .mec-calendar .mec-calendar-topsec {
+    float: none;
+    width: 100%;
+    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+
+    @include mec.wide {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  // Events for the selected day
+  .mec-calendar .mec-calendar-side,
+  .mec-calendar .mec-calendar-events-side {
+    display: block;
+    float: none;
+    width: auto;
+    padding: 0;
+  }
+
+  .mec-calendar-events-sec {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .mec-calendar .mec-calendar-events-side .mec-table-side-title {
+    margin: 0 0 1rem;
+    padding: 0 0 0.75rem;
+    border-bottom: 2px solid var(--wp--preset--color--charcoal);
+    color: var(--wp--preset--color--blue-dark);
+    font-size: var(--wp--preset--font-size--heading-6);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-align: start;
+    text-transform: none;
+
+    // Level with the month title, and its rule with the table's top rule, beside the grid.
+    @include mec.wide {
+      box-sizing: border-box;
+      height: 3.75rem; // the 2.75rem nav row + 1rem gap
+      margin-bottom: 0;
+      padding-bottom: 0;
+      line-height: 2.75rem !important;
+    }
+  }
+
+  .mec-calendar .mec-calendar-events-side .mec-table-side-day {
+    display: inline;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  .mec-event-article {
+    margin: 0;
+    padding: 1rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--wp--preset--color--light-grey);
+    background: none;
+    box-shadow: none;
+  }
+
+  .mec-event-image img {
+    border-radius: 0.5rem;
+  }
+
+  .mec-event-time {
+    color: var(--wp--preset--color--blue-dark);
+    @include mec.type(var(--wp--preset--font-size--body-regular), 500, 1.25rem);
+  }
+
+  .mec-event-title {
+    margin: 0.25rem 0;
+    @include mec.type(var(--wp--preset--font-size--card-title-small), 700, 1.5rem);
+
+    a {
+      color: var(--wp--preset--color--charcoal);
+      text-decoration: none;
+      @include mec.type(var(--wp--preset--font-size--card-title-small), 700, 1.5rem);
+
+      &:hover {
+        color: var(--wp--preset--color--blue);
+        text-decoration: underline;
+      }
+
+      @include focus.ring;
+    }
+  }
+
+  .mec-event-detail,
+  .mec-event-loc-place {
+    color: var(--wp--preset--color--charcoal) !important;
+    @include mec.type(var(--wp--preset--font-size--body-regular), 400, 1.25rem);
+  }
+
+  @include mec.narrow {
+    .mec-calendar {
+      --mec-tile: 2.75rem;
+      --mec-gap: 0.25rem;
+      --mec-dot: 0.3125rem;
+    }
+
+    .mec-calendar .mec-has-event:after {
+      bottom: 0.375rem;
+    }
+
+    .mec-day-dots {
+      bottom: 0.375rem;
+      gap: 0.125rem;
+    }
+
+    // The folder icon would squeeze the filter on a phone.
+    .mec-checkboxes-search > i {
+      display: none;
+    }
+  }
+}
+
+// select2 appends its dropdown to <body>, outside .mec-wrap, and MEC styles it from
+// `body:has(.mec-search-form)`; this matches that so it only applies on pages with the filter.
+body:has(.mec-search-form) > .select2-container--default .select2-dropdown {
+  margin-top: 0.25rem;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--white);
+  overflow: hidden;
+}
+
+body:has(.mec-search-form) > .select2-container--default .select2-results__option {
+  padding: 0.625rem 1.25rem;
+  color: var(--wp--preset--color--charcoal);
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+body:has(.mec-search-form) > .select2-container--default .select2-results__option--highlighted {
+  background: var(--wp--preset--color--blue-light);
+  color: var(--wp--preset--color--blue-dark);
+}
+
+body:has(.mec-search-form) > .select2-container--default .select2-results__option[aria-selected='true'] {
+  background: var(--wp--preset--color--blue);
+  color: var(--wp--preset--color--white);
+}

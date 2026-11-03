@@ -1,0 +1,89 @@
+@use 'breakpoints' as bp;
+@use '../base/focus';
+
+// Shared by components/_mec-calendar.scss and components/_mec-views.scss (Modern Events Calendar).
+
+// MEC sets type (size, weight, case, spacing) on many deep selectors and in its generated CSS, so this
+// declares them !important rather than chasing each one.
+@mixin type($size: var(--wp--preset--font-size--body), $weight: 500, $line: 1.5rem) {
+  font-family: var(--wp--preset--font-family--nata-sans) !important;
+  font-size: $size !important;
+  font-weight: $weight !important;
+  line-height: $line !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+// A calendar can sit in a narrow column or widget on a wide screen, so its layout follows its own width
+// (a container query on .mec-wrap, named `mec`), not the viewport's.
+@mixin narrow {
+  @container mec (max-width: #{bp.$md - 0.0625rem}) {
+    @content;
+  }
+}
+
+@mixin wide {
+  @container mec (min-width: #{bp.$md}) {
+    @content;
+  }
+}
+
+// Button text as the theme's small CTA (_utilities.scss `.u-cta-small`: Anonymous Pro, bold).
+@mixin cta-text {
+  font-family: var(--wp--preset--font-family--anonymous-pro) !important;
+  font-size: var(--wp--preset--font-size--cta-small) !important;
+  font-weight: 700 !important;
+  line-height: 1.125rem !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+// The shape of the theme's small <wa-button> (_button.scss): 40px pill, 2px border, 16px side padding.
+@mixin cta-shape {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  height: 2.5rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0 1rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  box-shadow: none;
+  text-decoration: none;
+  cursor: pointer;
+  @include cta-text;
+}
+
+// neutral/outlined: transparent, charcoal text and border; fills charcoal on hover.
+@mixin cta-outlined {
+  @include cta-shape;
+  border-color: var(--wp--preset--color--charcoal);
+  background: var(--wp--preset--color--white);
+  color: var(--wp--preset--color--charcoal);
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: var(--wp--preset--color--charcoal);
+    color: var(--wp--preset--color--white);
+  }
+
+  @include focus.ring;
+}
+
+// Replaces a glyph from MEC's icon font with one of the theme's SVGs: the SVG is a mask over the
+// text colour. Pass `url()` from the calling file, so its path is written next to the stylesheet that
+// owns it.
+@mixin theme-icon($url) {
+  content: '' !important;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  vertical-align: -0.125em;
+  -webkit-mask: $url center / contain no-repeat;
+  mask: $url center / contain no-repeat;
+}
