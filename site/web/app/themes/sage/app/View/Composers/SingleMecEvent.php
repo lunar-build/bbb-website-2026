@@ -4,6 +4,7 @@ namespace App\View\Composers;
 
 use App\Support\Breadcrumbs;
 use App\Support\ContentHero;
+use App\EventTimetable\CancelledSessions;
 use App\Support\EventSessions;
 use App\Support\PageMenu;
 use Roots\Acorn\View\Composer;
@@ -34,6 +35,7 @@ class SingleMecEvent extends Composer
             'body' => ContentHero::forPost()['body'],
             'breadcrumbs' => $this->breadcrumbs(),
             'nextSession' => $this->nextSession(),
+            'cancelledSessions' => $this->cancelledSessions(),
             'priceLines' => $this->priceLines(),
             'venue' => $this->venue(),
             'status' => $this->status(),
@@ -79,7 +81,7 @@ class SingleMecEvent extends Composer
      */
     public function booking(): string
     {
-        if (! class_exists(\MEC_skin_single::class)) {
+        if (! class_exists(\MEC_skin_single::class) || ! EventSessions::next(get_the_ID())) {
             return '';
         }
 
@@ -158,6 +160,19 @@ class SingleMecEvent extends Composer
             'note' => trim((string) (get_post_meta($id, 'mec_date', true)['comment'] ?? '')),
             'finished' => ! $shown['upcoming'],
         ];
+    }
+
+    /**
+     * Upcoming sessions the event's timetable has cancelled or closed, ready to list.
+     *
+     * @return list<array{when: string, reason: string}>
+     */
+    public function cancelledSessions(): array
+    {
+        return array_map(fn($row) => [
+            'when' => gmdate('l jS F Y', strtotime($row['date'] . ' UTC')) . ', ' . gmdate('g.ia', strtotime("{$row['date']} {$row['start']} UTC")) . ' – ' . gmdate('g.ia', strtotime("{$row['date']} {$row['end']} UTC")),
+            'reason' => $row['reason'],
+        ], CancelledSessions::forEvent(get_the_ID()));
     }
 
     /**

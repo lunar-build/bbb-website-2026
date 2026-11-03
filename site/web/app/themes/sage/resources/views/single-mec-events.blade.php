@@ -85,6 +85,18 @@
                 @if ($nextSession['finished'] ?? false)
                   <x-callout-text class="c-event__finished">{{ __('This event has finished.', 'sage') }}</x-callout-text>
                 @endif
+
+                {{-- Sessions the event timetable has called off: they're gone from the dates above, so say why. --}}
+                @if ($cancelledSessions)
+                  <x-callout-text type="warning" class="c-event__cancelled">
+                    <strong>{{ _n('Cancelled session', 'Cancelled sessions', count($cancelledSessions), 'sage') }}</strong>
+                    <ul>
+                      @foreach ($cancelledSessions as $session)
+                        <li>{{ $session['when'] }}@if ($session['reason']): {{ $session['reason'] }}@endif</li>
+                      @endforeach
+                    </ul>
+                  </x-callout-text>
+                @endif
               </div>
 
               @if ($priceLines && ! $booking)
