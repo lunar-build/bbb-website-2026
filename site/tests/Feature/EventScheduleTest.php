@@ -140,3 +140,57 @@ test('warnings: odd hours, closures outside the timetable, cancellations on the 
 
     expect(array_column($warnings, 'ref'))->toContain('late', 'away', 'wrong-day');
 });
+
+test('a MEC custom-days string parses back to a session with 24-hour times', function () {
+    expect(Schedule::parseDay('2027-01-02:2027-01-02:10-45-AM:11-30-AM'))->toBe(['date' => '2027-01-02', 'start' => '10:45', 'end' => '11:30'])
+        ->and(Schedule::parseDay('2027-01-02:2027-01-02:01-15-PM:02-00-PM'))->toBe(['date' => '2027-01-02', 'start' => '13:15', 'end' => '14:00'])
+        ->and(Schedule::parseDay('2027-01-02:2027-01-02:12-00-AM:12-30-PM'))->toBe(['date' => '2027-01-02', 'start' => '00:00', 'end' => '12:30'])
+        ->and(Schedule::parseDay('nonsense'))->toBeNull();
+});
+
+test('a day string round-trips through parseDay', function () {
+    // The format MecSync::dayString() writes.
+    $time = fn(string $hhmm) => gmdate('h-i-A', strtotime("1970-01-01 $hhmm UTC"));
+
+    foreach (['00:00', '09:45', '12:00', '13:15', '23:30'] as $hhmm) {
+        $day = "2027-02-03:2027-02-03:{$time($hhmm)}:{$time('23:59')}";
+        expect(Schedule::parseDay($day)['start'])->toBe($hhmm);
+    }
+});
+
+test('the reason for a removed session is its cancellation reason, else the closure message', function () {
+    $schedule = springTimetable([
+        'cancellations' => [['id' => 'c1', 'session' => 'sat-am', 'date' => '2027-01-09', 'reason' => 'Instructor ill']],
+        'closures' => [['id' => 'x1', 'from' => '2027-02-13', 'to' => '2027-02-21', 'label' => 'Half term']],
+    ]);
+
+    expect(Schedule::reasonFor($schedule, LEARN_TO_RIDE, '2027-01-09', '10:45', '11:30'))->toBe('Instructor ill')
+        // Same date, a different session: not the one that was cancelled.
+        ->and(Schedule::reasonFor($schedule, LEARN_TO_RIDE, '2027-01-09', '13:15', '14:00'))->toBe('')
+        ->and(Schedule::reasonFor($schedule, LEARN_TO_RIDE, '2027-02-13', '10:45', '11:30'))->toBe('Half term')
+        ->and(Schedule::reasonFor($schedule, FAMILY_CYCLING, '2027-03-06', '09:45', '10:30'))->toBe('');
+});
+
+test('a session on a weekday the timetable never reaches gets a warning', function () {
+    // 8 Dec 2026 is a Tuesday and the timetable is that one day: Monday and Wednesday sessions can't run.
+    $schedule = springTimetable([
+        'start' => '2026-12-08',
+        'end' => '2026-12-08',
+        'sessions' => [
+            ['id' => 'mon', 'event' => LEARN_TO_RIDE, 'weekday' => 1, 'start' => '10:00', 'end' => '10:45'],
+            ['id' => 'tue', 'event' => LEARN_TO_RIDE, 'weekday' => 2, 'start' => '10:00', 'end' => '10:45'],
+            ['id' => 'wed', 'event' => FAMILY_CYCLING, 'weekday' => 3, 'start' => '12:00', 'end' => '12:45'],
+        ],
+    ]);
+
+    $warnings = array_column(Schedule::validate($schedule)['warnings'], 'message', 'ref');
+
+    expect($warnings)->toHaveKeys(['mon', 'wed'])->not->toHaveKey('tue')
+        ->and($warnings['mon'])->toContain('no Monday');
+});
+
+test('a normal multi-week timetable has no never-runs warnings', function () {
+    $messages = implode(' ', array_column(Schedule::validate(springTimetable())['warnings'], 'message'));
+
+    expect($messages)->not->toContain('never runs');
+});

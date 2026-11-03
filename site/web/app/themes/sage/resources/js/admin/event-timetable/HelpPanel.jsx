@@ -80,10 +80,13 @@ const PANELS = {
             <strong>Closures</strong>: dates the centre is shut (bank holidays, breaks). Nothing runs.
           </li>
           <li>
-            <strong>Cancelled sessions</strong>: one session off on one date; the rest of the week runs. Pick the session, pick the date and add a reason if you like (e.g. “Instructor ill”). It stays on the What’s on timetable, struck through with a “Cancelled” label and your reason, so people can see it’s off. A “cancelled” badge also appears on that session in the week above.
+            <strong>Cancelled sessions</strong>: one session off on one date; the rest of the week runs. Pick the session, pick the date and add a reason if you like (e.g. “Instructor ill”). It stays on the What’s on timetable, struck through with a “Cancelled” label and your reason, and the event’s own page lists it under “Cancelled sessions”, so people who go looking can see it’s off. To say a session has moved, put that in the reason (e.g. “Moved to Sunday 22 November”) and add the new date as an extra session. A “cancelled” badge also appears on that session in the week above.
           </li>
           <li>
             <strong>Cancel sessions here, not in the events calendar.</strong> Don’t use the event’s own Event Status or cancel or delete its dates in the events calendar for a single session: the event’s Event Status applies to the whole event, and dates changed there are put back the next time this timetable is updated.
+          </li>
+          <li>
+            <strong>Bookings on a cancelled session are cancelled too.</strong> If people have already booked a session that you cancel, close or take out of the timetable, saving cancels those bookings and emails each person (with your reason, if you gave one). Before you save, a warning lists which sessions and how many bookings, and a confirmation box asks you to confirm. You also get one summary email. Refunds aren’t handled, so refund anyone who has paid yourself.
           </li>
           <li>
             <strong>Extra sessions</strong>: one-offs on top of the pattern, even on a closed day.
@@ -100,7 +103,7 @@ const PANELS = {
             <strong>Publish</strong> (or <strong>Update</strong>) writes every session into the events calendar; What’s on updates straight away. The summary line says how many.
           </li>
           <li>
-            <strong>Switch to draft</strong> (or trashing the timetable) takes its sessions off the calendar again.
+            <strong>Switch to draft</strong> (or trashing the timetable) takes its sessions off the calendar again. It does <em>not</em> cancel bookings already made: cancel or move those under Events → Bookings.
           </li>
         </ul>
       </section>
@@ -127,7 +130,7 @@ const PANELS = {
           <li>a closure outside the timetable, or a cancellation on the wrong day</li>
           <li>an event that’s no longer published (it’s skipped)</li>
           <li>an event with its own repeat rule in the events calendar (this timetable won’t change it)</li>
-          <li>dates overlapping another published timetable (both run)</li>
+          <li>dates overlapping another published timetable that schedules one of the same events (both run). Overlapping dates are fine for different events: for example a term timetable and a holiday club can run side by side.</li>
         </ul>
       </section>
     </div>

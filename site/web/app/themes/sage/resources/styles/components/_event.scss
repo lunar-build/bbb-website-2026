@@ -105,8 +105,13 @@
   }
 }
 
-.c-event__finished {
+.c-event__finished,
+.c-event__cancelled {
   margin-top: 1rem;
+}
+
+.c-event__cancelled ul {
+  margin: 0.25rem 0 0;
 }
 
 .c-event__note {

@@ -1,5 +1,5 @@
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { Button, Notice, SelectControl, Spinner, TextControl } from '@wordpress/components';
+import { Button, Modal, Notice, SelectControl, Spinner, TextControl } from '@wordpress/components';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import ExceptionsPanel from './ExceptionsPanel';
@@ -25,6 +25,9 @@ export default function App() {
   const [preview, setPreview] = useState(null);
   const [modal, setModal] = useState(null);
   const [otherTimetables, setOtherTimetables] = useState([]);
+  // An in-page confirmation. The browser's own confirm() is blocked on some managed computers, which would
+  // make the button do nothing.
+  const [confirmation, setConfirmation] = useState(null);
   const altKey = useRef(false);
 
   const eventsById = useMemo(() => Object.fromEntries(events.map((c) => [c.id, c])), [events]);
@@ -102,6 +105,37 @@ export default function App() {
   };
   const errorCount = (preview?.errors ?? []).length;
 
+  // Saving a published timetable cancels people's bookings on any session it stops running.
+  const bookingsAffected = status === 'publish' ? (preview?.bookings ?? []) : [];
+  const bookingsTotal = bookingsAffected.reduce((sum, b) => sum + b.count, 0);
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const sessionWhen = (b) => `${friendlyDate(b.date)}, ${b.start}–${b.end}`;
+  const confirmThen = (confirmation, action) => setConfirmation({ ...confirmation, action });
+  const publish = () =>
+    bookingsTotal
+      ? confirmThen(
+          {
+            title: `Cancel ${plural(bookingsTotal, 'booking', 'bookings')}?`,
+            message: `You've called off ${plural(bookingsAffected.length, 'session', 'sessions')} that ${bookingsAffected.length === 1 ? 'has' : 'have'} bookings. Updating cancels ${bookingsTotal === 1 ? 'that booking' : `those ${bookingsTotal} bookings`} and emails ${bookingsTotal === 1 ? 'the person who booked' : 'everyone who booked'}. The rest of the timetable carries on as normal. This can't be undone.`,
+            items: bookingsAffected.map((b) => `${b.title}, ${sessionWhen(b)}: ${plural(b.count, 'booking', 'bookings')}${b.reason ? ` (“${b.reason}” will be in the email)` : ''}`),
+            confirmLabel: `Update and cancel ${plural(bookingsTotal, 'booking', 'bookings')}`,
+          },
+          () => save('publish'),
+        )
+      : save('publish');
+  // Unpublishing takes every session this timetable created out of the calendar.
+  const unpublish = () =>
+    status !== 'publish'
+      ? save('draft')
+      : confirmThen(
+          {
+            title: 'Switch to draft?',
+            message: 'This removes all of this timetable’s sessions from the events calendar until you publish again. Bookings already made are not cancelled, so cancel or move them yourself under Events → Bookings.',
+            confirmLabel: 'Switch to draft',
+          },
+          () => save('draft'),
+        );
+
   const cancellationsFor = (sessionId) => schedule.cancellations.filter((c) => c.session === sessionId);
   // From a session's "cancelled" badge to its row in the Cancelled sessions list.
   const jumpTo = (ref) => {
@@ -125,6 +159,8 @@ export default function App() {
       const message = saved.status === 'publish' ? 'Published — the sessions are now in the events calendar.' : 'Draft saved. Nothing is added to the calendar until you publish.';
       setNotice({ status: 'success', message });
       speak(message);
+      // Bookings on dropped sessions were cancelled by this save, so what's left to warn about changes.
+      api.preview(schedule, saved.id).then(setPreview).catch(() => {});
     } catch (e) {
       setNotice({ status: 'error', message: e.message });
       speak(e.message, 'assertive');
@@ -254,7 +290,7 @@ export default function App() {
               {preview.total} session{preview.total === 1 ? '' : 's'}
             </strong>{' '}
             across {eventCount} event{eventCount === 1 ? '' : 's'}
-            {schedule.start && schedule.end && ` over ${weeksIn(schedule.start, schedule.end)} weeks (${friendlyDate(schedule.start)} – ${friendlyDate(schedule.end)})`}
+            {schedule.start && schedule.end && ` over ${plural(weeksIn(schedule.start, schedule.end), 'week', 'weeks')} (${friendlyDate(schedule.start)} – ${friendlyDate(schedule.end)})`}
             {status !== 'publish' && ' — added to the calendar when you publish.'}
           </p>
         ) : (
@@ -265,6 +301,22 @@ export default function App() {
             {p.message}
           </Notice>
         ))}
+        {bookingsTotal > 0 && (
+          <Notice status="warning" isDismissible={false} className="bbb-tt-bookings">
+            <strong>
+              Updating will cancel {plural(bookingsTotal, 'booking', 'bookings')} and email {bookingsTotal === 1 ? 'the person' : 'everyone'} who booked.
+            </strong>{' '}
+            {bookingsAffected.length === 1 ? 'This session has' : 'These sessions have'} bookings and {bookingsAffected.length === 1 ? 'is' : 'are'} being called off (cancelled, closed or removed). The rest of the timetable is unaffected:
+            <ul>
+              {bookingsAffected.map((b) => (
+                <li key={`${b.event}-${b.date}-${b.start}`}>
+                  {b.title}, {sessionWhen(b)}: {plural(b.count, 'booking', 'bookings')}
+                  {b.reason && <> (“{b.reason}” will be in the email)</>}
+                </li>
+              ))}
+            </ul>
+          </Notice>
+        )}
         {hasErrors && !timetableProblems.some((p) => p.level === 'error') && (
           <Notice status="error" isDismissible={false}>
             Some sessions need fixing before you can publish — they're outlined in red below.
@@ -283,18 +335,11 @@ export default function App() {
       <ExceptionsPanel schedule={schedule} events={events} eventsById={eventsById} problemsFor={problemsFor} onChange={change} />
 
       <footer className="bbb-tt-footer">
-        <Button
-          variant="secondary"
-          disabled={saving}
-          onClick={() =>
-            // Unpublishing takes every session this timetable created out of the calendar.
-            (status !== 'publish' || window.confirm('Switch to draft? This removes all of this timetable\'s sessions from the events calendar until you publish again.')) && save('draft')
-          }
-        >
+        <Button variant="secondary" disabled={saving} onClick={unpublish}>
           {status === 'publish' ? 'Switch to draft' : 'Save draft'}
         </Button>
         {config.canPublish && (
-          <Button variant="primary" onClick={() => save('publish')} disabled={saving || hasErrors} isBusy={saving}>
+          <Button variant="primary" onClick={publish} disabled={saving || hasErrors} isBusy={saving}>
             {status === 'publish' ? 'Update' : 'Publish'}
           </Button>
         )}
@@ -310,6 +355,35 @@ export default function App() {
           </span>
         )}
       </footer>
+
+      {confirmation && (
+        <Modal title={confirmation.title} onRequestClose={() => setConfirmation(null)} className="bbb-tt-confirm">
+          <p>{confirmation.message}</p>
+          {confirmation.items && (
+            <ul>
+              {confirmation.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+          <div className="bbb-tt-confirm__actions">
+            <Button variant="tertiary" onClick={() => setConfirmation(null)}>
+              Go back
+            </Button>
+            <Button
+              variant="primary"
+              isDestructive={!!confirmation.items}
+              onClick={() => {
+                const { action } = confirmation;
+                setConfirmation(null);
+                action();
+              }}
+            >
+              {confirmation.confirmLabel}
+            </Button>
+          </div>
+        </Modal>
+      )}
 
       {modal && (
         <SessionModal
