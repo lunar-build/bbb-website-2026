@@ -161,7 +161,7 @@
   padding: 0;
   list-style: none;
 
-  // Swatch is the same bar as on each session; overrides the .e-content bullet.
+  // Swatch is the same bar as on each session.
   li::before {
     content: '';
     position: static;
@@ -254,18 +254,13 @@
 
 /* Events */
 
-// Doubled class beats .e-content ul.
-.c-events-timetable__events.c-events-timetable__events {
+.c-events-timetable__events {
   grid-row: 2;
   grid-column: var(--col);
   position: relative;
   margin: 0;
   padding: 0;
   list-style: none;
-
-  li::before {
-    content: none;
-  }
 
   @include bp.respond($max: bp.$md) {
     grid-column: 2;

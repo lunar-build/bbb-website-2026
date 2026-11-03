@@ -25,9 +25,11 @@ ol {
   }
 }
 
-// Custom bullet for content lists, scoped to .e-content and the Bullet List block so it
-// doesn't leak onto UI <ul>s (nav, pattern library chrome).
-.e-content ul,
+// Custom bullet for content lists, scoped to the Bullet List block and to .e-content's own
+// lists (unclassed, or core List blocks) so it doesn't leak onto UI <ul>s (nav, pattern
+// library chrome) or lists inside blocks (Image Block, Business Card, Events Timetable).
+.e-content ul:not([class]),
+.e-content ul.wp-block-list,
 .c-bullet-list ul {
   list-style: none;
   padding-inline-start: 1.3125rem;
