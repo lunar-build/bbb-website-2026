@@ -7,6 +7,7 @@
         <img class="c-case-study-grid__image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
         <x-quote
           class="c-case-study-grid__quote"
+          size="standard"
           :attribution-name="$card['name'] ?: null"
           :attribution-role="$card['info'] ?: null"
         >{{ $card['quote'] }}</x-quote>

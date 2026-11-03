@@ -75,4 +75,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.625rem;
+
+  // Same size as Card Row's news tags (.u-news-tag).
+  .c-pill {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
 }

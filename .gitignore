@@ -5,3 +5,12 @@
 
 # macOS Finder metadata
 .DS_Store
+
+
+*.sql
+*.sql.gz
+*.tar.gz
+
+site/web/app/advanced-cache.php
+site/web/app/wflogs/
+site/web/app/wp-rocket-config/

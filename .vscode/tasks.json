@@ -4,17 +4,17 @@
 		{
 			"label": "docker:start",
 			"type": "shell",
-			"command": "docker desktop start",
+			"command": "docker desktop start"
 		},
 		{
 			"label": "ddev:start",
 			"type": "shell",
 			"command": "ddev start",
-            "options": {
+			"options": {
 				"cwd": "${workspaceFolder}/site"
 			}
 		},
-        {
+		{
 			"label": "ssh:site",
 			"type": "shell",
 			"command": "ddev ssh",
@@ -23,36 +23,46 @@
 			},
 			"options": {
 				"cwd": "${workspaceFolder}/site"
-			}
+			},
+			"problemMatcher": []
 		},
-        {
-			"label": "ssh:sage",
+		{
+			"label": "npm:dev",
 			"type": "shell",
-            "command": "ddev ssh -d /var/www/html/web/app/themes/sage",
+			"command": "ddev exec -d /var/www/html/web/app/themes/sage npm run dev",
+			"isBackground": true,
 			"presentation": {
 				"group": "ssh"
 			},
 			"options": {
 				"cwd": "${workspaceFolder}/site"
-			}
+			},
+			"problemMatcher": []
 		},
-        {
+		{
 			"label": "ssh:panels",
 			"type": "shell",
-            "dependsOn": ["ssh:site", "ssh:sage"],
-            "dependsOrder": "parallel",
+			"dependsOn": [
+				"ssh:site",
+				"npm:dev"
+			],
+			"dependsOrder": "parallel",
 			"options": {
 				"cwd": "${workspaceFolder}/site"
 			}
 		},
 		{
 			"label": "start-up",
-			"dependsOn": ["docker:start", "ddev:start", "ssh:panels"],
+			"dependsOn": [
+				"docker:start",
+				"ddev:start",
+				"ssh:panels"
+			],
 			"dependsOrder": "sequence",
 			"runOptions": {
-				"runOn": "folderOpen",
+				"runOn": "folderOpen"
 			},
-			"problemMatcher": [],
-		},
+			"problemMatcher": []
+		}
 	]
 }

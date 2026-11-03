@@ -15,7 +15,7 @@
     <div class="c-cta-banner__content">
       <div class="c-cta-banner__text">
         @if ($heading)
-          <h2 class="c-cta-banner__heading u-heading-1">{{ $heading }}</h2>
+          <h2 class="c-cta-banner__heading u-heading-2">{{ $heading }}</h2>
         @endif
 
         @if ($body)

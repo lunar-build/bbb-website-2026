@@ -6,11 +6,14 @@
       @foreach ($cards as $card)
         <wa-carousel-item class="c-testimonial-carousel__item">
           <x-testimonial-card
+            :type="$card['type']"
             :photo="$card['photo']"
             :name="$card['name']"
             :info="$card['info']"
             :quote="$card['quote']"
+            :body="$card['body']"
             :link="$card['link']"
+            :portrait="$portrait"
           />
         </wa-carousel-item>
       @endforeach

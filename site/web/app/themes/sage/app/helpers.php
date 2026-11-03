@@ -59,6 +59,38 @@ function legal_links_from_options(): array
     ], $rows);
 }
 
+/** Theme Options "404 page" quick links → `{ label, href, target }[]`, falling back to a default set when empty. */
+function not_found_links_from_options(): array
+{
+    $links = array_map(
+        fn($row) => normalize_link($row['link'] ?? null),
+        get_field('not_found_links', 'option') ?: [],
+    );
+
+    $links = array_values(array_filter($links, fn($link) => $link['url'] && $link['title']));
+
+    if (! $links) {
+        $postsPage = (int) get_option('page_for_posts');
+        // The planner is a homepage block with no page of its own, so follow the header CTA's link.
+        $plannerUrl = normalize_link(get_field('cta', 'option'))['url'] ?: home_url('/');
+
+        $links = array_filter([
+            ['title' => __('Home', 'sage'), 'url' => home_url('/')],
+            ['title' => __('Journey planner', 'sage'), 'url' => $plannerUrl],
+            ['title' => __('What’s on', 'sage'), 'url' => get_post_type_archive_link('mec-events')],
+            ['title' => __('News', 'sage'), 'url' => $postsPage ? get_permalink($postsPage) : null],
+        ], fn($link) => $link['url']);
+
+        $links = array_map(fn($link) => $link + ['target' => ''], array_values($links));
+    }
+
+    return array_map(fn($link) => [
+        'label' => $link['title'],
+        'href' => $link['url'],
+        'target' => $link['target'],
+    ], $links);
+}
+
 /**
  * Theme Options "Social" fields → `{ platform, url }[]`, skipping blanks. `platform` is
  * the field slug (e.g. 'facebook'), so it maps to an icon deterministically (see
