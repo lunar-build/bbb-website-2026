@@ -500,7 +500,7 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 
         // MEC stores wall-clock times as UTC timestamps; see App\Support\EventSessions.
         // A session that hasn't ended counts, so one running now sorts first.
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = Support\EventSessions::now();
         $clauses['join'] .= $wpdb->prepare(
             " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tend >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
             $now,

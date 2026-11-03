@@ -12,6 +12,14 @@ namespace App\Support;
 class EventSessions
 {
     /**
+     * The current time as MEC stores it: site wall-clock read as UTC.
+     */
+    public static function now(): int
+    {
+        return strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+    }
+
+    /**
      * Published sessions starting between two dates (inclusive, Y-m-d),
      * optionally limited to one mec_category term, ordered by start time.
      * Events set to MEC's "Hide from calendars & lists", cancelled or
@@ -55,8 +63,7 @@ class EventSessions
     {
         global $wpdb;
 
-        // Compare against the current wall-clock time stored the same way MEC does.
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return $wpdb->get_row($wpdb->prepare(
             "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
@@ -77,7 +84,7 @@ class EventSessions
     {
         global $wpdb;
 
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return array_map('intval', $wpdb->get_col($wpdb->prepare(
             "SELECT post_id FROM {$wpdb->prefix}mec_dates
@@ -97,7 +104,7 @@ class EventSessions
     {
         global $wpdb;
 
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return $wpdb->get_results($wpdb->prepare(
             "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
@@ -117,7 +124,7 @@ class EventSessions
     {
         global $wpdb;
 
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return $wpdb->get_row($wpdb->prepare(
             "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
