@@ -61,41 +61,19 @@ const BBB_MEC_EMAILS_VERSION = 1;
 
 function bbb_mec_email_wording(): array
 {
-    $event = "<strong>%%event_title%%</strong>\r\nWhen: %%book_date%%, %%book_time%%\r\nWhere: %%event_location_address%%";
     $emails = [
-        'email_verification' => [
-            'Please verify your booking for %%event_title%%',
-            "Hi %%name%%,\r\n\r\nPlease verify your booking by clicking the button below.\r\n\r\n$event\r\n\r\n"
-            . "<a class=\"bbb-button\" href=\"%%verification_link%%\">Verify your booking</a>",
-        ],
-        'booking_notification' => [
-            'We have received your booking for %%event_title%%',
-            "Hi %%name%%,\r\n\r\nThanks for your booking. You'll get another email as soon as it's confirmed.\r\n\r\n$event",
-        ],
-        'booking_confirmation' => [
-            'Your booking for %%event_title%% is confirmed',
-            "Hi %%name%%,\r\n\r\nYour booking is confirmed. We look forward to seeing you!\r\n\r\n$event\r\n\r\n"
-            . "<a class=\"bbb-button\" href=\"%%event_link%%\">View event details</a>\r\n\r\n"
-            . "Add to your calendar:\r\n%%google_calendar_link%%\r\n%%ics_link%%",
-        ],
-        'cancellation_notification' => [
-            'Your booking for %%event_title%% was cancelled',
-            "Hi %%name%%,\r\n\r\nYour booking has been cancelled.\r\n\r\n$event\r\n\r\n"
-            . "You can see what else is on from <a href=\"%%event_link%%\">the event page</a>.",
-        ],
-        'booking_rejection' => [
-            "We couldn't take your booking for %%event_title%%",
-            "Hi %%name%%,\r\n\r\nSorry, we couldn't accept your booking.\r\n\r\n$event\r\n\r\n"
-            . "You can see what else is on from <a href=\"%%event_link%%\">the event page</a>.",
-        ],
-        'admin_notification' => [
-            'New booking: %%event_title%%',
-            "A new booking has been made.\r\n\r\n$event\r\n\r\n%%attendees_full_info%%\r\n\r\n"
-            . "<a class=\"bbb-button\" href=\"%%admin_link%%\">View bookings</a>",
-        ],
+        'email_verification' => ['Please verify your booking for %%event_title%%', 'verification'],
+        'booking_notification' => ['We have received your booking for %%event_title%%', 'received'],
+        'booking_confirmation' => ['Your booking for %%event_title%% is confirmed', 'confirmed'],
+        'cancellation_notification' => ['Your booking for %%event_title%% was cancelled', 'cancelled'],
+        'booking_rejection' => ["We couldn't take your booking for %%event_title%%", 'rejected'],
+        'admin_notification' => ['New booking: %%event_title%%', 'admin'],
     ];
 
-    return $emails;
+    return array_map(
+        fn(array $email) => [$email[0], trim(view("emails.notifications.{$email[1]}")->render())],
+        $emails,
+    );
 }
 
 add_action('init', function () {
@@ -110,7 +88,7 @@ add_action('init', function () {
 
     foreach (bbb_mec_email_wording() as $key => [$subject, $body]) {
         $options['notifications'][$key]['subject'] = $subject;
-        $options['notifications'][$key]['content'] = $body . "\r\n\r\nRegards,\r\n%%blog_name%%";
+        $options['notifications'][$key]['content'] = $body . "\n\nRegards,\n%%blog_name%%";
     }
 
     update_option('mec_options', $options);

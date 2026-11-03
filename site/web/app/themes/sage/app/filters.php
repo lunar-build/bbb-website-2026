@@ -572,9 +572,4 @@ add_filter('mec_email_template', function (string $content) {
  * Settings → Notifications lists each email's placeholders; add the one rule our email wrapper
  * (above) adds: a `bbb-button` link becomes a yellow button. The action fires inside that list.
  */
-add_action('mec_extra_field_notifications', function () {
-    printf(
-        '<li><span>class="bbb-button"</span>: %s</li>',
-        esc_html__('Add to a link, in the editor\'s Text view, to make it a yellow button, e.g. <a class="bbb-button" href="%%event_link%%">View event details</a>. Links without it are blue and underlined.', 'sage'),
-    );
-});
+add_action('mec_extra_field_notifications', fn() => print view('emails.partials.button-note')->render());
