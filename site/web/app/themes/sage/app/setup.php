@@ -326,10 +326,13 @@ if (defined('WP_CLI') && WP_CLI) {
 
 /**
  * MEC enqueues ~20 styles/scripts (and Typekit) on every page, unused since
- * the theme renders events itself. Keep them only where an [MEC] shortcode is.
+ * the theme renders events itself. Keep them only where an [MEC] shortcode is, directly or
+ * through the Events Calendar block (whose saved content holds the block, not the shortcode).
  */
 add_action('wp_enqueue_scripts', function () {
-    if (is_singular() && has_shortcode((string) get_post_field('post_content'), 'MEC')) {
+    $content = (string) get_post_field('post_content');
+
+    if (is_singular() && (has_shortcode($content, 'MEC') || has_block('acf/events-calendar', $content))) {
         return;
     }
 

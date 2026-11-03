@@ -1,0 +1,14 @@
+// Events Calendar block: a Modern Events Calendar shortcode in the standard container. The calendar's own
+// styling is in components/_mec-calendar.scss and _mec-views.scss; this is only the editor placeholder,
+// because MEC's calendars need its scripts, which don't run in the block-editor preview.
+
+.c-events-calendar__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 1.5rem;
+  border: 2px dashed var(--wp--preset--color--place-holder-grey);
+  border-radius: 1.25rem;
+  color: var(--wp--preset--color--charcoal);
+}
