@@ -2,6 +2,7 @@
 
 namespace App\View\Composers;
 
+use App\Support\PatternLibraryForms;
 use Log1x\AcfComposer\Block;
 use Roots\Acorn\View\Composer;
 
@@ -113,6 +114,17 @@ class PatternLibrary extends Composer
 
             return substr($tag, 0, -1) . ' style="' . esc_attr($css) . '">';
         }, $html, 1);
+    }
+
+    /**
+     * Gravity Forms fields as GF renders them (dev-only) — see App\Support\PatternLibraryForms.
+     * Reaches the view as a lazy invokable, so the template calls it once.
+     *
+     * @return array{default: string, errors: string}|null
+     */
+    public function formFields(): ?array
+    {
+        return WP_DEBUG && PatternLibraryForms::available() ? PatternLibraryForms::render() : null;
     }
 
     /**
