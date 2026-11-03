@@ -1,0 +1,1 @@
+<li><span>class="bbb-button"</span>: {{ __('Add to a link, in the editor\'s Text view, to make it a yellow button, e.g.', 'sage') }} <code>&lt;a class="bbb-button" href="%%event_link%%"&gt;View event details&lt;/a&gt;</code>. {{ __('Links without it are blue and underlined.', 'sage') }}</li>

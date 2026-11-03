@@ -17,11 +17,17 @@ add_filter('option_mec_options', function ($options) {
         // for auto-confirmed ones unless this is on, leaving customers with only "received".
         $options['settings']['booking_auto_confirm_send_email'] = 1;
 
-        // The default says "we will check and confirm your booking", which is wrong for an
-        // auto-confirmed one. This reads correctly either way: the confirmed email follows.
-        $options['notifications']['booking_notification']['content'] = "Hello %%name%%,\r\n\r\n"
-            . "Thanks for your booking. You'll get another email as soon as it's confirmed.\r\n\r\n"
-            . "Regards,\r\n%%blog_name%%";
+        // MEC's grey default wrapper off, so the theme's branded one (the `mec_email_template`
+        // filter in the theme's filters.php) is used instead.
+        $options['settings']['notif_template_disable'] = 1;
+
+        // Cancelled and rejected bookings (including every booking on a cancelled session)
+        // must tell the booker. Both emails ship disabled, and cancellation is admin-only.
+        foreach (['cancellation_notification', 'booking_rejection'] as $notification) {
+            $options['notifications'][$notification]['status'] = 1;
+            $options['notifications'][$notification]['send_to_user'] = 1;
+            $options['notifications'][$notification]['send_to_admin'] = 1;
+        }
 
         // MEC's settings screens read these unchecked; until its settings are
         // first saved, each is a warning that Acorn turns into a 500.
@@ -33,3 +39,58 @@ add_filter('option_mec_options', function ($options) {
 
     return $options;
 });
+
+/*
+ * MEC's emails print dates and times in WordPress's general date and time formats, which
+ * default to "7 November 2026" and 24-hour "13:00". The event pages read "Saturday 7th
+ * November 2026" and "1.00pm", so the emails match. (Shown, locked, on Settings → General.)
+ */
+add_filter('option_date_format', fn() => 'l jS F Y');
+add_filter('option_time_format', fn() => 'g.ia');
+
+/*
+ * Starting wording for the booking emails. MEC's defaults never name the event, give no time, and
+ * leave "calling ." when an event has no organiser phone. Written to the database once per
+ * environment (below), so after that the client edits it under Events → Settings → Notifications.
+ * Bump BBB_MEC_EMAILS_VERSION to write it again, which overwrites their edits to these six.
+ *
+ * The theme's email wrapper (`mec_email_template` in filters.php) styles `bbb-button` links, so
+ * give a link that class to make it a button. MEC's calendar placeholders are ready-made links.
+ */
+const BBB_MEC_EMAILS_VERSION = 1;
+
+function bbb_mec_email_wording(): array
+{
+    $emails = [
+        'email_verification' => ['Please verify your booking for %%event_title%%', 'verification'],
+        'booking_notification' => ['We have received your booking for %%event_title%%', 'received'],
+        'booking_confirmation' => ['Your booking for %%event_title%% is confirmed', 'confirmed'],
+        'cancellation_notification' => ['Your booking for %%event_title%% was cancelled', 'cancelled'],
+        'booking_rejection' => ["We couldn't take your booking for %%event_title%%", 'rejected'],
+        'admin_notification' => ['New booking: %%event_title%%', 'admin'],
+    ];
+
+    return array_map(
+        fn(array $email) => [$email[0], trim(view("emails.notifications.{$email[1]}")->render())],
+        $emails,
+    );
+}
+
+add_action('init', function () {
+    if ((int) get_option('bbb_mec_emails_version') >= BBB_MEC_EMAILS_VERSION) {
+        return;
+    }
+
+    $options = get_option('mec_options');
+    if (! is_array($options)) {
+        return;
+    }
+
+    foreach (bbb_mec_email_wording() as $key => [$subject, $body]) {
+        $options['notifications'][$key]['subject'] = $subject;
+        $options['notifications'][$key]['content'] = $body . "\n\nRegards,\n%%blog_name%%";
+    }
+
+    update_option('mec_options', $options);
+    update_option('bbb_mec_emails_version', BBB_MEC_EMAILS_VERSION);
+}, 20);
