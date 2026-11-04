@@ -153,7 +153,7 @@
     .mec-full-calendar-search-ends .mec-tab-loader {
       grid-column: 1 / -1;
       width: auto;
-      margin: 0.5rem 0 0;
+      margin: 0; // the form's gap already spaces it
       float: none;
     }
 
@@ -211,7 +211,7 @@
       min-width: 0;
       width: 100% !important; // MEC leaves room beside it for its own icon cell
       min-height: 3rem;
-      margin: 0;
+      margin: 0 !important; // MEC adds 20px below each select, on top of the form's own gap
       padding: 0.5rem 2.75rem !important;
       border: 2px solid var(--wp--preset--color--charcoal) !important; // MEC squares the left corners
       border-radius: 1.25rem !important;
@@ -229,6 +229,9 @@
   .mec-text-input-search {
     width: 100% !important; // MEC's col-md-6, and its padding
     max-width: none;
+    height: 3rem;
+    min-height: 0 !important; // MEC gives the wrapper a 55px minimum, 7px taller than the input
+    margin: 0 !important; // MEC adds 10px above
     padding: 0 !important;
     float: none;
 
@@ -236,13 +239,19 @@
       flex: 1 1 auto;
       width: 100%;
       min-height: 3rem;
-      margin: 0;
+      margin: 0 !important; // MEC adds 10px below
       padding: 0.5rem 1.25rem 0.5rem 2.75rem !important;
       border: 2px solid var(--wp--preset--color--charcoal) !important;
       border-radius: 1.25rem !important;
       background: var(--wp--preset--color--white) !important;
       @include mec.type;
     }
+  }
+
+  // MEC puts `margin-bottom: 20px !important` on each dropdown with a selector three classes deep; match it
+  // and add one so the form's own gap is the only space between fields.
+  .mec-search-form.mec-totalcal-box .mec-dropdown-wrap .mec-dropdown-search select {
+    margin: 0 !important;
   }
 
   // MEC sizes the month/year pair as one joined control (100% - 106px, then 70px, with a square left
