@@ -40,6 +40,13 @@ if (toggle && menu) {
   });
 
   menu.addEventListener('click', (event) => {
+    // A label with no page: a click on it does what its chevron button does (keyboard users use the button).
+    const label = event.target.closest('[data-click-through]');
+    if (label) {
+      label.parentElement.querySelector('button').click();
+      return;
+    }
+
     const drill = event.target.closest('[data-open-panel]');
     if (drill) {
       showPanel(drill.dataset.openPanel);
@@ -140,6 +147,13 @@ if (desktopNav) {
   };
 
   desktopNav.addEventListener('click', (event) => {
+    // A label with no page: a click on it does what its chevron button does (keyboard users use the button).
+    const label = event.target.closest('[data-click-through]');
+    if (label) {
+      label.parentElement.querySelector('button').click();
+      return;
+    }
+
     const open = event.target.closest('[data-overflow-open]');
     if (open) {
       showOverflowPanel(open.dataset.overflowOpen);
