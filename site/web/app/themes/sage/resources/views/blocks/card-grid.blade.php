@@ -1,4 +1,7 @@
-<section {{ $attributes->class(['c-card-grid', 'o-full-bleed-bg']) }}>
+<x-block-root :heading="$heading" {{ $attributes->class(['c-card-grid', 'o-full-bleed-bg']) }}>
+
+{{-- Card headings sit one level below the block's heading, or at its level when it shows none. --}}
+@php($cardLevel = App\Support\HeadingLevel::inside($heading))
 
 <div class="o-container">
   @if (! empty($heading['text']))
@@ -34,7 +37,7 @@
             :card-style="$cardStyle"
             :image="$card['image']"
             :date="$card['date']"
-            :heading="$card['heading']"
+            :heading="array_merge($card['heading'], ['level' => $cardLevel])"
             :body="$card['body']"
             :link="$card['link']"
             :cta-style="$ctaStyle"
@@ -50,4 +53,4 @@
   <img class="c-card-grid__side-image" src="{{ $sideImage }}" alt="" aria-hidden="true">
 @endif
 
-</section>
+</x-block-root>
