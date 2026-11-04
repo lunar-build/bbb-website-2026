@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-table']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-table']) }}>
 
 <div class="o-container">
   <div class="c-table__scroll" role="region" aria-label="{{ $caption }}" tabindex="0">
@@ -28,4 +29,4 @@
   </div>
 </div>
 
-</section>
+</div>

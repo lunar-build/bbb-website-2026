@@ -47,7 +47,7 @@
     @include column-blocks.blocks;
   }
 
-  &__intro > section {
+  &__intro > :is(section, .is-acf-block) {
     padding-block: 0;
   }
 

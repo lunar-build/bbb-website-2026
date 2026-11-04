@@ -1,11 +1,11 @@
-  <section {{ $attributes->class(['c-journey-planner-widget', 'c-journey-planner-widget--'.str_replace('_', '-', $variant)]) }}>
+  <x-block-root :heading="(bool) $heading" {{ $attributes->class(['c-journey-planner-widget', 'c-journey-planner-widget--'.str_replace('_', '-', $variant)]) }}>
 
 @if ($contained)
 <div class="o-container">
 @endif
 <div class="c-journey-planner-widget__card">
   @php $headingId = 'c-journey-planner-widget__heading-'.uniqid(); @endphp
-  <h2 id="{{ $headingId }}" class="c-journey-planner-widget__heading">{{ $heading }}</h2>
+  <{{ $headingLevel }} id="{{ $headingId }}" class="c-journey-planner-widget__heading">{{ $heading }}</{{ $headingLevel }}>
 
   @if ($variant === 'find_nearby')
     <form class="c-journey-planner-widget__form" aria-labelledby="{{ $headingId }}" data-variant="find_nearby" data-redirect-url="{{ $journeyPlannerUrl }}">
@@ -68,4 +68,4 @@
 </div>
 @endif
 
-  </section>
+  </x-block-root>

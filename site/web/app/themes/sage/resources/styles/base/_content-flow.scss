@@ -2,26 +2,26 @@
 @use '../abstracts/spacing';
 
 
-// Pages put core blocks straight in .e-content; only the blocks (sections) manage their own
+// Pages put core blocks straight in .e-content; only the blocks (.is-acf-block, added in filters.php) manage their own
 // width, so keep everything else inside the container. Posts already make .e-content a container.
 // The Illustration block is a decorative div (not a section) that bleeds full width like one.
-.e-content:not(.o-container) > :not(section, .alignfull, .wp-block-illustration) {
+.e-content:not(.o-container) > :not(section, .is-acf-block, .alignfull, .wp-block-illustration) {
   @include container.contained;
 }
 
-// Full-bleed-background blocks (.o-full-bleed-bg, or any section.has-background) only
+// Full-bleed-background blocks (.o-full-bleed-bg, or any section.has-background, .is-acf-block.has-background) only
 // pad inside their coloured area. Margin only on the edge touching a paragraph, so
 // stacked ones stay flush.
-.e-content > .wp-block-paragraph + :is(.o-full-bleed-bg, section.has-background) {
+.e-content > .wp-block-paragraph + :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background) {
   margin-top: var(--wp--preset--spacing--large);
 }
 
-.e-content > :is(.o-full-bleed-bg, section.has-background):has(+ .wp-block-paragraph) {
+.e-content > :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background):has(+ .wp-block-paragraph) {
   margin-bottom: var(--wp--preset--spacing--large);
 }
 
 // Blocks already have 4rem top spacing; a preceding paragraph's margin-bottom would stack on it.
-.e-content > .wp-block-paragraph:has(+ section) {
+.e-content > .wp-block-paragraph:has(+ :is(section, .is-acf-block)) {
   margin-bottom: 0;
 }
 
@@ -32,7 +32,7 @@
 
 // A heading after a block belongs to what follows it, so it needs clear space above.
 // Also covers the Sticky Nav column, whose blocks aren't inside .e-content.
-:is(.e-content, .c-sticky-nav-template__content) > :is(section, .wp-block-illustration, .wp-block-embed) + .wp-block-heading {
+:is(.e-content, .c-sticky-nav-template__content) > :is(section, .is-acf-block, .wp-block-illustration, .wp-block-embed) + .wp-block-heading {
   margin-top: var(--wp--preset--spacing--small);
 }
 
@@ -54,11 +54,11 @@
   }
 }
 
-.e-content > section + .wp-block-embed {
+.e-content > :is(section, .is-acf-block) + .wp-block-embed {
   margin-top: 0;
 }
 
-.e-content > .wp-block-embed:has(+ section),
+.e-content > .wp-block-embed:has(+ :is(section, .is-acf-block)),
 .e-content > .wp-block-paragraph:has(+ .wp-block-embed) {
   margin-bottom: 0;
 }

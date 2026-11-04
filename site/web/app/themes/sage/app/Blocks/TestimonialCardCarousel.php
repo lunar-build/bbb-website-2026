@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Fields\HeadingLevelSelect;
 use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
@@ -277,6 +278,7 @@ class TestimonialCardCarousel extends Block
         $cards = $this->cards();
 
         return [
+            'headingLevel' => $this->resolveField('heading_level', 'h3'),
             'cards' => $cards,
             'portrait' => $this->hasLongQuote($cards),
         ];
@@ -298,6 +300,8 @@ class TestimonialCardCarousel extends Block
     public function fields(): array
     {
         $fields = Builder::make('testimonial_card_carousel');
+
+        $fields->addPartial(HeadingLevelSelect::class, ['default_level' => 'h3']);
 
         $cards = $fields->addRepeater('cards', [
             'label' => 'Cards',

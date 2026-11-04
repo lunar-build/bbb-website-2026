@@ -1,11 +1,14 @@
+{{-- A <section> is only a section with a heading; without one it is a <div>. --}}
+@php($tag = App\Support\HeadingLevel::tag((bool) $heading))
+
 @unless ($block->preview)
-  <section {{ $attributes->class(['c-accordion']) }}>
+  <{{ $tag }} {{ $attributes->class(['c-accordion']) }}>
 @endunless
 
 @if ($items)
   <div class="o-container">
     @if ($heading)
-      <h2 class="c-accordion__heading">{{ $heading }}</h2>
+      <x-heading :level="$headingLevel" style="h2" class="c-accordion__heading">{{ $heading }}</x-heading>
     @endif
 
     <wa-accordion class="c-accordion__list" appearance="plain">
@@ -23,5 +26,5 @@
 @endif
 
 @unless ($block->preview)
-  </section>
+  </{{ $tag }}>
 @endunless

@@ -1,4 +1,4 @@
-  <section {{ $attributes->class(['c-text-hero']) }}>
+  <x-block-root :heading="$heading" {{ $attributes->class(['c-text-hero']) }}>
 
 <div class="o-container">
   @if ($breadcrumbs)
@@ -16,4 +16,4 @@
   @endif
 </div>
 
-  </section>
+  </x-block-root>

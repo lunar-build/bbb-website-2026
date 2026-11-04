@@ -155,6 +155,24 @@ add_action('admin_notices', function () {
 });
 
 /**
+ * Marks every ACF block's root element, so CSS can tell a block from core markup now that a
+ * block without a heading is a <div> (not a <section>), e.g. the content-flow spacing rules.
+ */
+add_filter('render_block', function ($block_content, $block) {
+    if (! str_starts_with($block['blockName'] ?? '', 'acf/')) {
+        return $block_content;
+    }
+
+    $processor = new \WP_HTML_Tag_Processor($block_content);
+
+    if ($processor->next_tag()) {
+        $processor->add_class('is-acf-block');
+    }
+
+    return $processor->get_updated_html();
+}, 10, 2);
+
+/**
  * base/_forms.scss hides the native `input[type=checkbox]`/`input[type=radio]`
  * box (`appearance: none`) and draws a custom glyph via `::before`, which some
  * voice control software can't target on a bare pseudo-styled input. Gravity

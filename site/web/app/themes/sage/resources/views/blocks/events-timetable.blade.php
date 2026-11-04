@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-events-timetable', 'c-events-timetable--'.$layout]) }}>
+<x-block-root :heading="(bool) $periods" {{ $attributes->class(['c-events-timetable', 'c-events-timetable--'.$layout]) }}>
   @if ($periods)
     <div class="o-container">
       @if ($layout === 'accordion')
@@ -35,7 +35,7 @@
             $active = array_key_first(array_filter($period['weekdays'])) ?? 'Monday';
           @endphp
           <div class="c-events-timetable__panel">
-            <h3 class="c-events-timetable__title u-heading-5">{{ $period['title'] }}</h3>
+            <x-heading :level="$headingLevel" style="h5" class="c-events-timetable__title">{{ $period['title'] }}</x-heading>
             @if ($period['empty'] ?? false)
               <p class="c-events-timetable__empty">{{ __('No sessions in this period.', 'sage') }}</p>
             @else
@@ -57,4 +57,4 @@
       @endif
     </div>
   @endif
-</section>
+</x-block-root>
