@@ -130,8 +130,10 @@ class ThemeOptions extends Field
             ->addTab('archive_pages', [
                 'label' => 'Archive pages',
             ])
-                ->addMessage('archive_pages_info', 'News uses the "Posts page" set in Settings → Reading. Pick a page for any other archive below — its Image Hero and intro content render above the archive\'s filters and results. If that page contains an Events Calendar block, its content replaces the filters and results: the archive becomes the calendar (its own address redirects to the archive).', [
+                ->addMessage('archive_pages_info', $this->archivePagesIntro(), [
                     'label' => 'Archive pages',
+                    'esc_html' => 0,
+                    'new_lines' => '',
                 ]);
 
         // MEC registers `mec-events` after this runs, so it isn't among the registered post types yet: add it here.
@@ -151,5 +153,30 @@ class ThemeOptions extends Field
         }
 
         return $fields->build();
+    }
+
+    /**
+     * What archive pages are, why to link a page to one, and how.
+     */
+    protected function archivePagesIntro(): string
+    {
+        $postsPageId = (int) get_option('page_for_posts');
+        $newsAddress = $postsPageId ? get_permalink($postsPageId) : '';
+
+        $news = $newsAddress
+            ? sprintf('<strong>News</strong> works the same way, but its page is the "Posts page" chosen in Settings → Reading. Its address is <a href="%1$s" target="_blank" rel="noopener">%1$s</a>.', esc_url($newsAddress))
+            : '<strong>News</strong> works the same way, but its page is the "Posts page" chosen in Settings → Reading.';
+
+        return implode('', [
+            '<p><strong>What an archive is.</strong> Each of these is a listing of one type of content, with its own web address (shown under each field below). It starts with a plain title, then the filters and the cards.</p>',
+            '<p><strong>Why link a page.</strong> Linking a page lets you put your own content above the listing, such as a hero image and an introduction. The archive works without one; it just keeps the plain title.</p>',
+            '<p><strong>How to link one.</strong></p>',
+            '<ol>',
+            '<li>Create a normal page (Pages → Add New).</li>',
+            '<li>Put a hero block first (Image Hero, Text Hero or Video Hero), then any introduction text under it. The page\'s title and breadcrumbs come from the hero.</li>',
+            '<li>Publish the page, then pick it in the matching field below. Leave the field empty to keep the plain title.</li>',
+            '</ol>',
+            '<p>Only published pages are used. ' . $news . '</p>',
+        ]);
     }
 }
