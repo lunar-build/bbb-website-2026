@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-events-calendar']) }}>
+<section {{ $attributes->class(['c-events-calendar'])->merge(['data-heading-level' => $headingLevel]) }}>
 
 @if ($calendar)
   <div class="o-container">

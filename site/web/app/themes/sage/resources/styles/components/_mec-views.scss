@@ -130,6 +130,12 @@
     text-align: center;
   }
 
+  // The "View detail" cell sits below the text in a narrow row; MEC pulls it up over the last line.
+  .mec-event-list-modern .mec-btn-wrapper {
+    top: auto;
+    margin: 1rem 0 0;
+  }
+
   // List (modern/standard) rows
   .mec-event-list-modern .mec-event-article {
     margin: 0;
@@ -291,7 +297,12 @@
   }
 
   .mec-event-date-carousel {
+    width: 8.5rem; // the month name was clipped by MEC's narrower flag
     background: var(--wp--preset--color--blue);
+
+    .mec-event-date-info {
+      white-space: nowrap;
+    }
 
     .mec-event-date-info,
     .mec-event-date-info:first-child,

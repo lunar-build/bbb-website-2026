@@ -2,7 +2,7 @@
 // distinct event colour (MEC's single-event colour, shown in the day's event list as .event-color).
 // MEC swaps the whole month's markup on month change and filtering, so watch and redo.
 const MAX_DOTS = 5; // one per distinct event colour; the dots are small enough for a row of five
-const EMPTY_MONTH = 'No events this month.';
+const EMPTY_MONTH = window.bbbMec?.emptyMonth ?? 'No events this month.'; // translatable: set in app/setup.php
 
 // Perceived brightness of an `rgb()` string, 0–1.
 const brightness = (colour) => {
@@ -84,6 +84,17 @@ const enhanceTabs = (wrap) => {
   });
 };
 
+// MEC hardcodes an <h2> for the month title and an <h6> above each day's events, wherever the calendar sits on
+// the page. The Events Calendar block records the level the editor chose (data-heading-level); aria-level
+// restates it for assistive tech, and is redone after each month change as MEC redraws the headings.
+const setHeadingLevels = (wrap) => {
+  const level = Number(wrap.closest('[data-heading-level]')?.dataset.headingLevel);
+  if (!level) return;
+
+  wrap.querySelectorAll('.mec-calendar-header h2').forEach((heading) => heading.setAttribute('aria-level', level));
+  wrap.querySelectorAll('.mec-table-side-title').forEach((heading) => heading.setAttribute('aria-level', Math.min(level + 1, 6)));
+};
+
 // settleMonth clicks a day, which only does anything once MEC (jQuery, on ready) has bound its handlers.
 let mecReady = document.readyState === 'complete';
 window.addEventListener('load', () => {
@@ -103,6 +114,7 @@ document.querySelectorAll('.mec-wrap').forEach((wrap) => {
       if (mecReady) settleMonth(calendar);
     });
     enhanceTabs(wrap);
+    setHeadingLevels(wrap);
   };
 
   new MutationObserver(() => {

@@ -167,9 +167,12 @@ class EventsCalendar extends Block
      */
     public function with(): array
     {
+        $headingLevel = (int) $this->resolveField('heading_level', 2);
+
         return [
             'calendar' => $this->calendar(),
             'title' => $this->title(),
+            'headingLevel' => $headingLevel,
         ];
     }
 
@@ -199,6 +202,17 @@ class EventsCalendar extends Block
                 'choices' => [],
                 'ui' => true,
                 'allow_null' => true,
+            ])
+            ->addSelect('heading_level', [
+                'label' => 'Month heading level',
+                'choices' => [
+                    2 => 'H2',
+                    3 => 'H3',
+                    4 => 'H4',
+                    5 => 'H5',
+                ],
+                'default_value' => 2,
+                'instructions' => 'Heading level for the calendar\'s month title ("November 2026"). Choose the level one below the nearest heading above this block, so the page outline stays in order (e.g. H2 if the block sits straight under the page title). The list of a day\'s events uses the next level down. Calendars without a month title (lists, countdown) ignore it.',
             ])
         ;
 

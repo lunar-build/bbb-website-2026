@@ -36,6 +36,11 @@
 
   // Filter as simple checkboxes (MEC's "simple-checkboxes" category type): a row of labelled
   // checkboxes under a "Show events for" lead-in, like the Figma.
+  // Stacked filter groups (category, then location...): room between them.
+  .mec-simple-checkboxes-search + .mec-simple-checkboxes-search {
+    margin-top: 1rem;
+  }
+
   .mec-simple-checkboxes-search:not(:has(li)) {
     display: none; // a group with nothing to pick (no organizers with events, say)
   }
@@ -64,13 +69,14 @@
       padding: 0;
       list-style: none;
 
-      // One lead-in per filter group (category, location, ...), keyed on MEC's list id.
-      &[id^='mec_sf_category']::before { content: 'Show events for:'; }
-      &[id^='mec_sf_location']::before { content: 'Where:'; }
-      &[id^='mec_sf_organizer']::before { content: 'Run by:'; }
-      &[id^='mec_sf_speaker']::before { content: 'Speaker:'; }
-      &[id^='mec_sf_label']::before { content: 'Label:'; }
-      &[id^='mec_sf_tag']::before { content: 'Tag:'; }
+      // One lead-in per filter group (category, location, ...), keyed on MEC's list id. The words come from
+      // CSS variables the theme sets from translatable PHP strings (app/setup.php); English is the fallback.
+      &[id^='mec_sf_category']::before { content: var(--mec-text-category, 'Show events for:'); }
+      &[id^='mec_sf_location']::before { content: var(--mec-text-location, 'Where:'); }
+      &[id^='mec_sf_organizer']::before { content: var(--mec-text-organizer, 'Run by:'); }
+      &[id^='mec_sf_speaker']::before { content: var(--mec-text-speaker, 'Speaker:'); }
+      &[id^='mec_sf_label']::before { content: var(--mec-text-label, 'Label:'); }
+      &[id^='mec_sf_tag']::before { content: var(--mec-text-tag, 'Tag:'); }
 
       &::before {
         flex-basis: 100%;
@@ -253,6 +259,29 @@
 
   .mec-search-form.mec-totalcal-box .mec-date-search select:last-child {
     padding-left: 1.25rem !important; // no icon before the year
+    flex-grow: 2;
+  }
+
+  // The month name is the longer of the pair; give it the room.
+  .mec-search-form.mec-totalcal-box .mec-date-search select:first-of-type {
+    flex-grow: 3;
+  }
+
+  // On a phone the pair is too narrow for "November" beside the year: one select per row.
+  @include mec.narrow {
+    .mec-search-form.mec-totalcal-box .mec-date-search {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .mec-search-form.mec-totalcal-box .mec-date-search select,
+    .mec-search-form.mec-totalcal-box .mec-date-search select:last-child {
+      flex: 1 1 100%;
+    }
+
+    .mec-search-form.mec-totalcal-box .mec-date-search select:last-child {
+      padding-left: 2.75rem !important;
+    }
   }
 
   // Filter (select2 multi-select). The global input styles were stretching the search field
