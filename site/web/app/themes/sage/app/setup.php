@@ -333,7 +333,8 @@ function page_uses_mec_calendar(): bool
 {
     $content = (string) get_post_field('post_content');
 
-    return is_singular() && (has_shortcode($content, 'MEC') || has_block('acf/events-calendar', $content));
+    return (is_singular() && (has_shortcode($content, 'MEC') || has_block('acf/events-calendar', $content)))
+        || \App\Support\ArchiveCalendar::current();
 }
 
 add_action('wp_enqueue_scripts', function () {
