@@ -130,13 +130,19 @@ class ThemeOptions extends Field
             ->addTab('archive_pages', [
                 'label' => 'Archive pages',
             ])
-                ->addMessage('archive_pages_info', 'News uses the "Posts page" set in Settings → Reading. Pick a page for any other archive below — its Image Hero and intro content render above the archive\'s filters and results.', [
+                ->addMessage('archive_pages_info', 'News uses the "Posts page" set in Settings → Reading. Pick a page for any other archive below — its Image Hero and intro content render above the archive\'s filters and results. If that page contains an Events Calendar block, its content replaces the filters and results: the archive becomes the calendar (its own address redirects to the archive).', [
                     'label' => 'Archive pages',
                 ]);
 
+        // MEC registers `mec-events` after this runs, so it isn't among the registered post types yet: add it here.
+        $archives = ['mec-events' => 'Events'];
         foreach (get_post_types(['has_archive' => true, '_builtin' => false], 'objects') as $postType) {
-            $fields->addPostObject("archive_page_{$postType->name}", [
-                'label' => $postType->labels->name,
+            $archives[$postType->name] = $postType->labels->name;
+        }
+
+        foreach ($archives as $postTypeName => $label) {
+            $fields->addPostObject("archive_page_{$postTypeName}", [
+                'label' => $label,
                 'post_type' => ['page'],
                 'return_format' => 'id',
                 'allow_null' => true,
