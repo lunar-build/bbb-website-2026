@@ -36,3 +36,19 @@ test('an id someone chose is never generated again', function () {
 
     expect(HeadingIds::make('News'))->toBe('news-2');
 });
+
+test('addMissing gives every heading without an id one and leaves the rest alone', function () {
+    $html = '<h1>Page title</h1><h2 id="mine" class="x">Mine</h2><h3 class="y">Learn more</h3><h3>Learn more</h3><h4><img src="a.png" alt=""></h4><h4><svg></svg></h4>';
+
+    expect(HeadingIds::addMissing($html))->toBe(
+        '<h1 id="page-title">Page title</h1><h2 id="mine" class="x">Mine</h2><h3 id="learn-more" class="y">Learn more</h3><h3 id="learn-more-2">Learn more</h3><h4 id="heading"><img src="a.png" alt=""></h4><h4 id="heading-2"><svg></svg></h4>',
+    );
+});
+
+test('addMissing never repeats an id already on the page', function () {
+    expect(HeadingIds::addMissing('<section id="news"></section><h2>News</h2>'))->toBe('<section id="news"></section><h2 id="news-2">News</h2>');
+});
+
+test('addMissing leaves html without headings untouched', function () {
+    expect(HeadingIds::addMissing('<p>Hello</p>'))->toBe('<p>Hello</p>');
+});

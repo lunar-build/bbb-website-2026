@@ -44,6 +44,37 @@ class HeadingIds
         return $id;
     }
 
+    /**
+     * Give every heading in a page's HTML that has no id one, so nothing slips
+     * through: raw <h1>s, core heading blocks, plugin markup. Ids already on the
+     * page (any element) are kept and never repeated. A heading with no text
+     * gets "heading", "heading-2" and so on.
+     */
+    public static function addMissing(string $html): string
+    {
+        if (! preg_match('/<h[1-6][\s>]/i', $html)) {
+            return $html;
+        }
+
+        if (preg_match_all('/\sid=(["\'])(.*?)\1/s', $html, $existing)) {
+            foreach ($existing[2] as $existingId) {
+                static::reserve($existingId);
+            }
+        }
+
+        return preg_replace_callback('/<h([1-6])(\s[^>]*)?>(.*?)<\/h\1>/is', function (array $heading) {
+            $attributes = $heading[2] ?? '';
+
+            if (preg_match('/\sid=/i', $attributes)) {
+                return $heading[0];
+            }
+
+            $id = static::make($heading[3]) ?? static::make('heading');
+
+            return "<h{$heading[1]} id=\"{$id}\"{$attributes}>{$heading[3]}</h{$heading[1]}>";
+        }, $html) ?? $html;
+    }
+
     public static function reset(): void
     {
         static::$used = [];
