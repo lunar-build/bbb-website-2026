@@ -150,7 +150,7 @@ add_action('admin_notices', function () {
     }
 
     echo '<div class="notice notice-warning"><p>'
-        . __('Primary Navigation note: an item with sub-items does not link anywhere itself (it becomes an inert heading on mobile, a submenu toggle on desktop) — only items with no children are actual links.', 'sage')
+        . __('Primary Navigation note: a top-level item with sub-items links to its page if it has a real URL (not # or empty), and always has a chevron button that opens its submenu. The second-level items (the column headings) never link anywhere; the third-level items are the links.', 'sage')
         . '</p></div>';
 });
 

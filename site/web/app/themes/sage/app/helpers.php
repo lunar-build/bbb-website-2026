@@ -251,3 +251,9 @@ function theme_block_background_css(): string
 
     return $css;
 }
+
+/** A nav item that is a real page, not a "#" or empty placeholder: its label can link while a chevron opens the children. */
+function nav_item_has_link(array $item): bool
+{
+    return ! in_array(trim((string) ($item['href'] ?? '')), ['', '#'], true);
+}
