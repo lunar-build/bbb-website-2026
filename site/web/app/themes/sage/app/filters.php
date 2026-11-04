@@ -6,6 +6,8 @@
 
 namespace App;
 
+use App\Support\ArchiveCalendar;
+
 add_filter('excerpt_more', function () {
     return sprintf(' &hellip; <a href="%s">%s</a>', get_permalink(), __('Continued', 'sage'));
 });
@@ -90,6 +92,46 @@ add_filter('acf/register_block_type_args', function ($block) {
 
     return $block;
 });
+
+/**
+ * MEC's calendars and lists show a cancelled or postponed event like any other (only the single page
+ * says so). Say it in the title; this filter is the one place all its skins get a title from.
+ */
+add_filter('mec_occurrence_event_title', function ($title, $event) {
+    $status = $event->data->meta['mec_event_status'] ?? '';
+    $label = [
+        'EventCancelled' => __('Cancelled', 'sage'),
+        'EventPostponed' => __('Postponed', 'sage'),
+    ][$status] ?? null;
+
+    return $label ? sprintf('%s (%s)', $title, $label) : $title;
+}, 10, 2);
+
+/**
+ * The date picker in MEC's event editor (Date And Time) is jQuery UI's. MEC draws each day as a circle, but
+ * jQuery UI right-aligns the number inside its link, so it sits off-centre in the circle. The front-end
+ * theme CSS never loads in wp-admin, so this rides on MEC's backend stylesheet. The ID selector is
+ * needed to out-rank MEC's own rules.
+ */
+add_action('admin_enqueue_scripts', function () {
+    wp_add_inline_style('mec-backend-style', '#ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td a, #ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td span { padding: 0; text-align: center; }');
+}, 20);
+
+/**
+ * A page that is the content of a calendar archive (Theme Options → Archive pages) is a content source, not a
+ * page of its own: its URL would show the same calendar as the archive. Send visitors to the archive (previews
+ * still work, so editors can see the page), and keep the page out of the sitemap.
+ */
+add_action('template_redirect', function () {
+    $archiveUrl = is_page() && ! is_preview() ? (ArchiveCalendar::pages()[get_queried_object_id()] ?? null) : null;
+
+    if ($archiveUrl) {
+        wp_safe_redirect($archiveUrl, 301);
+        exit;
+    }
+});
+
+add_filter('wpseo_exclude_from_sitemap_by_post_ids', fn(array $postIds) => [...$postIds, ...array_keys(ArchiveCalendar::pages())]);
 
 /**
  * MEC forces the classic editor on events, which strips our ACF blocks on save. Use the
@@ -482,6 +524,44 @@ add_filter('template_include', function (string $template) {
 }, 99);
 
 /**
+ * Plain-English help under the fields editors trip over in MEC's event editor.
+ * MEC's form can't take extra markup, so it's added once the fields exist
+ * (the block editor builds the meta boxes after load).
+ */
+add_action('admin_footer', function () {
+    if (get_current_screen()?->post_type !== 'mec-events') {
+        return;
+    }
+
+    $hints = [
+        'input[name="mec[date][end][date]"]' => __('Dates are day-month-year and times are 24-hour (18:30). For a one-day event use the same date for start and end. For a weekend or longer, set the last day as the end date.', 'sage'),
+        'select[name="mec[date][repeat][end]"]' => __('Choose when the repeating stops, otherwise the event keeps repeating with no end.', 'sage'),
+        '#mec_event_color' => __('The colour of this event\'s dot on the events calendar. Left empty it uses the standard blue.', 'sage'),
+    ];
+
+    printf(
+        '<style>.bbb-mec-hint { margin: 0.5rem 0 1rem; color: #50575e; font-size: 0.8125rem; font-style: italic; }</style><script>(function () {
+            var hints = %s;
+            var addHints = function () {
+                Object.keys(hints).forEach(function (selector) {
+                    var field = document.querySelector(selector);
+                    if (!field || field.dataset.bbbHint) return;
+                    field.dataset.bbbHint = "1";
+                    var hint = document.createElement("p");
+                    hint.className = "bbb-mec-hint";
+                    hint.textContent = hints[selector];
+                    var row = field.closest(".mec-form-row") || field.parentNode;
+                    row.parentNode.insertBefore(hint, row.nextSibling);
+                });
+            };
+            new MutationObserver(addHints).observe(document.body, { childList: true, subtree: true });
+            addHints();
+        })();</script>',
+        wp_json_encode($hints),
+    );
+});
+
+/**
  * Multi-line Cost box in MEC's event editor, one price per line. Saved in
  * the `|`-separated format SingleMecEvent::priceLines() splits into bullets;
  * keeps the #mec_cost id that MEC's "This event is free" script targets.
@@ -589,4 +669,43 @@ add_action('wp_head', function () {
     }
 
     echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
+});
+
+/**
+ * MEC's calendar weekday headings are two letters (MO, TU…). Show three (Mon, Tue…), as translatable strings.
+ * MEC passes them already in the order the week starts, so map each by its two letters.
+ */
+add_filter('mec_weekday_abbr_labels', function (array $labels) {
+    $threeLetter = [
+        'MO' => _x('Mon', 'calendar weekday heading', 'sage'),
+        'TU' => _x('Tue', 'calendar weekday heading', 'sage'),
+        'WE' => _x('Wed', 'calendar weekday heading', 'sage'),
+        'TH' => _x('Thu', 'calendar weekday heading', 'sage'),
+        'FR' => _x('Fri', 'calendar weekday heading', 'sage'),
+        'SA' => _x('Sat', 'calendar weekday heading', 'sage'),
+        'SU' => _x('Sun', 'calendar weekday heading', 'sage'),
+    ];
+
+    return array_map(fn($label) => $threeLetter[strtoupper($label)] ?? $label, $labels);
+});
+
+/**
+ * Theme Options → Archive pages: show each archive's address under its field. Looked up when the field is
+ * shown, as MEC's post type and its address (the slug is a MEC setting) aren't registered yet when the fields
+ * are built; and registered here, not in the options class, as ACF Composer can cache the built fields.
+ */
+add_filter('acf/prepare_field', function ($field) {
+    // By render time `name` is the input name (acf[field_…]); `_name` is the field's own.
+    $name = $field['_name'] ?? $field['name'] ?? '';
+
+    if (! is_array($field) || ! str_starts_with($name, 'archive_page_')) {
+        return $field;
+    }
+
+    $archiveUrl = get_post_type_archive_link(substr($name, strlen('archive_page_')));
+    $field['instructions'] = $archiveUrl
+        ? sprintf('Archive address: <a href="%1$s" target="_blank" rel="noopener">%1$s</a>', esc_url($archiveUrl))
+        : '';
+
+    return $field;
 });

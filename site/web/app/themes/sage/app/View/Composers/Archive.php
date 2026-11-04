@@ -2,6 +2,7 @@
 
 namespace App\View\Composers;
 
+use App\Support\ArchiveCalendar;
 use App\Support\ArchiveFilters;
 use App\Support\ContentHero;
 use App\Support\PostCard;
@@ -24,7 +25,8 @@ class Archive extends Composer
     public function with(): array
     {
         $postType = ArchiveFilters::postType();
-        $content = $this->linkedContent($this->linkedPageId($postType));
+        $pageId = ArchiveCalendar::linkedPageId($postType);
+        $content = $this->linkedContent($pageId);
         $breadcrumbs = $this->breadcrumbs($postType);
 
         return [
@@ -33,6 +35,8 @@ class Archive extends Composer
                 $breadcrumbs,
             ),
             'body' => $content['body'],
+            // The linked page holds an Events Calendar block: its content is the archive (no filters or cards).
+            'showsCalendar' => ArchiveCalendar::pageHasCalendar($pageId),
             'filterGroups' => ArchiveFilters::groups($postType),
             'formAction' => ArchiveFilters::baseUrl($postType),
             'resultsHeading' => get_post_type_object($postType)->labels->name ?? '',
@@ -40,18 +44,6 @@ class Archive extends Composer
             'cards' => array_map(fn($post) => PostCard::fromPost($post, 'match'), $GLOBALS['wp_query']->posts),
             'paginationLinks' => $this->paginationLinks(),
         ];
-    }
-
-    /**
-     * The page whose content (Image Hero + intro) sits above this archive.
-     */
-    protected function linkedPageId(string $postType): ?int
-    {
-        $pageId = $postType === 'post'
-            ? (int) get_option('page_for_posts')
-            : (int) get_field("archive_page_{$postType}", 'option');
-
-        return $pageId && get_post_status($pageId) === 'publish' ? $pageId : null;
     }
 
     /**
