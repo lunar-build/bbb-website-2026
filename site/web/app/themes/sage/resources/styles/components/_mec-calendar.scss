@@ -683,7 +683,8 @@
     right: 0;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
+    align-items: center;
+    flex-wrap: nowrap; // five dots and the "+" always fit a tile; wrapping would drop the "+" under them
     gap: 0.1875rem;
     line-height: 0;
 
@@ -697,13 +698,11 @@
       box-shadow: inset 0 0 0 1px var(--wp--preset--color--charcoal); // pale colours vanish on the tile
     }
 
-    // "+" for colours beyond the cap: out of the dots' flow, at the right end of their row (it's
-    // positioned against .mec-day-dots, so `bottom: 0` lines it up with the dots), in the tile's own
-    // text colour (white on the selected day).
+    // "+" for colours beyond the cap: the last item in the dots' row, so it can never land on a dot (a
+    // corner position collided with the fifth dot on the narrower phone tiles). In the tile's own text
+    // colour (white on the selected day).
     .mec-day-dots__more {
-      position: absolute;
-      right: 0.375rem;
-      bottom: 0;
+      flex: none;
       width: auto;
       height: auto;
       border-radius: 0;
