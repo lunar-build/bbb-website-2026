@@ -524,6 +524,44 @@ add_filter('template_include', function (string $template) {
 }, 99);
 
 /**
+ * Plain-English help under the fields editors trip over in MEC's event editor.
+ * MEC's form can't take extra markup, so it's added once the fields exist
+ * (the block editor builds the meta boxes after load).
+ */
+add_action('admin_footer', function () {
+    if (get_current_screen()?->post_type !== 'mec-events') {
+        return;
+    }
+
+    $hints = [
+        'input[name="mec[date][end][date]"]' => __('Dates are day-month-year and times are 24-hour (18:30). For a one-day event use the same date for start and end. For a weekend or longer, set the last day as the end date.', 'sage'),
+        'select[name="mec[date][repeat][end]"]' => __('Choose when the repeating stops, otherwise the event keeps repeating with no end.', 'sage'),
+        '#mec_event_color' => __('The colour of this event\'s dot on the events calendar. Left empty it uses the standard blue.', 'sage'),
+    ];
+
+    printf(
+        '<style>.bbb-mec-hint { margin: 0.5rem 0 1rem; color: #50575e; font-size: 0.8125rem; font-style: italic; }</style><script>(function () {
+            var hints = %s;
+            var addHints = function () {
+                Object.keys(hints).forEach(function (selector) {
+                    var field = document.querySelector(selector);
+                    if (!field || field.dataset.bbbHint) return;
+                    field.dataset.bbbHint = "1";
+                    var hint = document.createElement("p");
+                    hint.className = "bbb-mec-hint";
+                    hint.textContent = hints[selector];
+                    var row = field.closest(".mec-form-row") || field.parentNode;
+                    row.parentNode.insertBefore(hint, row.nextSibling);
+                });
+            };
+            new MutationObserver(addHints).observe(document.body, { childList: true, subtree: true });
+            addHints();
+        })();</script>',
+        wp_json_encode($hints),
+    );
+});
+
+/**
  * Multi-line Cost box in MEC's event editor, one price per line. Saved in
  * the `|`-separated format SingleMecEvent::priceLines() splits into bullets;
  * keeps the #mec_cost id that MEC's "This event is free" script targets.
