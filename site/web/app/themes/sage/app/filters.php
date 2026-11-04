@@ -6,6 +6,8 @@
 
 namespace App;
 
+use App\Support\ArchiveCalendar;
+
 add_filter('excerpt_more', function () {
     return sprintf(' &hellip; <a href="%s">%s</a>', get_permalink(), __('Continued', 'sage'));
 });
@@ -114,6 +116,22 @@ add_filter('mec_occurrence_event_title', function ($title, $event) {
 add_action('admin_enqueue_scripts', function () {
     wp_add_inline_style('mec-backend-style', '#ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td a, #ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td span { padding: 0; text-align: center; }');
 }, 20);
+
+/**
+ * A page that is the content of a calendar archive (Theme Options → Archive pages) is a content source, not a
+ * page of its own: its URL would show the same calendar as the archive. Send visitors to the archive (previews
+ * still work, so editors can see the page), and keep the page out of the sitemap.
+ */
+add_action('template_redirect', function () {
+    $archiveUrl = is_page() && ! is_preview() ? (ArchiveCalendar::pages()[get_queried_object_id()] ?? null) : null;
+
+    if ($archiveUrl) {
+        wp_safe_redirect($archiveUrl, 301);
+        exit;
+    }
+});
+
+add_filter('wpseo_exclude_from_sitemap_by_post_ids', fn(array $postIds) => [...$postIds, ...array_keys(ArchiveCalendar::pages())]);
 
 /**
  * MEC forces the classic editor on events, which strips our ACF blocks on save. Use the
