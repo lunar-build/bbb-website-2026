@@ -25,6 +25,7 @@
           :services="$card['services']"
           :description="$card['description']"
           :link="$card['link']"
+          :heading-level="$cardLevel"
           class="c-card-grid__card"
         />
       @endforeach

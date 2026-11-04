@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Fields\HeadingLevelSelect;
 use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
@@ -210,6 +211,7 @@ class CycleRouteCard extends Block
     public function with(): array
     {
         return [
+            'headingLevel' => $this->resolveField('heading_level', 'h2'),
             'difficulty' => $this->difficulty(),
             'image' => $this->image(),
             'routeName' => $this->routeName(),
@@ -225,6 +227,8 @@ class CycleRouteCard extends Block
     public function fields(): array
     {
         $fields = Builder::make('cycle_route_card');
+
+        $fields->addPartial(HeadingLevelSelect::class, ['default_level' => 'h2']);
 
         $fields
             ->addSelect('difficulty', [

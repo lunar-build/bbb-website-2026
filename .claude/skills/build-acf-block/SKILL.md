@@ -277,15 +277,36 @@ Standard wrapper pattern (see `text-hero.blade.php`, `cta-strip.blade.php`):
 </section>
 ```
 
-**Root element is always `<section>`, never `<div>`, and is never guarded by
-`@unless ($block->preview)`.** Every block is a distinct region of page content, so
-`<section>` is the correct semantic wrapper — this is a fixed convention, not a
-per-block choice, with one exception: a block that is purely decorative (no text, no
-heading, e.g. `illustration.blade.php`) uses a `<div aria-hidden="true">`, because a
-`<section>` with no accessible name or content isn't a meaningful region. If a block's
-content already has its own inner `<section>` (e.g. an
-"inner" wrapper), rename that inner one to `<div>` rather than nesting two `<section>`s
-(see `video-hero.blade.php`'s `.c-video-hero__inner`).
+**Root element: a `<section>` only when the block shows a heading, otherwise a `<div>`.**
+A `<section>` is meant to have a heading; without one it is just a generic container, so
+a block with no heading (a button, a link list, a map, a quote) is a `<div>`. Use the
+`<x-block-root :heading="...">` component, which picks the tag:
+
+```blade
+<x-block-root :heading="$heading" {{ $attributes->class(['c-block-name']) }}>
+  ...
+</x-block-root>
+```
+
+`:heading` is the Heading field's array (text/level/style) or a boolean (`(bool) $heading`
+for a plain-text heading); it is a `<section>` when that shows a heading, else a `<div>`.
+Where a view still guards its root with `@unless ($block->preview)` (older blocks; see below),
+use `App\Support\HeadingLevel::tag($heading)` with `<{{ $tag }}>` ... `</{{ $tag }}>` instead, because a
+component tag can't be split across the condition. New blocks shouldn't guard the root.
+Every ACF block's root also gets an `is-acf-block` class from a `render_block` filter in
+`app/filters.php`; CSS that needs "an ACF block" (content flow, column layouts) targets
+that, never `section`, since a block can now be a `<div>`.
+
+**Heading levels.** Never hardcode a level. A block with a heading offers a level select
+(the `Heading` partial, or `HeadingLevelSelect` when the heading is a plain text field)
+and renders it with `<x-heading :level="...">`. Headings inside the block (cards, steps,
+list items) take `App\Support\HeadingLevel::inside($heading)`: one level below the
+block's heading, or the block's own level when it shows none, so the outline never jumps.
+
+If a block's content already has its own inner `<section>` (e.g. an "inner" wrapper), rename
+that inner one to `<div>` rather than nesting two `<section>`s (see `video-hero.blade.php`'s
+`.c-video-hero__inner`). A purely decorative block (e.g. `illustration.blade.php`) is a
+`<div aria-hidden="true">`.
 
 Earlier blocks guarded the wrapper with `@unless ($block->preview) ... @endunless`
 (ACF Composer's own scaffold stub does this). Don't do this — `$block->preview` is

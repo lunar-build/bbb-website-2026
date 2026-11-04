@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Fields\HeadingLevelSelect;
 use App\Support\EventSessions;
 use App\EventTimetable\Schedule;
 use App\EventTimetable\EventTimetable;
@@ -318,6 +319,7 @@ class EventsTimetable extends Block
     public function with(): array
     {
         return [
+            'headingLevel' => get_field('heading_level') ?: 'h3',
             'layout' => get_field('layout') ?: (shows_example($this->preview) ? $this->example['layout'] : 'tabs'),
             'periods' => $this->periods(),
         ];
@@ -329,6 +331,8 @@ class EventsTimetable extends Block
     public function fields(): array
     {
         $fields = Builder::make('events_timetable');
+
+        $fields->addPartial(HeadingLevelSelect::class, ['default_level' => 'h3']);
 
         $fields
             ->addButtonGroup('layout', [

@@ -1,4 +1,4 @@
-@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null])
+@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null, 'headingLevel' => 'h4'])
 
 {{-- The rule directly under the name is accented (yellow, per Figma); every
      rule after it is the plain divider colour — tracked here since which
@@ -6,7 +6,7 @@
 @php($ruleRendered = false)
 
 <div {{ $attributes->class(['c-business-card__card']) }}>
-  <h4 class="c-business-card__name">{{ $name }}</h4>
+  <x-heading :level="$headingLevel" style="h4" class="c-business-card__name">{{ $name }}</x-heading>
 
   @if (! empty($contactInfo))
     <hr class="c-business-card__rule @if (! $ruleRendered) c-business-card__rule--accent @endif">

@@ -16,6 +16,12 @@ class HeadingLevel
             && ($heading['level'] ?? 'h2') !== 'none';
     }
 
+    /** The root element for a block: a <section> only when it shows a heading, else a <div>. $heading: a heading array, or true/false. */
+    public static function tag(mixed $heading): string
+    {
+        return (is_array($heading) ? static::shows($heading) : (bool) $heading) ? 'section' : 'div';
+    }
+
     /**
      * Level for headings inside a section: one below the section's heading when it
      * shows one, otherwise the section's own level (the headings take its place, so

@@ -8,6 +8,7 @@
           <x-testimonial-card
             :type="$card['type']"
             :photo="$card['photo']"
+            :level="$headingLevel"
             :name="$card['name']"
             :info="$card['info']"
             :quote="$card['quote']"
