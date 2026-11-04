@@ -277,7 +277,8 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         $anchor = Support\PageMenu::slugify(wp_strip_all_tags($block_content));
 
         if ($anchor !== '') {
-            $processor->set_attribute('id', $anchor);
+            // Taken, so a heading component with the same text gets -2 rather than a duplicate.
+            $processor->set_attribute('id', Support\HeadingIds::reserve($anchor));
         }
     }
 
