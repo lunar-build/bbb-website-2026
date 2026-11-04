@@ -164,19 +164,18 @@ class ThemeOptions extends Field
         $newsAddress = $postsPageId ? get_permalink($postsPageId) : '';
 
         $news = $newsAddress
-            ? sprintf('<strong>News</strong> works the same way, but its page is the "Posts page" chosen in Settings → Reading. Its address is <a href="%1$s" target="_blank" rel="noopener">%1$s</a>.', esc_url($newsAddress))
-            : '<strong>News</strong> works the same way, but its page is the "Posts page" chosen in Settings → Reading.';
+            ? sprintf('News works the same way, using the "Posts page" in Settings → Reading (<a href="%1$s" target="_blank" rel="noopener">%1$s</a>).', esc_url($newsAddress))
+            : 'News works the same way, using the "Posts page" in Settings → Reading.';
 
         return implode('', [
-            '<p><strong>What an archive is.</strong> Each of these is a listing of one type of content, with its own web address (shown under each field below). It starts with a plain title, then the filters and the cards.</p>',
-            '<p><strong>Why link a page.</strong> Linking a page lets you put your own content above the listing, such as a hero image and an introduction. The archive works without one; it just keeps the plain title.</p>',
-            '<p><strong>How to link one.</strong></p>',
+            '<p>Each type of content below has its own listing page that shows its posts as cards, with filters. The address of each one is shown under its name. By default the page starts with just a title.</p>',
+            '<p>To add a banner image and some introduction text at the top instead, link a page: whatever is on that page appears above the listing.</p>',
             '<ol>',
             '<li>Create a normal page (Pages → Add New).</li>',
-            '<li>Put a hero block first (Image Hero, Text Hero or Video Hero), then any introduction text under it. The page\'s title and breadcrumbs come from the hero.</li>',
-            '<li>Publish the page, then pick it in the matching field below. Leave the field empty to keep the plain title.</li>',
+            '<li>Add a hero block first (Image Hero, Text Hero or Video Hero), then any introduction text.</li>',
+            '<li>Publish it, then choose it in the matching field below. Leave the field empty to keep just the title.</li>',
             '</ol>',
-            '<p>Only published pages are used. ' . $news . '</p>',
+            '<p>' . $news . '</p>',
         ]);
     }
 }
