@@ -907,3 +907,27 @@ body:has(.mec-search-form) > .select2-container--default .select2-results__optio
   background: var(--wp--preset--color--blue);
   color: var(--wp--preset--color--white);
 }
+
+// The date picker the filters open (month/year, date range) is jQuery UI's, appended to <body>. MEC turns each
+// day into a 30px circle, but jQuery UI right-aligns the text inside the link, so the number sits off-centre
+// in the circle on hover. Centre it, and use the theme's text colour and font (MEC's #9a9b9c is also too
+// pale to read). Selectors match MEC's own (`body:has(.mec-search-form) …`) plus a class, as MEC's sheet loads later.
+body:has(.mec-search-form) .ui-datepicker.ui-widget .ui-datepicker-calendar td {
+  a,
+  span {
+    padding: 0;
+    text-align: center;
+    font-family: var(--wp--preset--font-family--nata-sans);
+  }
+
+  a {
+    color: var(--wp--preset--color--charcoal);
+    font-weight: 500;
+  }
+
+  a:hover,
+  a.ui-state-active {
+    background: var(--wp--preset--color--blue);
+    color: var(--wp--preset--color--white);
+  }
+}

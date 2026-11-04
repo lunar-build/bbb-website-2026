@@ -106,6 +106,16 @@ add_filter('mec_occurrence_event_title', function ($title, $event) {
 }, 10, 2);
 
 /**
+ * The date picker in MEC's event editor (Date And Time) is jQuery UI's. MEC draws each day as a circle, but
+ * jQuery UI right-aligns the number inside its link, so it sits off-centre in the circle. The front-end
+ * theme CSS never loads in wp-admin, so this rides on MEC's backend stylesheet. The ID selector is
+ * needed to out-rank MEC's own rules.
+ */
+add_action('admin_enqueue_scripts', function () {
+    wp_add_inline_style('mec-backend-style', '#ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td a, #ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td span { padding: 0; text-align: center; }');
+}, 20);
+
+/**
  * MEC forces the classic editor on events, which strips our ACF blocks on save. Use the
  * block editor (MEC's panels still load as meta boxes) — priority 20, after MEC's filter.
  */
