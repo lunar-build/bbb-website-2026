@@ -13,11 +13,24 @@
                 @foreach ($items as $i => $item)
                     <li class="c-primary-nav-desktop__item" data-nav-item>
                         @if (!empty($item['children']))
-                            <button type="button" class="c-primary-nav-desktop__link" aria-expanded="false"
-                                aria-controls="desktop-dropdown-{{ $i }}">
-                                <span>{{ $item['label'] }}</span>
-                                <x-icon name="chevron" class="c-primary-nav-desktop__chevron" />
-                            </button>
+                            @if (nav_item_has_link($item))
+                                {{-- Label goes to the page; the chevron is its own button for the dropdown. --}}
+                                <div class="c-primary-nav-desktop__split">
+                                    <a href="{{ $item['href'] }}"
+                                        class="c-primary-nav-desktop__link"><span>{{ $item['label'] }}</span></a>
+                                    <button type="button" class="c-primary-nav-desktop__toggle" aria-expanded="false"
+                                        aria-controls="desktop-dropdown-{{ $i }}"
+                                        aria-label="{{ sprintf(__('%s submenu', 'sage'), $item['label']) }}">
+                                        <x-icon name="chevron" class="c-primary-nav-desktop__chevron" />
+                                    </button>
+                                </div>
+                            @else
+                                <button type="button" class="c-primary-nav-desktop__link" aria-expanded="false"
+                                    aria-controls="desktop-dropdown-{{ $i }}">
+                                    <span>{{ $item['label'] }}</span>
+                                    <x-icon name="chevron" class="c-primary-nav-desktop__chevron" />
+                                </button>
+                            @endif
 
                             <div id="desktop-dropdown-{{ $i }}" class="c-primary-nav-desktop__dropdown"
                                 hidden>
@@ -50,7 +63,19 @@
                                 aria-label="{{ __('More navigation', 'sage') }}">
                                 @foreach ($items as $i => $item)
                                     <li data-overflow-index="{{ $i }}" hidden>
-                                        @if (!empty($item['children']))
+                                        @if (!empty($item['children']) && nav_item_has_link($item))
+                                            <div class="c-primary-nav-desktop__split c-primary-nav-desktop__split--overflow">
+                                                <a href="{{ $item['href'] }}"
+                                                    class="c-primary-nav-desktop__link c-primary-nav-desktop__overflow-link"><span>{{ $item['label'] }}</span></a>
+                                                <button type="button" class="c-primary-nav-desktop__toggle"
+                                                    data-overflow-open="{{ $i }}" aria-expanded="false"
+                                                    aria-controls="desktop-overflow-panel-{{ $i }}"
+                                                    aria-label="{{ sprintf(__('%s submenu', 'sage'), $item['label']) }}">
+                                                    <x-icon name="chevron"
+                                                        class="c-primary-nav-desktop__chevron c-primary-nav-desktop__chevron--sub" />
+                                                </button>
+                                            </div>
+                                        @elseif (!empty($item['children']))
                                             <button type="button"
                                                 class="c-primary-nav-desktop__link c-primary-nav-desktop__overflow-link"
                                                 data-overflow-open="{{ $i }}" aria-expanded="false"

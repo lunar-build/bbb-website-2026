@@ -6,7 +6,16 @@
             aria-label="{{ wp_get_nav_menu_name('primary_navigation') ?: __('Primary', 'sage') }}">
             @foreach ($items as $i => $item)
                 <li class="c-primary-nav__item">
-                    @if (!empty($item['children']))
+                    @if (!empty($item['children']) && nav_item_has_link($item))
+                        {{-- Label goes to the page; the chevron is its own button that opens the children. --}}
+                        <div class="c-primary-nav__split">
+                            <a href="{{ $item['href'] }}" class="c-primary-nav__link"><span>{{ $item['label'] }}</span></a>
+                            <button type="button" class="c-primary-nav__toggle" data-open-panel="l1-{{ $i }}"
+                                aria-label="{{ sprintf(__('%s submenu', 'sage'), $item['label']) }}">
+                                <x-icon name="chevron" class="c-primary-nav__chevron" />
+                            </button>
+                        </div>
+                    @elseif (!empty($item['children']))
                         <button type="button" class="c-primary-nav__link c-primary-nav__link--drill"
                             data-open-panel="l1-{{ $i }}">
                             <span>{{ $item['label'] }}</span>
