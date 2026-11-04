@@ -650,3 +650,24 @@ add_filter('mec_weekday_abbr_labels', function (array $labels) {
 
     return array_map(fn($label) => $threeLetter[strtoupper($label)] ?? $label, $labels);
 });
+
+/**
+ * Theme Options → Archive pages: show each archive's address under its field. Looked up when the field is
+ * shown, as MEC's post type and its address (the slug is a MEC setting) aren't registered yet when the fields
+ * are built; and registered here, not in the options class, as ACF Composer can cache the built fields.
+ */
+add_filter('acf/prepare_field', function ($field) {
+    // By render time `name` is the input name (acf[field_…]); `_name` is the field's own.
+    $name = $field['_name'] ?? $field['name'] ?? '';
+
+    if (! is_array($field) || ! str_starts_with($name, 'archive_page_')) {
+        return $field;
+    }
+
+    $archiveUrl = get_post_type_archive_link(substr($name, strlen('archive_page_')));
+    $field['instructions'] = $archiveUrl
+        ? sprintf('Archive address: <a href="%1$s" target="_blank" rel="noopener">%1$s</a>', esc_url($archiveUrl))
+        : '';
+
+    return $field;
+});
