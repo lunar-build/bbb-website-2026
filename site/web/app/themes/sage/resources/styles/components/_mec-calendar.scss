@@ -616,7 +616,9 @@
 
   .mec-calendar .mec-calendar-table-head .mec-calendar-day-head {
     height: auto;
+    width: auto; // MEC sets 14.28%, which inside our grid column is a 6px box the text spills out of
     padding: 0.5rem 0;
+    text-align: center; // centred over its column of tiles
     border: 0;
     background: none;
     color: var(--wp--preset--color--charcoal);
@@ -899,6 +901,12 @@
       --mec-tile: 2.75rem;
       --mec-gap: 0.25rem;
       --mec-dot: 0.3125rem;
+    }
+
+    // Three-letter weekday headings (Mon, Tue…) need the room on a phone's narrow tiles.
+    .mec-calendar .mec-calendar-table-head .mec-calendar-day-head {
+      font-size: 0.75rem !important;
+      letter-spacing: 0 !important;
     }
 
     .mec-calendar .mec-has-event:after {

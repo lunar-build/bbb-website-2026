@@ -632,3 +632,21 @@ add_action('wp_head', function () {
 
     echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
 });
+
+/**
+ * MEC's calendar weekday headings are two letters (MO, TU…). Show three (Mon, Tue…), as translatable strings.
+ * MEC passes them already in the order the week starts, so map each by its two letters.
+ */
+add_filter('mec_weekday_abbr_labels', function (array $labels) {
+    $threeLetter = [
+        'MO' => _x('Mon', 'calendar weekday heading', 'sage'),
+        'TU' => _x('Tue', 'calendar weekday heading', 'sage'),
+        'WE' => _x('Wed', 'calendar weekday heading', 'sage'),
+        'TH' => _x('Thu', 'calendar weekday heading', 'sage'),
+        'FR' => _x('Fri', 'calendar weekday heading', 'sage'),
+        'SA' => _x('Sat', 'calendar weekday heading', 'sage'),
+        'SU' => _x('Sun', 'calendar weekday heading', 'sage'),
+    ];
+
+    return array_map(fn($label) => $threeLetter[strtoupper($label)] ?? $label, $labels);
+});
