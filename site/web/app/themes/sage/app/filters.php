@@ -277,7 +277,8 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         $anchor = Support\PageMenu::slugify(wp_strip_all_tags($block_content));
 
         if ($anchor !== '') {
-            $processor->set_attribute('id', $anchor);
+            // Taken, so a heading component with the same text gets -2 rather than a duplicate.
+            $processor->set_attribute('id', Support\HeadingIds::reserve($anchor));
         }
     }
 
@@ -286,6 +287,18 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 
     return $processor->get_updated_html();
 }, 10, 2);
+
+/**
+ * Every heading on a front-end page has an id (for aria-labelledby and anchors): <x-heading> and the
+ * core heading filter above make theirs as they render; this gives the rest (raw <h1>s, plugin markup) one.
+ */
+add_action('template_redirect', function () {
+    if (is_feed() || is_embed() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+        return;
+    }
+
+    ob_start(fn($html) => is_string($html) && str_contains($html, '</html>') ? Support\HeadingIds::addMissing($html) : $html);
+}, 0);
 
 /**
  * Blocks with `'color' => ['background' => true]` in `$supports` get WP's Background

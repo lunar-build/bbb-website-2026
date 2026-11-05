@@ -287,6 +287,12 @@ content already has its own inner `<section>` (e.g. an
 "inner" wrapper), rename that inner one to `<div>` rather than nesting two `<section>`s
 (see `video-hero.blade.php`'s `.c-video-hero__inner`).
 
+**Headings: use `<x-heading>`, and don't hand-write heading ids.** `<x-heading>` gives the
+heading a slug `id` from its text (unique per page: repeats become `-2`, `-3`), so you
+never write one. To point a section or list at its heading with `aria-labelledby`, get the
+id first with `$headingId = \App\Support\HeadingIds::make($text)` and pass it:
+`<x-heading :id="$headingId">`. An `id` you pass is kept, never replaced.
+
 Earlier blocks guarded the wrapper with `@unless ($block->preview) ... @endunless`
 (ACF Composer's own scaffold stub does this). Don't do this — `$block->preview` is
 `true` for both the real Gutenberg editor canvas and the `/pattern-library` page (see

@@ -47,6 +47,11 @@ class PageMenu
 
         if ($items) {
             static::$shown[$postId] = true;
+
+            // Taken up front, so a heading component with the same text (a hero) gets -2 and not the menu's anchor.
+            foreach ($items as $item) {
+                HeadingIds::reserve(ltrim($item['url'], '#'));
+            }
         }
 
         return $items;

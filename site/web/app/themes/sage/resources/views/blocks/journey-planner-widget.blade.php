@@ -4,8 +4,8 @@
 <div class="o-container">
 @endif
 <div class="c-journey-planner-widget__card">
-  @php $headingId = 'c-journey-planner-widget__heading-'.uniqid(); @endphp
-  <h2 id="{{ $headingId }}" class="c-journey-planner-widget__heading">{{ $heading }}</h2>
+  @php $headingId = \App\Support\HeadingIds::make($heading); @endphp
+  <x-heading level="h2" :id="$headingId" class="c-journey-planner-widget__heading">{{ $heading }}</x-heading>
 
   @if ($variant === 'find_nearby')
     <form class="c-journey-planner-widget__form" aria-labelledby="{{ $headingId }}" data-variant="find_nearby" data-redirect-url="{{ $journeyPlannerUrl }}">

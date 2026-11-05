@@ -99,8 +99,9 @@
           {!! $body !!}
 
           @if ($upcoming)
-            <section class="c-event__upcoming" aria-labelledby="c-event-upcoming">
-              <h2 id="c-event-upcoming" class="u-heading-5">{{ __('More upcoming sessions', 'sage') }}</h2>
+            @php($upcomingHeadingId = \App\Support\HeadingIds::make(__('More upcoming sessions', 'sage')))
+            <section class="c-event__upcoming" aria-labelledby="{{ $upcomingHeadingId }}">
+              <x-heading level="h2" style="h5" :id="$upcomingHeadingId">{{ __('More upcoming sessions', 'sage') }}</x-heading>
               <x-bullet-list :items="array_map(fn($line) => ['text' => $line], $upcoming)" />
             </section>
           @endif
