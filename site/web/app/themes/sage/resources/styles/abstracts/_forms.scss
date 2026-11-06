@@ -1,0 +1,26 @@
+@use '../base/focus' as focus;
+
+// Native text-field look. base/_forms.scss applies it to every text input with
+// $important (Gravity Forms' Orbital theme out-specifies a bare `input[type=...]`);
+// components include it where they can't rely on those global rules, e.g. the header
+// search in the Cycle Planner's stylesheet (planner.scss), which leaves base/_forms out.
+@mixin text-input($important: false) {
+  $imp: if($important, !important, null);
+
+  width: 100% $imp;
+  padding: 0.625rem 1.25rem $imp;
+  background: var(--wp--preset--color--white) $imp;
+  border: 2px solid var(--wp--preset--color--charcoal) $imp;
+  border-radius: 999px $imp;
+  font-family: var(--wp--preset--font-family--nata-sans) $imp;
+  font-weight: 500 $imp;
+  font-size: var(--wp--preset--font-size--input-placeholder) $imp;
+  line-height: 1.125rem $imp;
+  color: var(--wp--preset--color--charcoal) $imp;
+
+  &::placeholder {
+    color: var(--wp--preset--color--place-holder-grey) $imp;
+  }
+
+  @include focus.ring;
+}
