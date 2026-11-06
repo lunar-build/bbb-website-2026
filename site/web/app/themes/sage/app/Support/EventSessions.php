@@ -55,6 +55,11 @@ class EventSessions
     {
         global $wpdb;
 
+        // Undated events keep a placeholder date (it can be in the future) but have no sessions.
+        if (get_post_meta($postId, '_event_undated', true)) {
+            return null;
+        }
+
         // Compare against the current wall-clock time stored the same way MEC does.
         $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
 
@@ -74,6 +79,10 @@ class EventSessions
     public static function upcoming(int $postId, int $limit = 8): array
     {
         global $wpdb;
+
+        if (get_post_meta($postId, '_event_undated', true)) {
+            return [];
+        }
 
         $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
 
