@@ -4,7 +4,7 @@
 <div class="o-container">
 @endif
 <div class="c-journey-planner-widget__card">
-  @php $headingId = 'c-journey-planner-widget__heading-'.uniqid(); @endphp
+  @php $headingId = \App\Support\HeadingIds::make($heading); @endphp
   <{{ $headingLevel }} id="{{ $headingId }}" class="c-journey-planner-widget__heading">{{ $heading }}</{{ $headingLevel }}>
 
   @if ($variant === 'find_nearby')
