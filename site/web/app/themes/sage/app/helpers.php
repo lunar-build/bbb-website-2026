@@ -272,3 +272,9 @@ function pagination_links(): array
         'next_text' => __('Next', 'sage') . ' ' . $hidden(__('page', 'sage')) . $arrow,
     ]) ?: [];
 }
+
+/** A nav item that is a real page, not a "#" or empty placeholder: its label can link while a chevron opens the children. */
+function nav_item_has_link(array $item): bool
+{
+    return ! in_array(trim((string) ($item['href'] ?? '')), ['', '#'], true);
+}
