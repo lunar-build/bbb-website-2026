@@ -11,7 +11,7 @@ class CaseStudy extends Field
      * The field group.
      *
      * Same meta names as the old site's case studies, so migrated values land
-     * here directly. No single case study design yet — kept for that.
+     * here directly.
      */
     public function fields(): array
     {
@@ -26,12 +26,8 @@ class CaseStudy extends Field
         $fields
             ->addTextarea('quote', [
                 'label' => 'Quote',
+                'instructions' => 'Shown on the card in case study listings.',
                 'rows' => 3,
-            ])
-            ->addImage('card_image', [
-                'label' => 'Card image',
-                'return_format' => 'id',
-                'preview_size' => 'medium',
             ]);
 
         return $fields->build();

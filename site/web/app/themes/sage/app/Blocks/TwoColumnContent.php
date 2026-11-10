@@ -214,7 +214,7 @@ class TwoColumnContent extends Block
             ],
             'right' => [
                 'type' => 'bullet_list',
-                'heading' => 'What you get',
+                'heading_text' => 'What you get',
                 'items' => [
                     ['text' => 'Balance bikes'],
                     ['text' => 'Trailers'],
@@ -299,8 +299,14 @@ class TwoColumnContent extends Block
                     'required' => true,
                 ]);
 
-            $flexible->addLayout('bullet_list', ['label' => 'Bullet List'])
-                ->addText('heading', ['label' => 'Heading'])
+            $bulletList = $flexible->addLayout('bullet_list', ['label' => 'Bullet List']);
+            $bulletList->addPartial(Heading::class, [
+                'name' => 'heading',
+                'label' => 'Heading',
+                'default_level' => 'h3',
+                'default_style' => 'h3',
+            ]);
+            $bulletList
                 ->addRepeater('items', [
                     'label' => 'Items',
                     'button_label' => 'Add item',
@@ -357,7 +363,12 @@ class TwoColumnContent extends Block
             ],
             'bullet_list' => [
                 'type' => 'bullet_list',
-                'heading' => $row['heading'] ?? '',
+                // Rows saved before the Heading partial stored the text as `heading`.
+                'heading' => [
+                    'text' => ($row['heading_text'] ?? '') ?: ($row['heading'] ?? ''),
+                    'level' => $row['heading_level'] ?? 'h3',
+                    'style' => $row['heading_style'] ?? 'h3',
+                ],
                 'items' => $row['items'] ?? [],
             ],
             default => [

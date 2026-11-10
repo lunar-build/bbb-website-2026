@@ -6,76 +6,104 @@
 }
 
 .c-timeline {
-  --timeline-marker-size: 3.5625rem; // 57px — fits a 2-digit step number
+  --timeline-marker-size: 3.5625rem; // 57px minimum — fits a 2-digit step number
+  --timeline-gap: 1.875rem; // 30px
 
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.875rem; // 30px
+  // Steps share one grid (via subgrid) so the marker column takes the widest
+  // marker's width — a long label grows every square to fit, keeping them equal.
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1.625rem; // 26px
+  row-gap: var(--timeline-gap);
   margin: 0;
   padding: 0;
   list-style: none;
+}
 
-  // One line from first to last marker centre, behind the markers (z-index 1). Drawn on
-  // the list so per-step baseline shifts (.c-timeline__step) can't skew its length.
-  &::before {
+.c-timeline__step {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  // First line level with the marker's text baseline, whatever its height.
+  align-items: baseline;
+  margin: 0;
+
+  // The connecting line, behind the markers (z-index 1). Each step draws its own stretch,
+  // through the gap below, so the line starts and stops at the first and last marker
+  // centres however tall the step's text is.
+  &::after {
     content: '';
     position: absolute;
-    top: calc(var(--timeline-marker-size) / 2);
-    bottom: calc(var(--timeline-marker-size) / 2);
-    left: calc(var(--timeline-marker-size) / 2);
+    grid-column: 1 / 2; // explicit end: an absolute item's `auto` end would span the whole step
+    top: 0;
+    bottom: calc(-1 * var(--timeline-gap));
+    left: 50%;
     width: 0.1875rem; // 3px
     margin-left: -0.09375rem;
     background: var(--wp--preset--color--yellow);
   }
-}
 
-// One marker size per block, so mixed numbers and dates don't mismatch.
-.c-timeline--dates {
-  --timeline-marker-size: 6rem; // 96px — fits an 8-char DD/MM/YY date
-}
+  // Markers sit at the top of a step with a heading.
+  &:first-child::after {
+    top: calc(var(--timeline-marker-size) / 2);
+  }
 
-.c-timeline__step {
-  display: flex;
-  // First line level with the marker's text baseline, whatever its height.
-  align-items: baseline;
-  gap: 1.625rem; // 26px
-  margin: 0;
+  &:last-child::after {
+    bottom: auto;
+    height: calc(var(--timeline-marker-size) / 2);
+  }
 }
 
 // No heading: centre on the marker so a two-line wrap still centres.
 .c-timeline__step--no-heading {
   align-items: center;
+
+  // ...so its marker centre is the step's centre.
+  &:first-child::after {
+    top: 50%;
+  }
+
+  &:last-child::after {
+    bottom: 50%;
+    height: auto;
+  }
 }
 
 .c-timeline__marker-col {
-  flex: none;
   display: flex;
-  justify-content: center;
-  width: var(--timeline-marker-size);
 }
 
+// Square: fills the shared column (at least --timeline-marker-size), height follows.
 .c-timeline__marker {
   position: relative;
   z-index: 1;
   display: flex;
-  flex: none;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  width: var(--timeline-marker-size);
-  height: var(--timeline-marker-size);
+  min-width: var(--timeline-marker-size);
+  aspect-ratio: 1;
   margin-bottom: 0; // override .u-heading-4's margin-bottom
-  padding-inline: 0.25rem;
+  padding-inline: 0.5rem;
   border-radius: 1.25rem; // 20px
   background: var(--wp--preset--color--yellow);
   color: var(--wp--preset--color--charcoal);
   text-align: center;
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
 
+  // Custom labels (years, ranges): same height as number markers, widened to fit the longest.
+  // A step smaller on phones so the text column keeps its room.
   .c-timeline--dates & {
-    font-size: 0.9375rem; // heading-4's size is tuned for 2 digits, too wide at 8 (DD/MM/YY)
+    aspect-ratio: auto;
+    height: var(--timeline-marker-size);
+    padding-inline: 0.75rem;
+    font-size: var(--wp--preset--font-size--heading-6);
+
+    @include bp.respond($min: bp.$md) {
+      padding-inline: 1rem;
+      font-size: var(--wp--preset--font-size--heading-5);
+    }
   }
 }
 

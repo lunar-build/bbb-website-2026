@@ -55,6 +55,7 @@
     <p class="u-heading-3">{{ __('Heading 3', 'sage') }}</p>
     <p class="u-heading-4">{{ __('Heading 4', 'sage') }}</p>
     <p class="u-heading-5">{{ __('Heading 5', 'sage') }}</p>
+    <p class="u-heading-6">{{ __('Heading 6', 'sage') }}</p>
     <p class="u-standfirst">{{ __('Standfirst text', 'sage') }}</p>
     <p class="u-input-label">{{ __('Input label text', 'sage') }}</p>
     <p>{{ __('Body text', 'sage') }}</p>

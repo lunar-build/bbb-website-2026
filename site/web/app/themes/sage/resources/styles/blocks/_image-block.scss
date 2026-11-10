@@ -29,7 +29,7 @@
 .c-image-block__info-box-content {
   color: var(--wp--preset--color--charcoal);
 
-  p:last-child {
+  :is(p, ul, ol):last-child {
     margin-bottom: 0;
   }
 }

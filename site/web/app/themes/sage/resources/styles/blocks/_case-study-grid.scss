@@ -3,6 +3,7 @@
 // card is always dropped by exactly $offset — independent flex columns let
 // card heights drift and the stagger shrink or vanish.
 @use '../abstracts/breakpoints' as bp;
+@use '../base/typography';
 
 $gap: 2.5rem; // Figma's 40px; distinct from spacing.$card-gap (1.5rem)
 $offset: 5.875rem; // 94px
@@ -12,8 +13,7 @@ $max-width: 62rem;
   &__cards {
     display: grid;
     gap: $gap;
-    // The card photos are portrait (the old site's were 460x650), so cards stay narrow enough
-    // that a tall-ish image crops little; wider, they'd turn into huge cards.
+    // Capped so the cards (and their images) don't grow huge on wide screens.
     max-width: $max-width;
     margin-inline: auto;
 
@@ -42,16 +42,39 @@ $max-width: 62rem;
   }
 
   &__image {
-    // Portrait, not Figma's 750/450 landscape: the photos are mostly portrait, and faces sit near the top.
-    aspect-ratio: 3 / 4;
+    // Landscape so the image doesn't dwarf the quote. The photos are mostly portrait with
+    // faces near the top, so crop from just below the top edge.
+    aspect-ratio: 4 / 3;
     width: 100%;
     object-fit: cover;
-    object-position: center top;
+    object-position: center 20%;
   }
 
   &__quote {
     flex: 1 1 auto; // takes spare height so the button sits at the card's bottom
     padding: 1.5rem;
+
+    // Mark and the body's drop below it scaled down to suit the standard-size text.
+    .c-quote__mark svg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .c-quote__body {
+      @include bp.respond($min: bp.$md) {
+        margin-top: 1rem;
+      }
+    }
+
+    // Name matches the quote text's size (bold); role steps down below it.
+    .c-quote__attribution-name {
+      @extend .u-standfirst-compact;
+    }
+
+    .c-quote__attribution-role {
+      font-size: var(--wp--preset--font-size--body-regular);
+      line-height: 1.375rem;
+    }
   }
 
   // Quote's own bottom padding already clears the attribution; this only

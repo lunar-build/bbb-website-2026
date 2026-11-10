@@ -11,7 +11,7 @@
 
       <div class="c-link-card__content">
         @if ($card['title'])
-          <p class="c-link-card__title u-heading-4">{{ $card['title'] }}</p>
+          <p class="c-link-card__title u-heading-5">{{ $card['title'] }}</p>
         @endif
 
         @if ($card['description'])
@@ -29,7 +29,7 @@
         />
       @else
         <div class="c-link-card__cta">
-          <a class="c-link-card__cta-link u-cta-large" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+          <a class="c-link-card__cta-link u-cta-small" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
             {{-- Outer span is the flex item; the inner one stays inline so its highlight follows each line. --}}
             <span><span class="c-link-card__cta-text">{{ $card['link']['title'] }}</span></span>
             @if (($card['link']['target'] ?? '') === '_blank')

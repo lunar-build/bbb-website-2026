@@ -12,7 +12,7 @@
   @else
     <div class="c-image-block__info-box">
       @if ($infoBoxType === 'wysiwyg')
-        <div class="c-image-block__info-box-content">{!! $infoBoxContent !!}</div>
+        <div class="c-image-block__info-box-content u-rich-text">{!! $infoBoxContent !!}</div>
       @else
         <div class="c-image-block__info-box-columns">
           <div class="c-image-block__info-box-column">

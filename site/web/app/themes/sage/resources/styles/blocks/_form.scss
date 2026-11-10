@@ -96,31 +96,19 @@
     }
   }
 
-  // "Centred": no image, one narrower column.
+  // "Centred": no image, one narrower column. Only the heading and intro centre —
+  // form fields and their labels always stay left-aligned.
   &--centred {
+    // Explicit width: auto margins on a grid item (inside .o-container) shrink it to its
+    // content, which left the form at GF's intrinsic input width (~435px).
     .c-form__inner {
+      width: 100%;
       max-width: 48rem;
       margin-inline: auto;
-      text-align: center;
     }
 
     .c-form__content {
-      :where(h1, h2, h3, h4, h5, h6) {
-        text-align: center;
-      }
-    }
-
-    // GF stretches choice labels full width, so centred text drifts from its control:
-    // shrink-wrap the group, centre it, left-align rows.
-    .gfield_radio,
-    .gfield_checkbox {
-      width: fit-content;
-      max-width: 100%;
-      margin-inline: auto;
-    }
-
-    .gchoice {
-      text-align: left;
+      text-align: center;
     }
 
     .gform_footer,

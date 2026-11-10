@@ -16,9 +16,9 @@
           <tr>
             @foreach ($row['cells'] as $i => $cell)
               @if ($i === 0 && $firstColumnIsHeader)
-                <th scope="row" class="u-table-cell-heading">{!! $cell['content'] !!}</th>
+                <th scope="row" class="u-table-cell-heading u-rich-text">{!! $cell['content'] !!}</th>
               @else
-                <td class="u-body-regular">{!! $cell['content'] !!}</td>
+                <td class="u-body-regular u-rich-text">{!! $cell['content'] !!}</td>
               @endif
             @endforeach
           </tr>

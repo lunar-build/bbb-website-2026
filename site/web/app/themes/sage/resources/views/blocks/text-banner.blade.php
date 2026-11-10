@@ -12,7 +12,7 @@
     @endif
 
     @if ($body)
-      <div class="c-text-banner__body u-body-large">{!! $body !!}</div>
+      <div class="c-text-banner__body u-body-large u-rich-text">{!! $body !!}</div>
     @endif
   </div>
 </div>

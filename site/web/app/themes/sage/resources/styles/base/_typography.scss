@@ -1,4 +1,5 @@
 @use '../abstracts/spacing';
+@use '../abstracts/lists';
 
 body {
   font-family: var(--wp--preset--font-family--nata-sans);
@@ -25,10 +26,13 @@ ol {
   }
 }
 
-// Custom bullet for content lists, scoped to .e-content and the Bullet List block so it
-// doesn't leak onto UI <ul>s (nav, pattern library chrome).
+// Custom bullet for content lists, scoped so it doesn't leak onto UI <ul>s (nav,
+// pattern library chrome): page content, core List blocks, the Bullet List block
+// and rich-text fields (.u-rich-text).
 .e-content ul,
-.c-bullet-list ul {
+ul.wp-block-list,
+.c-bullet-list ul,
+.u-rich-text ul {
   list-style: none;
   padding-inline-start: 1.3125rem;
 
@@ -38,7 +42,8 @@ ol {
     &::before {
       content: '';
       position: absolute;
-      top: 0.59375rem;
+      top: 0.59375rem; // centred on a 1.5rem line; `lh` below follows larger text
+      top: calc(0.5lh - 0.15625rem);
       left: -1.3125rem;
       width: 0.3125rem;
       height: 0.3125rem;
@@ -46,6 +51,12 @@ ol {
       background: var(--wp--preset--color--blue);
     }
   }
+}
+
+// Spacing, hollow nested bullets and numbering to match the Bullet List block.
+.wp-block-list,
+.u-rich-text {
+  @include lists.content-list;
 }
 
 h1,
@@ -59,7 +70,7 @@ h1,
 h2,
 .u-heading-2 {
   font-size: var(--wp--preset--font-size--heading-2);
-  line-height: 3.375rem;
+  line-height: 3.125rem;
   font-weight: 700;
   margin-bottom: spacing.$loose;
 }
@@ -80,20 +91,40 @@ h4,
   margin-bottom: spacing.$base;
 }
 
-// No distinct H6 spec supplied by design — reuses H5 size until one is provided.
 h5,
-h6,
 .u-heading-5 {
   font-size: var(--wp--preset--font-size--heading-5);
-  line-height: 2.25rem;
+  line-height: 1.875rem;
   font-weight: 700;
   margin-bottom: spacing.$base;
+}
+
+// Not in the Figma type scale — one step below H5, still clear of body text.
+h6,
+.u-heading-6 {
+  font-size: var(--wp--preset--font-size--heading-6);
+  line-height: 1.625rem;
+  font-weight: 700;
+  margin-bottom: spacing.$base;
+}
+
+// Card titles: between H5 and H6. Shared by Feature Card (Card Grid etc.) and Business Card; Card Row's news cards step down from it.
+.u-card-title {
+  font-size: clamp(1.25rem, 1.198rem + 0.221vw, 1.375rem);
+  line-height: 1.75rem;
+  font-weight: 700;
 }
 
 .u-standfirst {
   font-size: var(--wp--preset--font-size--standfirst);
   line-height: 1.875rem;
   font-weight: 400;
+}
+
+// Standfirst size on a tighter line, for short one-line text (card titles, quote names).
+.u-standfirst-compact {
+  font-size: var(--wp--preset--font-size--standfirst);
+  line-height: 1.5rem;
 }
 
 .u-input-label {
@@ -103,14 +134,14 @@ h6,
 }
 
 .u-news-tag {
-  font-size: var(--wp--preset--font-size--input-label);
-  line-height: 32px;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
   font-weight: 500;
 }
 
 .u-business-service-label {
   font-size: var(--wp--preset--font-size--business-service-label);
-  line-height: 24px;
+  line-height: 1.5rem;
   font-weight: 400;
 }
 
@@ -122,19 +153,13 @@ h6,
 
 .u-body-regular {
   font-size: var(--wp--preset--font-size--body-regular);
-  line-height: 24px;
+  line-height: 1.5rem;
   font-weight: 400;
 }
 
 .u-contact-text {
   font-size: var(--wp--preset--font-size--body-regular);
-  line-height: 24px;
-  font-weight: 700;
-}
-
-.u-news-row-card-title {
-  font-size: var(--wp--preset--font-size--news-row-card-title);
-  line-height: 36px;
+  line-height: 1.5rem;
   font-weight: 700;
 }
 
@@ -178,9 +203,17 @@ h6,
   font-weight: 700;
 }
 
+// Short-form link a step down, for links grouped in a list or grid.
+.u-short-form-link-small {
+  font-family: var(--wp--preset--font-family--anonymous-pro);
+  font-size: 1.25rem;
+  line-height: 1.625rem;
+  font-weight: 700;
+}
+
 .u-quote {
   font-size: var(--wp--preset--font-size--quote);
-  line-height: 40px;
+  line-height: 2.125rem;
   font-weight: 400;
 }
 

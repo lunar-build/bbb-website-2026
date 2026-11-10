@@ -59,6 +59,38 @@ function legal_links_from_options(): array
     ], $rows);
 }
 
+/** Theme Options "404 page" quick links → `{ label, href, target }[]`, falling back to a default set when empty. */
+function not_found_links_from_options(): array
+{
+    $links = array_map(
+        fn($row) => normalize_link($row['link'] ?? null),
+        get_field('not_found_links', 'option') ?: [],
+    );
+
+    $links = array_values(array_filter($links, fn($link) => $link['url'] && $link['title']));
+
+    if (! $links) {
+        $postsPage = (int) get_option('page_for_posts');
+        // The planner is a homepage block with no page of its own, so follow the header CTA's link.
+        $plannerUrl = normalize_link(get_field('cta', 'option'))['url'] ?: home_url('/');
+
+        $links = array_filter([
+            ['title' => __('Home', 'sage'), 'url' => home_url('/')],
+            ['title' => __('Journey planner', 'sage'), 'url' => $plannerUrl],
+            ['title' => __('What’s on', 'sage'), 'url' => get_post_type_archive_link('mec-events')],
+            ['title' => __('News', 'sage'), 'url' => $postsPage ? get_permalink($postsPage) : null],
+        ], fn($link) => $link['url']);
+
+        $links = array_map(fn($link) => $link + ['target' => ''], array_values($links));
+    }
+
+    return array_map(fn($link) => [
+        'label' => $link['title'],
+        'href' => $link['url'],
+        'target' => $link['target'],
+    ], $links);
+}
+
 /**
  * Theme Options "Social" fields → `{ platform, url }[]`, skipping blanks. `platform` is
  * the field slug (e.g. 'facebook'), so it maps to an icon deterministically (see
@@ -218,4 +250,31 @@ function theme_block_background_css(): string
     }
 
     return $css;
+}
+
+/**
+ * Main query's pagination as `<a>`/`<span>` strings for archive and search results.
+ * paginate_links() carries the current query string (search term, active filters) onto each link.
+ * Hidden text gives the accessible names "Page 2", "Previous page" and "Next page"; the
+ * spaces outside it don't render, as the links are inline-flex.
+ */
+function pagination_links(): array
+{
+    $arrow = \Illuminate\Support\Facades\Blade::render('<x-icon name="arrow-right" />');
+    $hidden = fn(string $text) => '<span class="u-sr-only">' . esc_html($text) . '</span>';
+
+    return paginate_links([
+        'type' => 'array',
+        'current' => max(1, (int) get_query_var('paged')),
+        'total' => (int) $GLOBALS['wp_query']->max_num_pages,
+        'before_page_number' => $hidden(__('Page', 'sage')) . ' ',
+        'prev_text' => $arrow . __('Previous', 'sage') . ' ' . $hidden(__('page', 'sage')),
+        'next_text' => __('Next', 'sage') . ' ' . $hidden(__('page', 'sage')) . $arrow,
+    ]) ?: [];
+}
+
+/** A nav item that is a real page, not a "#" or empty placeholder: its label can link while a chevron opens the children. */
+function nav_item_has_link(array $item): bool
+{
+    return ! in_array(trim((string) ($item['href'] ?? '')), ['', '#'], true);
 }

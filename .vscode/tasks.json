@@ -27,22 +27,24 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "ssh:sage",
+			"label": "npm:dev",
 			"type": "shell",
-			"command": "ddev ssh -d /var/www/html/web/app/themes/sage",
+			"command": "ddev exec -d /var/www/html/web/app/themes/sage npm run dev",
+			"isBackground": true,
 			"presentation": {
 				"group": "ssh"
 			},
 			"options": {
 				"cwd": "${workspaceFolder}/site"
-			}
+			},
+			"problemMatcher": []
 		},
 		{
 			"label": "ssh:panels",
 			"type": "shell",
 			"dependsOn": [
 				"ssh:site",
-				"ssh:sage"
+				"npm:dev"
 			],
 			"dependsOrder": "parallel",
 			"options": {

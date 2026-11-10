@@ -8,6 +8,7 @@
 
 
 *.sql
+*.sql.gz
 *.tar.gz
 
 site/web/app/advanced-cache.php

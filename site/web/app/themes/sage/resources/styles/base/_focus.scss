@@ -14,6 +14,7 @@
 
 // Dark surfaces override the variable, so default ring() calls inside them go white.
 .c-primary-nav,
+.c-primary-nav-desktop__bar,
 .c-primary-nav-desktop__dropdown {
   --focus-color: var(--wp--preset--color--white);
 }

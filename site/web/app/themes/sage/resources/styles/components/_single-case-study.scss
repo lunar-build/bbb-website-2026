@@ -1,0 +1,72 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Figma "Sample page -> Case Study": hero photo, question/answer rows, other case studies.
+
+.c-single-case-study {
+  &__image-el {
+    display: block;
+    width: 100%;
+    aspect-ratio: 940 / 564;
+    object-fit: cover;
+    border-radius: 1.25rem;
+  }
+
+  &__details {
+    margin-block: 2.5rem 0;
+  }
+
+  &__row {
+    display: grid;
+    gap: 0.5rem 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--wp--preset--color--blue);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    @include bp.respond($min: bp.$md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__question {
+    margin: 0;
+    font-family: var(--wp--preset--font-family--anonymous-pro);
+    font-size: 1.25rem;
+    line-height: 1.875rem;
+    font-weight: 700;
+    color: var(--wp--preset--color--blue-medium);
+  }
+
+  &__answer {
+    margin: 0;
+    color: var(--wp--preset--color--blue-dark);
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Figma's cards are landscape with body-size quotes; the Case Study Grid block's
+  // defaults (portrait photo, large quote) are for its own design.
+  &__related {
+    padding-block: 5rem 3.5rem;
+
+    .c-case-study-grid__image {
+      aspect-ratio: 750 / 450;
+      object-position: center;
+    }
+
+    .c-quote__body {
+      font-size: 1rem;
+      line-height: 1.625rem;
+      margin-top: 0.25rem;
+    }
+
+    .c-quote__mark svg {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+}
