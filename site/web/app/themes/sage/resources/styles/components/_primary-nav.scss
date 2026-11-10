@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/links';
 @use '../components/header' as header;
 @use '../base/typography';
 
@@ -79,9 +80,7 @@
     text-underline-offset: 0.25rem;
   }
 
-  &:focus-visible {
-    outline: none;
-  }
+  @include links.focus-span;
 }
 
 .c-primary-nav__chevron {
@@ -241,9 +240,7 @@
     text-underline-offset: 0.25rem;
   }
 
-  &:focus-visible {
-    outline: none;
-  }
+  @include links.focus-span;
 }
 
 .c-primary-nav-desktop__chevron {
@@ -325,9 +322,7 @@
     text-underline-offset: 0.25rem;
   }
 
-  &:focus-visible {
-    outline: none;
-  }
+  @include links.focus-span;
 
   .c-primary-nav-desktop__chevron svg {
     transform: rotate(-90deg);

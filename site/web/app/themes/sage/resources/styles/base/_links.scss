@@ -65,6 +65,25 @@ $offset: 0.3em;
   }
 }
 
+// Nav links: the text span is a flex item, so padding would shift the row. Keyboard focus swaps
+// hover's solid underline for a dashed one on a yellow highlight; the box-shadow grows the
+// highlight without moving the text.
+//
+//   .thing__link { @include links.focus-span; }
+@mixin focus-span {
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible > span:first-child {
+    background-color: var(--wp--preset--color--yellow);
+    box-shadow: 0 0 0 0.25rem var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+    text-decoration-style: dashed;
+    text-decoration-color: var(--wp--preset--color--charcoal);
+  }
+}
+
 // Classless links inside text elements, which is what the editor and rich-text fields output.
 // Component links (buttons, cards, nav) all carry a class, so they're left alone.
 :where(p, li, dd, dt, td, th, figcaption, blockquote, address) a:not([class]) {
