@@ -50,14 +50,16 @@
   }
 
   &__includes-heading {
-    margin: 0 0 0.5rem;
+    margin: 0 0 1rem;
   }
 
   &__includes-list {
     display: grid;
-    // Fixed-width columns keep icons aligned across cards (Figma: 64px items, 40px gap).
+    // Fixed-width columns keep icons aligned across cards (Figma: 64px items, 40px min gap);
+    // space-between spreads the leftover width so the last column sits flush right.
     grid-template-columns: repeat(auto-fill, 4rem);
-    gap: 0.75rem 2.5rem;
+    justify-content: space-between;
+    gap: 1rem 2.5rem;
     margin: 0;
     padding: 0;
     list-style: none;
