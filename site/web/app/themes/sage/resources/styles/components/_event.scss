@@ -1,3 +1,4 @@
+@use '../base/links';
 @use '../abstracts/breakpoints' as bp;
 @use '../base/typography';
 @use '../base/focus';
@@ -99,9 +100,7 @@
   }
 
   a {
-    color: var(--wp--preset--color--blue);
-
-    @include focus.ring;
+    @include links.inline;
   }
 }
 
