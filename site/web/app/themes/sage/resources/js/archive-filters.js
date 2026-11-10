@@ -1,3 +1,5 @@
+import { setHeaderHidden } from './site-header.js';
+
 // Archive filters: a checkbox or pagination click fetches the URL and swaps in its
 // [data-archive-results] fragment, keeping real ?filter_{taxonomy}[]= URLs shareable.
 const form = document.querySelector('[data-archive-filters]');
@@ -37,6 +39,8 @@ if (results) {
         const target = results.querySelector('[data-archive-focus]');
         target?.focus({ preventScroll: true });
         target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => setHeaderHidden(true), 1000)
+        
       }
     } catch (error) {
       if (error.name !== 'AbortError') window.location.href = url;
