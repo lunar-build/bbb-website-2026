@@ -43,3 +43,10 @@
   outline: 2px solid $color;
   outline-offset: 2px;
 }
+
+// Elements focused by script (headings after a Page Index click, a form's confirmation message)
+// carry tabindex="-1". The browser only shows a ring for them after keyboard use, and its default
+// is blue, so give them the theme ring.
+[tabindex='-1']:focus-visible {
+  @include ring-styles;
+}
