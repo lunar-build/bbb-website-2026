@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -189,6 +190,7 @@ class Accordion extends Block
     {
         return [
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'items' => $this->items(),
         ];
     }
@@ -204,6 +206,7 @@ class Accordion extends Block
             ->addText('heading', [
                 'label' => 'Heading',
             ])
+            ->addPartial(HeadingLevelSelect::class)
             ->addRepeater('items', [
                 'label' => 'Items',
                 'button_label' => 'Add item',
@@ -224,6 +227,11 @@ class Accordion extends Block
             ->endRepeater();
 
         return $fields->build();
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     public function heading()

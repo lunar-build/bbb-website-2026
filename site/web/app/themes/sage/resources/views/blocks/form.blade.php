@@ -1,4 +1,4 @@
-  <section {{ $attributes->class(['c-form', 'c-form--'.$layout, 'o-full-bleed-bg']) }}>
+  <x-block-root :heading="App\Support\HeadingLevel::shows($heading) || $headingHighlight" {{ $attributes->class(['c-form', 'c-form--'.$layout, 'o-full-bleed-bg']) }}>
 
   @if ($layout === 'image')
     <div class="c-form__panel">
@@ -78,4 +78,4 @@
     </div>
   @endif
 
-  </section>
+  </x-block-root>

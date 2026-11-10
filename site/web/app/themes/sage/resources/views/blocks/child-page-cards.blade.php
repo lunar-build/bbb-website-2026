@@ -1,5 +1,8 @@
 @if (count($cards))
-<section {{ $attributes->class(['c-card-grid', 'c-child-page-cards', 'o-full-bleed-bg']) }}>
+<x-block-root :heading="$heading" {{ $attributes->class(['c-card-grid', 'c-child-page-cards', 'o-full-bleed-bg']) }}>
+
+{{-- Card headings sit one level below the block's heading, or at its level when it shows none. --}}
+@php($cardLevel = App\Support\HeadingLevel::inside($heading))
 
 <div class="o-container">
   @if (! empty($heading['text']))
@@ -19,7 +22,7 @@
       <x-card
         card-style="link"
         :image="$card['image']"
-        :heading="$card['heading']"
+        :heading="array_merge($card['heading'], ['level' => $cardLevel])"
         :body="$card['body']"
         :link="$card['link']"
         cta-style="icon"
@@ -29,5 +32,5 @@
   </div>
 </div>
 
-</section>
+</x-block-root>
 @endif

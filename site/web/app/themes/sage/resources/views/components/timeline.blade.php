@@ -1,4 +1,4 @@
-@props(['steps' => [], 'markerSize' => 'number'])
+@props(['steps' => [], 'markerSize' => 'number', 'headingLevel' => 'h3'])
 
 <ol {{ $attributes->class(['c-timeline', 'c-timeline--dates' => $markerSize === 'date']) }}>
   @foreach ($steps as $index => $step)
@@ -14,7 +14,7 @@
 
       <div class="c-timeline__content">
         @if (! empty($step['heading']))
-          <h3 class="c-timeline__heading u-heading-5">{{ $step['heading'] }}</h3>
+          <x-heading :level="$headingLevel" style="h5" class="c-timeline__heading">{{ $step['heading'] }}</x-heading>
         @endif
 
         @if (! empty($step['body']))

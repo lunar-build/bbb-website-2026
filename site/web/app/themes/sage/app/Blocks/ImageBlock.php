@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Fields\HeadingLevelSelect;
 use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
@@ -200,6 +201,7 @@ class ImageBlock extends Block
     public function with(): array
     {
         return [
+            'headingLevel' => $this->resolveField('heading_level', 'h3'),
             'image' => $this->image(),
             'contentType' => $this->contentType(),
             'caption' => $this->caption(),
@@ -218,6 +220,8 @@ class ImageBlock extends Block
     public function fields(): array
     {
         $fields = Builder::make('image_block');
+
+        $fields->addPartial(HeadingLevelSelect::class, ['default_level' => 'h3']);
 
         $infoBoxCondition = [
             [

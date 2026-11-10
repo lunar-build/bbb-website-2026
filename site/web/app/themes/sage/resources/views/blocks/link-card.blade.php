@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-link-card']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-link-card']) }}>
 
 <div class="o-container">
   @foreach ($cards as $card)
@@ -42,4 +43,4 @@
   @endforeach
 </div>
 
-</section>
+</div>

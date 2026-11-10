@@ -155,6 +155,24 @@ add_action('admin_notices', function () {
 });
 
 /**
+ * Marks every ACF block's root element, so CSS can tell a block from core markup now that a
+ * block without a heading is a <div> (not a <section>), e.g. the content-flow spacing rules.
+ */
+add_filter('render_block', function ($block_content, $block) {
+    if (! str_starts_with($block['blockName'] ?? '', 'acf/')) {
+        return $block_content;
+    }
+
+    $processor = new \WP_HTML_Tag_Processor($block_content);
+
+    if ($processor->next_tag()) {
+        $processor->add_class('is-acf-block');
+    }
+
+    return $processor->get_updated_html();
+}, 10, 2);
+
+/**
  * base/_forms.scss hides the native `input[type=checkbox]`/`input[type=radio]`
  * box (`appearance: none`) and draws a custom glyph via `::before`, which some
  * voice control software can't target on a bare pseudo-styled input. Gravity
@@ -277,7 +295,8 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         $anchor = Support\PageMenu::slugify(wp_strip_all_tags($block_content));
 
         if ($anchor !== '') {
-            $processor->set_attribute('id', $anchor);
+            // Taken, so a heading component with the same text gets -2 rather than a duplicate.
+            $processor->set_attribute('id', Support\HeadingIds::reserve($anchor));
         }
     }
 
@@ -286,6 +305,18 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 
     return $processor->get_updated_html();
 }, 10, 2);
+
+/**
+ * Every heading on a front-end page has an id (for aria-labelledby and anchors): <x-heading> and the
+ * core heading filter above make theirs as they render; this gives the rest (raw <h1>s, plugin markup) one.
+ */
+add_action('template_redirect', function () {
+    if (is_feed() || is_embed() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+        return;
+    }
+
+    ob_start(fn($html) => is_string($html) && str_contains($html, '</html>') ? Support\HeadingIds::addMissing($html) : $html);
+}, 0);
 
 /**
  * Blocks with `'color' => ['background' => true]` in `$supports` get WP's Background
@@ -337,12 +368,51 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 
     $postType = Support\ArchiveFilters::postType();
 
+    // Events whose sessions have all passed aren't listed. [0] matches nothing, so no events
+    // left shows the archive's empty state, not every event. (Order: the posts_clauses below.)
+    if ($postType === 'mec-events') {
+        $query->set('post__in', Support\EventSessions::upcomingEventIds() ?: [0]);
+    }
+
     if (! $taxQuery = Support\ArchiveFilters::taxQuery($postType)) {
         return;
     }
 
     $query->set('tax_query', $taxQuery);
     $query->set('ignore_sticky_posts', true);
+});
+
+/**
+ * Search results' content-type filter (?filter_type[]=page) — see App\Support\SearchFilters.
+ */
+add_action('pre_get_posts', function (\WP_Query $query) {
+    if (is_admin() || ! $query->is_main_query() || ! $query->is_search()) {
+        return;
+    }
+
+    $query->set('post_type', Support\SearchFilters::queryPostTypes());
+});
+
+/**
+ * Result count in the search page title. Submitting a search reloads the page, and the
+ * title is what screen readers announce on load (the count's live region only speaks on
+ * archive-filters.js swaps, which sync the title too).
+ */
+add_filter('document_title_parts', function (array $title) {
+    if (! is_search()) {
+        return $title;
+    }
+
+    $found = (int) $GLOBALS['wp_query']->found_posts;
+    $query = get_search_query(false);
+
+    $title['title'] = $query === ''
+        /* translators: %d: number of search results */
+        ? sprintf(_n('%d search result', '%d search results', $found, 'sage'), $found)
+        /* translators: 1: number of search results, 2: the search term */
+        : sprintf(_n('%1$d result for “%2$s”', '%1$d results for “%2$s”', $found, 'sage'), $found, $query);
+
+    return $title;
 });
 
 /**
@@ -558,9 +628,10 @@ add_action('pre_get_posts', function (\WP_Query $query) {
         global $wpdb;
 
         // MEC stores wall-clock times as UTC timestamps; see App\Support\EventSessions.
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        // A session that hasn't ended counts, so one running now sorts first.
+        $now = Support\EventSessions::now();
         $clauses['join'] .= $wpdb->prepare(
-            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tstart >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
+            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tend >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
             $now,
         );
         $clauses['orderby'] = "mec_next.next_session IS NULL, mec_next.next_session ASC, {$wpdb->posts}.post_title ASC";
