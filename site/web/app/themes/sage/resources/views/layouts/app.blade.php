@@ -19,7 +19,7 @@
     @php(wp_body_open())
 
     <div id="app">
-      <a class="u-sr-only" href="#main">
+      <a class="c-skip-link" href="#main">
         {{ __('Skip to content', 'sage') }}
       </a>
 

@@ -1,0 +1,33 @@
+@use '../base/focus' as focus;
+@use '../base/typography';
+
+// Visually hidden until focused, then pinned top-left above the sticky header.
+// Same clip technique as .u-sr-only (px intentional there); the focused state is rem.
+.c-skip-link {
+  @extend .u-cta-small;
+
+  position: absolute;
+  z-index: 1000;
+  // WP sets this to the logged-in admin bar's height (32px / 46px), unset otherwise.
+  inset-block-start: calc(var(--wp-admin--admin-bar--height, 0px) + 0.5rem);
+  inset-inline-start: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-radius: 999px;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  text-decoration: none;
+
+  &:not(:focus) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @include focus.ring;
+}
