@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-case-study-grid']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-case-study-grid']) }}>
 
 <div class="o-container">
   <div class="c-case-study-grid__cards">
@@ -33,4 +34,4 @@
   </div>
 </div>
 
-</section>
+</div>

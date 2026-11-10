@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-business-card']) }}>
+<x-block-root :heading="(bool) $name" {{ $attributes->class(['c-business-card']) }}>
 
 @if ($name)
 <div class="o-container">
@@ -8,8 +8,9 @@
     :services="$services"
     :description="$description"
     :link="$link"
+    :heading-level="$headingLevel"
   />
 </div>
 @endif
 
-</section>
+</x-block-root>

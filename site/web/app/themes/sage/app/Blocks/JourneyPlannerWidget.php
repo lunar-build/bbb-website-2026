@@ -4,6 +4,7 @@ namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\ContainedToggle;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -179,6 +180,7 @@ class JourneyPlannerWidget extends Block
             'contained' => $this->contained(),
             'variant' => $this->variant(),
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'ctaLabel' => $this->ctaLabel(),
             'journeyPlannerUrl' => $this->journeyPlannerUrl(),
             'nearbyOptions' => self::NEARBY_OPTIONS,
@@ -209,6 +211,7 @@ class JourneyPlannerWidget extends Block
                     'label' => 'Heading',
                     'instructions' => 'Leave empty to use the default for the selected variant ("Plan a cycling route" / "What\'s near you…").',
                 ])
+            ->addPartial(HeadingLevelSelect::class)
                 ->addText('cta_label', [
                     'label' => 'CTA button label',
                     'instructions' => 'Leave empty to use the default for the selected variant ("Plan your route" / "Search near here").',
@@ -241,6 +244,11 @@ class JourneyPlannerWidget extends Block
     public function variant()
     {
         return $this->resolveField('variant', 'plan_route');
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     /**

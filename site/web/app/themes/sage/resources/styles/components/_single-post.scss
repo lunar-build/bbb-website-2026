@@ -5,13 +5,13 @@
 
 // .e-content is itself an .o-container here, so put full-bleed-background blocks back
 // on the full-bleed track; their inner .o-container still narrows their content.
-.e-content.o-container > :is(.o-full-bleed-bg, section.has-background) {
+.e-content.o-container > :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background) {
   grid-column: full-start / full-end;
 }
 
 // Other blocks' <section> is already the content column, so flatten their inner
 // .o-container to avoid narrowing twice.
-.e-content.o-container > section:not(.o-full-bleed-bg, .has-background) .o-container {
+.e-content.o-container > :is(section, .is-acf-block):not(.o-full-bleed-bg, .has-background) .o-container {
   grid-template-columns: [full-start content-start] 100% [content-end full-end];
 }
 

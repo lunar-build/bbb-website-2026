@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-feature-card']) }}>
+<x-block-root :heading="$heading" {{ $attributes->class(['c-feature-card']) }}>
 
 <div class="o-container">
   <x-card
@@ -12,4 +12,4 @@
   />
 </div>
 
-</section>
+</x-block-root>
