@@ -1,16 +1,17 @@
-// Figma "Filter checkboxes": heading + `<x-checkbox>` rows, standalone or inside
-// `.c-filter-checkboxes`. <wa-checkbox-group> already renders a fieldset/legend
-// (WCAG 1.3.1); this resets its host display and themes the label.
+// Figma "Filter checkboxes": legend + `<x-checkbox>` rows, standalone or inside
+// `.c-filter-checkboxes`.
 
 .c-filter-checkbox-group {
-  display: block;
   min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
 
-  &::part(form-control-label) {
-    @extend .u-table-column-heading !optional;
-    color: var(--wp--preset--color--blue-medium);
-    margin: 0 0 0.875rem;
-  }
+.c-filter-checkbox-group__legend {
+  margin: 0 0 0.875rem;
+  padding: 0;
+  color: var(--wp--preset--color--blue-medium);
 }
 
 .c-filter-checkbox-group + .c-filter-checkbox-group {

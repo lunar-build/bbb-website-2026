@@ -12,6 +12,14 @@ namespace App\Support;
 class EventSessions
 {
     /**
+     * The current time as MEC stores it: site wall-clock read as UTC.
+     */
+    public static function now(): int
+    {
+        return strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+    }
+
+    /**
      * Published sessions starting between two dates (inclusive, Y-m-d),
      * optionally limited to one mec_category term, ordered by start time.
      * Events set to MEC's "Hide from calendars & lists", cancelled or
@@ -55,8 +63,7 @@ class EventSessions
     {
         global $wpdb;
 
-        // Compare against the current wall-clock time stored the same way MEC does.
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return $wpdb->get_row($wpdb->prepare(
             "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
@@ -64,6 +71,28 @@ class EventSessions
             $postId,
             $now,
         ));
+    }
+
+    /**
+     * IDs of events with a session that hasn't ended, soonest first. A session
+     * running now counts; one that has finished doesn't. `_event_undated` events
+     * are skipped: they keep a placeholder date that can sit in the future.
+     *
+     * @return int[]
+     */
+    public static function upcomingEventIds(): array
+    {
+        global $wpdb;
+
+        $now = self::now();
+
+        return array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->prefix}mec_dates
+            WHERE tend >= %d
+                AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} u WHERE u.post_id = {$wpdb->prefix}mec_dates.post_id AND u.meta_key = '_event_undated')
+            GROUP BY post_id ORDER BY MIN(tstart)",
+            $now,
+        )));
     }
 
     /**
@@ -75,7 +104,7 @@ class EventSessions
     {
         global $wpdb;
 
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return $wpdb->get_results($wpdb->prepare(
             "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
@@ -95,7 +124,7 @@ class EventSessions
     {
         global $wpdb;
 
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        $now = self::now();
 
         return $wpdb->get_row($wpdb->prepare(
             "SELECT tstart, tend FROM {$wpdb->prefix}mec_dates
@@ -103,6 +132,28 @@ class EventSessions
             $postId,
             $now,
         ));
+    }
+
+    /**
+     * Whether every session has finished (by end time, so one in progress
+     * hasn't). False for events with no sessions or `_event_undated` ones.
+     */
+    public static function hasEnded(int $postId): bool
+    {
+        global $wpdb;
+
+        if (get_post_meta($postId, '_event_undated', true)) {
+            return false;
+        }
+
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+
+        $latestEnd = $wpdb->get_var($wpdb->prepare(
+            "SELECT MAX(tend) FROM {$wpdb->prefix}mec_dates WHERE post_id = %d",
+            $postId,
+        ));
+
+        return $latestEnd !== null && (int) $latestEnd < $now;
     }
 
     /**

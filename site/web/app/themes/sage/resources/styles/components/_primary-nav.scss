@@ -84,6 +84,28 @@
   }
 }
 
+// Label link + separate chevron button (items that are a real page as well as a parent).
+.c-primary-nav__split {
+  display: flex;
+  align-items: center;
+}
+
+.c-primary-nav__toggle {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; // chevron lines up with the other rows' (the 0.25rem is their link padding)
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+  border: none;
+  background: none;
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  @include focus.ring;
+}
+
 .c-primary-nav__chevron {
   flex: none;
   color: inherit;
@@ -270,8 +292,38 @@
 
 .c-primary-nav-desktop__link[aria-expanded='true']
   .c-primary-nav-desktop__chevron
+  svg,
+.c-primary-nav-desktop__toggle[aria-expanded='true']
+  .c-primary-nav-desktop__chevron
   svg {
   transform: rotate(180deg);
+}
+
+// Label link + separate chevron button (items that are a real page as well as a parent).
+.c-primary-nav-desktop__split {
+  display: inline-flex;
+  align-items: center;
+}
+
+.c-primary-nav-desktop__split--overflow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.c-primary-nav-desktop__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  margin-inline-start: 0.25rem;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  @include focus.ring;
 }
 
 .c-primary-nav-desktop__dropdown {
