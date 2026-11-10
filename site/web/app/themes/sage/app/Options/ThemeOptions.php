@@ -130,13 +130,21 @@ class ThemeOptions extends Field
             ->addTab('archive_pages', [
                 'label' => 'Archive pages',
             ])
-                ->addMessage('archive_pages_info', 'News uses the "Posts page" set in Settings → Reading. Pick a page for any other archive below — its Image Hero and intro content render above the archive\'s filters and results.', [
+                ->addMessage('archive_pages_info', $this->archivePagesIntro(), [
                     'label' => 'Archive pages',
+                    'esc_html' => 0,
+                    'new_lines' => '',
                 ]);
 
+        // MEC registers `mec-events` after this runs, so it isn't among the registered post types yet: add it here.
+        $archives = ['mec-events' => 'Events'];
         foreach (get_post_types(['has_archive' => true, '_builtin' => false], 'objects') as $postType) {
-            $fields->addPostObject("archive_page_{$postType->name}", [
-                'label' => $postType->labels->name,
+            $archives[$postType->name] = $postType->labels->name;
+        }
+
+        foreach ($archives as $postTypeName => $label) {
+            $fields->addPostObject("archive_page_{$postTypeName}", [
+                'label' => $label,
                 'post_type' => ['page'],
                 'return_format' => 'id',
                 'allow_null' => true,
@@ -145,5 +153,29 @@ class ThemeOptions extends Field
         }
 
         return $fields->build();
+    }
+
+    /**
+     * What archive pages are, why to link a page to one, and how.
+     */
+    protected function archivePagesIntro(): string
+    {
+        $postsPageId = (int) get_option('page_for_posts');
+        $newsAddress = $postsPageId ? get_permalink($postsPageId) : '';
+
+        $news = $newsAddress
+            ? sprintf('News works the same way, using the "Posts page" in Settings → Reading (<a href="%1$s" target="_blank" rel="noopener">%1$s</a>).', esc_url($newsAddress))
+            : 'News works the same way, using the "Posts page" in Settings → Reading.';
+
+        return implode('', [
+            '<p>Each type of content below has its own listing page that shows its posts as cards, with filters. The address of each one is shown under its name. By default the page starts with just a title.</p>',
+            '<p>To add a banner image and some introduction text at the top instead, link a page: whatever is on that page appears above the listing.</p>',
+            '<ol>',
+            '<li>Create a normal page (Pages → Add New).</li>',
+            '<li>Add a hero block first (Image Hero, Text Hero or Video Hero), then any introduction text.</li>',
+            '<li>Publish it, then choose it in the matching field below. Leave the field empty to keep just the title.</li>',
+            '</ol>',
+            '<p>' . $news . '</p>',
+        ]);
     }
 }

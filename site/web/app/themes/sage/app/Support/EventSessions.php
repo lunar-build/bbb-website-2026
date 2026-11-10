@@ -106,6 +106,28 @@ class EventSessions
     }
 
     /**
+     * Whether every session has finished (by end time, so one in progress
+     * hasn't). False for events with no sessions or `_event_undated` ones.
+     */
+    public static function hasEnded(int $postId): bool
+    {
+        global $wpdb;
+
+        if (get_post_meta($postId, '_event_undated', true)) {
+            return false;
+        }
+
+        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+
+        $latestEnd = $wpdb->get_var($wpdb->prepare(
+            "SELECT MAX(tend) FROM {$wpdb->prefix}mec_dates WHERE post_id = %d",
+            $postId,
+        ));
+
+        return $latestEnd !== null && (int) $latestEnd < $now;
+    }
+
+    /**
      * The next session, or once an event has finished its last one, so a
      * past one-off still shows when it ran. `_event_undated` events (imported
      * on a placeholder date) never show a past date.
