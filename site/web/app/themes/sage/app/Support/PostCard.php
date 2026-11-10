@@ -59,7 +59,7 @@ class PostCard
      * which WP's auto-excerpt skips since it's an ACF block), else the
      * auto-excerpt from the opening paragraphs.
      */
-    private static function summary(\WP_Post $post): string
+    public static function summary(\WP_Post $post): string
     {
         $text = $post->post_excerpt;
 

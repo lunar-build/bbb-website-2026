@@ -40,7 +40,7 @@ class Archive extends Composer
             // Nothing to list and no filters to blame: there's simply nothing on.
             'noCurrentEvents' => $postType === 'mec-events' && ! $GLOBALS['wp_query']->found_posts && ! ArchiveFilters::active($postType),
             'cards' => array_map(fn($post) => PostCard::fromPost($post, 'match'), $GLOBALS['wp_query']->posts),
-            'paginationLinks' => $this->paginationLinks(),
+            'paginationLinks' => pagination_links(),
         ];
     }
 
@@ -92,19 +92,5 @@ class Archive extends Composer
             ['label' => __('Home', 'sage'), 'url' => home_url('/')],
             ['label' => get_post_type_object($postType)->labels->name ?? get_the_archive_title()],
         ];
-    }
-
-    /**
-     * paginate_links() carries the current query string (active filters) onto each link.
-     */
-    protected function paginationLinks(): array
-    {
-        return paginate_links([
-            'type' => 'array',
-            'current' => max(1, (int) get_query_var('paged')),
-            'total' => (int) $GLOBALS['wp_query']->max_num_pages,
-            'prev_text' => __('Previous', 'sage'),
-            'next_text' => __('Next', 'sage'),
-        ]) ?: [];
     }
 }
