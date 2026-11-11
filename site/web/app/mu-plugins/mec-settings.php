@@ -13,6 +13,16 @@ add_filter('option_mec_options', function ($options) {
     if (is_array($options)) {
         $options['settings']['single_cost_type'] = 'alphabetic';
 
+        // Free bookings confirm themselves, but MEC skips the "booking confirmed" email
+        // for auto-confirmed ones unless this is on, leaving customers with only "received".
+        $options['settings']['booking_auto_confirm_send_email'] = 1;
+
+        // The default says "we will check and confirm your booking", which is wrong for an
+        // auto-confirmed one. This reads correctly either way: the confirmed email follows.
+        $options['notifications']['booking_notification']['content'] = "Hello %%name%%,\r\n\r\n"
+            . "Thanks for your booking. You'll get another email as soon as it's confirmed.\r\n\r\n"
+            . "Regards,\r\n%%blog_name%%";
+
         // MEC's settings screens read these unchecked; until its settings are
         // first saved, each is a warning that Acorn turns into a 500.
         $options['settings'] += [

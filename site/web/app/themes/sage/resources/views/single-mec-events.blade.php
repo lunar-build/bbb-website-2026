@@ -87,7 +87,7 @@
                 @endif
               </div>
 
-              @if ($priceLines)
+              @if ($priceLines && ! $booking)
                 <div class="c-event__info-column">
                   <h2 class="c-event__info-heading u-heading-5">{{ __('Price', 'sage') }}</h2>
                   <x-bullet-list class="c-event__price" :items="$priceLines" />
@@ -95,6 +95,18 @@
               @endif
             </div>
           </div>
+
+          {{-- Result of a /verify/ or /cancel/ link, level with the form so it's seen. --}}
+          @if ($bookingNotice)
+            <x-callout-text :type="$bookingNotice['type']" class="c-event__booking-notice" data-booking-notice>{{ $bookingNotice['text'] }}</x-callout-text>
+          @endif
+
+          @if ($booking)
+            <section class="c-event__booking" aria-labelledby="c-event-booking">
+              <h2 id="c-event-booking" class="u-heading-5">{{ __('Book your place', 'sage') }}</h2>
+              {!! $booking !!}
+            </section>
+          @endif
 
           {!! $body !!}
 

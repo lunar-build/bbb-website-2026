@@ -1,0 +1,322 @@
+@use '../base/focus' as focus;
+@use '../base/typography';
+@use 'callout-text' as callout;
+
+// MEC's booking form (tickets → attendees → payment) inside the event page.
+// MEC supplies the markup and JS; this restyles its buttons to match <wa-button>
+// (components/_button.scss) and hides what the page already says.
+
+.c-event__booking {
+  margin-bottom: 3rem;
+
+  // MEC's own step titles ("Book Event", "Attendee's Form", "Checkout").
+  // Spacing between them and their neighbours comes from the stage gaps below.
+  h3,
+  h4 {
+    margin: 0;
+    font-family: var(--wp--preset--font-family--nata-sans);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  // "Book your place" above already titles step 1.
+  .mec-booking > form:not(.mec-booking-form-container) > h4:first-child {
+    display: none;
+  }
+
+  // Decorative icons; the labels carry the meaning.
+  .mec-ticket-icon-wrapper,
+  .mec-field-icon,
+  .mec-book-price-detail-icon,
+  .mec-book-form-gateway-option-svg,
+  .mec-ssl-protection-message img {
+    display: none;
+  }
+
+  // Running subtotals repeat the total shown at checkout and the ticket prices in step 1.
+  .mec-ticket-subtotal-wrapper,
+  .mec-ticket-detail .mec-ticket-price-wrapper,
+  .mec-events-meta-group-booking .mec-book-price-details li.mec-book-price-detail.mec-book-price-detail-type-tickets {
+    display: none;
+  }
+
+  // Attendee and total lists are layout, not content lists.
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mec-book-price-total {
+    font-weight: 700;
+  }
+
+  // "For free bookings, there is no payment step." above the confirmation.
+  .warning-msg:has(+ .mec-event-book-message) {
+    display: none;
+  }
+}
+
+// Buttons: Back is the outlined small CTA, everything else the filled brand CTA.
+.c-event__booking :is(.mec-book-form-next-button, .mec-book-form-back-button) {
+  @extend .u-cta-large;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 2px solid var(--wp--preset--color--yellow);
+  border-radius: 999px;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:is(:hover, :focus-visible) {
+    border-color: var(--wp--preset--color--charcoal);
+    background: var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  @include focus.ring;
+
+  img,
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+
+  // MEC's arrow is cyan; follow the label colour like our CTAs.
+  svg * {
+    stroke: currentColor;
+  }
+}
+
+.c-event__booking .mec-book-form-back-button {
+  border-color: var(--wp--preset--color--charcoal);
+  background: transparent;
+}
+
+.c-event__booking .mec-book-form-btn-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+// Ticket counter: [−] [ n ] [+] in a row. MEC absolutely positions stacked
+// up/down arrows over the input and puts "+" first in the markup.
+.c-event__booking .mec-event-tickets-list .mec-ticket-style-row .mec-event-ticket-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  :is(.plus, .minus) {
+    position: relative;
+    inset: auto; // MEC offsets these 5px from the top/bottom/right
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 2px solid var(--wp--preset--color--charcoal);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--wp--preset--color--charcoal);
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+
+    &:is(:hover, :focus-visible):not(.dis) {
+      background: var(--wp--preset--color--yellow);
+    }
+
+    &.dis {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    @include focus.ring;
+
+    // MEC's up/down chevrons don't suit a sideways counter; the bars are drawn
+    // as shapes (not text) so they centre exactly in the circle.
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 1rem;
+      height: 2px;
+      background: currentColor;
+    }
+
+    &::after {
+      display: none;
+    }
+
+    img {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+
+  .minus {
+    order: 1;
+  }
+
+  .mec-book-ticket-limit {
+    order: 2;
+    width: 4rem !important; // MEC sets 80px !important
+    height: 2.75rem;
+    margin: 0; // MEC: 0 0 10px auto, which lifts it off the buttons' centre line
+    text-align: center;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
+
+  .plus {
+    order: 3;
+
+    &::after {
+      display: block;
+      transform: rotate(90deg);
+    }
+  }
+}
+
+// "Fill in other attendees information the same as the first form.": centre the
+// checkbox on the text (spacing off the fields above is the stage gap).
+.c-event__booking .mec-first-for-all-wrapper {
+  margin: 0;
+
+  .mec-fill-attendees {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  // MEC's fake checkbox label; the real input is themed globally (base/_forms.scss).
+  .wn-checkbox-label {
+    display: none;
+  }
+}
+
+// MEC outlines every checked checkbox in the skin colour (!important, at 4 classes),
+// which stacks on the theme's tick image. The :not() pushes this one specificity higher.
+.c-event__booking .mec-booking input[type='checkbox']:checked:not(:disabled) {
+  border: none !important;
+}
+
+// Every stage (tickets, attendees, checkout) is a stack of loose blocks: MEC spaces
+// them with floats and one-off margins that don't survive our resets. One gap per
+// level instead, so a block added to any stage still gets breathing room.
+.c-event__booking {
+  .mec-booking > form,
+  .mec-booking-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  // Lists of rows: tickets, attendees, each attendee's fields, the price breakdown.
+  :is(
+      .mec-event-tickets-list,
+      .mec-book-bfixed-fields-container,
+      .mec-book-tickets-container,
+      .mec-book-tickets-reg-fields-container,
+      .mec-booking-registrtaion-fields,
+      .mec-book-price-details,
+      .mec-book-form-gateways-radio-buttons
+    ) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  // Attendee blocks are heavier than their fields, so they get the bigger gap.
+  .mec-book-tickets-container {
+    gap: 1.5rem;
+  }
+
+  // Float-clearing spacers: empty boxes that would otherwise become their own gap.
+  .clearfix,
+  [style*='clear:both'] {
+    display: none;
+  }
+
+  // Total/coupon, payment method and the pay button are separate groups.
+  .mec-book-form-gateways {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .mec-event-book-message {
+    margin: 0;
+  }
+}
+
+// Every message in the booking flow (sold out, no tickets, coupon result, booked, errors)
+// wears the callout component's shape and tones in place of MEC's stock pastel boxes.
+.c-event__booking :is(.info-msg, .warning-msg, .mec-error, .mec-success) {
+  @include callout.tone(info);
+  margin: 0;
+  padding: 0.625rem 1rem;
+  box-shadow: inset 0 0 0 2px var(--callout-border);
+  border-radius: 1.375rem;
+  background: var(--callout-bg);
+  color: var(--callout-fg);
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 1.5rem;
+
+  // The component's icon, redrawn as a mask since MEC's markup has no slot for it.
+  --callout-icon: url('../../svg/info.svg');
+  position: relative;
+  padding-left: 2.875rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0.75rem;
+    left: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: currentColor;
+    mask: var(--callout-icon) center / contain no-repeat;
+  }
+}
+
+.c-event__booking .warning-msg {
+  @include callout.tone(warning);
+  --callout-icon: url('../../svg/alert.svg');
+}
+
+.c-event__booking .mec-success {
+  @include callout.tone(success);
+  --callout-icon: url('../../svg/circle-check.svg');
+}
+
+.c-event__booking .mec-error {
+  @include callout.tone(error);
+  --callout-icon: url('../../svg/alert.svg');
+  color: var(--callout-fg) !important; // MEC forces its red with !important
+}
+
+// Result of a verify/cancel link, above the form (an <x-callout-text>).
+.c-event__booking-notice {
+  margin-bottom: 1.5rem;
+  scroll-margin-top: 2rem;
+}

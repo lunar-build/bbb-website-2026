@@ -19,4 +19,5 @@ import './testimonial-carousel.js';
 import './gravity-forms.js';
 import './file-upload.js';
 import './marker.js';
+import './event-booking.js';
 import '../styles/app.scss';

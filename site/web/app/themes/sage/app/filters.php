@@ -524,6 +524,15 @@ add_action('init', function () {
         'index.php?post_type=mec-events&name=$matches[1]',
         'top',
     );
+
+    // MEC's booking links (verify/cancel, payment returns) hang off an event's URL as
+    // endpoints. Without these, /{slug}/verify/{key}/ loses the endpoint and WordPress
+    // redirects to the plain event page, so bookings never get verified.
+    add_rewrite_rule(
+        '^' . CYCLING_CENTRE_EVENTS_PATH . '/([^/]+)/(verify|cancel|gateway-cancel|gateway-return|gateway-notify)(/(.*))?/?$',
+        'index.php?post_type=mec-events&name=$matches[1]&$matches[2]=$matches[4]',
+        'top',
+    );
 });
 
 add_filter('post_type_link', function (string $link, \WP_Post $post) {
