@@ -23,12 +23,9 @@ $offset: 0.3em;
   text-underline-offset: $offset;
   transition: background-color var(--wa-transition-normal, 0.15s) ease;
 
-  // Chrome draws dashed underlines half their thickness higher than solid ones, so the
-  // line visibly jumps up; the extra offset keeps it in place.
   &:hover,
   &:focus-visible {
     text-decoration-style: dashed;
-    text-underline-offset: calc(#{$offset} + #{$thickness} / 2);
   }
 
   // Keyboard only: the highlight is the focus indicator, replacing the outline.
