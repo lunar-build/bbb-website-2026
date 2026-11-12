@@ -49,7 +49,8 @@ if (container) {
           const marker = new maps.Marker({
             map,
             position: { lat: item.lat, lng: item.lng },
-            title: item.name,
+            // Read out by screen readers: a pin you can't see needs more than a name to place it.
+            title: [item.name, item.place].filter(Boolean).join(', '),
             icon: { url: PIN, scaledSize: new maps.Size(28, 38) },
           });
 
