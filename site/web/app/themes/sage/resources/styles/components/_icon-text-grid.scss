@@ -1,0 +1,60 @@
+@use '../abstracts/breakpoints' as bp;
+
+// Icon Link Grid's layout without links: icon + body text only.
+.c-icon-text-grid {
+  // Blue light until an editor picks another (WP's native Background colour).
+  &:not(.has-background) {
+    background: var(--wp--preset--color--blue-light);
+  }
+}
+
+.c-icon-text-grid__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include bp.respond($min: bp.$md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include bp.respond($min: bp.$lg) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+.c-icon-text-grid__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding-block: 1rem;
+}
+
+.c-icon-text-grid--center .c-icon-text-grid__item {
+  align-items: center;
+  text-align: center;
+}
+
+.c-icon-text-grid__icon {
+  // Same orange as Icon Link Grid, with the same known WCAG 1.4.11 contrast issue.
+  display: inline-flex;
+  color: var(--wp--preset--color--orange);
+
+  svg {
+    width: 3.0625rem; // 49px
+    height: 3.0625rem;
+  }
+}
+
+.c-icon-text-grid__body {
+  margin: 0;
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--c-block-fg, var(--wp--preset--color--charcoal));
+}
