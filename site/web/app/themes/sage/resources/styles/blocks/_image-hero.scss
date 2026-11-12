@@ -47,4 +47,14 @@
   wa-breadcrumb-item:last-of-type::part(label) {
     color: var(--c-breadcrumbs-color);
   }
+
+  // Keyboard focus: dark text on the yellow highlight, no shadow. Spelled out for the last item
+  // because the white rule above is more specific than the shared focus colour.
+  wa-breadcrumb-item::part(label):focus-visible {
+    text-shadow: none;
+  }
+
+  wa-breadcrumb-item:last-of-type::part(label):focus-visible {
+    color: var(--wp--preset--color--charcoal);
+  }
 }
