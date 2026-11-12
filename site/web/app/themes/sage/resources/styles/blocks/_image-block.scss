@@ -24,6 +24,15 @@
   margin-top: 2.75rem;
 }
 
+.c-image-block__info-box-about {
+  margin-top: 3.75rem;
+
+  // Alone (Rich text layout) it's the whole box, so no gap above.
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
 .c-image-block__info-box-content {
   color: var(--wp--preset--color--charcoal);
 

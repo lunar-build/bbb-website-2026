@@ -68,6 +68,9 @@
 
   &__service-text {
     @extend .u-business-service-label;
+    // Over the label preset (12px): too small to read on a card. Set here rather than in the
+    // preset, which the events timetable and form labels share.
+    font-size: 0.875rem;
     color: var(--wp--preset--color--charcoal);
   }
 

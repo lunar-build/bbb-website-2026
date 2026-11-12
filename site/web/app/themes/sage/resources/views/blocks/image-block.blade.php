@@ -1,4 +1,4 @@
-<x-block-root :heading="(bool) $infoBoxRowsHeading" {{ $attributes->class(['c-image-block']) }}>
+<x-block-root :heading="(bool) ($infoBoxRowsHeading || $infoBoxContentHeading)" {{ $attributes->class(['c-image-block']) }}>
 
 <div class="o-container">
   @if ($image['url'] ?? null)
@@ -11,9 +11,7 @@
     @endif
   @else
     <div class="c-image-block__info-box">
-      @if ($infoBoxType === 'wysiwyg')
-        <div class="c-image-block__info-box-content u-rich-text">{!! $infoBoxContent !!}</div>
-      @else
+      @if ($infoBoxType !== 'wysiwyg')
         <div class="c-image-block__info-box-columns">
           <div class="c-image-block__info-box-column">
             @if ($infoBoxRowsHeading)
@@ -38,6 +36,16 @@
               class="c-image-block__info-box-bullet-list"
             />
           </div>
+        </div>
+      @endif
+
+      @if ($infoBoxContent || $infoBoxContentHeading)
+        <div class="c-image-block__info-box-about">
+          @if ($infoBoxContentHeading)
+            <x-heading :level="$headingLevel" style="h5" class="c-image-block__info-box-heading">{{ $infoBoxContentHeading }}</x-heading>
+          @endif
+
+          <div class="c-image-block__info-box-content u-rich-text">{!! $infoBoxContent !!}</div>
         </div>
       @endif
     </div>
