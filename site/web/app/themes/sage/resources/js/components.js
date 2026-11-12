@@ -10,7 +10,6 @@ import '@awesome.me/webawesome/dist/components/textarea/textarea.js';
 import '@awesome.me/webawesome/dist/components/radio/radio.js';
 import '@awesome.me/webawesome/dist/components/radio-group/radio-group.js';
 import '@awesome.me/webawesome/dist/components/checkbox/checkbox.js';
-import '@awesome.me/webawesome/dist/components/checkbox-group/checkbox-group.js';
 import '@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js';
 import '@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js';
 import '@awesome.me/webawesome/dist/components/carousel/carousel.js';

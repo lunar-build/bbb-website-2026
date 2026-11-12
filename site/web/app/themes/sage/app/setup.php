@@ -275,19 +275,6 @@ add_action('init', function () {
         'show_admin_column' => true,
         'rewrite' => ['slug' => 'ibikeitilikeit/tag'],
     ]);
-
-    register_post_type('testimonial', [
-        'labels' => [
-            'name' => __('Testimonials', 'sage'),
-            'singular_name' => __('Testimonial', 'sage'),
-        ],
-        'public' => true,
-        'show_in_rest' => true,
-        'menu_icon' => 'dashicons-testimonial',
-        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
-        'has_archive' => true,
-        'rewrite' => ['slug' => 'testimonials'],
-    ]);
 }, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.
 
 /**

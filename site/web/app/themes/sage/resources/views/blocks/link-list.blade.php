@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-link-list']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-link-list']) }}>
 
 <div class="o-container">
   <div class="c-link-list__group c-link-list--{{ str_replace('_', '-', $layout) }}">
@@ -30,4 +31,4 @@
   </div>
 </div>
 
-</section>
+</div>

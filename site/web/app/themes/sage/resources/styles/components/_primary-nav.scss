@@ -2,6 +2,7 @@
 @use '../base/focus' as focus;
 @use '../components/header' as header;
 @use '../base/typography';
+@use '../abstracts/forms';
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A sibling of
 // .c-site-header, not a child: the header's auto-hide `transform` would become the
@@ -82,6 +83,28 @@
   &:focus-visible {
     outline: none;
   }
+}
+
+// Label link + separate chevron button (items that are a real page as well as a parent).
+.c-primary-nav__split {
+  display: flex;
+  align-items: center;
+}
+
+.c-primary-nav__toggle {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; // chevron lines up with the other rows' (the 0.25rem is their link padding)
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+  border: none;
+  background: none;
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  @include focus.ring;
 }
 
 .c-primary-nav__chevron {
@@ -270,8 +293,38 @@
 
 .c-primary-nav-desktop__link[aria-expanded='true']
   .c-primary-nav-desktop__chevron
+  svg,
+.c-primary-nav-desktop__toggle[aria-expanded='true']
+  .c-primary-nav-desktop__chevron
   svg {
   transform: rotate(180deg);
+}
+
+// Label link + separate chevron button (items that are a real page as well as a parent).
+.c-primary-nav-desktop__split {
+  display: inline-flex;
+  align-items: center;
+}
+
+.c-primary-nav-desktop__split--overflow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.c-primary-nav-desktop__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  margin-inline-start: 0.25rem;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--wp--preset--color--white);
+  cursor: pointer;
+
+  @include focus.ring;
 }
 
 .c-primary-nav-desktop__dropdown {
@@ -509,7 +562,10 @@
   align-items: stretch;
 
   input {
-    // Overrides base/_forms.scss's width:100% !important, which would claim the whole row.
+    // The text-field look here too, for the Cycle Planner, whose stylesheet leaves base/_forms out.
+    @include forms.text-input($important: true);
+
+    // Overrides the text-field width:100% !important, which would claim the whole row.
     width: auto !important;
     flex: 1 1 auto;
     font-size: 1rem; // Figma: 16px vs the shared 14px default

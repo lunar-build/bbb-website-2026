@@ -127,7 +127,7 @@ const PANELS = {
           <li>a closure outside the timetable, or a cancellation on the wrong day</li>
           <li>an event that’s no longer published (it’s skipped)</li>
           <li>an event with its own repeat rule in the events calendar (this timetable won’t change it)</li>
-          <li>dates overlapping another published timetable (both run)</li>
+          <li>dates overlapping another published timetable that schedules one of the same events (both run). Overlapping dates are fine for different events</li>
         </ul>
       </section>
     </div>

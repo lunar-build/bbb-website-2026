@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-events-timetable']) }}>
+<x-block-root :heading="(bool) $periods" {{ $attributes->class(['c-events-timetable']) }}>
   @if ($periods)
     <div class="o-container">
       {{-- Figma "Events Timetable" (node 497:5333) --}}
@@ -73,4 +73,4 @@
       <x-callout-text>{{ __('There are no timetables running at the moment. Please check back soon.', 'sage') }}</x-callout-text>
     </div>
   @endif
-</section>
+</x-block-root>

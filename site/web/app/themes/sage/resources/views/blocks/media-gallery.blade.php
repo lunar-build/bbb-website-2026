@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-media-gallery']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-media-gallery']) }}>
 
 @if ($pages)
 <div class="o-container">
@@ -47,4 +48,4 @@
 </div>
 @endif
 
-</section>
+</div>
