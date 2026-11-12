@@ -79,7 +79,7 @@ h2,
 h3,
 .u-heading-3 {
   font-size: var(--wp--preset--font-size--heading-3);
-  line-height: 2.75rem;
+  line-height: 1.25; // unitless so wrapped lines scale with the fluid size; 2.75rem packed three-line H3s too tight
   font-weight: 700;
   margin-bottom: spacing.$base;
 }
