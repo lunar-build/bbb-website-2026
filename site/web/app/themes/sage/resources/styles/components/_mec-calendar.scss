@@ -494,6 +494,11 @@
     padding: 0;
   }
 
+  // MEC pads the grid out to 450px tall, which leaves a gap before the day list once stacked.
+  .mec-calendar-side .mec-calendar-table {
+    min-height: 0;
+  }
+
   // Month heading + prev/next. Scoped to the monthly skin: daily, weekly and tile reuse these MEC class
   // names (month-navigator, calendar-header) for their own, different headers.
   .mec-skin-monthly-view-month-navigator-container .mec-month-navigator,
@@ -818,6 +823,24 @@
     padding: 0;
     border: 0;
     background: none;
+
+    // Stacked under the grid, the day's events are one column on a phone and two from tablet width.
+    // Beside the grid (wide) the list column is too narrow for two. Columns rather than a grid, as
+    // MEC's script sets `display` inline on the day it shows.
+    @include mec.narrow {
+      @container mec (min-width: 30rem) {
+        columns: 2;
+        column-gap: 2rem;
+
+        > .mec-table-side-title {
+          column-span: all;
+        }
+
+        > .mec-event-article {
+          break-inside: avoid;
+        }
+      }
+    }
   }
 
   .mec-calendar .mec-calendar-events-side .mec-table-side-title {
