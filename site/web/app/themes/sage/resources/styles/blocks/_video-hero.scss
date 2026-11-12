@@ -12,6 +12,14 @@
   aspect-ratio: 1440 / 574;
   overflow: hidden;
 
+  // Height follows the viewport at $xl+ so the H1 and the overlapping planner card land above
+  // the fold: 35rem leaves room for the admin bar (2rem), the two-row header (~10rem) and the
+  // card's height less its 3rem overlap (~22rem). Capped at the original 1440 / 574 ratio.
+  @include bp.respond($min: bp.$xl) {
+    aspect-ratio: auto;
+    height: clamp(15rem, calc(100svh - 35rem), 40vw);
+  }
+
   @include bp.respond($max: bp.$md) {
     aspect-ratio: 4 / 3;
   }
@@ -24,6 +32,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  // The wide box crops the 16:9 source; bias upward so a rider's head isn't lost.
+  object-position: center 20%;
 }
 
 // Aligns with the .o-container content edge once there's room for it.
