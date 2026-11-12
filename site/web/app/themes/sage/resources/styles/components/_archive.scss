@@ -1,3 +1,4 @@
+@use '../base/links';
 @use '../abstracts/breakpoints' as bp;
 @use '../abstracts/column-blocks';
 @use '../base/focus';
@@ -234,9 +235,7 @@
   }
 
   a {
-    color: var(--wp--preset--color--blue);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+    @include links.inline;
   }
 }
 

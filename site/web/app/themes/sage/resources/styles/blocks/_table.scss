@@ -1,3 +1,4 @@
+@use '../base/links';
 @use '../base/focus' as focus;
 
 // Figma "Table" (node 10:4095). Column count is author-defined, not fixed
@@ -72,10 +73,9 @@
     margin-bottom: 0;
   }
 
+  // Blue on the pale-blue striped rows is 4.3:1, under WCAG AA.
   tbody a {
-    color: var(--wp--preset--color--charcoal);
-
-    @include focus.ring;
+    @include links.inline(var(--wp--preset--color--blue-dark));
   }
 }
 

@@ -1,0 +1,31 @@
+@use 'focus';
+
+// Mid-text links share one look: blue, underlined, thicker underline on hover (and darker
+// blue when using the default colour). Pass $color: inherit
+// for coloured backgrounds where blue wouldn't contrast.
+//
+// Usage:
+//   @use '../base/links';
+//   .thing a { @include links.inline; }
+@mixin inline($color: var(--wp--preset--color--blue)) {
+  color: $color;
+  text-decoration: underline;
+  text-decoration-thickness: 0.0625rem;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    text-decoration-thickness: 0.125rem;
+
+    @if $color == var(--wp--preset--color--blue) {
+      color: var(--wp--preset--color--blue-dark);
+    }
+  }
+
+  @include focus.ring;
+}
+
+// Links in core blocks and rich-text fields. :where() keeps specificity low so a block can
+// override it (e.g. on a coloured background).
+:where(.e-content, .u-rich-text) :where(p, li, td, th, h2, h3, h4, h5, h6) a:not([class]) {
+  @include inline;
+}
