@@ -37,6 +37,8 @@ class Archive extends Composer
             'formAction' => ArchiveFilters::baseUrl($postType),
             'resultsHeading' => get_post_type_object($postType)->labels->name ?? '',
             'foundPosts' => (int) $GLOBALS['wp_query']->found_posts,
+            // Nothing to list and no filters to blame: there's simply nothing on.
+            'noCurrentEvents' => $postType === 'mec-events' && ! $GLOBALS['wp_query']->found_posts && ! ArchiveFilters::active($postType),
             'cards' => array_map(fn($post) => PostCard::fromPost($post, 'match'), $GLOBALS['wp_query']->posts),
             'paginationLinks' => pagination_links(),
         ];

@@ -1,13 +1,19 @@
-<section {{ $attributes->class(['c-card-row']) }}>
+@php
+  $hasHeading = (bool) ($headingHighlight || $heading);
+  // Card headings sit one level below the block's heading, or at its level when it shows none.
+  $cardLevel = App\Support\HeadingLevel::inside(['text' => $hasHeading ? 'x' : '', 'level' => $headingLevel]);
+@endphp
+
+<x-block-root :heading="$hasHeading" {{ $attributes->class(['c-card-row']) }}>
 
     <div class="o-container c-card-row--{{ $type }}">
         @if ($headingHighlight || $heading)
-            <h2 class="c-card-row__heading">
+            <x-heading :level="$headingLevel" style="h2" class="c-card-row__heading">
                 @if ($headingHighlight)
                     <span class="c-card-row__heading-highlight">{{ $headingHighlight }}</span>
                 @endif
                 {{ $heading }}
-            </h2>
+            </x-heading>
         @endif
 
         @if ($intro)
@@ -24,7 +30,7 @@
                         @if (!empty($card['tag']))
                             <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
                         @endif
-                        <h3 class="c-card-row__news-title">{{ $card['title'] }}</h3>
+                        <x-heading :level="$cardLevel" style="h3" class="c-card-row__news-title">{{ $card['title'] }}</x-heading>
                         <x-link class="c-card-row__news-cta" :link="$card['link']" />
                     </article>
                 @endforeach
@@ -37,7 +43,7 @@
                         </div>
 
                         <div class="c-cycle-route-card__banner">
-                            <h3 class="c-cycle-route-card__route-name">{{ $card['route_name'] }}</h3>
+                            <x-heading :level="$cardLevel" style="h3" class="c-cycle-route-card__route-name">{{ $card['route_name'] }}</x-heading>
                         </div>
 
                         <dl class="c-cycle-route-card__info"
@@ -67,7 +73,7 @@
                         <img class="c-card-row__link-image" src="{{ $card['image']['url'] }}"
                             alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
 
-                        <h3 class="c-card-row__link-title">{{ $card['title'] }}</h3>
+                        <x-heading :level="$cardLevel" style="h3" class="c-card-row__link-title">{{ $card['title'] }}</x-heading>
                         <p class="c-card-row__link-body">{{ $card['body'] }}</p>
 
                         <x-link class="c-card-row__link-cta" :link="$card['link']" />
@@ -97,4 +103,4 @@
         @endif
     </div>
 
-</section>
+</x-block-root>

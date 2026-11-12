@@ -140,3 +140,27 @@ test('warnings: odd hours, closures outside the timetable, cancellations on the 
 
     expect(array_column($warnings, 'ref'))->toContain('late', 'away', 'wrong-day');
 });
+
+test('a session on a weekday the timetable never reaches gets a warning', function () {
+    // 8 Dec 2026 is a Tuesday and the timetable is that one day: Monday and Wednesday sessions can't run.
+    $schedule = springTimetable([
+        'start' => '2026-12-08',
+        'end' => '2026-12-08',
+        'sessions' => [
+            ['id' => 'mon', 'event' => LEARN_TO_RIDE, 'weekday' => 1, 'start' => '10:00', 'end' => '10:45'],
+            ['id' => 'tue', 'event' => LEARN_TO_RIDE, 'weekday' => 2, 'start' => '10:00', 'end' => '10:45'],
+            ['id' => 'wed', 'event' => FAMILY_CYCLING, 'weekday' => 3, 'start' => '12:00', 'end' => '12:45'],
+        ],
+    ]);
+
+    $warnings = array_column(Schedule::validate($schedule)['warnings'], 'message', 'ref');
+
+    expect($warnings)->toHaveKeys(['mon', 'wed'])->not->toHaveKey('tue')
+        ->and($warnings['mon'])->toContain('no Monday');
+});
+
+test('a normal multi-week timetable has no never-runs warnings', function () {
+    $messages = implode(' ', array_column(Schedule::validate(springTimetable())['warnings'], 'message'));
+
+    expect($messages)->not->toContain('never runs');
+});

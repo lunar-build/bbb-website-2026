@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-image-block']) }}>
+<x-block-root :heading="(bool) $infoBoxRowsHeading" {{ $attributes->class(['c-image-block']) }}>
 
 <div class="o-container">
   @if ($image['url'] ?? null)
@@ -17,7 +17,7 @@
         <div class="c-image-block__info-box-columns">
           <div class="c-image-block__info-box-column">
             @if ($infoBoxRowsHeading)
-              <h3 class="c-image-block__info-box-heading u-heading-5">{{ $infoBoxRowsHeading }}</h3>
+              <x-heading :level="$headingLevel" style="h5" class="c-image-block__info-box-heading">{{ $infoBoxRowsHeading }}</x-heading>
             @endif
 
             <ul class="c-image-block__info-box-rows" role="list">
@@ -44,4 +44,4 @@
   @endif
 </div>
 
-</section>
+</x-block-root>

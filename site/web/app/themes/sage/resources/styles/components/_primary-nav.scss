@@ -3,6 +3,7 @@
 @use '../base/links';
 @use '../components/header' as header;
 @use '../base/typography';
+@use '../abstracts/forms';
 
 // Full-screen mobile nav overlay (Figma "Mobile | Menu level 1/2"). A sibling of
 // .c-site-header, not a child: the header's auto-hide `transform` would become the
@@ -556,7 +557,10 @@
   align-items: stretch;
 
   input {
-    // Overrides base/_forms.scss's width:100% !important, which would claim the whole row.
+    // The text-field look here too, for the Cycle Planner, whose stylesheet leaves base/_forms out.
+    @include forms.text-input($important: true);
+
+    // Overrides the text-field width:100% !important, which would claim the whole row.
     width: auto !important;
     flex: 1 1 auto;
     font-size: 1rem; // Figma: 16px vs the shared 14px default

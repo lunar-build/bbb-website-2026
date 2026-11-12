@@ -1,7 +1,7 @@
+@use '../base/links';
 @use '../abstracts/breakpoints' as bp;
 @use '../abstracts/column-blocks';
 @use '../base/focus';
-@use '../base/links';
 @use '../base/typography';
 @use 'button';
 
@@ -50,7 +50,7 @@
     @include column-blocks.blocks;
   }
 
-  &__intro > section {
+  &__intro > :is(section, .is-acf-block) {
     padding-block: 0;
   }
 
@@ -235,9 +235,7 @@
   }
 
   a {
-    color: var(--wp--preset--color--blue);
-
-    @include links.body;
+    @include links.compare(var(--wp--preset--color--blue), var(--wp--preset--color--blue));
   }
 }
 

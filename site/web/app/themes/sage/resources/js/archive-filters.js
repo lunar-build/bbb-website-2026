@@ -7,6 +7,7 @@ const results = document.querySelector('[data-archive-results]');
 
 if (results) {
   const root = results.closest('.c-archive');
+  const status = root.querySelector('[data-archive-status]');
   let controller;
   let pushed = false;
 
@@ -34,6 +35,17 @@ if (results) {
       results.dispatchEvent(new CustomEvent('archive:updated', { bubbles: true }));
       history.pushState({ archive: true }, '', url);
       pushed = true;
+
+      // The count, plus the empty-state message when there is one ("0 results found. Sorry, …").
+      const message = [...results.querySelectorAll('[data-archive-count], .c-archive__empty, .c-callout-text')]
+        .map((element) => element.textContent.trim())
+        .filter(Boolean)
+        .join('. ');
+      // Cleared first so the same message twice in a row is still announced.
+      status.textContent = '';
+      requestAnimationFrame(() => {
+        status.textContent = message;
+      });
 
       if (focus) {
         const target = results.querySelector('[data-archive-focus]');

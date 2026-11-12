@@ -4,6 +4,7 @@ namespace App\Blocks;
 
 use App\Blocks\Concerns\HasIllustrations;
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -195,6 +196,7 @@ class CtaBanner extends Block
         return [
             'layout' => $this->layout(),
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'body' => $this->body(),
             'link' => $this->link(),
             'imageLeft' => $this->imageLeft(),
@@ -235,6 +237,7 @@ class CtaBanner extends Block
                         ],
                     ],
                 ])
+            ->addPartial(HeadingLevelSelect::class)
                 ->addTextarea('body', [
                     'label' => 'Body text',
                     'rows' => 4,
@@ -309,6 +312,11 @@ class CtaBanner extends Block
     public function layout()
     {
         return $this->resolveField('layout', 'centred');
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     /**

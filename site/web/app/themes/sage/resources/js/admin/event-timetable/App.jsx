@@ -102,6 +102,8 @@ export default function App() {
   };
   const errorCount = (preview?.errors ?? []).length;
 
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
   const cancellationsFor = (sessionId) => schedule.cancellations.filter((c) => c.session === sessionId);
   // From a session's "cancelled" badge to its row in the Cancelled sessions list.
   const jumpTo = (ref) => {
@@ -254,7 +256,7 @@ export default function App() {
               {preview.total} session{preview.total === 1 ? '' : 's'}
             </strong>{' '}
             across {eventCount} event{eventCount === 1 ? '' : 's'}
-            {schedule.start && schedule.end && ` over ${weeksIn(schedule.start, schedule.end)} weeks (${friendlyDate(schedule.start)} – ${friendlyDate(schedule.end)})`}
+            {schedule.start && schedule.end && ` over ${plural(weeksIn(schedule.start, schedule.end), 'week', 'weeks')} (${friendlyDate(schedule.start)} – ${friendlyDate(schedule.end)})`}
             {status !== 'publish' && ' — added to the calendar when you publish.'}
           </p>
         ) : (

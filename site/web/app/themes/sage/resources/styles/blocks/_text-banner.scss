@@ -1,5 +1,4 @@
 @use '../base/links';
-
 // Figma statement banner: light heading text with any words the editor bolds picked out, and
 // optional normal-size body text under it. The block's background colour comes from the sidebar
 // (theme_block_background_colors()); --c-block-fg is the contrasting text colour set for it.
@@ -17,9 +16,7 @@
   }
 
   a {
-    color: inherit;
-
-    @include links.body;
+    @include links.compare(inherit, inherit);
   }
 }
 

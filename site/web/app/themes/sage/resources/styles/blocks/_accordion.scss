@@ -1,3 +1,4 @@
+@use '../base/links';
 @use '../base/typography';
 
 // Figma "Accordion" (node 21:1225)
@@ -85,6 +86,6 @@ wa-accordion-item {
   }
 
   a {
-    color: var(--wp--preset--color--blue);
+    @include links.inline;
   }
 }
