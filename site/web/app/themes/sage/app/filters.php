@@ -94,30 +94,6 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
- * MEC's calendars and lists show a cancelled or postponed event like any other (only the single page
- * says so). Say it in the title; this filter is the one place all its skins get a title from.
- */
-add_filter('mec_occurrence_event_title', function ($title, $event) {
-    $status = $event->data->meta['mec_event_status'] ?? '';
-    $label = [
-        'EventCancelled' => __('Cancelled', 'sage'),
-        'EventPostponed' => __('Postponed', 'sage'),
-    ][$status] ?? null;
-
-    return $label ? sprintf('%s (%s)', $title, $label) : $title;
-}, 10, 2);
-
-/**
- * The date picker in MEC's event editor (Date And Time) is jQuery UI's. MEC draws each day as a circle, but
- * jQuery UI right-aligns the number inside its link, so it sits off-centre in the circle. The front-end
- * theme CSS never loads in wp-admin, so this rides on MEC's backend stylesheet. The ID selector is
- * needed to out-rank MEC's own rules.
- */
-add_action('admin_enqueue_scripts', function () {
-    wp_add_inline_style('mec-backend-style', '#ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td a, #ui-datepicker-div.ui-datepicker .ui-datepicker-calendar td span { padding: 0; text-align: center; }');
-}, 20);
-
-/**
  * A page that is the content of a calendar archive (Theme Options → Archive pages) is a content source, not a
  * page of its own: its URL would show the same calendar as the archive. Send visitors to the archive (previews
  * still work, so editors can see the page), and keep the page out of the sitemap.
@@ -669,24 +645,6 @@ add_action('wp_head', function () {
     }
 
     echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
-});
-
-/**
- * MEC's calendar weekday headings are two letters (MO, TU…). Show three (Mon, Tue…), as translatable strings.
- * MEC passes them already in the order the week starts, so map each by its two letters.
- */
-add_filter('mec_weekday_abbr_labels', function (array $labels) {
-    $threeLetter = [
-        'MO' => _x('Mon', 'calendar weekday heading', 'sage'),
-        'TU' => _x('Tue', 'calendar weekday heading', 'sage'),
-        'WE' => _x('Wed', 'calendar weekday heading', 'sage'),
-        'TH' => _x('Thu', 'calendar weekday heading', 'sage'),
-        'FR' => _x('Fri', 'calendar weekday heading', 'sage'),
-        'SA' => _x('Sat', 'calendar weekday heading', 'sage'),
-        'SU' => _x('Sun', 'calendar weekday heading', 'sage'),
-    ];
-
-    return array_map(fn($label) => $threeLetter[strtoupper($label)] ?? $label, $labels);
 });
 
 /**

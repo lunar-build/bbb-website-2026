@@ -1,0 +1,4 @@
+// Modern Events Calendar restyle. Loaded by the mec-lunar-theme plugin (not app.scss), so deactivating the
+// plugin returns the calendar to stock MEC.
+@use 'components/mec-calendar';
+@use 'components/mec-views';

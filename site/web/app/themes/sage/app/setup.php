@@ -338,30 +338,3 @@ add_action('wp_enqueue_scripts', function () {
         wp_dequeue_script($handle);
     }
 }, 100);
-
-/**
- * The few words our MEC styling adds (filter lead-ins in CSS, the empty-month line in JS), as translatable
- * strings: CSS variables for the stylesheet, a global for mec-calendar.js.
- */
-add_action('wp_head', function () {
-    if (! page_uses_mec_calendar()) {
-        return;
-    }
-
-    $words = [
-        'category' => __('Show events for:', 'sage'),
-        'location' => __('Where:', 'sage'),
-        'organizer' => __('Run by:', 'sage'),
-        'speaker' => __('Speaker:', 'sage'),
-        'label' => __('Label:', 'sage'),
-        'tag' => __('Tag:', 'sage'),
-    ];
-    $variables = '';
-    foreach ($words as $name => $text) {
-        $variables .= sprintf('--mec-text-%s:%s;', $name, wp_json_encode($text, JSON_UNESCAPED_UNICODE));
-    }
-
-    printf("<style id=\"mec-text\">:root{%s}</style>\n", $variables);
-    printf("<script>window.bbbMec=%s;</script>\n", wp_json_encode(['emptyMonth' => __('No events this month.', 'sage')]));
-}, 20);
-

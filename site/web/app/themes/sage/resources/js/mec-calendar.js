@@ -2,7 +2,7 @@
 // distinct event colour (MEC's single-event colour, shown in the day's event list as .event-color).
 // MEC swaps the whole month's markup on month change and filtering, so watch and redo.
 const MAX_DOTS = 5; // one per distinct event colour; the dots are small enough for a row of five
-const EMPTY_MONTH = window.bbbMec?.emptyMonth ?? 'No events this month.'; // translatable: set in app/setup.php
+const EMPTY_MONTH = window.bbbMec?.emptyMonth ?? 'No events this month.'; // translatable: set by the mec-lunar-theme plugin
 
 // Perceived brightness of an `rgb()` string, 0–1.
 const brightness = (colour) => {

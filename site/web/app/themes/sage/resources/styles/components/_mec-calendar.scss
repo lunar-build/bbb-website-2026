@@ -3,7 +3,7 @@
 @use '../abstracts/mec';
 
 // Modern Events Calendar (monthly view, "modern" style) restyled to the theme.
-// MEC's own colours come from its Styling settings (mu-plugins/mec-settings.php);
+// MEC's own colours come from its Styling settings (set by the mec-lunar-theme plugin);
 // this overrides the markup and the bits those settings don't reach. Everything is
 // scoped under .mec-wrap so it beats frontend.min.css without !important, except for type: MEC sets
 // size, weight, case and spacing on many deep selectors (and in its generated CSS), so `type()`
