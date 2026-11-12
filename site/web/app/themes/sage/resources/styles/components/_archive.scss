@@ -215,6 +215,17 @@
   border-radius: 1.25rem;
   overflow: hidden;
   background: var(--wp--preset--color--lightest-grey);
+
+  // Google's map canvas and pins take focus with `outline: none`, and tabbing in from the filters lands
+  // on its tiny "Keyboard shortcuts" button first. Ring the whole map whenever keyboard focus is inside it.
+  &:has(:focus-visible) {
+    @include focus.ring-styles;
+  }
+
+  // Pins: the canvas ring is clipped by overflow, so give each pin its own.
+  div[tabindex]:focus-visible {
+    @include focus.ring-styles;
+  }
 }
 
 // Pin popup (partials/map-listing-info.blade.php) inside Google's InfoWindow,
