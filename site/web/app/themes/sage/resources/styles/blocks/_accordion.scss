@@ -1,6 +1,5 @@
 @use '../base/links';
 @use '../base/typography';
-@use '../base/focus' as focus;
 
 // Figma "Accordion" (node 21:1225)
 .c-accordion__heading {
@@ -9,9 +8,6 @@
 
 .c-accordion__list {
   display: block;
-
-  // wa-accordion forces overflow:hidden, clipping the focus ring on first/last items.
-  overflow: visible;
 }
 
 wa-accordion-item {
@@ -23,14 +19,40 @@ wa-accordion-item {
     color: var(--wp--preset--color--blue-medium);
     align-items: flex-start; // keep icon pinned to the title's first line if it wraps
 
-    // WA rounds first/last corners for boxed appearances; ours is flat, so it only
-    // showed as a stray corner on the focus outline.
-    border-radius: 0;
-
     // .o-container already provides the horizontal gutter.
     padding-inline: 0;
 
-    @include focus.ring;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 0.125rem;
+    text-underline-offset: 0.25rem;
+    transition:
+      color var(--wa-transition-normal, 0.15s) ease,
+      text-decoration-color var(--wa-transition-normal, 0.15s) ease;
+  }
+
+  &::part(button):hover {
+    color: var(--wp--preset--color--blue-dark);
+    text-decoration-color: currentColor;
+  }
+
+  // Keyboard only: underline + yellow highlight replace WA's built-in outline.
+  // ::part() can't be chained, so the label picks up the background via this variable.
+  &::part(button):focus-visible {
+    --c-accordion-label-bg: var(--wp--preset--color--yellow);
+    outline: none;
+    color: var(--wp--preset--color--charcoal);
+    text-decoration-color: currentColor;
+  }
+
+  // The label is a <slot> (display: contents), which can't paint a background.
+  // Negative margin keeps the text aligned with the gutter despite the padding.
+  &::part(label) {
+    display: inline;
+    padding-inline: 0.25rem;
+    margin-inline: -0.25rem;
+    background-color: var(--c-accordion-label-bg, transparent);
+    transition: background-color var(--wa-transition-normal, 0.15s) ease;
   }
 
   &::part(content) {

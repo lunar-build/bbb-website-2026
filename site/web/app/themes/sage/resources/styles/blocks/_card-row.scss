@@ -6,6 +6,7 @@
 @use '../abstracts/spacing';
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/links';
 
 .c-card-row__heading {
   text-align: center;
@@ -188,12 +189,13 @@
   color: var(--wp--preset--color--blue-dark);
   text-decoration: none;
 
-  @include focus.ring;
-
   &:hover,
   &:focus-visible {
     @include button.arrow-hover;
   }
+
+  // Underline + highlight on the text span only.
+  @include links.focus-label('.c-card-row__area-link-text');
 }
 
 .c-card-row__browse-all {

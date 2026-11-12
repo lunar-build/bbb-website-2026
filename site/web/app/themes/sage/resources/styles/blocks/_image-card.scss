@@ -12,7 +12,7 @@
     background: var(--wp--preset--color--white);
     text-decoration: none;
 
-    @include focus.ring;
+    @include focus.card-ring;
 
     &:hover,
     &:focus-visible {

@@ -1,5 +1,5 @@
-@use '../base/links';
 @use '../base/focus' as focus;
+@use '../base/links';
 
 // Figma "Table" (node 10:4095). Column count is author-defined, not fixed
 // to 2 — min-width + horizontal scroll (not squeeze) keeps columns legible
@@ -75,7 +75,7 @@
 
   // Blue on the pale-blue striped rows is 4.3:1, under WCAG AA.
   tbody a {
-    @include links.inline(var(--wp--preset--color--blue-dark));
+    @include links.inline(var(--wp--preset--color--charcoal));
   }
 }
 

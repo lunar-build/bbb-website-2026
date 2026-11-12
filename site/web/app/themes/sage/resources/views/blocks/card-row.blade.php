@@ -85,7 +85,7 @@
         @if (!empty($areaLinks))
             <div class="c-card-row__area-links">
                 @foreach ($areaLinks as $row)
-                    <x-link class="c-card-row__area-link" :link="$row['link']" />
+                    <x-link class="c-card-row__area-link" label-class="c-card-row__area-link-text" :link="$row['link']" />
                 @endforeach
             </div>
         @endif

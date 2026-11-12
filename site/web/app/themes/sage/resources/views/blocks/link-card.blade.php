@@ -31,7 +31,8 @@
       @else
         <div class="c-link-card__cta">
           <a class="c-link-card__cta-link u-cta-small" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-            {{ $card['link']['title'] }}
+            {{-- Outer span is the flex item; the inner one stays inline so its highlight follows each line. --}}
+            <span><span class="c-link-card__cta-text">{{ $card['link']['title'] }}</span></span>
             @if (($card['link']['target'] ?? '') === '_blank')
               <span class="u-sr-only">(opens in a new tab)</span>
             @endif

@@ -1,31 +1,99 @@
-@use 'focus';
-
-// Mid-text links share one look: blue, underlined, thicker underline on hover (and darker
-// blue when using the default colour). Pass $color: inherit
-// for coloured backgrounds where blue wouldn't contrast.
+// Inline links in running text (WP paragraphs, rich-text fields). Colour stays contextual;
+// this sets the underline and the hover/focus states so they match everywhere.
 //
-// Usage:
+// Usage, for links the global rule below doesn't reach:
 //   @use '../base/links';
-//   .thing a { @include links.inline; }
-@mixin inline($color: var(--wp--preset--color--blue)) {
-  color: $color;
-  text-decoration: underline;
-  text-decoration-thickness: 0.0625rem;
-  text-underline-offset: 0.2em;
+//   .thing a { @include links.body; }
 
-  &:hover {
-    text-decoration-thickness: 0.125rem;
+$thickness: 0.125rem;
+$offset: 0.3em;
 
-    @if $color == var(--wp--preset--color--blue) {
-      color: var(--wp--preset--color--blue-dark);
-    }
+@mixin body {
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: $thickness;
+  text-underline-offset: $offset;
+  transition: background-color var(--wa-transition-normal, 0.15s) ease;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-style: dashed;
   }
 
-  @include focus.ring;
+  // Keyboard only: the highlight is the focus indicator, replacing the outline.
+  &:focus-visible {
+    outline: none;
+    background-color: var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+    text-decoration-color: var(--wp--preset--color--charcoal);
+  }
 }
 
-// Links in core blocks and rich-text fields. :where() keeps specificity low so a block can
-// override it (e.g. on a coloured background).
-:where(.e-content, .u-rich-text) :where(p, li, td, th, h2, h3, h4, h5, h6) a:not([class]) {
-  @include inline;
+// Standalone links (icon + text, arrow CTAs) with no underline at rest or on hover: any focus
+// shows a dashed underline, keyboard focus adds a yellow highlight. Both sit on a text span
+// inside the link ($label) so the icon stays clear. If the link is a flex container, wrap
+// $label in a plain <span> so it stays inline and the highlight follows each line.
+//
+//   .thing__link { @include links.focus-label('.thing__link-text'); }
+@mixin focus-label($label) {
+  &:focus {
+    outline: none;
+  }
+
+  #{$label} {
+    text-decoration: underline dashed transparent;
+    text-decoration-thickness: $thickness;
+    text-underline-offset: $offset;
+    // Inline padding grows the highlight without moving the text; the bottom covers the underline.
+    padding-block: 0.1em 0.45em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    transition: background-color var(--wa-transition-normal, 0.15s) ease;
+  }
+
+  &:focus #{$label} {
+    text-decoration-color: currentColor;
+  }
+
+  &:focus-visible #{$label} {
+    background-color: var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+  }
+}
+
+// Nav links: the text span is a flex item, so padding would shift the row. Keyboard focus swaps
+// hover's solid underline for a dashed one on a yellow highlight; the box-shadow grows the
+// highlight without moving the text.
+//
+//   .thing__link { @include links.focus-span; }
+@mixin focus-span {
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible > span:first-child {
+    background-color: var(--wp--preset--color--yellow);
+    box-shadow: 0 0 0 0.25rem var(--wp--preset--color--yellow);
+    color: var(--wp--preset--color--charcoal);
+    text-decoration-style: dashed;
+    text-decoration-color: var(--wp--preset--color--charcoal);
+  }
+}
+
+
+// Body link in a given colour, for the places that set one (accent blue on pale backgrounds,
+// inherit on coloured ones).
+//
+//   .thing a { @include links.inline(inherit); }
+@mixin inline($color: var(--wp--preset--color--blue)) {
+  color: $color;
+
+  @include body;
+}
+
+// Classless links inside text elements, which is what the editor and rich-text fields output.
+// Component links (buttons, cards, nav) all carry a class, so they're left alone.
+:where(p, li, dd, dt, td, th, figcaption, blockquote, address) a:not([class]) {
+  @include body;
 }

@@ -4,6 +4,9 @@
 // theme_block_background_colors()) wins via WP's `!important` preset class and sets
 // `--c-block-fg` for the text.
 
+// --focus-color follows the text colour so the CTA's focus ring stays visible on each
+// background (white on blue, dark on light).
+
 // overflow:hidden stops Centred's edge-bleeding illustrations causing horizontal scroll.
 .c-cta-banner {
   position: relative;
@@ -65,6 +68,7 @@
 .c-cta-banner--centred {
   background: var(--wp--preset--color--blue);
   color: var(--c-block-fg, var(--wp--preset--color--white));
+  --focus-color: var(--c-block-fg, var(--wp--preset--color--white));
   text-align: center;
 
   .c-cta-banner__content {
@@ -87,6 +91,7 @@
 .c-cta-banner--left {
   background: var(--wp--preset--color--blue-light);
   color: var(--c-block-fg, var(--wp--preset--color--blue-dark));
+  --focus-color: var(--c-block-fg, var(--wp--preset--color--charcoal));
 
   .c-cta-banner__grid {
     @include bp.respond($min: bp.$lg) {
@@ -111,6 +116,7 @@
 .c-cta-banner--row {
   background: var(--wp--preset--color--blue);
   color: var(--c-block-fg, var(--wp--preset--color--white));
+  --focus-color: var(--c-block-fg, var(--wp--preset--color--white));
 
   .c-cta-banner__heading,
   .c-cta-banner__body {
@@ -180,6 +186,7 @@
 .c-cta-banner--slimline {
   background: var(--wp--preset--color--blue-dark);
   color: var(--c-block-fg, var(--wp--preset--color--white));
+  --focus-color: var(--c-block-fg, var(--wp--preset--color--white));
 
   .c-cta-banner__content {
     flex-direction: column;

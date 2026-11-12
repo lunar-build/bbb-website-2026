@@ -1,5 +1,6 @@
 @use '../abstracts/breakpoints' as bp;
 @use '../base/focus' as focus;
+@use '../base/links';
 @use '../components/header' as header;
 @use '../base/typography';
 @use '../abstracts/forms';
@@ -80,9 +81,7 @@
     text-underline-offset: 0.25rem;
   }
 
-  &:focus-visible {
-    outline: none;
-  }
+  @include links.focus-span;
 }
 
 // Label link + separate chevron button (items that are a real page as well as a parent).
@@ -274,9 +273,7 @@
     text-underline-offset: 0.25rem;
   }
 
-  &:focus-visible {
-    outline: none;
-  }
+  @include links.focus-span;
 }
 
 .c-primary-nav-desktop__chevron {
@@ -391,9 +388,7 @@
     text-underline-offset: 0.25rem;
   }
 
-  &:focus-visible {
-    outline: none;
-  }
+  @include links.focus-span;
 
   .c-primary-nav-desktop__chevron svg {
     transform: rotate(-90deg);

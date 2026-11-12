@@ -23,8 +23,7 @@
     }
 
     .c-quote-carousel__carousel::part(navigation-button),
-    .c-quote-carousel__carousel::part(pagination-item),
-    .c-quote-carousel__carousel::part(scroll-container) {
+    .c-quote-carousel__carousel::part(pagination-item) {
       @include focus.ring($color: var(--wp--preset--color--white));
     }
   }
@@ -53,8 +52,7 @@
     }
 
     .c-quote-carousel__carousel::part(navigation-button),
-    .c-quote-carousel__carousel::part(pagination-item),
-    .c-quote-carousel__carousel::part(scroll-container) {
+    .c-quote-carousel__carousel::part(pagination-item) {
       @include focus.ring;
     }
   }
