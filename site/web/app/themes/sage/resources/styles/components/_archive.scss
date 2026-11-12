@@ -235,7 +235,7 @@
   }
 
   a {
-    @include links.compare(var(--wp--preset--color--blue), var(--wp--preset--color--blue));
+    @include links.inline;
   }
 }
 

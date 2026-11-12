@@ -1,10 +1,3 @@
-@use 'focus';
-
-// TEMPORARY COMPARISON of two mid-text link looks. Default = the focus-styling look (#96:
-// semibold, dashed hover, yellow keyboard-focus highlight). Add ?links=inline to any URL (stays
-// on until ?links=body) to see main's look (#98: blue, thin underline, thicker on hover).
-// Delete the loser, `compare` and resources/js/link-style-preview.js once decided.
-
 // Inline links in running text (WP paragraphs, rich-text fields). Colour stays contextual;
 // this sets the underline and the hover/focus states so they match everywhere.
 //
@@ -89,39 +82,18 @@ $offset: 0.3em;
 }
 
 
-// Look from #98: blue, underlined, thicker underline on hover (darker blue when using the default colour).
+// Body link in a given colour, for the places that set one (accent blue on pale backgrounds,
+// inherit on coloured ones).
+//
+//   .thing a { @include links.inline(inherit); }
 @mixin inline($color: var(--wp--preset--color--blue)) {
   color: $color;
-  text-decoration: underline;
-  text-decoration-thickness: 0.0625rem;
-  text-underline-offset: 0.2em;
 
-  &:hover {
-    text-decoration-thickness: 0.125rem;
-
-    @if $color == var(--wp--preset--color--blue) {
-      color: var(--wp--preset--color--blue-dark);
-    }
-  }
-
-  @include focus.ring;
-}
-
-// Both looks on one selector: #96's `body` unless <body class="links-inline">, then #98's `inline`.
-@mixin compare($color-body: inherit, $color-inline: var(--wp--preset--color--blue)) {
-  @at-root :where(body:not(.links-inline)) #{&} {
-    color: $color-body;
-
-    @include body;
-  }
-
-  @at-root .links-inline #{&} {
-    @include inline($color-inline);
-  }
+  @include body;
 }
 
 // Classless links inside text elements, which is what the editor and rich-text fields output.
 // Component links (buttons, cards, nav) all carry a class, so they're left alone.
 :where(p, li, dd, dt, td, th, figcaption, blockquote, address) a:not([class]) {
-  @include compare;
+  @include body;
 }

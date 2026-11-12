@@ -16,7 +16,7 @@
   }
 
   a {
-    @include links.compare(inherit, inherit);
+    @include links.inline(inherit);
   }
 }
 

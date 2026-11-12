@@ -75,7 +75,7 @@
 
   // Blue on the pale-blue striped rows is 4.3:1, under WCAG AA.
   tbody a {
-    @include links.compare(var(--wp--preset--color--charcoal), var(--wp--preset--color--blue-dark));
+    @include links.inline(var(--wp--preset--color--charcoal));
   }
 }
 
