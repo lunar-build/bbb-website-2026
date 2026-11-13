@@ -2,6 +2,8 @@
 
 @use '../abstracts/breakpoints' as bp;
 @use '../components/download-link';
+@use '../components/button';
+@use '../base/focus' as focus;
 @use '../base/links';
 @use '../base/typography';
 
@@ -116,4 +118,19 @@
 // Download CTA (shared component): same focus treatment, inside Link Cards only.
 .c-link-card .c-download-link__link {
   @include links.focus-label('.c-download-link__label');
+}
+
+// Optional yellow button. The text-link focus highlight is yellow too, so it can't show on
+// this fill: drop it and bring back the standard focus ring instead.
+// Scoped under .c-link-card so it outranks the @extend-ed copies of the text link's "no outline" rule.
+.c-link-card :is(.c-download-link__link--yellow, .c-link-card__cta-link--yellow) {
+  @include button.yellow-pill;
+
+  &:focus-visible {
+    @include focus.ring-styles;
+  }
+
+  &:focus-visible :is(.c-download-link__label, .c-link-card__cta-text) {
+    background-color: transparent;
+  }
 }
