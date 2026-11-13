@@ -7,6 +7,7 @@ use App\Support\Breadcrumbs;
 use App\Support\ContentHero;
 use App\Support\MapListingFilters;
 use App\Support\OpenData;
+use App\Support\PageMenu;
 use Roots\Acorn\View\Composer;
 
 class MapListing extends Composer
@@ -31,12 +32,15 @@ class MapListing extends Composer
         $all = OpenData::items($dataset);
         $active = MapListingFilters::active((array) get_field('map_listing_services'));
         $items = MapListingFilters::apply($all, $active);
+        // Before the content renders: that's what switches on the headings' anchor ids.
+        $pageMenuItems = PageMenu::forPost();
         $content = ContentHero::forPost(get_the_ID());
         $cards = array_map(fn($item) => $this->card($item, $dataset), $items);
 
         return [
             'hero' => $content['hero'] ?: ContentHero::fallback(get_the_title(), Breadcrumbs::forPost()),
             'body' => $content['body'],
+            'pageMenuItems' => $pageMenuItems,
             'filterGroups' => MapListingFilters::groups($all, $active),
             'resultsHeading' => get_field('map_listing_heading') ?: OpenData::DATASETS[$dataset]['label'] ?? '',
             'foundPosts' => count($items),
