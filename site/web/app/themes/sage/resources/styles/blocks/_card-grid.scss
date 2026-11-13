@@ -25,6 +25,11 @@
     margin-bottom: 2rem;
   }
 
+  // Extra space when no intro sits between heading and cards (as in Card Row).
+  &__heading + &__cards {
+    margin-top: 1rem;
+  }
+
   // Resets Feature Card's standalone 443px max-width so it fills the column.
   &__card {
     max-width: none;
@@ -71,6 +76,30 @@
 
     @include bp.respond($min: bp.$xl) {
       display: block;
+    }
+  }
+}
+
+// Picked or few child pages can leave a grid row part-empty, so lay the cards out as
+// centred columns of the same width the grid would give them.
+.c-child-page-cards .c-card-grid__cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  > * {
+    flex: 0 1 100%;
+  }
+
+  @include bp.respond($min: bp.$md) {
+    > * {
+      flex-basis: calc((100% - #{spacing.$card-gap}) / 2);
+    }
+  }
+
+  @include bp.respond($min: bp.$lg) {
+    > * {
+      flex-basis: calc((100% - 2 * #{spacing.$card-gap}) / 3);
     }
   }
 }
