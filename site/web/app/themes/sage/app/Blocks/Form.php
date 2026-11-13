@@ -253,7 +253,6 @@ class Form extends Block
             'name' => 'heading',
             'label' => 'Heading',
             'default_level' => 'h2',
-            'required' => true,
         ]);
 
         $fields->addPartial(Heading::class, [
