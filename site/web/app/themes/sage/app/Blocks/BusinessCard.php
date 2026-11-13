@@ -190,6 +190,7 @@ class BusinessCard extends Block
             'services' => $this->services(),
             'description' => $this->description(),
             'link' => $this->link(),
+            'ctaColour' => $this->resolveField('cta_colour', 'yellow') ?: 'yellow',
         ];
     }
 

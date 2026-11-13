@@ -44,6 +44,7 @@ class MapListing extends Composer
             'filterGroups' => MapListingFilters::groups($all, $active),
             'resultsHeading' => get_field('map_listing_heading') ?: OpenData::DATASETS[$dataset]['label'] ?? '',
             'foundPosts' => count($items),
+            'ctaColour' => get_field('map_listing_cta_colour') ?: 'yellow',
             'cards' => $cards,
             'markers' => array_values(array_filter(array_map(fn($item, $card) => $item['lat'] === null ? null : [
                 'name' => $item['name'],

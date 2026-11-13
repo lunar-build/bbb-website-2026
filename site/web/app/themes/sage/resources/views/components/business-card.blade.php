@@ -1,4 +1,4 @@
-@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null, 'headingLevel' => 'h4'])
+@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null, 'ctaColour' => 'yellow', 'headingLevel' => 'h4'])
 
 {{-- The rule directly under the name is accented (yellow, per Figma); every
      rule after it is the plain divider colour — tracked here since which
@@ -55,7 +55,7 @@
 
   @if (! empty($link['url']))
     <a
-      class="c-business-card__cta"
+      @class(['c-business-card__cta', 'c-business-card__cta--outlined' => $ctaColour === 'outlined'])
       href="{{ $link['url'] }}"
       @if (($link['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
     >
