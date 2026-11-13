@@ -33,7 +33,7 @@ class ChildPageCards extends Block
      *
      * @var string
      */
-    public $description = 'A grid of link cards for every published child page of the current page, kept in sync automatically as pages are added, removed or reordered.';
+    public $description = 'A grid of link cards for the current page\'s published child pages (kept in sync automatically), or for any pages you choose.';
 
     /**
      * The block category.
@@ -187,8 +187,34 @@ class ChildPageCards extends Block
     {
         $fields = Builder::make('child_page_cards');
 
-        $fields->addMessage('child_pages_note', 'Cards are built from this page\'s published child pages (Page Attributes → Parent), in their Order. Each card uses the child\'s featured image, title and excerpt.', [
+        $fields->addSelect('pages_source', [
             'label' => 'Cards',
+            'instructions' => 'Show this page\'s child pages (Page Attributes → Parent, in their Order), or pick any pages. Each card uses the page\'s featured image, title and excerpt.',
+            'choices' => [
+                'children' => 'Child pages',
+                'pages' => 'Choose pages',
+            ],
+            'default_value' => 'children',
+            'ui' => true,
+        ]);
+
+        $fields->addPostObject('pages', [
+            'label' => 'Pages',
+            'instructions' => 'Cards appear in the order picked.',
+            'post_type' => ['page'],
+            'post_status' => ['publish'],
+            'multiple' => 1,
+            'return_format' => 'id',
+            'ui' => 1,
+            'conditional_logic' => [
+                [
+                    [
+                        'field' => 'pages_source',
+                        'operator' => '==',
+                        'value' => 'pages',
+                    ],
+                ],
+            ],
         ]);
 
         $fields->addPartial(Heading::class, [
@@ -224,19 +250,15 @@ class ChildPageCards extends Block
     }
 
     /**
-     * Link cards for the current page's published children. The pattern library
-     * has no real page, so it gets placeholder cards instead.
+     * Link cards for the pages picked in the block, or else the current page's
+     * published children. The pattern library has no real page, so it gets
+     * placeholder cards instead.
      */
     public function cards(): array
     {
-        $parent = (int) ($this->post_id ?: get_the_ID());
-        $children = $parent ? get_pages([
-            'parent' => $parent,
-            'sort_column' => 'menu_order,post_title',
-            'post_status' => 'publish',
-        ]) : [];
+        $pages = $this->pages();
 
-        if (! $children) {
+        if (! $pages) {
             return $this->exampleField('cards', []) ? $this->exampleCards() : [];
         }
 
@@ -244,7 +266,35 @@ class ChildPageCards extends Block
             $card = PostCard::fromPost($page, 'match');
 
             return [...$card, 'date' => null, 'categories' => []];
-        }, $children);
+        }, $pages);
+    }
+
+    /**
+     * The pages to show as cards, in display order.
+     *
+     * @return \WP_Post[]
+     */
+    protected function pages(): array
+    {
+        if (get_field('pages_source') === 'pages') {
+            $pageIds = array_filter((array) get_field('pages'));
+
+            return $pageIds ? get_posts([
+                'post_type' => 'page',
+                'post_status' => 'publish',
+                'post__in' => $pageIds,
+                'orderby' => 'post__in',
+                'posts_per_page' => count($pageIds),
+            ]) : [];
+        }
+
+        $parent = (int) ($this->post_id ?: get_the_ID());
+
+        return $parent ? get_pages([
+            'parent' => $parent,
+            'sort_column' => 'menu_order,post_title',
+            'post_status' => 'publish',
+        ]) : [];
     }
 
     /**
