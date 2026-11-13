@@ -93,6 +93,21 @@ wa-button:is(:hover, :focus-within) {
   @include arrow-hover;
 }
 
+// The yellow pill look (brand/accent, small) for plain-HTML CTA links that are otherwise
+// text links: filled yellow, charcoal text, charcoal border on hover/focus only.
+@mixin yellow-pill {
+  padding: 0.625rem 1rem;
+  border: 2px solid var(--wp--preset--color--yellow);
+  border-radius: 999px;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--wp--preset--color--charcoal);
+  }
+}
+
 // Plain-HTML twin of the brand/accent <wa-button>, for pages that can't load Web Awesome
 // (the Cycle Planner, through planner.scss). Same arrow markup as <x-icon name="arrow-right">.
 .c-button {

@@ -20,10 +20,18 @@
     {!! $hero !!}
 
     <div class="o-container">
-      <div @class(['c-archive', 'c-archive--no-filters' => ! count($filterGroups)])>
+      <div @class(['c-archive', 'c-archive--no-filters' => ! count($filterGroups) && ! count($pageMenuItems)])>
         @if (trim($body))
           <div class="c-archive__intro">
             {!! $body !!}
+          </div>
+        @endif
+
+        {{-- The page index (built from the intro's H2s, as on the Sticky Nav template) sits beside the
+             intro and sticks only while the intro scrolls; the filters stay beside the map below it. --}}
+        @if (count($pageMenuItems))
+          <div class="c-archive__page-menu-cell">
+            <x-sticky-page-menu :items="$pageMenuItems" class="c-archive__page-menu" data-sticky-nav-menu />
           </div>
         @endif
 

@@ -44,10 +44,54 @@
     }
   }
 
+  // Map Listing page index. The cell spans the intro's row and the menu sticks inside it
+  // (sticky is bounded by its parent, not its grid area), so it has scrolled away by the
+  // time the filters beside the map come into view.
+  &__page-menu-cell {
+    order: -1; // first on small screens, before the intro
+
+    @include bp.respond($min: bp.$lg) {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  &__page-menu {
+    max-width: 100%;
+
+    @include bp.respond($min: bp.$lg) {
+      position: sticky;
+      // 12rem clears the visible header; 2rem once it's hidden (html.is-header-hidden,
+      // set by site-header.js). Same values as the Sticky Nav template.
+      top: 12rem;
+      max-height: calc(100vh - 12rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      transition: top 0.25s ease;
+
+      html.is-header-hidden & {
+        top: 2rem;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+  }
+
   // Blocks in the linked page's intro: flattened containers, background
   // blocks as rounded panels — shared with the Sticky Nav column.
   &__intro {
     @include column-blocks.blocks;
+  }
+
+  // Keeps jumped-to headings out from under the sticky header (as on the Sticky Nav template).
+  &__intro :where(h2, h3, h4, a, button, [tabindex]) {
+    scroll-margin-top: 13rem;
+
+    html.is-header-hidden & {
+      scroll-margin-top: 3rem;
+    }
   }
 
   &__intro > :is(section, .is-acf-block) {

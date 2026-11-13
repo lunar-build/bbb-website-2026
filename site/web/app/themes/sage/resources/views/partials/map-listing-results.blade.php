@@ -18,6 +18,7 @@
         :description="$card['description']"
         :regions="$card['regions']"
         :link="$card['link']"
+        :cta-colour="$ctaColour"
       />
     @endforeach
   </div>

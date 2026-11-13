@@ -1,4 +1,4 @@
-@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null, 'headingLevel' => 'h4'])
+@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null, 'ctaColour' => 'yellow', 'headingLevel' => 'h4'])
 
 {{-- The rule directly under the name is accented (yellow, per Figma); every
      rule after it is the plain divider colour — tracked here since which
@@ -17,7 +17,7 @@
         <li class="c-business-card__contact-item">
           <wa-icon name="{{ $row['icon'] }}" class="c-business-card__icon"></wa-icon>
           @if ($row['href'])
-            <a class="c-business-card__contact-text c-business-card__contact-link" href="{{ $row['href'] }}" @if ($row['icon'] === 'location-dot' || $row['icon'] === 'globe') target="_blank" rel="noopener" @endif>{{ $row['text'] }}</a>
+            <a class="c-business-card__contact-text c-business-card__contact-link" href="{{ $row['href'] }}" @if (in_array($row['icon'], ['location-dot', 'globe', 'street-view'])) target="_blank" rel="noopener" @endif>{{ $row['text'] }}@if ($row['icon'] === 'street-view')<span class="u-sr-only"> {{ __('(opens in a new tab)', 'sage') }}</span>@endif</a>
           @else
             <span class="c-business-card__contact-text">{{ $row['text'] }}</span>
           @endif
@@ -55,7 +55,7 @@
 
   @if (! empty($link['url']))
     <a
-      class="c-business-card__cta"
+      @class(['c-business-card__cta', 'c-business-card__cta--outlined' => $ctaColour === 'outlined'])
       href="{{ $link['url'] }}"
       @if (($link['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
     >

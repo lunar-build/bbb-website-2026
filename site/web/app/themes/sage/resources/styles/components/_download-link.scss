@@ -26,6 +26,15 @@
   }
 }
 
+// Optional yellow button (editor's choice per block); the default stays a text link.
+.c-download-link__link--yellow {
+  @include button.yellow-pill;
+  // The pill's padding would push a long label out of its card; let it wrap.
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
 .c-download-link__file-size {
   color: var(--wp--preset--color--charcoal);
 }

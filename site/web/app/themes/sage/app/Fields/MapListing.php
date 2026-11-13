@@ -35,6 +35,12 @@ class MapListing extends Field
                 'label' => 'Results heading',
                 'instructions' => 'Shown above the results, e.g. "List of bike shops".',
             ])
+            ->addSelect('map_listing_cta_colour', [
+                'label' => 'Card button colour',
+                'instructions' => 'The "Learn more" button on every card.',
+                'choices' => ['yellow' => 'Yellow', 'outlined' => 'Outlined'],
+                'default_value' => 'yellow',
+            ])
             ->addCheckbox('map_listing_services', [
                 'label' => 'Pre-selected services',
                 'instructions' => 'Ticked on first visit, e.g. only "Bike hire" and "Bike tours" for a bike hire page. Visitors can still change them.',

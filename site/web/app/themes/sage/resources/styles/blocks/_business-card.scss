@@ -114,6 +114,18 @@
     }
   }
 
+  // Yellow by default (brand/accent look: filled yellow, charcoal on hover/focus); the
+  // outlined variant keeps the original charcoal outline.
+  &__cta:not(&__cta--outlined) {
+    border-color: var(--wp--preset--color--yellow);
+    background: var(--wp--preset--color--yellow);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--wp--preset--color--charcoal);
+    }
+  }
+
   &__region + &__cta {
     margin-top: 0;
   }

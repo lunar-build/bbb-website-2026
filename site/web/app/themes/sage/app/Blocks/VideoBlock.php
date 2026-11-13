@@ -260,6 +260,17 @@ class VideoBlock extends Block
                 'label' => 'Transcript file size label',
                 'instructions' => 'e.g. "PDF 1.1MB".',
                 'conditional_logic' => [[['field' => 'transcript_file', 'operator' => '!=empty']]],
+            ])
+            ->addSelect('transcript_button_style', [
+                'label' => 'Transcript button style',
+                'instructions' => 'How the download looks: the standard text link, or a yellow button.',
+                'choices' => [
+                    'link' => 'Text link (default)',
+                    'yellow' => 'Yellow button',
+                ],
+                'default_value' => 'link',
+                'ui' => true,
+                'conditional_logic' => [[['field' => 'transcript_file', 'operator' => '!=empty']]],
             ]);
 
         return $fields->build();
@@ -332,6 +343,7 @@ class VideoBlock extends Block
                 'url' => $this->exampleField('transcript')['url'] ?? null,
                 'label' => $this->exampleField('transcript_label', ''),
                 'file_size' => $this->exampleField('transcript_file_size', ''),
+                'button_style' => 'link',
             ];
         }
 
@@ -341,6 +353,7 @@ class VideoBlock extends Block
             'url' => is_array($file) ? ($file['url'] ?? null) : null,
             'label' => get_field('transcript_label') ?: 'Download transcript',
             'file_size' => get_field('transcript_file_size') ?: '',
+            'button_style' => get_field('transcript_button_style') === 'yellow' ? 'yellow' : 'link',
         ];
     }
 

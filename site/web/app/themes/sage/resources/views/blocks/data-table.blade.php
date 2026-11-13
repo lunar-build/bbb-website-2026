@@ -8,7 +8,7 @@
       <thead>
         <tr>
           @foreach ($columns as $column)
-            <th scope="col" class="u-table-column-heading">{{ $column['heading'] }}</th>
+            <th scope="col" @class(['u-table-column-heading', 'c-table__col--'.($column['width'] ?? 'auto')])>{{ $column['heading'] }}</th>
           @endforeach
         </tr>
       </thead>
@@ -16,10 +16,11 @@
         @foreach ($rows as $row)
           <tr>
             @foreach ($row['cells'] as $i => $cell)
+              @php($widthClass = 'c-table__col--'.($columns[$i]['width'] ?? 'auto'))
               @if ($i === 0 && $firstColumnIsHeader)
-                <th scope="row" class="u-table-cell-heading u-rich-text">{!! $cell['content'] !!}</th>
+                <th scope="row" @class(['u-table-cell-heading', 'u-rich-text', $widthClass])>{!! $cell['content'] !!}</th>
               @else
-                <td class="u-body-regular u-rich-text">{!! $cell['content'] !!}</td>
+                <td @class(['u-body-regular', 'u-rich-text', $widthClass])>{!! $cell['content'] !!}</td>
               @endif
             @endforeach
           </tr>
