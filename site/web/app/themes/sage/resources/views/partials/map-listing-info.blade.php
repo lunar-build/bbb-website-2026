@@ -6,6 +6,8 @@
     <p class="c-map-listing__info-row">
       @if ($row['icon'] === 'phone')
         {{ __('Call:', 'sage') }} <a href="{{ $row['href'] }}">{{ $row['text'] }}</a>
+      @elseif ($row['icon'] === 'street-view')
+        <a href="{{ $row['href'] }}" target="_blank" rel="noopener">{{ $row['text'] }}<span class="u-sr-only"> {{ __('(opens in a new tab)', 'sage') }}</span></a>
       @else
         {{ $row['text'] }}
       @endif
