@@ -239,6 +239,17 @@ class Table extends Block
                         'label' => 'Heading',
                         'required' => true,
                     ])
+                    ->addSelect('width', [
+                        'label' => 'Width',
+                        'instructions' => 'Wide gives the column more room. One line stops its text wrapping, e.g. for full dates like "Saturday 14 March 2026".',
+                        'choices' => [
+                            'auto' => 'Standard',
+                            'wide' => 'Wide',
+                            'one-line' => 'One line',
+                        ],
+                        'default_value' => 'auto',
+                        'ui' => true,
+                    ])
                 ->endRepeater()
             ->addTab('Rows')
                 ->addRepeater('rows', [
