@@ -43,6 +43,8 @@ class MapListing extends Composer
             'cards' => $cards,
             'markers' => array_values(array_filter(array_map(fn($item, $card) => $item['lat'] === null ? null : [
                 'name' => $item['name'],
+                // Where the pin is, in words: the address, or the region for datasets without one (bike pumps).
+                'place' => $item['address'] ?: implode(', ', $item['regions']),
                 'lat' => $item['lat'],
                 'lng' => $item['lng'],
                 // The pin's popup — same details as its card, rendered here so Blade escapes it.

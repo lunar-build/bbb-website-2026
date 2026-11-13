@@ -42,7 +42,7 @@
               data-api-key="{{ $mapsKey }}"
               @if ($mapId) data-map-id="{{ $mapId }}" @endif
               role="region"
-              aria-label="{{ __('Map of results', 'sage') }}"
+              aria-label="{{ __('Map of results. The same places are listed below the map.', 'sage') }}"
             ></div>
           @endif
 

@@ -203,6 +203,7 @@ class Table extends Block
             'caption' => $this->caption(),
             'firstColumnIsHeader' => $this->firstColumnIsHeader(),
             'columns' => $this->columns(),
+            'hasColumnHeadings' => $this->hasColumnHeadings(),
             'rows' => $this->rows(),
         ];
     }
@@ -237,7 +238,7 @@ class Table extends Block
                 ])
                     ->addText('heading', [
                         'label' => 'Heading',
-                        'required' => true,
+                        'instructions' => 'Leave every heading empty for a table without a header row.',
                     ])
                 ->endRepeater()
             ->addTab('Rows')
@@ -295,6 +296,17 @@ class Table extends Block
     public function columns()
     {
         return $this->resolveField('columns', []);
+    }
+
+    /**
+     * Whether any column has a heading. With none, the table renders without a
+     * <thead> rather than an empty dark-blue header row.
+     *
+     * @return bool
+     */
+    public function hasColumnHeadings()
+    {
+        return collect($this->columns())->contains(fn ($column) => filled($column['heading'] ?? ''));
     }
 
     /**
