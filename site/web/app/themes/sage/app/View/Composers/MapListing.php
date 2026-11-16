@@ -71,6 +71,7 @@ class MapListing extends Composer
     protected function card(array $item): array
     {
         $contactInfo = array_values(array_filter([
+            $item['regions'] ? ['icon' => 'map-pin', 'text' => implode(', ', $item['regions'])] : null,
             $item['address'] ? ['icon' => 'location-dot', 'text' => $item['address']] : null,
             $item['phone'] ? ['icon' => 'phone', 'text' => $item['phone']] : null,
             $item['type'] ? ['icon' => 'circle-info', 'text' => $item['type']] : null,
@@ -86,7 +87,6 @@ class MapListing extends Composer
             ], $item['services']),
             // Pumps have no description — who maintains them is their summary.
             'description' => $item['description'] ?: $item['maintained'],
-            'regions' => $item['regions'],
             'link' => $item['website'] ? [
                 'title' => __('Learn more (opens in a new tab)', 'sage'),
                 'url' => $item['website'],

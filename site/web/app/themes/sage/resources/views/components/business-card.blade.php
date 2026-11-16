@@ -1,4 +1,4 @@
-@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'regions' => [], 'link' => null, 'headingLevel' => 'h4'])
+@props(['name', 'contactInfo' => [], 'services' => [], 'description' => null, 'link' => null, 'headingLevel' => 'h4'])
 
 {{-- The rule directly under the name is accented (yellow, per Figma); every
      rule after it is the plain divider colour — tracked here since which
@@ -45,12 +45,6 @@
     @php($ruleRendered = true)
 
     <p class="c-business-card__description">{{ $description }}</p>
-  @endif
-
-  @if (count($regions))
-    <p class="c-business-card__region">
-      <strong>{{ _n('Region:', 'Regions:', count($regions), 'sage') }}</strong> {{ implode(', ', $regions) }}
-    </p>
   @endif
 
   @if (! empty($link['url']))
