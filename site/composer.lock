@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "87a567a1f7951b05488a485bcf04324d",
+    "content-hash": "e014b744904e7ffb1fb5bf7aaf9d8e40",
     "packages": [
         {
             "name": "cloudflare/cf-ip-rewrite",
@@ -305,6 +305,36 @@
                 }
             ],
             "time": "2026-10-29T01:08:25+00:00"
+        },
+        {
+            "name": "gravityforms/gravityformsrecaptcha",
+            "version": "2.2.3",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:lunar-build/gravityformsrecaptcha.git",
+                "reference": "c0b2b58269d5548b12001d4ccaec9b487642d5af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lunar-build/gravityformsrecaptcha/zipball/c0b2b58269d5548b12001d4ccaec9b487642d5af",
+                "reference": "c0b2b58269d5548b12001d4ccaec9b487642d5af",
+                "shasum": ""
+            },
+            "require-dev": {
+                "tutv95/wp-package-parser": "^1.0"
+            },
+            "type": "wordpress-plugin",
+            "authors": [
+                {
+                    "name": "Rocketgenius Inc.",
+                    "email": "contact@gravityforms.com"
+                },
+                {
+                    "name": "Ethan Clevenger",
+                    "email": "ethan@sternerstuff.dev"
+                }
+            ],
+            "time": "2026-10-30T01:15:05+00:00"
         },
         {
             "name": "lunar-build/modern-events-calendar-pro",
