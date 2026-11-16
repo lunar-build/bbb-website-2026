@@ -51,6 +51,22 @@
       }
     }
 
+    // Used by the footer newsletter: no space under the panel, so the illustration stands on
+    // the edge below it. The text column keeps the space the panel's padding gave it.
+    &.c-form--flush-bottom {
+      .c-form__panel {
+        padding-bottom: 0;
+      }
+
+      .c-form__inner {
+        padding-bottom: 3rem;
+
+        @include bp.respond($min: bp.$lg) {
+          padding-bottom: 4rem;
+        }
+      }
+    }
+
     .c-form__image {
       aspect-ratio: 16 / 9;
       margin-bottom: 2rem;

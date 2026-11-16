@@ -818,28 +818,6 @@ function news_footer_illustration(wpdb $src, int $id): ?array
     return news_acf_block('acf/illustration', \App\Blocks\Illustration::class, $fields, 'illustration');
 }
 
-/** The newsletter sign-up that closed the old landing pages: a Form block for the site's "News letter" Gravity Form. */
-function news_newsletter_form(array &$notes): ?array
-{
-    foreach (GFAPI::get_forms(null) as $form) {
-        if ($form['title'] === 'News letter') {
-            return news_acf_block('acf/form', \App\Blocks\Form::class, [
-                'layout' => 'centred',
-                'heading_highlight' => 'Stay up to date,',
-                'heading_text' => 'with news and events in the region. Join our newsletter',
-                'heading_level' => 'h2',
-                'heading_style' => 'match',
-                'intro_text' => '',
-                'intro_style' => 'body',
-                'form_id' => (int) $form['id'],
-            ], 'form');
-        }
-    }
-    $notes[] = 'no "News letter" Gravity Form, so no newsletter sign-up was added';
-
-    return null;
-}
-
 /** A Text Banner from its heading and body rich text, on an optional background colour slug; $level is h2-h4, or none for a standalone statement. */
 function news_text_banner_html(string $heading, string $body = '', string $background = '', string $level = 'none'): array
 {
@@ -2190,9 +2168,6 @@ function news_page_content(wpdb $src, int $id, callable $replaceUrls, array &$no
     }
     if ($landing && ($footer = news_footer_illustration($src, $id))) {
         $blocks[] = $footer;
-    }
-    if ($landing && ($newsletter = news_newsletter_form($notes))) {
-        $blocks[] = $newsletter;
     }
     $hero = in_array($blocks[0]['blockName'] ?? null, \App\Support\ContentHero::HERO_BLOCKS, true) ? '' : serialize_block(news_page_hero($row->post_title, $thumb, $landing)) . "\n\n";
 
