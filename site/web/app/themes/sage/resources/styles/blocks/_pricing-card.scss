@@ -1,0 +1,65 @@
+// Figma node 640:665. Card Grid's "Pricing card" style.
+@use '../base/typography';
+
+.c-pricing-card {
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    // Figma insets: 20px top, 16px sides.
+    padding: 1.25rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    background: var(--wp--preset--color--white);
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    // Keeps a one-line title and a two-line title the same height across a row.
+    min-height: 3rem;
+  }
+
+  // Figma: 18/24 bold, a step under the Business Card's name.
+  &__title {
+    flex: 1;
+    margin: 0;
+    align-self: center;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    font-weight: 700;
+    color: var(--wp--preset--color--blue);
+  }
+
+  &__price {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.8125rem;
+    height: 2.8125rem;
+    border-radius: 999px;
+    background: var(--wp--preset--color--yellow);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 700;
+    color: var(--wp--preset--color--charcoal);
+  }
+
+  // The divider is the blue line from the design, not the plain grey rule.
+  &__rule {
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-top: 1px solid var(--wp--preset--color--blue);
+  }
+
+  &__description {
+    @extend .u-body-regular;
+    margin: 0;
+    padding-block: 0.375rem;
+    color: var(--wp--preset--color--blue-dark);
+  }
+}

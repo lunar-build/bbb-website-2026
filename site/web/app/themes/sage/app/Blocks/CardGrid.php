@@ -226,6 +226,21 @@ class CardGrid extends Block
         'Image card' => [
             'card_style' => 'image_card',
         ],
+        'Pricing card' => [
+            'card_style' => 'pricing',
+            'pricing_cards' => [
+                [
+                    'title' => 'Adult',
+                    'price' => '£24',
+                    'description' => 'Up to 4 x cycle sessions at the Bristol Cycling Centre',
+                ],
+                [
+                    'title' => 'Children and Accompanying Adult',
+                    'price' => '£48',
+                    'description' => 'Up to 12 paid in advance entries to the Bristol Cycling Centre',
+                ],
+            ],
+        ],
         'Link (with side image)' => [
             'show_side_image' => true,
         ],
@@ -275,6 +290,7 @@ class CardGrid extends Block
             'ctaStyle' => $this->ctaStyle(),
             'cards' => $this->cards(),
             'businessCards' => $this->businessCards(),
+            'pricingCards' => $this->pricingCards(),
             'sideImage' => $this->sideImage(),
         ];
     }
@@ -311,6 +327,7 @@ class CardGrid extends Block
                     'news' => 'News card (button CTA, date shown, no body copy)',
                     'image_card' => 'Image card (image + linked caption bar only)',
                     'business' => 'Business card (name, contact info, services, description — no image)',
+                    'pricing' => 'Pricing card (title, price badge, description — no image or link)',
                 ],
                 'default_value' => 'link',
                 'ui' => true,
@@ -352,6 +369,32 @@ class CardGrid extends Block
             ]);
 
         $imageCards->endRepeater();
+
+        $fields->addTab('Pricing cards', $this->whenCardStyle(['pricing']));
+
+        $pricingCards = $fields->addRepeater('pricing_cards', [
+            'label' => 'Pricing cards',
+            'button_label' => 'Add card',
+            'min' => 0,
+            'layout' => 'block',
+        ]);
+
+        $pricingCards
+            ->addText('title', [
+                'label' => 'Title',
+                'required' => 1,
+            ])
+            ->addText('price', [
+                'label' => 'Price',
+                'instructions' => 'Shown in the yellow badge, e.g. £24. Keep it short.',
+                'required' => 1,
+            ])
+            ->addTextarea('description', [
+                'label' => 'Description',
+                'rows' => 3,
+            ]);
+
+        $pricingCards->endRepeater();
 
         $fields->addTab('Business cards', $this->whenCardStyle(['business']));
 
@@ -544,6 +587,16 @@ class CardGrid extends Block
                 'link' => normalize_link($card['link'] ?? null),
             ];
         }, $cards);
+    }
+
+    /**
+     * Retrieve the Pricing card style's cards.
+     *
+     * @return array
+     */
+    public function pricingCards()
+    {
+        return $this->resolveField('pricing_cards', []);
     }
 
     /**
