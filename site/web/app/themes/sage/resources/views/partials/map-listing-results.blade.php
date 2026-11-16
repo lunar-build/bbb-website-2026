@@ -16,7 +16,6 @@
         :contact-info="$card['contactInfo']"
         :services="$card['services']"
         :description="$card['description']"
-        :regions="$card['regions']"
         :link="$card['link']"
       />
     @endforeach
