@@ -87,7 +87,8 @@ class PatternLibrary extends Composer
      * Standalone previews skip `WP_Block_Supports::apply_block_supports()` (no real
      * `WP_Block` context), so the default spacing support never reaches the `style`
      * attribute. Rebuild the padding from the block's `$spacing` with the same style
-     * engine and merge it onto the root wrapper.
+     * engine and merge it onto the root wrapper — a <section>, or a <div> for blocks with
+     * no heading.
      */
     protected function injectPreviewSpacingStyle(string $html, Block $block): string
     {
@@ -103,7 +104,7 @@ class PatternLibrary extends Composer
             return $html;
         }
 
-        return preg_replace_callback('/<section\b[^>]*>/', function ($matches) use ($css) {
+        return preg_replace_callback('/<(?:section|div)\b[^>]*>/', function ($matches) use ($css) {
             $tag = $matches[0];
 
             if (preg_match('/style="([^"]*)"/', $tag, $styleMatch)) {
