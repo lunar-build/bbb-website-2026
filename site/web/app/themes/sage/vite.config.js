@@ -14,6 +14,7 @@ export default defineConfig({
     laravel({
       input: [
         'resources/js/app.js',
+        'resources/js/mec-lunar-theme.js',
         'resources/css/editor.scss',
         'resources/js/editor.js',
         'resources/js/editor-canvas.js',

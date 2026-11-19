@@ -13,6 +13,10 @@ add_filter('option_mec_options', function ($options) {
     if (is_array($options)) {
         $options['settings']['single_cost_type'] = 'alphabetic';
 
+        // UK date (day first) and 24-hour time in the event editor's pickers.
+        $options['settings']['datepicker_format'] = 'dd-mm-yy&d-m-Y';
+        $options['settings']['time_format'] = '24';
+
         // MEC's settings screens read these unchecked; until its settings are
         // first saved, each is a warning that Acorn turns into a 500.
         $options['settings'] += [

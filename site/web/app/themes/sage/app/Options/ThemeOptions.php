@@ -194,6 +194,7 @@ class ThemeOptions extends Field
             '<li>Add a hero block first (Image Hero, Text Hero or Video Hero), then any introduction text.</li>',
             '<li>Publish it, then choose it in the matching field below. Leave the field empty to keep just the title.</li>',
             '</ol>',
+            '<p>Events is a special case: if the page you link contains an Events Calendar block, the Events listing becomes that calendar instead of cards (the page\'s own address then redirects to /events/).</p>',
             '<p>' . $news . '</p>',
         ]);
     }
