@@ -40,12 +40,30 @@
   border: 0;
   background: none;
   cursor: pointer;
+  position: relative;
+  border-radius: 1.25rem; // matches .c-media-thumbnail__image
 
-  @include focus.ring;
+  // Keyboard only: focus.card-ring's charcoal + yellow pair, drawn inside the tile because
+  // WA's scroll container clips anything outside edge tiles. On an overlay, as the image
+  // would cover inset shadows on the button itself. Yellow is listed first so it paints
+  // on top at the edge, leaving charcoal hugging the image.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
 
-  // Inset: the default outset ring is clipped on edge tiles by WA's .slides overflow.
   &:focus-visible {
+    outline: 2px solid transparent; // Windows High Contrast drops box-shadows
     outline-offset: -2px;
+
+    &::after {
+      box-shadow:
+        inset 0 0 0 2px var(--wp--preset--color--yellow),
+        inset 0 0 0 4px var(--wp--preset--color--charcoal);
+    }
   }
 
   // Clamp to the grid's column count at each step.
@@ -74,14 +92,15 @@
 
 // Explicit size: slotted content under wa-carousel's display:contents wrapper
 // collapses to 0 width in some browsers (same as the other carousels' nav icons).
+// Dark orange, as in Quote Carousel's white variant.
 .c-media-gallery__nav-icon {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 2.375rem; // 38px
-  height: 2.0625rem; // 33px
-  color: var(--wp--preset--color--yellow);
+  width: 1.75rem;
+  height: 1.125rem;
+  color: var(--wp--preset--color--dark-orange);
 
   .c-icon,
   svg {
@@ -89,9 +108,15 @@
     width: 100%;
     height: 100%;
   }
+
+  // ::part() can't reach the slotted arrow, so the button passes the extended path down
+  // (see ::part(navigation-button):hover below). Same shape as button.arrow-hover.
+  .c-icon__arrow {
+    d: var(--c-media-gallery-arrow, path('M1 7H20M20 7L14 1M20 7L14 13'));
+  }
 }
 
-.c-media-gallery__nav-icon--previous svg {
+.c-media-gallery__nav-icon--previous {
   transform: rotate(180deg);
 }
 
@@ -138,7 +163,28 @@
   background-color: var(--wp--preset--color--blue);
 }
 
-.c-media-gallery__carousel::part(navigation-button),
+// Keyboard focus: card ring, no extension. Hover: the arrow extends (not while focused,
+// where it would poke through the ring).
+// Fixed square + 50% radius so the focus ring is a circle around the arrow.
+.c-media-gallery__carousel::part(navigation-button) {
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+
+  @include focus.card-ring;
+}
+
+.c-media-gallery__carousel::part(navigation-button):hover {
+  --c-media-gallery-arrow: path('M1 7H28M28 7L22 1M28 7L22 13');
+}
+
+// After :hover so it wins when both apply (::part() doesn't reliably take :not()).
+.c-media-gallery__carousel::part(navigation-button):focus-visible {
+  --c-media-gallery-arrow: initial;
+}
+
 .c-media-gallery__carousel::part(pagination-item),
 .c-media-gallery__carousel::part(scroll-container) {
   @include focus.ring;
@@ -150,8 +196,14 @@
 
 // ::part(close-button) is the <wa-button> host, which never gets :focus-visible (its
 // inner <button> does), so target close-button__base instead.
+// Fixed square + 50% radius: WA's default padding made it wider than tall, so the ring was oval.
 .c-media-gallery__dialog::part(close-button__base) {
-  @include focus.ring;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+
+  @include focus.card-ring;
 }
 
 .c-media-gallery__dialog-body {
@@ -164,8 +216,8 @@
     border-radius: 0.625rem;
   }
 
-  // Same ring as other interactive elements, not the browser's native video focus style.
+  // Card ring, not the browser's native video focus style.
   video {
-    @include focus.ring;
+    @include focus.card-ring;
   }
 }

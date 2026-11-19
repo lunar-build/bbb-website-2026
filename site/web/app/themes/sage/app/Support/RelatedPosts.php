@@ -18,6 +18,6 @@ class RelatedPosts
         ]);
 
         // Three across the narrow post column — the full h3 scale wraps to 4-5 lines.
-        return array_map(fn($post) => PostCard::fromPost($post, 'h5'), $posts);
+        return array_map(fn($post) => PostCard::fromPost($post, 'match'), $posts);
     }
 }

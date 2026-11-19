@@ -39,14 +39,6 @@ wa-textarea::part(textarea) {
   line-height: 1.125rem;
 }
 
-// For errors managed at runtime outside the component — see #from-error/
-// #to-error in journey-planner-widget.blade.php.
-.c-input__error {
-  font-family: var(--wp--preset--font-family--nata-sans);
-  font-size: var(--wp--preset--font-size--input-label);
-  color: var(--wp--preset--color--dark-orange);
-}
-
 wa-input[hint]::part(input-wrapper),
 wa-textarea[hint]::part(textarea-wrapper) {
   border-color: var(--wp--preset--color--dark-orange);
@@ -66,6 +58,16 @@ wa-textarea[hint]::part(textarea-wrapper) {
     width: 1.25rem;
     height: 1.25rem;
   }
+}
+
+// Inline icon button (see $iconInline in input.blade.php): looks like the decorative icon, but focusable.
+.c-input__icon--inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  @include focus.ring;
 }
 
 // Icon-button variant: adjacent real element (see $iconButtonLabel in input.blade.php), squared off at the seam.

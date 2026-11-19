@@ -1,5 +1,51 @@
 <?php
 
+/**
+ * The site-wide newsletter band above the footer: the Form block's image layout with the
+ * embed pasted in Theme Options → Footer. Empty when no embed is set.
+ */
+function footer_newsletter_html(): string
+{
+    $embedCode = get_field('newsletter_embed', 'option');
+
+    if (! $embedCode) {
+        return '';
+    }
+
+    $fields = [
+        'layout' => 'image',
+        // null until Theme Options is first saved (ACF skips field defaults until then); a
+        // saved empty value is kept, so the heading can be cleared.
+        'heading_highlight' => get_field('newsletter_heading_highlight', 'option') ?? 'Stay up to date,',
+        'heading_text' => get_field('newsletter_heading_text', 'option') ?? 'with news and events in the region.',
+        // An H3 under the H2 above, sized like an H2.
+        'subheading_text' => get_field('newsletter_subheading_text', 'option') ?? 'Join our newsletter',
+        'subheading_level' => 'h3',
+        'subheading_style' => 'h2',
+        'heading_level' => 'h2',
+        'form_source' => 'embed',
+        'embed_code' => $embedCode,
+        'image_type' => 'illustration',
+        'illustration' => 'mountain_biker',
+    ];
+
+    $data = [];
+
+    foreach ($fields as $name => $value) {
+        $data[$name] = $value;
+        $data['_' . $name] = 'field_form_' . $name;
+    }
+
+    return do_blocks(serialize_block([
+        'blockName' => 'acf/form',
+        // Flush bottom: the illustration stands on the footer's top edge.
+        'attrs' => ['name' => 'acf/form', 'data' => $data, 'mode' => 'preview', 'className' => 'c-form--flush-bottom', 'style' => ['spacing' => ['padding' => ['bottom' => '0']]]],
+        'innerBlocks' => [],
+        'innerHTML' => '',
+        'innerContent' => [],
+    ]));
+}
+
 /** Nav menu location → nested [{ label, href, current, children }] (header and primary-nav views). */
 function menu_items_to_array(string $location): array
 {
@@ -57,6 +103,38 @@ function legal_links_from_options(): array
         'label' => $row['label'],
         'href' => $row['href'],
     ], $rows);
+}
+
+/** Theme Options "404 page" quick links → `{ label, href, target }[]`, falling back to a default set when empty. */
+function not_found_links_from_options(): array
+{
+    $links = array_map(
+        fn($row) => normalize_link($row['link'] ?? null),
+        get_field('not_found_links', 'option') ?: [],
+    );
+
+    $links = array_values(array_filter($links, fn($link) => $link['url'] && $link['title']));
+
+    if (! $links) {
+        $postsPage = (int) get_option('page_for_posts');
+        // The planner is a homepage block with no page of its own, so follow the header CTA's link.
+        $plannerUrl = normalize_link(get_field('cta', 'option'))['url'] ?: home_url('/');
+
+        $links = array_filter([
+            ['title' => __('Home', 'sage'), 'url' => home_url('/')],
+            ['title' => __('Journey planner', 'sage'), 'url' => $plannerUrl],
+            ['title' => __('What’s on', 'sage'), 'url' => get_post_type_archive_link('mec-events')],
+            ['title' => __('News', 'sage'), 'url' => $postsPage ? get_permalink($postsPage) : null],
+        ], fn($link) => $link['url']);
+
+        $links = array_map(fn($link) => $link + ['target' => ''], array_values($links));
+    }
+
+    return array_map(fn($link) => [
+        'label' => $link['title'],
+        'href' => $link['url'],
+        'target' => $link['target'],
+    ], $links);
 }
 
 /**
@@ -218,4 +296,31 @@ function theme_block_background_css(): string
     }
 
     return $css;
+}
+
+/**
+ * Main query's pagination as `<a>`/`<span>` strings for archive and search results.
+ * paginate_links() carries the current query string (search term, active filters) onto each link.
+ * Hidden text gives the accessible names "Page 2", "Previous page" and "Next page"; the
+ * spaces outside it don't render, as the links are inline-flex.
+ */
+function pagination_links(): array
+{
+    $arrow = \Illuminate\Support\Facades\Blade::render('<x-icon name="arrow-right" />');
+    $hidden = fn(string $text) => '<span class="u-sr-only">' . esc_html($text) . '</span>';
+
+    return paginate_links([
+        'type' => 'array',
+        'current' => max(1, (int) get_query_var('paged')),
+        'total' => (int) $GLOBALS['wp_query']->max_num_pages,
+        'before_page_number' => $hidden(__('Page', 'sage')) . ' ',
+        'prev_text' => $arrow . __('Previous', 'sage') . ' ' . $hidden(__('page', 'sage')),
+        'next_text' => __('Next', 'sage') . ' ' . $hidden(__('page', 'sage')) . $arrow,
+    ]) ?: [];
+}
+
+/** A nav item that is a real page, not a "#" or empty placeholder: its label can link while a chevron opens the children. */
+function nav_item_has_link(array $item): bool
+{
+    return ! in_array(trim((string) ($item['href'] ?? '')), ['', '#'], true);
 }

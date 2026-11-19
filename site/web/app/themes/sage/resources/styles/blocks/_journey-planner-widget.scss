@@ -28,23 +28,25 @@
   align-items: flex-start;
 }
 
-// <wa-radio-group> renders its own fieldset/legend; this themes the label part and lays out the <x-radio>s.
+// <wa-radio-group> renders its own fieldset/legend; this hides the label part and lays out the <x-radio>s.
 .c-journey-planner-widget__options {
   width: 100%;
 
+  // Legend kept for the group's accessible name but hidden visually (not in the design).
   &::part(form-control-label) {
-    font-family: var(--wp--preset--font-family--nata-sans);
-    font-size: var(--wp--preset--font-size--input-label);
-    font-weight: 500;
-    line-height: 1.625rem;
-    color: var(--wp--preset--color--charcoal);
-    margin-bottom: 0.25rem;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   &::part(form-control-input) {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 3.75rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.25rem;
     row-gap: 0.75rem;
   }
 }

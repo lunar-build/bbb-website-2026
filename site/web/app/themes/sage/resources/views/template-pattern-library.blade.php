@@ -12,6 +12,8 @@
       {{ __('Sorry, but the page you are trying to view does not exist.', 'sage') }}
     </x-alert>
   @else
+    @php($formFields = $formFields())
+
     {{-- .o-container only sets the shared max-width/gutter grid — the
     nav + content split lives on .c-pattern-library, one level in, so it
     gets its own grid-template-columns without clashing with .o-container's
@@ -37,6 +39,9 @@
               @foreach ($components as $component)
                 <li><a href="#component-{{ $component['name'] }}"><span>{{ $component['name'] }}</span></a></li>
               @endforeach
+              @if ($formFields)
+                <li><a href="#style-form-fields"><span>{{ __('Form fields', 'sage') }}</span></a></li>
+              @endif
               <li><a href="#style-buttons"><span>{{ __('Buttons', 'sage') }}</span></a></li>
               <li><a href="#style-type-scale"><span>{{ __('Type scale', 'sage') }}</span></a></li>
             </ul>
@@ -88,6 +93,27 @@
                 </div>
               </section>
             @endforeach
+
+            @if ($formFields)
+              <section id="style-form-fields" class="c-pattern-library__entry">
+                <div class="c-pattern-library__meta">
+                  <h2>{{ __('Form fields (Gravity Forms)', 'sage') }}</h2>
+                  <p>{{ __('Every GF field type, rendered by GF with the theme\'s filters — as forms currently look. No GF JavaScript, so counters and date pickers are inert.', 'sage') }}</p>
+                </div>
+
+                <div class="c-pattern-library__preview">
+                  <div class="c-pattern-library__variant">
+                    <p class="c-pattern-library__variant-label">{{ __('Default', 'sage') }}</p>
+                    {!! $formFields['default'] !!}
+                  </div>
+
+                  <div class="c-pattern-library__variant">
+                    <p class="c-pattern-library__variant-label">{{ __('With validation errors', 'sage') }}</p>
+                    {!! $formFields['errors'] !!}
+                  </div>
+                </div>
+              </section>
+            @endif
 
             @include('partials.pattern-library-styles')
           @endif

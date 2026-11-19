@@ -1,6 +1,6 @@
 @switch($slot['type'])
   @case('image')
-    <img class="c-two-column-content__image" src="{{ $slot['image']['url'] }}" alt="{{ $slot['image']['alt'] ?? '' }}">
+    <x-image class="c-two-column-content__image" :image="$slot['image']" size="large" />
     @break
 
   @case('quote')
@@ -17,7 +17,7 @@
     @break
 
   @case('bullet_list')
-    <x-bullet-list :heading="$slot['heading']" :items="$slot['items']" />
+    <x-bullet-list :heading="$slot['heading']['text']" :heading-level="$slot['heading']['level']" :heading-style="$slot['heading']['style']" :items="$slot['items']" />
     @break
 
   @default

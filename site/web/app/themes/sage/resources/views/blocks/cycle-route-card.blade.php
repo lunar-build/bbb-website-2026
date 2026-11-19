@@ -1,45 +1,39 @@
-<section {{ $attributes->class(['c-cycle-route-card']) }}>
+<x-block-root :heading="(bool) $routeName" {{ $attributes->class(['c-cycle-route-card']) }}>
 
 @if ($routeName)
 <div class="o-container">
-  <div class="c-cycle-route-card__card c-cycle-route-card--{{ $difficulty }}">
+  <article class="c-cycle-route-card__card c-cycle-route-card--{{ $difficulty }}">
     <div class="c-cycle-route-card__image">
       @if ($image)
-        <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+        <x-image :image="$image" size="medium_large" />
       @endif
     </div>
 
     <div class="c-cycle-route-card__banner">
-      <span class="c-cycle-route-card__route-name">{{ $routeName }}</span>
+      <x-heading :level="$headingLevel" style="h2" class="c-cycle-route-card__route-name">{{ $routeName }}</x-heading>
     </div>
 
-    <div class="c-cycle-route-card__info">
+    <dl class="c-cycle-route-card__info"
+      aria-label="{{ sprintf(__('Details for %s', 'sage'), $routeName) }}">
       <div class="c-cycle-route-card__info-row">
-        <span class="c-cycle-route-card__info-label">{{ __('Time needed', 'sage') }}</span>
-        <span class="c-cycle-route-card__info-value">{{ $timeNeeded }}</span>
+        <dt class="c-cycle-route-card__info-label">{{ __('Time needed', 'sage') }}</dt>
+        <dd class="c-cycle-route-card__info-value">{{ $timeNeeded }}</dd>
       </div>
 
       <div class="c-cycle-route-card__info-row">
-        <span class="c-cycle-route-card__info-label">{{ __('Distance', 'sage') }}</span>
-        <span class="c-cycle-route-card__info-value">{{ $distance }}</span>
+        <dt class="c-cycle-route-card__info-label">{{ __('Distance', 'sage') }}</dt>
+        <dd class="c-cycle-route-card__info-value">{{ $distance }}</dd>
       </div>
 
       <div class="c-cycle-route-card__info-row">
-        <span class="c-cycle-route-card__info-label">{{ __('Difficulty', 'sage') }}</span>
-        <span class="c-cycle-route-card__badge">{{ ucfirst($difficulty) }}</span>
+        <dt class="c-cycle-route-card__info-label">{{ __('Difficulty', 'sage') }}</dt>
+        <dd class="c-cycle-route-card__badge">{{ ucfirst($difficulty) }}</dd>
       </div>
-    </div>
+    </dl>
 
-    <a
-      class="c-cycle-route-card__cta"
-      href="{{ $link['url'] }}"
-      @if (($link['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif
-    >
-      {{ $link['title'] }}
-      <x-icon name="arrow-right" />
-    </a>
-  </div>
+    <x-link class="c-cycle-route-card__cta" :link="$link" />
+  </article>
 </div>
 @endif
 
-</section>
+</x-block-root>

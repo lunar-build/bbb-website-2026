@@ -4,6 +4,7 @@ namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
 use App\Fields\ContainedToggle;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -156,12 +157,18 @@ class JourneyPlannerWidget extends Block
         'heading' => 'Plan a cycling route',
         'cta_label' => 'Plan your route',
         'journey_planner_url' => 'https://cycleplanner.betterbybike.info/route-planning',
-        'nearby_options' => [
-            ['label' => 'Public bike pumps'],
-            ['label' => 'Bike servicing & repairs'],
-            ['label' => 'Secondhand bike shops'],
-            ['label' => 'Cycle hangars'],
-        ],
+    ];
+
+    /**
+     * The "find nearby" radio options, fixed because the keys are the cycle planner's `/near-me?type=` values.
+     *
+     * @var array<string, string> value => label
+     */
+    public const NEARBY_OPTIONS = [
+        'pumps' => 'Public bike pumps',
+        'repairs' => 'Bike servicing & repairs',
+        'secondhand' => 'Secondhand bike shops',
+        'hangars' => 'Cycle hangars',
     ];
 
     /**
@@ -173,9 +180,10 @@ class JourneyPlannerWidget extends Block
             'contained' => $this->contained(),
             'variant' => $this->variant(),
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'ctaLabel' => $this->ctaLabel(),
             'journeyPlannerUrl' => $this->journeyPlannerUrl(),
-            'nearbyOptions' => $this->nearbyOptions(),
+            'nearbyOptions' => self::NEARBY_OPTIONS,
         ];
     }
 
@@ -203,45 +211,16 @@ class JourneyPlannerWidget extends Block
                     'label' => 'Heading',
                     'instructions' => 'Leave empty to use the default for the selected variant ("Plan a cycling route" / "What\'s near you…").',
                 ])
+            ->addPartial(HeadingLevelSelect::class)
                 ->addText('cta_label', [
                     'label' => 'CTA button label',
                     'instructions' => 'Leave empty to use the default for the selected variant ("Plan your route" / "Search near here").',
                 ])
-            ->addTab('Plan a route')
+            ->addTab('Journey planner')
                 ->addUrl('journey_planner_url', [
                     'label' => 'Journey planner URL',
-                    'instructions' => 'Base URL the "Plan a route" variant redirects to, with a `locations` query param appended.',
-                    'conditional_logic' => [
-                        [
-                            [
-                                'field' => 'variant',
-                                'operator' => '==',
-                                'value' => 'plan_route',
-                            ],
-                        ],
-                    ],
+                    'instructions' => '"Plan a route" redirects to this URL with a `locations` query param appended. "Find nearby" redirects to `/near-me` on the same site.',
                 ])
-            ->addTab('Find nearby feature', [
-                'conditional_logic' => [
-                    [
-                        [
-                            'field' => 'variant',
-                            'operator' => '==',
-                            'value' => 'find_nearby',
-                        ],
-                    ],
-                ],
-            ])
-                ->addRepeater('nearby_options', [
-                    'label' => 'Options',
-                    'instructions' => 'Radio choices shown under the location field.',
-                    'button_label' => 'Add option',
-                ])
-                    ->addText('label', [
-                        'label' => 'Label',
-                        'required' => true,
-                    ])
-                ->endRepeater()
         ;
 
         return $fields->build();
@@ -265,6 +244,11 @@ class JourneyPlannerWidget extends Block
     public function variant()
     {
         return $this->resolveField('variant', 'plan_route');
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     /**
@@ -299,16 +283,6 @@ class JourneyPlannerWidget extends Block
     public function journeyPlannerUrl()
     {
         return $this->resolveField('journey_planner_url', '');
-    }
-
-    /**
-     * Retrieve the "find nearby" radio options.
-     *
-     * @return array
-     */
-    public function nearbyOptions()
-    {
-        return $this->resolveField('nearby_options', []);
     }
 
     /**

@@ -1,5 +1,5 @@
 @if ($src)
-<section {{ $attributes->class(['c-map-embed']) }}>
+<div {{ $attributes->class(['c-map-embed']) }}>
 
 <div class="o-container">
   <iframe
@@ -13,5 +13,5 @@
   ></iframe>
 </div>
 
-</section>
+</div>
 @endif

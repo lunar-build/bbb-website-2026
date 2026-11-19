@@ -1,4 +1,3 @@
-@use '../base/focus' as focus;
 @use '../base/typography';
 
 // Figma: 20px/30px, letter-spacing 0.4px, blue-dark. Current page (last
@@ -28,15 +27,54 @@ wa-breadcrumb-item {
   letter-spacing: 0.025rem;
 }
 
+// The link is WA's ::part(label), but ::part() can't reach the slotted .c-breadcrumbs__label
+// span, so link states pass the underline and highlight down as custom properties. They sit
+// on the span so the yellow can extend below (and so cover) the underline, and so it follows
+// each line of a wrapped title.
+// Fixed colour: WA fades the label on :hover/:active by default (color-mix).
 wa-breadcrumb-item::part(label) {
+  color: var(--c-breadcrumbs-color);
   text-decoration: none;
-  transition: text-decoration-color var(--wa-transition-normal, 0.15s) ease;
-  // $color, not --focus-color, so the ring shows on both the dark hero and light pages.
-  @include focus.ring($color: var(--c-breadcrumbs-color));
 }
 
-wa-breadcrumb-item:not(:last-of-type)::part(label):is(:hover, :focus-visible) {
-  text-decoration: underline;
+wa-breadcrumb-item:not(:last-of-type)::part(label):hover {
+  --c-breadcrumbs-underline: currentColor;
+}
+
+// Includes the current page: WA's <button> for it is still tabbable.
+wa-breadcrumb-item::part(label):focus {
+  outline: none;
+  --c-breadcrumbs-underline: currentColor;
+  --c-breadcrumbs-underline-style: dashed;
+}
+
+// Keyboard only.
+wa-breadcrumb-item::part(label):focus-visible {
+  --c-breadcrumbs-highlight: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+}
+
+.c-breadcrumbs__label {
+  text-decoration-line: underline;
+  text-decoration-style: var(--c-breadcrumbs-underline-style, solid);
+  text-decoration-color: var(--c-breadcrumbs-underline, transparent);
+  text-decoration-thickness: 0.125rem;
+  text-underline-offset: 0.3em;
+  // Inline padding grows the highlight without moving the text; the bottom clears the underline.
+  padding-block: 0.1em 0.45em;
+  background-color: var(--c-breadcrumbs-highlight, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-color var(--wa-transition-normal, 0.15s) ease;
+}
+
+// Current page: always underlined, at the browser's default weight.
+wa-breadcrumb-item:last-of-type {
+  --c-breadcrumbs-underline: currentColor;
+
+  .c-breadcrumbs__label {
+    text-decoration-thickness: auto;
+  }
 }
 
 wa-breadcrumb-item::part(separator) {
@@ -57,7 +95,6 @@ wa-breadcrumb-item .c-icon--arrow-right {
 wa-breadcrumb-item:last-of-type::part(label) {
   // WA renders the current page as a <button>, which centres a wrapped title.
   text-align: start;
-  text-decoration: underline;
   cursor: default;
   pointer-events: none;
 }

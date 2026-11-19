@@ -184,7 +184,7 @@ class TextHero extends Block
             'name' => 'heading',
             'label' => 'Heading',
             'default_level' => 'h1',
-            'required' => true,
+            'instructions' => 'Leave empty to use the page title.',
         ]);
 
         $fields->addPartial(Copy::class, [
@@ -211,7 +211,7 @@ class TextHero extends Block
     public function heading()
     {
         return [
-            'text' => $this->resolveField('heading_text', ''),
+            'text' => $this->resolveField('heading_text') ?: get_the_title(),
             'level' => $this->resolveField('heading_level', 'h1'),
             'style' => $this->resolveField('heading_style', 'match'),
         ];

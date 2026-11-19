@@ -1,8 +1,8 @@
-<section {{ $attributes->class(['c-image-block']) }}>
+<x-block-root :heading="(bool) ($infoBoxRowsHeading || $infoBoxContentHeading)" {{ $attributes->class(['c-image-block']) }}>
 
 <div class="o-container">
   @if ($image['url'] ?? null)
-    <img class="c-image-block__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+    <x-image class="c-image-block__image" :image="$image" size="full" sizes="100vw" />
   @endif
 
   @if ($contentType === 'caption')
@@ -11,13 +11,11 @@
     @endif
   @else
     <div class="c-image-block__info-box">
-      @if ($infoBoxType === 'wysiwyg')
-        <div class="c-image-block__info-box-content">{!! $infoBoxContent !!}</div>
-      @else
+      @if ($infoBoxType !== 'wysiwyg')
         <div class="c-image-block__info-box-columns">
           <div class="c-image-block__info-box-column">
             @if ($infoBoxRowsHeading)
-              <h3 class="c-image-block__info-box-heading u-heading-5">{{ $infoBoxRowsHeading }}</h3>
+              <x-heading :level="$headingLevel" style="h5" class="c-image-block__info-box-heading">{{ $infoBoxRowsHeading }}</x-heading>
             @endif
 
             <ul class="c-image-block__info-box-rows" role="list">
@@ -40,8 +38,18 @@
           </div>
         </div>
       @endif
+
+      @if ($infoBoxContent || $infoBoxContentHeading)
+        <div class="c-image-block__info-box-about">
+          @if ($infoBoxContentHeading)
+            <x-heading :level="$headingLevel" style="h5" class="c-image-block__info-box-heading">{{ $infoBoxContentHeading }}</x-heading>
+          @endif
+
+          <div class="c-image-block__info-box-content u-rich-text">{!! $infoBoxContent !!}</div>
+        </div>
+      @endif
     </div>
   @endif
 </div>
 
-</section>
+</x-block-root>

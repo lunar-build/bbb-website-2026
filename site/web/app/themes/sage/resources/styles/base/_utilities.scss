@@ -1,7 +1,7 @@
 // px, not rem, is intentional here — this is a visually-hidden clip
 // technique (1px box shrunk to nothing via a negative margin), not a
 // visual size, so it must not scale with the user's zoom/font-size.
-.u-sr-only {
+@mixin sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -11,6 +11,10 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.u-sr-only {
+  @include sr-only;
 
   &:focus {
     position: static;

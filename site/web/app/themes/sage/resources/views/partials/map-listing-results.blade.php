@@ -1,5 +1,5 @@
 <div class="c-archive__results-header">
-  <h2 class="c-archive__results-heading u-heading-3" tabindex="-1" data-archive-results-heading>{{ $resultsHeading }}</h2>
+  <h2 class="c-archive__results-heading u-heading-3" tabindex="-1" data-archive-focus>{{ $resultsHeading }}</h2>
   <p class="c-archive__count" aria-live="polite" aria-atomic="true">
     {{ sprintf(_n('%d result found', '%d results found', $foundPosts, 'sage'), $foundPosts) }}
   </p>
@@ -11,13 +11,14 @@
       <x-business-card
         class="c-archive__card"
         :id="$card['id']"
+        heading-level="h3"
         tabindex="-1"
         :name="$card['name']"
         :contact-info="$card['contactInfo']"
         :services="$card['services']"
         :description="$card['description']"
-        :regions="$card['regions']"
         :link="$card['link']"
+        :cta-colour="$ctaColour"
       />
     @endforeach
   </div>

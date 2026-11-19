@@ -51,6 +51,22 @@
       }
     }
 
+    // Used by the footer newsletter: no space under the panel, so the illustration stands on
+    // the edge below it. The text column keeps the space the panel's padding gave it.
+    &.c-form--flush-bottom {
+      .c-form__panel {
+        padding-bottom: 0;
+      }
+
+      .c-form__inner {
+        padding-bottom: 3rem;
+
+        @include bp.respond($min: bp.$lg) {
+          padding-bottom: 4rem;
+        }
+      }
+    }
+
     .c-form__image {
       aspect-ratio: 16 / 9;
       margin-bottom: 2rem;
@@ -96,31 +112,19 @@
     }
   }
 
-  // "Centred": no image, one narrower column.
+  // "Centred": no image, one narrower column. Only the heading and intro centre —
+  // form fields and their labels always stay left-aligned.
   &--centred {
+    // Explicit width: auto margins on a grid item (inside .o-container) shrink it to its
+    // content, which left the form at GF's intrinsic input width (~435px).
     .c-form__inner {
+      width: 100%;
       max-width: 48rem;
       margin-inline: auto;
-      text-align: center;
     }
 
     .c-form__content {
-      :where(h1, h2, h3, h4, h5, h6) {
-        text-align: center;
-      }
-    }
-
-    // GF stretches choice labels full width, so centred text drifts from its control:
-    // shrink-wrap the group, centre it, left-align rows.
-    .gfield_radio,
-    .gfield_checkbox {
-      width: fit-content;
-      max-width: 100%;
-      margin-inline: auto;
-    }
-
-    .gchoice {
-      text-align: left;
+      text-align: center;
     }
 
     .gform_footer,

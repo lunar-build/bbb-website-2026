@@ -1,4 +1,7 @@
-<section {{ $attributes->class(['c-card-grid', 'o-full-bleed-bg']) }}>
+<x-block-root :heading="$heading" {{ $attributes->class(['c-card-grid', 'o-full-bleed-bg']) }}>
+
+{{-- Card headings sit one level below the block's heading, or at its level when it shows none. --}}
+@php($cardLevel = App\Support\HeadingLevel::inside($heading))
 
 <div class="o-container">
   @if (! empty($heading['text']))
@@ -13,7 +16,7 @@
     </x-copy>
   @endif
 
-  <div class="c-card-grid__cards @if ($sideImage) c-card-grid__cards--with-side-image @endif">
+  <div class="c-card-grid__cards @if ($sideImage) c-card-grid__cards--with-side-image @endif @if ($cardStyle === 'pricing') c-card-grid__cards--pricing @endif">
     @if ($cardStyle === 'business')
       @foreach ($businessCards as $card)
         <x-business-card
@@ -22,6 +25,18 @@
           :services="$card['services']"
           :description="$card['description']"
           :link="$card['link']"
+          :cta-colour="$card['cta_colour'] ?? 'yellow'"
+          :heading-level="$cardLevel"
+          class="c-card-grid__card"
+        />
+      @endforeach
+    @elseif ($cardStyle === 'pricing')
+      @foreach ($pricingCards as $card)
+        <x-pricing-card
+          :title="$card['title']"
+          :price="$card['price']"
+          :description="$card['description']"
+          :heading-level="$cardLevel"
           class="c-card-grid__card"
         />
       @endforeach
@@ -34,7 +49,7 @@
             :card-style="$cardStyle"
             :image="$card['image']"
             :date="$card['date']"
-            :heading="$card['heading']"
+            :heading="array_merge($card['heading'], ['level' => $cardLevel])"
             :body="$card['body']"
             :link="$card['link']"
             :cta-style="$ctaStyle"
@@ -50,4 +65,4 @@
   <img class="c-card-grid__side-image" src="{{ $sideImage }}" alt="" aria-hidden="true">
 @endif
 
-</section>
+</x-block-root>

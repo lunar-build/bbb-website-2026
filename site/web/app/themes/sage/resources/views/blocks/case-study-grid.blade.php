@@ -1,12 +1,14 @@
-<section {{ $attributes->class(['c-case-study-grid']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-case-study-grid']) }}>
 
 <div class="o-container">
   <div class="c-case-study-grid__cards">
     @foreach ($cards as $card)
       <div class="c-case-study-grid__card">
-        <img class="c-case-study-grid__image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
+        <x-image class="c-case-study-grid__image" :image="$card['image']" size="large" />
         <x-quote
           class="c-case-study-grid__quote"
+          size="standard"
           :attribution-name="$card['name'] ?: null"
           :attribution-role="$card['info'] ?: null"
         >{{ $card['quote'] }}</x-quote>
@@ -32,4 +34,4 @@
   </div>
 </div>
 
-</section>
+</div>

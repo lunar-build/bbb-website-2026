@@ -26,6 +26,10 @@
         </form>
       @endif
 
+      {{-- Outside the results fragment, which filtering swaps out: a live region that's replaced
+           along with its content isn't reliably announced. archive-filters.js fills this in. --}}
+      <p class="u-sr-only" role="status" aria-live="polite" aria-atomic="true" data-archive-status></p>
+
       <div class="c-archive__results" data-archive-results>
         @include('partials.archive-results')
       </div>

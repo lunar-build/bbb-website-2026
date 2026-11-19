@@ -39,6 +39,12 @@ video {
   max-width: 100%;
 }
 
+// WordPress prints width/height attributes on media images (reserves space, no layout shift);
+// auto keeps them from stretching an image that has no explicit height.
+img {
+  height: auto;
+}
+
 input,
 button,
 textarea,

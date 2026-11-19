@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\Heading;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -158,7 +159,7 @@ class BulletList extends Block
      * @var array
      */
     public $example = [
-        'heading' => 'Example of non-urgent',
+        'heading_text' => 'Example of non-urgent',
         'list_style' => 'bullets',
         'items' => [
             ['text' => 'Missing cycle signage', 'level' => 0],
@@ -177,7 +178,7 @@ class BulletList extends Block
     public $examples = [
         'Bullets' => [],
         'Numbers, nested' => [
-            'heading' => 'How to report a fault',
+            'heading_text' => 'How to report a fault',
             'list_style' => 'numbers',
             'items' => [
                 ['text' => 'Find the pump on the map', 'level' => 0],
@@ -203,10 +204,12 @@ class BulletList extends Block
         $fields = Builder::make('bullet_list');
 
         $fields
-            ->addText('heading', [
+            ->addPartial(Heading::class, [
+                'name' => 'heading',
                 'label' => 'Heading',
                 'instructions' => 'Optional heading shown above the list.',
-                'required' => 0,
+                'default_level' => 'h3',
+                'default_style' => 'h3',
             ])
             ->addButtonGroup('list_style', [
                 'label' => 'List style',
@@ -243,9 +246,17 @@ class BulletList extends Block
         return $fields->build();
     }
 
-    public function heading()
+    /**
+     * The heading's text/level/style. Blocks saved before the Heading partial
+     * stored the text as `heading`, so that's the fallback.
+     */
+    public function heading(): array
     {
-        return $this->resolveField('heading', '');
+        return [
+            'text' => $this->resolveField('heading_text') ?: (string) get_field('heading'),
+            'level' => $this->resolveField('heading_level', 'h3'),
+            'style' => $this->resolveField('heading_style', 'h3'),
+        ];
     }
 
     public function listStyle()

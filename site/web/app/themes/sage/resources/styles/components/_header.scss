@@ -4,6 +4,8 @@
 
 $site-header-z-index: 100;
 $site-header-transition-duration: 0.25s;
+// Strong enough to separate the blue nav bar from a blue block scrolling under it.
+$site-header-shadow: 0 4px 12px rgb(0 0 0 / 25%);
 
 // Auto-hide-on-scroll (.is-hidden) is in site-header.js.
 .c-site-header {
@@ -11,6 +13,7 @@ $site-header-transition-duration: 0.25s;
   inset-block-start: 0;
   z-index: $site-header-z-index;
   background: canvas;
+  box-shadow: $site-header-shadow;
   transform: translateY(0);
   visibility: visible;
   transition:

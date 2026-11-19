@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -207,9 +208,9 @@ class Timeline extends Block
         'Dates' => [
             'marker_size' => 'date',
             'steps' => [
-                ['label' => '12/03/19', 'heading' => 'Scheme launched', 'body' => 'Better by Bike began with a handful of pilot routes.'],
-                ['label' => '04/07/21', 'heading' => 'Network expanded', 'body' => 'New cycle routes added across the city.'],
-                ['label' => '18/09/24', 'heading' => 'Love to Ride partnership', 'body' => 'Joined forces with Love to Ride to get more people cycling.'],
+                ['label' => '2009–16', 'heading' => 'Scheme launched', 'body' => 'Better by Bike began with a handful of pilot routes.'],
+                ['label' => '2021', 'heading' => 'Network expanded', 'body' => 'New cycle routes added across the city.'],
+                ['label' => '2024', 'heading' => 'Love to Ride partnership', 'body' => 'Joined forces with Love to Ride to get more people cycling.'],
             ],
         ],
     ];
@@ -218,6 +219,7 @@ class Timeline extends Block
     {
         return [
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'intro' => $this->intro(),
             'markerSize' => $this->markerSize(),
             'steps' => $this->steps(),
@@ -233,6 +235,7 @@ class Timeline extends Block
                 'label' => 'Heading',
                 'required' => 0,
             ])
+            ->addPartial(HeadingLevelSelect::class)
             ->addText('intro', [
                 'label' => 'Intro',
                 'instructions' => 'Optional standfirst shown under the heading.',
@@ -240,10 +243,10 @@ class Timeline extends Block
             ])
             ->addSelect('marker_size', [
                 'label' => 'Marker size',
-                'instructions' => 'Applies to every marker in this timeline, so they never render as mismatched sizes. Use "Date" when Label below holds a date in DD/MM/YY format (e.g. 18/09/24) — that\'s what the larger marker is sized for.',
+                'instructions' => '"Number" adds a simple numbered marker; "Custom" lets you type a short label per step, such as a year or range of years.',
                 'choices' => [
-                    'number' => 'Number (2 digits)',
-                    'date' => 'Date (DD/MM/YY)',
+                    'number' => 'Number',
+                    'date' => 'Custom',
                 ],
                 'default_value' => 'number',
                 'required' => 0,
@@ -256,8 +259,9 @@ class Timeline extends Block
             ])
                 ->addText('label', [
                     'label' => 'Label',
-                    'instructions' => 'Optional — shown in the marker instead of the step\'s position (e.g. a date in DD/MM/YY format). Leave blank to show the step number. If using dates, set Marker size above to "Date" so every marker matches.',
-                    'required' => 0,
+                    'instructions' => 'Short text shown in the marker, e.g. 2016 or 2009–16.',
+                    'required' => 1,
+                    'conditional_logic' => [[['field' => 'marker_size', 'operator' => '==', 'value' => 'date']]],
                 ])
                 ->addText('heading', [
                     'label' => 'Heading',
@@ -272,6 +276,11 @@ class Timeline extends Block
             ->endRepeater();
 
         return $fields->build();
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     public function heading()

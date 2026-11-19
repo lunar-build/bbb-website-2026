@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-link-list']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-link-list']) }}>
 
 <div class="o-container">
   <div class="c-link-list__group c-link-list--{{ str_replace('_', '-', $layout) }}">
@@ -10,14 +11,15 @@
 
     @foreach ($links as $row)
       @if (str_starts_with($layout, 'short_'))
-        <a class="c-link-list__short-link u-short-form-link" href="{{ $row['link']['url'] }}" @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-          {{ $row['link']['title'] }}
+        <a class="c-link-list__short-link u-short-form-link-small" href="{{ $row['link']['url'] }}" @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+          {{-- Outer span is the flex item; the inner one stays inline so its highlight follows each line. --}}
+          <span><span class="c-link-list__short-text">{{ $row['link']['title'] }}</span></span>
           <x-icon name="arrow-right" />
         </a>
       @else
         <div class="c-link-list__long-item">
           <a class="c-link-list__long-header" href="{{ $row['link']['url'] }}" @if (($row['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-            <span class="c-link-list__long-title u-heading-5">{{ $row['link']['title'] }}</span>
+            <span class="c-link-list__long-title u-heading-5"><span class="c-link-list__long-title-text">{{ $row['link']['title'] }}</span></span>
             <x-icon name="arrow-right" />
           </a>
 
@@ -30,4 +32,4 @@
   </div>
 </div>
 
-</section>
+</div>

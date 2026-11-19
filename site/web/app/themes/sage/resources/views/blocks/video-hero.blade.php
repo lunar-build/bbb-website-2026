@@ -1,4 +1,4 @@
-  <section {{ $attributes->class(['c-video-hero', 'o-full-bleed-bg']) }}>
+  <x-block-root :heading="(bool) $heading" {{ $attributes->class(['c-video-hero', 'o-full-bleed-bg']) }}>
 
 <div class="c-video-hero__media" data-video-hero>
   @if ($video['url'] ?? null)
@@ -32,7 +32,7 @@
       <x-icon name="video-play" class="c-video-hero__toggle-icon" data-video-hero-icon="play" hidden />
     </button>
   @elseif ($poster['url'] ?? null)
-    <img class="c-video-hero__video" src="{{ $poster['url'] }}" alt="{{ $videoAlt }}">
+    <x-image class="c-video-hero__video" :image="$poster" :alt="$videoAlt" size="full" sizes="100vw" priority />
   @elseif ($block->preview)
     <div class="c-video-hero__placeholder">
       {{ __('Add a video and/or poster image…', 'sage') }}
@@ -53,7 +53,7 @@
     <div class="c-video-hero__row">
       <div class="c-video-hero__content">
         <h1 class="c-video-hero__heading">{{ $heading }}</h1>
-        <div class="c-video-hero__intro">{!! $intro !!}</div>
+        <div class="c-video-hero__intro u-rich-text">{!! $intro !!}</div>
       </div>
 
       {{-- Widget slot — empty by default in the editor until a Journey
@@ -68,4 +68,4 @@
   </div>
 </div>
 
-  </section>
+  </x-block-root>

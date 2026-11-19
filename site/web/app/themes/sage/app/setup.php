@@ -260,7 +260,7 @@ add_action('init', function () {
         'public' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-analytics',
-        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'supports' => ['title', 'thumbnail', 'excerpt'],
         'has_archive' => true,
         'rewrite' => ['slug' => 'ibikeitilikeit'],
     ]);
@@ -274,32 +274,6 @@ add_action('init', function () {
         'show_in_rest' => true,
         'show_admin_column' => true,
         'rewrite' => ['slug' => 'ibikeitilikeit/tag'],
-    ]);
-
-    register_post_type('testimonial', [
-        'labels' => [
-            'name' => __('Testimonials', 'sage'),
-            'singular_name' => __('Testimonial', 'sage'),
-        ],
-        'public' => true,
-        'show_in_rest' => true,
-        'menu_icon' => 'dashicons-testimonial',
-        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
-        'has_archive' => true,
-        'rewrite' => ['slug' => 'testimonials'],
-    ]);
-
-    register_post_type('cycle-route', [
-        'labels' => [
-            'name' => __('Cycle Routes', 'sage'),
-            'singular_name' => __('Cycle Route', 'sage'),
-        ],
-        'public' => true,
-        'show_in_rest' => true,
-        'menu_icon' => 'dashicons-location-alt',
-        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
-        'has_archive' => true,
-        'rewrite' => ['slug' => 'cycle-routes'],
     ]);
 }, 0); // Before acf/init (init:5), so ThemeOptions' "Archive pages" tab can list these.
 

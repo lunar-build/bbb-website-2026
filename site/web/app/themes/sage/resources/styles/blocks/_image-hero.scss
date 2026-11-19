@@ -20,7 +20,8 @@
 .c-image-hero__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgb(0 0 0 / 70%), transparent 80%);
+  // Stays dark far enough up to sit behind the breadcrumbs too, so they hold contrast on light photos.
+  background: linear-gradient(to top, rgb(0 0 0 / 70%), rgb(0 0 0 / 45%) 60%, transparent);
 }
 
 .c-image-hero__content {
@@ -35,4 +36,25 @@
 .c-image-hero__heading {
   margin: 0;
   color: var(--wp--preset--color--white);
+}
+
+// Breadcrumbs float over a photo: a soft shadow keeps them readable where it's bright, and the
+// current page (WA greys the last item) stays the same white as the rest.
+.c-image-hero .c-breadcrumbs {
+  text-shadow: 0 0 0.5rem rgb(0 0 0 / 60%);
+
+  wa-breadcrumb-item:last-of-type,
+  wa-breadcrumb-item:last-of-type::part(label) {
+    color: var(--c-breadcrumbs-color);
+  }
+
+  // Keyboard focus: dark text on the yellow highlight, no shadow. Spelled out for the last item
+  // because the white rule above is more specific than the shared focus colour.
+  wa-breadcrumb-item::part(label):focus-visible {
+    text-shadow: none;
+  }
+
+  wa-breadcrumb-item:last-of-type::part(label):focus-visible {
+    color: var(--wp--preset--color--charcoal);
+  }
 }

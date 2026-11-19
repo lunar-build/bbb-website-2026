@@ -2,6 +2,7 @@
 
 namespace App\View\Composers;
 
+use App\Support\PatternLibraryForms;
 use Log1x\AcfComposer\Block;
 use Roots\Acorn\View\Composer;
 
@@ -86,7 +87,8 @@ class PatternLibrary extends Composer
      * Standalone previews skip `WP_Block_Supports::apply_block_supports()` (no real
      * `WP_Block` context), so the default spacing support never reaches the `style`
      * attribute. Rebuild the padding from the block's `$spacing` with the same style
-     * engine and merge it onto the root wrapper.
+     * engine and merge it onto the root wrapper — a <section>, or a <div> for blocks with
+     * no heading.
      */
     protected function injectPreviewSpacingStyle(string $html, Block $block): string
     {
@@ -102,7 +104,7 @@ class PatternLibrary extends Composer
             return $html;
         }
 
-        return preg_replace_callback('/<section\b[^>]*>/', function ($matches) use ($css) {
+        return preg_replace_callback('/<(?:section|div)\b[^>]*>/', function ($matches) use ($css) {
             $tag = $matches[0];
 
             if (preg_match('/style="([^"]*)"/', $tag, $styleMatch)) {
@@ -113,6 +115,17 @@ class PatternLibrary extends Composer
 
             return substr($tag, 0, -1) . ' style="' . esc_attr($css) . '">';
         }, $html, 1);
+    }
+
+    /**
+     * Gravity Forms fields as GF renders them (dev-only) — see App\Support\PatternLibraryForms.
+     * Reaches the view as a lazy invokable, so the template calls it once.
+     *
+     * @return array{default: string, errors: string}|null
+     */
+    public function formFields(): ?array
+    {
+        return WP_DEBUG && PatternLibraryForms::available() ? PatternLibraryForms::render() : null;
     }
 
     /**

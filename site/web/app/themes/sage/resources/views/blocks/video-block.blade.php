@@ -56,6 +56,7 @@
         :label="$transcript['label']"
         :context="$heading['text']"
         :file-size="$transcript['file_size']"
+        :button-style="$transcript['button_style']"
         :id="$fileSizeId"
       />
     </div>

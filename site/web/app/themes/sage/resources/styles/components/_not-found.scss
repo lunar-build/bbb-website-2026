@@ -1,0 +1,89 @@
+@use '../abstracts/breakpoints' as bp;
+@use '../base/container';
+@use '../base/focus' as focus;
+@use '../base/typography';
+
+// 404 page (Figma "Sample page -> 404", node 521-1945).
+
+.c-not-found {
+  padding-block: 4rem;
+  color: var(--wp--preset--color--blue-dark);
+  text-align: center;
+
+  @include bp.respond($min: bp.$lg) {
+    padding-block: 7.5rem 6rem;
+  }
+}
+
+.c-not-found__title {
+  margin-bottom: 1.125rem;
+}
+
+.c-not-found__intro {
+  margin-bottom: 3rem;
+}
+
+// Same field + squared-off yellow button as the desktop nav search (_primary-nav.scss).
+.c-not-found__search {
+  display: flex;
+  width: 100%;
+  max-width: container.$container-narrow-max-width;
+  align-items: stretch;
+  margin-inline: auto;
+  margin-bottom: 3rem;
+  text-align: start;
+
+  input {
+    // Overrides base/_forms.scss's width:100% !important so the button keeps its room.
+    width: auto !important;
+    min-width: 0;
+    flex: 1 1 auto;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    border-radius: 999px 0 0 999px !important;
+    border-right: none !important;
+  }
+}
+
+.c-not-found__search-submit {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding-inline: 1rem 1.25rem;
+  border: 2px solid var(--wp--preset--color--charcoal);
+  border-left: none;
+  border-radius: 0 999px 999px 0;
+  background: var(--wp--preset--color--yellow);
+  color: var(--wp--preset--color--charcoal);
+  @extend .u-cta-large;
+  cursor: pointer;
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  @include focus.ring;
+}
+
+// Icon-only on small screens so the field keeps room for the placeholder; the label stays
+// in the accessibility tree (same clip pattern as .u-sr-only, which can't be @extended in a @media).
+.c-not-found__search-label {
+  @include bp.respond($max: bp.$sm) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
+.c-not-found__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+}

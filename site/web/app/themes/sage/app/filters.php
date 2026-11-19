@@ -150,9 +150,27 @@ add_action('admin_notices', function () {
     }
 
     echo '<div class="notice notice-warning"><p>'
-        . __('Primary Navigation note: an item with sub-items does not link anywhere itself (it becomes an inert heading on mobile, a submenu toggle on desktop) — only items with no children are actual links.', 'sage')
+        . __('Primary Navigation note: a top-level item with sub-items links to its page if it has a real URL (not # or empty), and always has a chevron button that opens its submenu. The second-level items (the column headings) never link anywhere; the third-level items are the links.', 'sage')
         . '</p></div>';
 });
+
+/**
+ * Marks every ACF block's root element, so CSS can tell a block from core markup now that a
+ * block without a heading is a <div> (not a <section>), e.g. the content-flow spacing rules.
+ */
+add_filter('render_block', function ($block_content, $block) {
+    if (! str_starts_with($block['blockName'] ?? '', 'acf/')) {
+        return $block_content;
+    }
+
+    $processor = new \WP_HTML_Tag_Processor($block_content);
+
+    if ($processor->next_tag()) {
+        $processor->add_class('is-acf-block');
+    }
+
+    return $processor->get_updated_html();
+}, 10, 2);
 
 /**
  * base/_forms.scss hides the native `input[type=checkbox]`/`input[type=radio]`
@@ -169,6 +187,71 @@ add_filter('gform_field_content', function ($content, $field) {
     }
 
     return preg_replace('/<label\s+for=([\'"])choice_/', '<label role="link" tabindex="0" for=$1choice_', $content);
+}, 10, 2);
+
+/**
+ * Single file upload (Figma "Input | File upload"): adds a "Choose a file" CTA
+ * as a second `<label>` for the native input, which stays the real (visually
+ * hidden) control — clicking the label opens the picker, and the input's focus
+ * ring is drawn on it. resources/js/file-upload.js shows the chosen file.
+ * Multi-file uploads keep GF's own uploader (its button is the drop target and
+ * GF's JS lists the files), restyled to the same layout and chips.
+ * Post Image fields get the same single-file treatment.
+ */
+add_filter('gform_field_content', function ($content, $field) {
+    if (! in_array($field->type, ['fileupload', 'post_image'], true) || $field->is_form_editor() || $field->is_entry_detail()) {
+        return $content;
+    }
+
+    $container = $field->type === 'post_image' ? 'ginput_container_post_image' : 'ginput_container_fileupload';
+
+    if ($field->multipleFiles) {
+        $content = preg_replace('/(gform_button_select_files[^>]*>)[^<]*</', '$1' . esc_html__('Choose files', 'sage') . '<', $content, 1);
+
+        return str_replace($container, "{$container} c-file-upload c-file-upload--multiple", $content);
+    }
+
+    $inputId = "input_{$field->formId}_{$field->id}";
+    $button = '<label for="' . esc_attr($inputId) . '" class="c-file-upload__button">' . esc_html__('Choose a file', 'sage') . '</label>';
+
+    $content = preg_replace('/(<input[^>]*type=([\'"])file\2[^>]*\/?>)/', '$1' . $button, $content, 1);
+
+    return str_replace($container, "{$container} c-file-upload", $content);
+}, 10, 2);
+
+/**
+ * Autocomplete (WCAG 1.3.5) for Paragraph Text and Date fields. GF's "Enable
+ * Autocomplete" setting (field → Advanced) only exists for its personal-data
+ * fields (Name, Email, Address, Phone, Text, Number, Website, Drop Down), but
+ * these can hold personal data too: an address, or a date of birth (`bday`,
+ * or `bday-month`/`bday-day`/`bday-year` per box when the date isn't a picker).
+ * This adds the setting to them in the editor and the attribute on the front end.
+ */
+$autocompleteFieldTypes = ['textarea', 'date'];
+
+add_action('gform_editor_js', function () use ($autocompleteFieldTypes) {
+    $js = implode('', array_map(fn($type) => "fieldSettings.{$type} += ', .autocomplete_setting';", $autocompleteFieldTypes));
+
+    echo "<script>{$js}</script>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+});
+
+add_filter('gform_field_content', function ($content, $field) use ($autocompleteFieldTypes) {
+    if (! in_array($field->type, $autocompleteFieldTypes, true) || ! $field->enableAutocomplete || $field->is_form_editor() || $field->is_entry_detail()) {
+        return $content;
+    }
+
+    // Element id => `autocomplete="…"`. A date picker is one input; separate boxes/dropdowns have one per part.
+    $attributes = $field->type === 'date' && $field->dateType !== 'datepicker' && is_array($field->inputs)
+        ? collect($field->inputs)->mapWithKeys(fn($input) => [
+            "input_{$field->formId}_" . str_replace('.', '_', $input['id']) => $field->get_input_autocomplete_attribute($input),
+        ])
+        : collect(["input_{$field->formId}_{$field->id}" => $field->get_field_autocomplete_attribute()]);
+
+    foreach ($attributes->filter() as $id => $attribute) {
+        $content = preg_replace('/(<(?:input|textarea|select)\b[^>]*\bid=([\'"])' . preg_quote($id, '/') . '\2)/', '$1 ' . $attribute, $content, 1);
+    }
+
+    return $content;
 }, 10, 2);
 
 /**
@@ -212,7 +295,8 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
         $anchor = Support\PageMenu::slugify(wp_strip_all_tags($block_content));
 
         if ($anchor !== '') {
-            $processor->set_attribute('id', $anchor);
+            // Taken, so a heading component with the same text gets -2 rather than a duplicate.
+            $processor->set_attribute('id', Support\HeadingIds::reserve($anchor));
         }
     }
 
@@ -221,6 +305,18 @@ add_filter('render_block_core/heading', function ($block_content, $block) {
 
     return $processor->get_updated_html();
 }, 10, 2);
+
+/**
+ * Every heading on a front-end page has an id (for aria-labelledby and anchors): <x-heading> and the
+ * core heading filter above make theirs as they render; this gives the rest (raw <h1>s, plugin markup) one.
+ */
+add_action('template_redirect', function () {
+    if (is_feed() || is_embed() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+        return;
+    }
+
+    ob_start(fn($html) => is_string($html) && str_contains($html, '</html>') ? Support\HeadingIds::addMissing($html) : $html);
+}, 0);
 
 /**
  * Blocks with `'color' => ['background' => true]` in `$supports` get WP's Background
@@ -272,12 +368,51 @@ add_action('pre_get_posts', function (\WP_Query $query) {
 
     $postType = Support\ArchiveFilters::postType();
 
+    // Events whose sessions have all passed aren't listed. [0] matches nothing, so no events
+    // left shows the archive's empty state, not every event. (Order: the posts_clauses below.)
+    if ($postType === 'mec-events') {
+        $query->set('post__in', Support\EventSessions::upcomingEventIds() ?: [0]);
+    }
+
     if (! $taxQuery = Support\ArchiveFilters::taxQuery($postType)) {
         return;
     }
 
     $query->set('tax_query', $taxQuery);
     $query->set('ignore_sticky_posts', true);
+});
+
+/**
+ * Search results' content-type filter (?filter_type[]=page) — see App\Support\SearchFilters.
+ */
+add_action('pre_get_posts', function (\WP_Query $query) {
+    if (is_admin() || ! $query->is_main_query() || ! $query->is_search()) {
+        return;
+    }
+
+    $query->set('post_type', Support\SearchFilters::queryPostTypes());
+});
+
+/**
+ * Result count in the search page title. Submitting a search reloads the page, and the
+ * title is what screen readers announce on load (the count's live region only speaks on
+ * archive-filters.js swaps, which sync the title too).
+ */
+add_filter('document_title_parts', function (array $title) {
+    if (! is_search()) {
+        return $title;
+    }
+
+    $found = (int) $GLOBALS['wp_query']->found_posts;
+    $query = get_search_query(false);
+
+    $title['title'] = $query === ''
+        /* translators: %d: number of search results */
+        ? sprintf(_n('%d search result', '%d search results', $found, 'sage'), $found)
+        /* translators: 1: number of search results, 2: the search term */
+        : sprintf(_n('%1$d result for “%2$s”', '%1$d results for “%2$s”', $found, 'sage'), $found, $query);
+
+    return $title;
 });
 
 /**
@@ -493,9 +628,10 @@ add_action('pre_get_posts', function (\WP_Query $query) {
         global $wpdb;
 
         // MEC stores wall-clock times as UTC timestamps; see App\Support\EventSessions.
-        $now = strtotime(current_time('Y-m-d H:i:s') . ' UTC');
+        // A session that hasn't ended counts, so one running now sorts first.
+        $now = Support\EventSessions::now();
         $clauses['join'] .= $wpdb->prepare(
-            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tstart >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
+            " LEFT JOIN (SELECT post_id, MIN(tstart) AS next_session FROM {$wpdb->prefix}mec_dates WHERE tend >= %d GROUP BY post_id) mec_next ON mec_next.post_id = {$wpdb->posts}.ID",
             $now,
         );
         $clauses['orderby'] = "mec_next.next_session IS NULL, mec_next.next_session ASC, {$wpdb->posts}.post_title ASC";
@@ -524,4 +660,25 @@ add_action('wp_head', function () {
     }
 
     echo '<script>window.markerProject=' . wp_json_encode(env('MARKER_PROJECT_ID') ?: '6adf384284936c1d0de1c19e') . ';</script>';
+});
+
+/**
+ * Theme Options → Archive pages: show each archive's address under its field. Looked up when the field is
+ * shown, as MEC's post type and its address (the slug is a MEC setting) aren't registered yet when the fields
+ * are built; and registered here, not in the options class, as ACF Composer can cache the built fields.
+ */
+add_filter('acf/prepare_field', function ($field) {
+    // By render time `name` is the input name (acf[field_…]); `_name` is the field's own.
+    $name = $field['_name'] ?? $field['name'] ?? '';
+
+    if (! is_array($field) || ! str_starts_with($name, 'archive_page_')) {
+        return $field;
+    }
+
+    $archiveUrl = get_post_type_archive_link(substr($name, strlen('archive_page_')));
+    $field['instructions'] = $archiveUrl
+        ? sprintf('Archive address: <a href="%1$s" target="_blank" rel="noopener">%1$s</a>', esc_url($archiveUrl))
+        : '';
+
+    return $field;
 });
