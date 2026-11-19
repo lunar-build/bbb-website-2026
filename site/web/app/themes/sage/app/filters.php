@@ -70,18 +70,6 @@ add_filter('acf/register_block_type_args', function ($block) {
 });
 
 /**
- * Generate WebP for the resized copies of new JPEG/PNG uploads (the original is kept), which
- * are far smaller at the same quality. Existing uploads pick this up with
- * `wp media regenerate --yes`.
- */
-add_filter('image_editor_output_format', function (array $formats) {
-    return $formats + [
-        'image/jpeg' => 'image/webp',
-        'image/png' => 'image/webp',
-    ];
-});
-
-/**
  * Blocks with a Background colour support (see theme_block_background_colors()) show that
  * control straight away in the Color panel, rather than hidden behind the panel's menu, so
  * choosing a colour is: Background, pick a swatch.
