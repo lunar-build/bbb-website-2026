@@ -1,6 +1,4 @@
 {{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
-@php($hasHeadings = collect($columns)->contains(fn ($column) => filled($column['heading'])))
-
 <div {{ $attributes->class(['c-table']) }}>
 
 <div class="o-container">
@@ -9,12 +7,11 @@
       @if ($caption)
         <caption class="u-sr-only">{{ $caption }}</caption>
       @endif
-      {{-- Skipped when no column has a heading: an empty <thead> is an empty dark band to everyone and noise to a screen reader. --}}
-      @if ($hasHeadings)
+      @if ($hasColumnHeadings)
         <thead>
           <tr>
             @foreach ($columns as $column)
-              <th scope="col" class="u-table-column-heading">{{ $column['heading'] }}</th>
+              <th scope="col" @class(['u-table-column-heading', 'c-table__col--'.($column['width'] ?? 'auto')])>{{ $column['heading'] }}</th>
             @endforeach
           </tr>
         </thead>
@@ -23,10 +20,11 @@
         @foreach ($rows as $row)
           <tr>
             @foreach ($row['cells'] as $i => $cell)
+              @php($widthClass = 'c-table__col--'.($columns[$i]['width'] ?? 'auto'))
               @if ($i === 0 && $firstColumnIsHeader)
-                <th scope="row" class="u-table-cell-heading u-rich-text">{!! $cell['content'] !!}</th>
+                <th scope="row" @class(['u-table-cell-heading', 'u-rich-text', $widthClass])>{!! $cell['content'] !!}</th>
               @else
-                <td class="u-body-regular u-rich-text">{!! $cell['content'] !!}</td>
+                <td @class(['u-body-regular', 'u-rich-text', $widthClass])>{!! $cell['content'] !!}</td>
               @endif
             @endforeach
           </tr>

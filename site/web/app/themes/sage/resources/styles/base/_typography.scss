@@ -79,7 +79,7 @@ h2,
 h3,
 .u-heading-3 {
   font-size: var(--wp--preset--font-size--heading-3);
-  line-height: 2.75rem;
+  line-height: 1.25; // unitless so wrapped lines scale with the fluid size; 2.75rem packed three-line H3s too tight
   font-weight: 700;
   margin-bottom: spacing.$base;
 }
@@ -107,6 +107,12 @@ h6,
   line-height: 1.625rem;
   font-weight: 700;
   margin-bottom: spacing.$base;
+}
+
+// Headings are already bold, so <strong>/<b> pasted into them (common in migrated content) would
+// step up to 900 and leave any unbolded part, like a trailing full stop, looking lighter.
+:is(h1, h2, h3, h4, h5, h6, .u-heading-1, .u-heading-2, .u-heading-3, .u-heading-4, .u-heading-5, .u-heading-6) :is(strong, b) {
+  font-weight: inherit;
 }
 
 // Card titles: between H5 and H6. Shared by Feature Card (Card Grid etc.) and Business Card; Card Row's news cards step down from it.

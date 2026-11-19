@@ -264,6 +264,12 @@ function news_list(array $b, array &$notes): array
     };
     $collect($b, 0);
 
+    // Lists saved before WordPress 6.1 have no list-item inner blocks: the <li>s are
+    // only in the list's own HTML, so read them from there.
+    if (! $items && trim($b['innerHTML']) !== '') {
+        $items = news_legacy_list_items($b['innerHTML'], $notes);
+    }
+
     $fields = [
         'heading' => '',
         'list_style' => ! empty($b['attrs']['ordered']) ? 'numbers' : 'bullets',
@@ -279,6 +285,53 @@ function news_list(array $b, array &$notes): array
     $block['attrs']['style']['spacing']['padding'] = ['top' => '0', 'bottom' => 'var:preset|spacing|small'];
 
     return $block;
+}
+
+/**
+ * Items of a pre-6.1 core/list, whose <li>s sit in the block's HTML rather than in
+ * list-item inner blocks. Nested <ul>/<ol> keep their depth, as in news_list().
+ */
+function news_legacy_list_items(string $html, array &$notes): array
+{
+    $document = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $document->loadHTML('<?xml encoding="utf-8"?><body>' . $html . '</body>');
+    libxml_clear_errors();
+
+    $items = [];
+    $collect = function (DOMNode $list, int $level) use (&$collect, &$items, &$notes) {
+        if ($level > 2) {
+            $notes[] = 'list nested deeper than 3 levels — extra levels indented at 2';
+        }
+        foreach ($list->childNodes as $item) {
+            if ($item->nodeName !== 'li') {
+                continue;
+            }
+            $own = '';
+            $nested = [];
+            foreach ($item->childNodes as $child) {
+                if (in_array($child->nodeName, ['ul', 'ol'], true)) {
+                    $nested[] = $child;
+                } else {
+                    $own .= $item->ownerDocument->saveHTML($child);
+                }
+            }
+            $text = trim(html_entity_decode(strip_tags($own, NEWS_LIST_INLINE), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($text !== '') {
+                $items[] = ['text' => $text, 'level' => min($level, 2)];
+            }
+            foreach ($nested as $sublist) {
+                $collect($sublist, $level + 1);
+            }
+        }
+    };
+    foreach ($document->getElementsByTagName('body')->item(0)->childNodes as $root) {
+        if (in_array($root->nodeName, ['ul', 'ol'], true)) {
+            $collect($root, 0);
+        }
+    }
+
+    return $items;
 }
 
 /** core/table -> Table block; a first row that's all bold becomes the column headings. */

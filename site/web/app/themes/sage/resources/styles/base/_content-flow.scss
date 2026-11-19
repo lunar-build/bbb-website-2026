@@ -26,8 +26,14 @@
 }
 
 // Headings only carry margin-bottom, so flow content would run straight into them.
-.e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image, .c-bullet-list-block) + .wp-block-heading {
+.e-content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image, .c-bullet-list-block) + .wp-block-heading,
+.c-sticky-nav-template__content > :is(.wp-block-paragraph, .wp-block-list, .wp-block-table, .wp-block-image, .c-bullet-list-block) + .wp-block-heading {
   margin-top: var(--wp--preset--spacing--small);
+}
+
+// Divider lines (core Separator) sit in running text, so give them clear space either side.
+:is(.e-content, .c-sticky-nav-template__content) > :is(hr, .wp-block-separator) {
+  margin-block: var(--wp--preset--spacing--small);
 }
 
 // A heading after a block belongs to what follows it, so it needs clear space above.

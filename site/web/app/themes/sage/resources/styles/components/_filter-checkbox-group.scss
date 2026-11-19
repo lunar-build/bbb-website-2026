@@ -29,3 +29,14 @@
 .c-filter-checkbox-group__item {
   width: 100%;
 }
+
+// Selected filters get a filled box (plus the tick, so it isn't colour alone) so the
+// active ones stand out in a long list. Filters only: other checkboxes stay white with a dark tick.
+.c-filter-checkbox-group wa-checkbox {
+  --checked-icon-color: var(--wp--preset--color--white);
+
+  &:state(checked)::part(control) {
+    background-color: var(--wp--preset--color--blue-medium);
+    border-color: var(--wp--preset--color--blue-medium);
+  }
+}
