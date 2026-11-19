@@ -116,8 +116,4 @@
       @include button.arrow-hover;
     }
   }
-
-  &__region + &__cta {
-    margin-top: 0;
-  }
 }

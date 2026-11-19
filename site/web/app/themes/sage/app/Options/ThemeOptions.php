@@ -88,6 +88,25 @@ class ThemeOptions extends Field
                     'label' => 'Official cycling website',
                     'instructions' => 'Shown in the footer bottom bar, e.g. "Official cycling website for Bristol, Bath & NE Somerset, North Somerset and South Gloucestershire". Leave empty to fall back to the site tagline.',
                 ])
+                ->addTextarea('newsletter_embed', [
+                    'label' => 'Newsletter sign-up (embed code)',
+                    'instructions' => 'Paste the sign-up embed snippet from the newsletter service. It shows above the footer on every page, beside an illustration. Leave empty to hide it. Output exactly as pasted, so only paste code from a source you trust.',
+                    'rows' => 10,
+                    'new_lines' => '',
+                ])
+                ->addText('newsletter_heading_highlight', [
+                    'label' => 'Newsletter heading (highlighted words)',
+                    'default_value' => 'Stay up to date,',
+                ])
+                ->addText('newsletter_heading_text', [
+                    'label' => 'Newsletter heading',
+                    'default_value' => 'with news and events in the region.',
+                ])
+                ->addText('newsletter_subheading_text', [
+                    'label' => 'Newsletter subheading',
+                    'instructions' => 'Shown on its own line under the heading, sized like a Heading 2.',
+                    'default_value' => 'Join our newsletter',
+                ])
             ->addRepeater('legal_links', [
                 'label' => 'Legal Links',
                 'instructions' => 'Links shown in the footer legal row (e.g. Privacy Policy, Terms).',

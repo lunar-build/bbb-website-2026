@@ -1,5 +1,51 @@
 <?php
 
+/**
+ * The site-wide newsletter band above the footer: the Form block's image layout with the
+ * embed pasted in Theme Options → Footer. Empty when no embed is set.
+ */
+function footer_newsletter_html(): string
+{
+    $embedCode = get_field('newsletter_embed', 'option');
+
+    if (! $embedCode) {
+        return '';
+    }
+
+    $fields = [
+        'layout' => 'image',
+        // null until Theme Options is first saved (ACF skips field defaults until then); a
+        // saved empty value is kept, so the heading can be cleared.
+        'heading_highlight' => get_field('newsletter_heading_highlight', 'option') ?? 'Stay up to date,',
+        'heading_text' => get_field('newsletter_heading_text', 'option') ?? 'with news and events in the region.',
+        // An H3 under the H2 above, sized like an H2.
+        'subheading_text' => get_field('newsletter_subheading_text', 'option') ?? 'Join our newsletter',
+        'subheading_level' => 'h3',
+        'subheading_style' => 'h2',
+        'heading_level' => 'h2',
+        'form_source' => 'embed',
+        'embed_code' => $embedCode,
+        'image_type' => 'illustration',
+        'illustration' => 'mountain_biker',
+    ];
+
+    $data = [];
+
+    foreach ($fields as $name => $value) {
+        $data[$name] = $value;
+        $data['_' . $name] = 'field_form_' . $name;
+    }
+
+    return do_blocks(serialize_block([
+        'blockName' => 'acf/form',
+        // Flush bottom: the illustration stands on the footer's top edge.
+        'attrs' => ['name' => 'acf/form', 'data' => $data, 'mode' => 'preview', 'className' => 'c-form--flush-bottom', 'style' => ['spacing' => ['padding' => ['bottom' => '0']]]],
+        'innerBlocks' => [],
+        'innerHTML' => '',
+        'innerContent' => [],
+    ]));
+}
+
 /** Nav menu location → nested [{ label, href, current, children }] (header and primary-nav views). */
 function menu_items_to_array(string $location): array
 {
