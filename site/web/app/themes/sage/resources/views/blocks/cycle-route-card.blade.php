@@ -5,7 +5,7 @@
   <article class="c-cycle-route-card__card c-cycle-route-card--{{ $difficulty }}">
     <div class="c-cycle-route-card__image">
       @if ($image)
-        <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+        <x-image :image="$image" size="medium_large" />
       @endif
     </div>
 
