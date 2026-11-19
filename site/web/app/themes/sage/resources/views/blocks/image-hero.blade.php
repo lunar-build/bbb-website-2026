@@ -1,7 +1,7 @@
 <x-block-root :heading="(bool) $showHeading" {{ $attributes->class(['c-image-hero', 'o-full-bleed-bg']) }}>
 
 @if ($backgroundImage['url'] ?? null)
-  <img class="c-image-hero__background" src="{{ $backgroundImage['url'] }}" alt="" style="object-position: center {{ $imagePosition }};">
+  <x-image class="c-image-hero__background" :image="$backgroundImage" alt="" size="full" sizes="100vw" priority style="object-position: center {{ $imagePosition }};" />
 @endif
 
 @if ($showHeading || $showBreadcrumbs)

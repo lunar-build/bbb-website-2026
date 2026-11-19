@@ -24,22 +24,20 @@
             @if ($type === 'news')
                 @foreach ($newsCards as $card)
                     <article class="c-card-row__news-card">
-                        <img class="c-card-row__news-image" src="{{ $card['image']['url'] }}"
-                            alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
+                        <x-image class="c-card-row__news-image" :image="$card['image']" size="medium_large" style="object-position: {{ $imagePosition }}" />
 
                         @if (!empty($card['tag']))
                             <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
                         @endif
                         <x-heading :level="$cardLevel" style="h3" class="c-card-row__news-title">{{ $card['title'] }}</x-heading>
-                        <x-link class="c-card-row__news-cta" :link="$card['link']" />
+                        <x-link class="c-card-row__news-cta" :link="$card['link']" :context="$card['title']" />
                     </article>
                 @endforeach
             @elseif ($type === 'route')
                 @foreach ($routeCards as $card)
                     <article class="c-cycle-route-card__card c-cycle-route-card--{{ $card['difficulty'] }}">
                         <div class="c-cycle-route-card__image">
-                            <img src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}"
-                                style="object-position: {{ $imagePosition }}">
+                            <x-image :image="$card['image']" size="medium_large" style="object-position: {{ $imagePosition }}" />
                         </div>
 
                         <div class="c-cycle-route-card__banner">
@@ -70,8 +68,7 @@
             @else
                 @foreach ($linkCards as $card)
                     <article class="c-card-row__link-card">
-                        <img class="c-card-row__link-image" src="{{ $card['image']['url'] }}"
-                            alt="{{ $card['image']['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
+                        <x-image class="c-card-row__link-image" :image="$card['image']" size="medium_large" style="object-position: {{ $imagePosition }}" />
 
                         <x-heading :level="$cardLevel" style="h3" class="c-card-row__link-title">{{ $card['title'] }}</x-heading>
                         <p class="c-card-row__link-body">{{ $card['body'] }}</p>

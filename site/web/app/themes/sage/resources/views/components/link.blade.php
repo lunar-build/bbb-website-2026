@@ -1,4 +1,4 @@
-@props(['link', 'icon' => 'arrow-right', 'labelClass' => null])
+@props(['link', 'icon' => 'arrow-right', 'labelClass' => null, 'context' => null])
 
 @php($newTab = ($link['target'] ?? '') === '_blank')
 
@@ -8,6 +8,10 @@
         <span><span class="{{ $labelClass }}">{{ $link['title'] }}</span></span>
     @else
         {{ $link['title'] }}
+    @endif
+    {{-- What a generic label ("Read more") refers to, for screen reader users. --}}
+    @if ($context)
+        <span class="u-sr-only">: {{ $context }}</span>
     @endif
     @if ($icon)
         <x-icon :name="$icon" />

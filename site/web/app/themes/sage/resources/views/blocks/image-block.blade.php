@@ -2,7 +2,7 @@
 
 <div class="o-container">
   @if ($image['url'] ?? null)
-    <img class="c-image-block__image" src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}">
+    <x-image class="c-image-block__image" :image="$image" size="full" sizes="100vw" />
   @endif
 
   @if ($contentType === 'caption')

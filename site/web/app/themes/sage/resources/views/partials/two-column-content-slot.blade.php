@@ -1,6 +1,6 @@
 @switch($slot['type'])
   @case('image')
-    <img class="c-two-column-content__image" src="{{ $slot['image']['url'] }}" alt="{{ $slot['image']['alt'] ?? '' }}">
+    <x-image class="c-two-column-content__image" :image="$slot['image']" size="large" />
     @break
 
   @case('quote')

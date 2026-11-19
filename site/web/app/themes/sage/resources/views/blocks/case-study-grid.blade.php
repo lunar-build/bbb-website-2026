@@ -5,7 +5,7 @@
   <div class="c-case-study-grid__cards">
     @foreach ($cards as $card)
       <div class="c-case-study-grid__card">
-        <img class="c-case-study-grid__image" src="{{ $card['image']['url'] }}" alt="{{ $card['image']['alt'] ?? '' }}">
+        <x-image class="c-case-study-grid__image" :image="$card['image']" size="large" />
         <x-quote
           class="c-case-study-grid__quote"
           size="standard"
