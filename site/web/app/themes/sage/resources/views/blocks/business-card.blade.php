@@ -8,6 +8,7 @@
     :services="$services"
     :description="$description"
     :link="$link"
+    :cta-colour="$ctaColour"
     :heading-level="$headingLevel"
   />
 </div>

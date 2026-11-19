@@ -16,7 +16,7 @@
     </x-copy>
   @endif
 
-  <div class="c-card-grid__cards @if ($sideImage) c-card-grid__cards--with-side-image @endif">
+  <div class="c-card-grid__cards @if ($sideImage) c-card-grid__cards--with-side-image @endif @if ($cardStyle === 'pricing') c-card-grid__cards--pricing @endif">
     @if ($cardStyle === 'business')
       @foreach ($businessCards as $card)
         <x-business-card
@@ -25,6 +25,17 @@
           :services="$card['services']"
           :description="$card['description']"
           :link="$card['link']"
+          :cta-colour="$card['cta_colour'] ?? 'yellow'"
+          :heading-level="$cardLevel"
+          class="c-card-grid__card"
+        />
+      @endforeach
+    @elseif ($cardStyle === 'pricing')
+      @foreach ($pricingCards as $card)
+        <x-pricing-card
+          :title="$card['title']"
+          :price="$card['price']"
+          :description="$card['description']"
           :heading-level="$cardLevel"
           class="c-card-grid__card"
         />

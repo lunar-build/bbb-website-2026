@@ -4,11 +4,12 @@
     'fileSize' => '',
     'id' => null,
     'context' => '',
+    'buttonStyle' => 'link',
 ])
 
 <div {{ $attributes->class(['c-download-link']) }}>
     <a
-        class="c-download-link__link u-cta-large"
+        @class(['c-download-link__link', 'u-cta-large', 'c-download-link__link--yellow' => $buttonStyle === 'yellow'])
         href="{{ $url }}"
         download
         @if ($fileSize && $id) aria-describedby="{{ $id }}" @endif

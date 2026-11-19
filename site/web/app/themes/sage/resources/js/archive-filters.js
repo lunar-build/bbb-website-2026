@@ -41,11 +41,14 @@ if (results) {
         .map((element) => element.textContent.trim())
         .filter(Boolean)
         .join('. ');
-      // Cleared first so the same message twice in a row is still announced.
-      status.textContent = '';
-      requestAnimationFrame(() => {
-        status.textContent = message;
-      });
+      // Cleared first so the same message twice in a row is still announced. Search and the
+      // map listing have no status region: their count has its own live region instead.
+      if (status) {
+        status.textContent = '';
+        requestAnimationFrame(() => {
+          status.textContent = message;
+        });
+      }
 
       if (focus) {
         const target = results.querySelector('[data-archive-focus]');

@@ -42,6 +42,15 @@
     }
   }
 
+  // Per-column width, set in the block's Columns tab (Standard is the default above).
+  .c-table__col--wide {
+    min-width: 17rem;
+  }
+
+  .c-table__col--one-line {
+    white-space: nowrap;
+  }
+
   thead th {
     background: var(--wp--preset--color--blue-dark);
     color: var(--wp--preset--color--white);

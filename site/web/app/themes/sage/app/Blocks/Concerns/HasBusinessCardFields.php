@@ -99,6 +99,12 @@ trait HasBusinessCardFields
                 'label' => 'Link',
                 'instructions' => 'Link text + URL for the CTA.',
                 'required' => true,
+            ])
+            ->addSelect("{$prefix}cta_colour", [
+                'label' => 'Button colour',
+                'choices' => ['yellow' => 'Yellow', 'outlined' => 'Outlined'],
+                'default_value' => 'yellow',
+                'ui' => true,
             ]);
     }
 

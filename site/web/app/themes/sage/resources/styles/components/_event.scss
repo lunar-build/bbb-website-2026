@@ -10,6 +10,19 @@
   padding-block: 3rem;
 }
 
+// Header-to-breadcrumbs space matches the Text Hero's top padding (the same spacing preset)
+// rather than the 3rem both layouts default to.
+// Doubled so it also beats .c-sticky-nav-template's own padding when the event has a page index.
+.c-event__layout.c-event__layout {
+  padding-top: var(--wp--preset--spacing--large);
+}
+
+// Same gap as the Text Hero, which every other page's title sits under; the event template has
+// no hero of its own, so the breadcrumbs sat flush against the title.
+.c-event__breadcrumbs {
+  margin-bottom: 1.75rem;
+}
+
 .c-event__title {
   margin-bottom: 2rem;
   color: var(--wp--preset--color--blue-medium);
