@@ -10,6 +10,8 @@
     $copyright = sprintf('© %s %s', date('Y'), get_bloginfo('name'));
 @endphp
 
+{!! footer_newsletter_html() !!}
+
 <footer class="c-footer">
     <div class="c-footer-top">
         <div class="o-container">

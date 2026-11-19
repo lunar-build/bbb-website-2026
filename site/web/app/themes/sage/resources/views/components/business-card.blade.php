@@ -47,12 +47,6 @@
     <p class="c-business-card__description">{{ $description }}</p>
   @endif
 
-  @if (count($regions))
-    <p class="c-business-card__region">
-      <strong>{{ _n('Region:', 'Regions:', count($regions), 'sage') }}</strong> {{ implode(', ', $regions) }}
-    </p>
-  @endif
-
   @if (! empty($link['url']))
     <a
       @class(['c-business-card__cta', 'c-business-card__cta--outlined' => $ctaColour === 'outlined'])

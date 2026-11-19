@@ -1,0 +1,183 @@
+@use '../abstracts/forms';
+@use '../base/focus' as focus;
+@use '../base/utilities';
+
+// The Form block's "Embed code" source: a snippet pasted from another service (the
+// newsletter sign-up, say) in place of a Gravity Form. Text inputs, textareas, checkboxes
+// and radios already pick up the global rules in base/_forms.scss. Everything else a
+// snippet might bring is styled here, first for any embed (plain elements), then for the
+// newsletter vendor's `EMB_` markup, which ships no CSS of its own.
+
+.c-form__embed {
+  font-family: var(--wp--preset--font-family--nata-sans);
+  font-size: var(--wp--preset--font-size--body-regular);
+  color: var(--wp--preset--color--charcoal);
+
+  :where(label, legend) {
+    font-family: var(--wp--preset--font-family--nata-sans);
+    font-weight: 500;
+    font-size: var(--wp--preset--font-size--input-label);
+    line-height: 1.625rem;
+  }
+
+  :where(fieldset) {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  select {
+    @include forms.text-input;
+  }
+
+  // Same yellow pill as the Gravity Forms submit (.gform_button in base/_forms.scss).
+  :where(button, input[type='submit'], input[type='button']) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.625rem 1.625rem;
+    background: var(--wp--preset--color--yellow);
+    border: 2px solid var(--wp--preset--color--charcoal);
+    border-radius: 999px;
+    font-family: var(--wp--preset--font-family--anonymous-pro);
+    font-weight: 700;
+    font-size: var(--wp--preset--font-size--button-label);
+    line-height: 1.875rem;
+    color: var(--wp--preset--color--charcoal);
+    cursor: pointer;
+
+    @include focus.ring;
+  }
+
+  :where(a) {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+
+    @include focus.ring;
+  }
+
+  :where(iframe, img, video) {
+    max-width: 100%;
+  }
+
+  // On the dark background colours the text follows the block's contrasting colour.
+  .c-form:is(.has-blue-background-color, .has-blue-dark-background-color) & {
+    color: var(--c-block-fg);
+
+    :where(label, legend) {
+      color: var(--c-block-fg);
+    }
+  }
+}
+
+// ---- Newsletter sign-up (subscribeapp.emailblaster.cloud) ----
+// Its script toggles `.Selected` on a tick row, `.EMB_FormElement_Error` on a field's
+// parent, and shows `.EMB_Complete` (with jQuery) in place of the form on submit.
+
+.c-form__embed .EMB_Structure {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// Empty spacer blocks and the unused second structure only add gap, and so does the <br>
+// after each heading (the headings are blocks with their own margin).
+.c-form__embed :is(.EMB_Spacer, .EMB_StructureEmpty, .EMB_Text br) {
+  display: none;
+}
+
+.c-form__embed .EMB_H1 {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: var(--wp--preset--font-size--body);
+}
+
+.c-form__embed .EMB_inputs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// A bot trap that must stay in the DOM and stay empty, so it is moved out of sight (not
+// display: none) rather than removed.
+.c-form__embed .EMB_Input_Field_Hnypt {
+  @include utilities.sr-only;
+}
+
+.c-form__embed .EMB_TickLabel {
+  margin-bottom: 0.5rem;
+}
+
+// The consent tick is a div, not an input: drawn with the same two images as the real
+// checkboxes in base/_forms.scss, switched by the `.Selected` class the script toggles.
+.c-form__embed .EMB_TickRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: var(--wp--preset--font-size--input-label);
+  line-height: 1.625rem;
+
+  &::before {
+    content: '';
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    background: url('../../svg/checkbox-unchecked.svg') center / 1.125rem 1.125rem no-repeat;
+  }
+
+  &.Selected::before {
+    background-image: url('../../svg/checkbox-checked.svg');
+  }
+}
+
+.c-form__embed .EMB_FormElement_Error {
+  .EMB_Input_Field {
+    border-color: var(--wp--preset--color--dark-orange);
+  }
+
+  .EMB_TickLabel,
+  .EMB_TickRow {
+    color: var(--wp--preset--color--dark-orange);
+  }
+}
+
+.c-form--centred .c-form__embed .EMB_Submit {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+// Shown (inline display, by the script) in place of the form: the same blue panel as a sent
+// Gravity Form. A failed sign-up fills it with <center><p><strong>Oops!, so that gets the
+// orange error panel without the tick. The embed's logo is dropped, as the page has its own.
+.c-form__embed .EMB_Complete {
+  display: none;
+  padding: 1.5rem 2rem;
+  border-radius: 1.25rem;
+  background: var(--wp--preset--color--blue-light);
+  font-weight: 700;
+  font-size: var(--wp--preset--font-size--body);
+  line-height: 1.5rem;
+  color: var(--wp--preset--color--blue-dark);
+
+  .EMB_Image {
+    display: none;
+  }
+
+  .EMB_H2 {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  &:has(center) {
+    border: 2px solid var(--wp--preset--color--dark-orange);
+    background: var(--wp--preset--color--white);
+    color: var(--wp--preset--color--dark-orange);
+    text-align: center;
+  }
+}

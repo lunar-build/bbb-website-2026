@@ -213,6 +213,8 @@ class Form extends Block
         return [
             'layout' => $this->layout(),
             'formId' => $this->formId(),
+            'formSource' => $this->formSource(),
+            'embedCode' => $this->embedCode(),
             'headingHighlight' => $this->headingHighlight(),
             'heading' => $this->heading(),
             'subheading' => $this->subheading(),
@@ -319,6 +321,16 @@ class Form extends Block
 
         $fields->addTab('Form');
 
+        $fields->addButtonGroup('form_source', [
+            'label' => 'Form source',
+            'instructions' => 'A Gravity Forms form, or an embed code from another service (e.g. the Emma newsletter sign-up).',
+            'choices' => [
+                'gravity_form' => 'Gravity Form',
+                'embed' => 'Embed code',
+            ],
+            'default_value' => 'gravity_form',
+        ]);
+
         $fields
             ->addSelect('form_id', [
                 'label' => 'Choose a Gravity Form',
@@ -327,7 +339,17 @@ class Form extends Block
                 'ui' => 1,
                 'allow_null' => 1,
                 'required' => 1,
+                'conditional_logic' => [[['field' => 'form_source', 'operator' => '==', 'value' => 'gravity_form']]],
             ]);
+
+        $fields->addTextarea('embed_code', [
+            'label' => 'Embed code',
+            'instructions' => 'Paste the full embed snippet from the service. It is output exactly as pasted, so only paste code from a source you trust.',
+            'rows' => 10,
+            'new_lines' => '',
+            'required' => 1,
+            'conditional_logic' => [[['field' => 'form_source', 'operator' => '==', 'value' => 'embed']]],
+        ]);
 
         return $fields->build();
     }
@@ -465,6 +487,27 @@ class Form extends Block
     public function formId()
     {
         return $this->resolveField('form_id');
+    }
+
+    /**
+     * Retrieve where the form comes from: 'gravity_form' or 'embed'. Blocks
+     * saved before the embed option existed have no value and are Gravity Forms.
+     *
+     * @return string
+     */
+    public function formSource()
+    {
+        return $this->resolveField('form_source', 'gravity_form') === 'embed' ? 'embed' : 'gravity_form';
+    }
+
+    /**
+     * Retrieve the pasted embed snippet, output as-is on the front end.
+     *
+     * @return string
+     */
+    public function embedCode()
+    {
+        return $this->resolveField('embed_code', '');
     }
 
     /**

@@ -33,13 +33,7 @@
           </div>
 
           <div class="c-form__form">
-            @if ($block->preview)
-              <p class="c-form__placeholder">
-                {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
-              </p>
-            @else
-              @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
-            @endif
+            @include('partials.form-output')
           </div>
         </div>
       </div>
@@ -66,13 +60,7 @@
         </div>
 
         <div class="c-form__form">
-          @if ($block->preview)
-            <p class="c-form__placeholder">
-              {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
-            </p>
-          @else
-            @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
-          @endif
+          @include('partials.form-output')
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@
     {!! $hero !!}
 
     <div class="o-container">
-      <div @if (count($pageMenuItems)) class="c-sticky-nav-template" @else class="c-event" @endif>
+      <div @if (count($pageMenuItems)) class="c-sticky-nav-template c-event__layout" @else class="c-event c-event__layout" @endif>
         @if (count($pageMenuItems))
           <div class="c-sticky-nav-template__nav">
             <x-sticky-page-menu :items="$pageMenuItems" data-sticky-nav-menu />
@@ -15,7 +15,7 @@
         @endif
 
         <div class="c-sticky-nav-template__content">
-          <x-breadcrumbs :items="$breadcrumbs" />
+          <x-breadcrumbs class="c-event__breadcrumbs" :items="$breadcrumbs" />
 
           <h1 class="c-event__title">{!! get_the_title() !!}</h1>
 

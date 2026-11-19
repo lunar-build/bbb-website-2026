@@ -51,6 +51,14 @@
     }
   }
 
+  // Pricing cards are short, so they stay near the design's 300px width rather than
+  // splitting into three narrow columns where the titles wrap to three lines.
+  &__cards--pricing {
+    @include bp.respond($min: bp.$md) {
+      grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+    }
+  }
+
   // Reserves room for the overlay &__side-image; narrower than it, some overlap is fine.
   // Stays at two across: with the side image's padding, three would be too narrow.
   &__cards--with-side-image {

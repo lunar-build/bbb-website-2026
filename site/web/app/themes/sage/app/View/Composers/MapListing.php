@@ -48,6 +48,8 @@ class MapListing extends Composer
             'cards' => $cards,
             'markers' => array_values(array_filter(array_map(fn($item, $card) => $item['lat'] === null ? null : [
                 'name' => $item['name'],
+                // Where the pin is, in words: the address, or the region for datasets without one (bike pumps).
+                'place' => $item['address'] ?: implode(', ', $item['regions']),
                 'lat' => $item['lat'],
                 'lng' => $item['lng'],
                 // The pin's popup — same details as its card, rendered here so Blade escapes it.
@@ -84,6 +86,7 @@ class MapListing extends Composer
     protected function card(array $item, string $dataset): array
     {
         $contactInfo = array_values(array_filter([
+            $item['regions'] ? ['icon' => 'map-pin', 'text' => implode(', ', $item['regions'])] : null,
             $item['address'] ? ['icon' => 'location-dot', 'text' => $item['address']] : null,
             $item['phone'] ? ['icon' => 'phone', 'text' => $item['phone']] : null,
             $item['type'] ? ['icon' => 'circle-info', 'text' => $item['type']] : null,
@@ -107,7 +110,6 @@ class MapListing extends Composer
             ], $item['services']),
             // Pumps have no description — who maintains them is their summary.
             'description' => $item['description'] ?: $item['maintained'],
-            'regions' => $item['regions'],
             'link' => $item['website'] ? [
                 'title' => __('Learn more (opens in a new tab)', 'sage'),
                 'url' => $item['website'],

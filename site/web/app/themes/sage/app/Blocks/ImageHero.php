@@ -215,6 +215,7 @@ class ImageHero extends Block
             ])
             ->addText('heading', [
                 'label' => 'Heading',
+                'instructions' => 'Leave empty to use the page title.',
                 'conditional_logic' => [
                     [
                         [
@@ -276,13 +277,13 @@ class ImageHero extends Block
     }
 
     /**
-     * Retrieve the heading.
+     * Retrieve the heading, falling back to the page title so it isn't typed twice.
      *
      * @return string
      */
     public function heading()
     {
-        return $this->resolveField('heading', '');
+        return $this->resolveField('heading') ?: get_the_title();
     }
 
     /**
