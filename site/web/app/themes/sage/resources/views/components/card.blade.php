@@ -16,7 +16,7 @@
 
   {{-- Stretched-link overlay: makes the whole card clickable without nesting an
        anchor around the visible CTA below (invalid HTML). The CTA below is
-       purely decorative (aria-hidden + tabindex="-1", pointer-events:none via
+       purely decorative (inert + aria-hidden, pointer-events:none via
        _button.scss) — this is the only real, focusable link in the card. --}}
   @if (! empty($link['url']))
     <a
@@ -71,6 +71,7 @@
             with-end
             tabindex="-1"
             aria-hidden="true"
+            inert
           >
             {{ $link['label'] ?? ($link['title'] ?: __('Find out more', 'sage')) }}
             <x-icon name="arrow-right" slot="end" />

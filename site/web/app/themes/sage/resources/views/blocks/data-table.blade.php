@@ -1,17 +1,24 @@
 {{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+@php($hasHeadings = collect($columns)->contains(fn ($column) => filled($column['heading'])))
+
 <div {{ $attributes->class(['c-table']) }}>
 
 <div class="o-container">
-  <div class="c-table__scroll" role="region" aria-label="{{ $caption }}" tabindex="0">
+  <div class="c-table__scroll" tabindex="0" @if ($caption) role="region" aria-label="{{ $caption }}" @endif>
     <table class="c-table__table">
-      <caption class="u-sr-only">{{ $caption }}</caption>
-      <thead>
-        <tr>
-          @foreach ($columns as $column)
-            <th scope="col" class="u-table-column-heading">{{ $column['heading'] }}</th>
-          @endforeach
-        </tr>
-      </thead>
+      @if ($caption)
+        <caption class="u-sr-only">{{ $caption }}</caption>
+      @endif
+      {{-- Skipped when no column has a heading: an empty <thead> is an empty dark band to everyone and noise to a screen reader. --}}
+      @if ($hasHeadings)
+        <thead>
+          <tr>
+            @foreach ($columns as $column)
+              <th scope="col" class="u-table-column-heading">{{ $column['heading'] }}</th>
+            @endforeach
+          </tr>
+        </thead>
+      @endif
       <tbody>
         @foreach ($rows as $row)
           <tr>

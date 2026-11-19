@@ -31,7 +31,7 @@
                             <span class="c-card-row__news-tag">{{ $card['tag'] }}</span>
                         @endif
                         <x-heading :level="$cardLevel" style="h3" class="c-card-row__news-title">{{ $card['title'] }}</x-heading>
-                        <x-link class="c-card-row__news-cta" :link="$card['link']" />
+                        <x-link class="c-card-row__news-cta" :link="$card['link']" :context="$card['title']" />
                     </article>
                 @endforeach
             @elseif ($type === 'route')

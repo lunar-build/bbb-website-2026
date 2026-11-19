@@ -11,6 +11,7 @@
       <x-business-card
         class="c-archive__card"
         :id="$card['id']"
+        heading-level="h3"
         tabindex="-1"
         :name="$card['name']"
         :contact-info="$card['contactInfo']"
