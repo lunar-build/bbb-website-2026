@@ -4,6 +4,7 @@ namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -269,6 +270,7 @@ class CardRow extends Block
             'type' => $this->type(),
             'headingHighlight' => $this->headingHighlight(),
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'intro' => $this->intro(),
             'imagePosition' => $this->imagePosition(),
             'newsCards' => $this->newsCards(),
@@ -306,6 +308,7 @@ class CardRow extends Block
                     'label' => 'Heading (rest)',
                     'instructions' => 'Optional. Use on its own for a plain heading.',
                 ])
+            ->addPartial(HeadingLevelSelect::class)
                 ->addTextarea('intro', [
                     'label' => 'Intro text',
                     'instructions' => 'Shown on the Link and Route types.',
@@ -524,6 +527,11 @@ class CardRow extends Block
     public function headingHighlight()
     {
         return $this->resolveField('heading_highlight', '');
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     /**

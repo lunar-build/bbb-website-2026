@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-instagram-feed', 'o-full-bleed-bg']) }}>
+<x-block-root :heading="$heading" {{ $attributes->class(['c-instagram-feed', 'o-full-bleed-bg']) }}>
   <div class="o-container">
     @if (! empty($heading['text']) || ! empty($intro['text']))
       <div class="c-instagram-feed__text">
@@ -22,4 +22,4 @@
       </div>
     @endif
   </div>
-</section>
+</x-block-root>

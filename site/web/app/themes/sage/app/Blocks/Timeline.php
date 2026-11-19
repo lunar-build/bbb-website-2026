@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\Fields\HeadingLevelSelect;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -218,6 +219,7 @@ class Timeline extends Block
     {
         return [
             'heading' => $this->heading(),
+            'headingLevel' => $this->headingLevel(),
             'intro' => $this->intro(),
             'markerSize' => $this->markerSize(),
             'steps' => $this->steps(),
@@ -233,6 +235,7 @@ class Timeline extends Block
                 'label' => 'Heading',
                 'required' => 0,
             ])
+            ->addPartial(HeadingLevelSelect::class)
             ->addText('intro', [
                 'label' => 'Intro',
                 'instructions' => 'Optional standfirst shown under the heading.',
@@ -273,6 +276,11 @@ class Timeline extends Block
             ->endRepeater();
 
         return $fields->build();
+    }
+
+    public function headingLevel()
+    {
+        return $this->resolveField('heading_level', 'h2');
     }
 
     public function heading()

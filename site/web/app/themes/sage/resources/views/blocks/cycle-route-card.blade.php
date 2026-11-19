@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-cycle-route-card']) }}>
+<x-block-root :heading="(bool) $routeName" {{ $attributes->class(['c-cycle-route-card']) }}>
 
 @if ($routeName)
 <div class="o-container">
@@ -10,7 +10,7 @@
     </div>
 
     <div class="c-cycle-route-card__banner">
-      <h2 class="c-cycle-route-card__route-name">{{ $routeName }}</h2>
+      <x-heading :level="$headingLevel" style="h2" class="c-cycle-route-card__route-name">{{ $routeName }}</x-heading>
     </div>
 
     <dl class="c-cycle-route-card__info"
@@ -36,4 +36,4 @@
 </div>
 @endif
 
-</section>
+</x-block-root>

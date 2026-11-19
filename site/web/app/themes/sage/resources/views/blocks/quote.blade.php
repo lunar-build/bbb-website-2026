@@ -1,4 +1,5 @@
-  <section {{ $attributes->class(['c-quote-block']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+  <div {{ $attributes->class(['c-quote-block']) }}>
 
 @if (trim(strip_tags((string) $quote)) !== '')
 <div class="o-container">
@@ -8,4 +9,4 @@
 </div>
 @endif
 
-  </section>
+  </div>

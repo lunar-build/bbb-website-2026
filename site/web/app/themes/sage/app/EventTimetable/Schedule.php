@@ -106,6 +106,9 @@ class Schedule
             if (($session['start'] ?? '99') < static::DAY_START || ($session['end'] ?? '') > static::DAY_END) {
                 $warnings[] = ['message' => 'This session is unusually early or late — check the times.', 'ref' => $session['id'] ?? ''];
             }
+            if (! $errors && static::neverRuns($s, (int) ($session['weekday'] ?? 0))) {
+                $warnings[] = ['message' => sprintf('This session never runs: there is no %s between the first and last day.', static::WEEKDAY_NAMES[(int) ($session['weekday'] ?? 0)] ?? 'matching day'), 'ref' => $session['id'] ?? ''];
+            }
         }
 
         // The same event twice at overlapping times on one day is almost certainly a mistake.
@@ -213,5 +216,25 @@ class Schedule
         }
 
         return $out;
+    }
+
+    /** Index = ISO weekday (Monday 1), for messages. */
+    protected const WEEKDAY_NAMES = [1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'];
+
+    /** True when no date from the first to the last day falls on this weekday (a one-day timetable, say). */
+    protected static function neverRuns(array $schedule, int $weekday): bool
+    {
+        if (! preg_match(static::DATE, $schedule['start']) || ! preg_match(static::DATE, $schedule['end']) || $weekday < 1 || $weekday > 7) {
+            return false;
+        }
+        $last = new DateTimeImmutable($schedule['end']);
+        $day = new DateTimeImmutable($schedule['start']);
+        for ($i = 0; $i < 7 && $day <= $last; $i++, $day = $day->modify('+1 day')) {
+            if ((int) $day->format('N') === $weekday) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

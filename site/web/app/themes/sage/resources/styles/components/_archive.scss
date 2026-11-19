@@ -1,6 +1,9 @@
+@use '../base/links';
 @use '../abstracts/breakpoints' as bp;
 @use '../abstracts/column-blocks';
 @use '../base/focus';
+@use '../base/typography';
+@use 'button';
 
 // Figma "Sample page -> Filter page": intro over the results column, then a
 // filter sidebar beside the results. Markup: resources/views/archive.blade.php.
@@ -41,13 +44,57 @@
     }
   }
 
+  // Map Listing page index. The cell spans the intro's row and the menu sticks inside it
+  // (sticky is bounded by its parent, not its grid area), so it has scrolled away by the
+  // time the filters beside the map come into view.
+  &__page-menu-cell {
+    order: -1; // first on small screens, before the intro
+
+    @include bp.respond($min: bp.$lg) {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  &__page-menu {
+    max-width: 100%;
+
+    @include bp.respond($min: bp.$lg) {
+      position: sticky;
+      // 12rem clears the visible header; 2rem once it's hidden (html.is-header-hidden,
+      // set by site-header.js). Same values as the Sticky Nav template.
+      top: 12rem;
+      max-height: calc(100vh - 12rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      transition: top 0.25s ease;
+
+      html.is-header-hidden & {
+        top: 2rem;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+  }
+
   // Blocks in the linked page's intro: flattened containers, background
   // blocks as rounded panels — shared with the Sticky Nav column.
   &__intro {
     @include column-blocks.blocks;
   }
 
-  &__intro > section {
+  // Keeps jumped-to headings out from under the sticky header (as on the Sticky Nav template).
+  &__intro :where(h2, h3, h4, a, button, [tabindex]) {
+    scroll-margin-top: 13rem;
+
+    html.is-header-hidden & {
+      scroll-margin-top: 3rem;
+    }
+  }
+
+  &__intro > :is(section, .is-acf-block) {
     padding-block: 0;
   }
 
@@ -106,27 +153,31 @@
     }
   }
 
-  &__pagination ul {
+  // Figma (search results page): light-blue ringed page numbers, yellow
+  // current page, charcoal CTA-small Previous/Next with the arrow.
+  &__pagination {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.625rem;
     margin: 3.5rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  &__pagination :is(a, span) {
+  &__pagination > :is(a, span) {
+    @extend .u-cta-small;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-width: 2.5rem;
-    min-height: 2.5rem;
-    padding-inline: 0.75rem;
-    border: 2px solid var(--wp--preset--color--charcoal);
+    height: 2.5rem;
+    padding-inline: 0.5rem;
+    border: 2px solid var(--wp--preset--color--blue-light);
     border-radius: 999px;
+    background: var(--wp--preset--color--white);
     color: var(--wp--preset--color--charcoal);
-    font-weight: 700;
     text-decoration: none;
   }
 
@@ -134,18 +185,48 @@
     @include focus.ring;
 
     &:hover {
-      background: var(--wp--preset--color--charcoal);
-      color: var(--wp--preset--color--white);
+      border-color: var(--wp--preset--color--charcoal);
     }
   }
 
   &__pagination .current {
-    background: var(--wp--preset--color--charcoal);
-    color: var(--wp--preset--color--white);
+    border-color: var(--wp--preset--color--charcoal);
+    background: var(--wp--preset--color--yellow);
   }
 
   &__pagination .dots {
     border-color: transparent;
+  }
+
+  &__pagination :is(.prev, .next) {
+    gap: 0.625rem;
+    padding-inline: 1rem;
+    border-color: var(--wp--preset--color--white);
+    background: var(--wp--preset--color--charcoal);
+    color: var(--wp--preset--color--white);
+
+    &:hover {
+      border-color: var(--wp--preset--color--white);
+      @include button.arrow-hover;
+    }
+
+    .c-icon--arrow-right svg {
+      display: block;
+      width: 1rem;
+      height: 0.75rem;
+    }
+  }
+
+  &__pagination .next {
+    margin-inline-start: 1.375rem;
+  }
+
+  &__pagination .prev {
+    margin-inline-end: 1.375rem;
+  }
+
+  &__pagination .prev .c-icon--arrow-right {
+    transform: scaleX(-1);
   }
 
   &.is-loading &__results {
@@ -178,6 +259,17 @@
   border-radius: 1.25rem;
   overflow: hidden;
   background: var(--wp--preset--color--lightest-grey);
+
+  // Google's map canvas and pins take focus with `outline: none`, and tabbing in from the filters lands
+  // on its tiny "Keyboard shortcuts" button first. Ring the whole map whenever keyboard focus is inside it.
+  &:has(:focus-visible) {
+    @include focus.ring-styles;
+  }
+
+  // Pins: the canvas ring is clipped by overflow, so give each pin its own.
+  div[tabindex]:focus-visible {
+    @include focus.ring-styles;
+  }
 }
 
 // Pin popup (partials/map-listing-info.blade.php) inside Google's InfoWindow,
@@ -198,9 +290,7 @@
   }
 
   a {
-    color: var(--wp--preset--color--blue);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+    @include links.inline;
   }
 }
 

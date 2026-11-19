@@ -10,7 +10,7 @@
 
   // Background blocks can't bleed from a column, so box them as rounded
   // panels. Their spacing controls still set top/bottom inline.
-  :is(.o-full-bleed-bg, section.has-background) {
+  :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background) {
     padding: var(--wp--preset--spacing--small) 1.5rem;
     border-radius: 1.25rem;
 
@@ -20,13 +20,13 @@
   }
 
   // Stacked background blocks join into one panel, as they would full bleed.
-  :is(.o-full-bleed-bg, section.has-background) + :is(.o-full-bleed-bg, section.has-background) {
+  :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background) + :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background) {
     margin-top: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
 
-  :is(.o-full-bleed-bg, section.has-background):has(+ :is(.o-full-bleed-bg, section.has-background)) {
+  :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background):has(+ :is(.o-full-bleed-bg, section.has-background, .is-acf-block.has-background)) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }

@@ -1,4 +1,4 @@
-  <section {{ $attributes->class(['c-form', 'c-form--'.$layout, 'o-full-bleed-bg']) }}>
+  <x-block-root :heading="App\Support\HeadingLevel::shows($heading) || $headingHighlight" {{ $attributes->class(['c-form', 'c-form--'.$layout, 'o-full-bleed-bg']) }}>
 
   @if ($layout === 'image')
     <div class="c-form__panel">
@@ -33,13 +33,7 @@
           </div>
 
           <div class="c-form__form">
-            @if ($block->preview)
-              <p class="c-form__placeholder">
-                {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
-              </p>
-            @else
-              @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
-            @endif
+            @include('partials.form-output')
           </div>
         </div>
       </div>
@@ -66,16 +60,10 @@
         </div>
 
         <div class="c-form__form">
-          @if ($block->preview)
-            <p class="c-form__placeholder">
-              {{ sprintf(__('Gravity Form #%d will render here.', 'sage'), $formId) }}
-            </p>
-          @else
-            @php gravity_form($formId, false, false, false, null, true, 0, true); @endphp
-          @endif
+          @include('partials.form-output')
         </div>
       </div>
     </div>
   @endif
 
-  </section>
+  </x-block-root>

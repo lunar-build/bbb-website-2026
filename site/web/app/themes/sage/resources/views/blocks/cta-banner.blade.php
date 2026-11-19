@@ -1,4 +1,4 @@
-<section {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout, 'o-full-bleed-bg']) }}>
+<x-block-root :heading="(bool) $heading" {{ $attributes->class(['c-cta-banner', 'c-cta-banner--'.$layout, 'o-full-bleed-bg']) }}>
 
 @if ($layout === 'centred')
   @if ($imageLeft)
@@ -15,7 +15,7 @@
     <div class="c-cta-banner__content">
       <div class="c-cta-banner__text">
         @if ($heading)
-          <h2 class="c-cta-banner__heading u-heading-2">{{ $heading }}</h2>
+          <x-heading :level="$headingLevel" style="h2" class="c-cta-banner__heading">{{ $heading }}</x-heading>
         @endif
 
         @if ($body)
@@ -45,4 +45,4 @@
   </div>
 </div>
 
-</section>
+</x-block-root>

@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Fields\HeadingLevelSelect;
 use App\Blocks\Concerns\ResolvesFields;
 use Illuminate\Support\Facades\Vite;
 use Log1x\AcfComposer\Block;
@@ -165,6 +166,7 @@ class ImageBlock extends Block
             ['text' => 'Carers and under 2s FREE'],
             ['text' => 'This includes hire of our cycles during that session on our site.'],
         ],
+        'info_box_content_heading' => 'About',
         'info_box_content' => '<p>Rich text content goes here.</p>',
     ];
 
@@ -200,6 +202,7 @@ class ImageBlock extends Block
     public function with(): array
     {
         return [
+            'headingLevel' => $this->resolveField('heading_level', 'h3'),
             'image' => $this->image(),
             'contentType' => $this->contentType(),
             'caption' => $this->caption(),
@@ -208,6 +211,7 @@ class ImageBlock extends Block
             'infoBoxRows' => $this->infoBoxRows(),
             'infoBoxHeading' => $this->infoBoxHeading(),
             'infoBoxBullets' => $this->infoBoxBullets(),
+            'infoBoxContentHeading' => $this->infoBoxContentHeading(),
             'infoBoxContent' => $this->infoBoxContent(),
         ];
     }
@@ -218,6 +222,8 @@ class ImageBlock extends Block
     public function fields(): array
     {
         $fields = Builder::make('image_block');
+
+        $fields->addPartial(HeadingLevelSelect::class, ['default_level' => 'h3']);
 
         $infoBoxCondition = [
             [
@@ -240,21 +246,6 @@ class ImageBlock extends Block
                     'field' => 'info_box_type',
                     'operator' => '==',
                     'value' => 'columns',
-                ],
-            ],
-        ];
-
-        $infoBoxWysiwygCondition = [
-            [
-                [
-                    'field' => 'content_type',
-                    'operator' => '==',
-                    'value' => 'info_box',
-                ],
-                [
-                    'field' => 'info_box_type',
-                    'operator' => '==',
-                    'value' => 'wysiwyg',
                 ],
             ],
         ];
@@ -341,13 +332,20 @@ class ImageBlock extends Block
                     'required' => 1,
                 ])
             ->endRepeater()
+            ->addText('info_box_content_heading', [
+                'label' => 'Content heading',
+                'instructions' => 'e.g. "About". Optional.',
+                'required' => 0,
+                'conditional_logic' => $infoBoxCondition,
+            ])
             ->addWysiwyg('info_box_content', [
                 'label' => 'Content',
+                'instructions' => 'With "Icon rows + bullet list", this sits in its own section below the two columns. Optional.',
                 'required' => 0,
                 'tabs' => 'visual',
                 'media_upload' => 0,
                 'toolbar' => 'full',
-                'conditional_logic' => $infoBoxWysiwygCondition,
+                'conditional_logic' => $infoBoxCondition,
             ]);
 
         return $fields->build();
@@ -437,6 +435,16 @@ class ImageBlock extends Block
     public function infoBoxBullets()
     {
         return $this->resolveField('info_box_bullets', []);
+    }
+
+    /**
+     * Retrieve the heading above the rich-text info box content.
+     *
+     * @return string
+     */
+    public function infoBoxContentHeading()
+    {
+        return $this->resolveField('info_box_content_heading', '');
     }
 
     /**

@@ -7,7 +7,7 @@
     {!! $hero !!}
 
     <div class="o-container">
-      <div @if (count($pageMenuItems)) class="c-sticky-nav-template" @else class="c-event" @endif>
+      <div @if (count($pageMenuItems)) class="c-sticky-nav-template c-event__layout" @else class="c-event c-event__layout" @endif>
         @if (count($pageMenuItems))
           <div class="c-sticky-nav-template__nav">
             <x-sticky-page-menu :items="$pageMenuItems" data-sticky-nav-menu />
@@ -15,7 +15,7 @@
         @endif
 
         <div class="c-sticky-nav-template__content">
-          <x-breadcrumbs :items="$breadcrumbs" />
+          <x-breadcrumbs class="c-event__breadcrumbs" :items="$breadcrumbs" />
 
           <h1 class="c-event__title">{!! get_the_title() !!}</h1>
 
@@ -99,8 +99,9 @@
           {!! $body !!}
 
           @if ($upcoming)
-            <section class="c-event__upcoming" aria-labelledby="c-event-upcoming">
-              <h2 id="c-event-upcoming" class="u-heading-5">{{ __('More upcoming sessions', 'sage') }}</h2>
+            @php($upcomingHeadingId = \App\Support\HeadingIds::make(__('More upcoming sessions', 'sage')))
+            <section class="c-event__upcoming" aria-labelledby="{{ $upcomingHeadingId }}">
+              <x-heading level="h2" style="h5" :id="$upcomingHeadingId">{{ __('More upcoming sessions', 'sage') }}</x-heading>
               <x-bullet-list :items="array_map(fn($line) => ['text' => $line], $upcoming)" />
             </section>
           @endif

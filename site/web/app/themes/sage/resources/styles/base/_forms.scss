@@ -1,4 +1,5 @@
 @use '../base/focus' as focus;
+@use '../abstracts/forms';
 
 // Base styling for native form controls, including Gravity Forms' fields. `!important`
 // is needed: GF's Orbital theme targets `.gform-theme--framework input[type]:where(...)`,
@@ -12,22 +13,7 @@ input[type='number'],
 input[type='search'],
 input[type='password'],
 textarea {
-  width: 100% !important;
-  padding: 0.625rem 1.25rem !important;
-  background: var(--wp--preset--color--white) !important;
-  border: 2px solid var(--wp--preset--color--charcoal) !important;
-  border-radius: 999px !important;
-  font-family: var(--wp--preset--font-family--nata-sans) !important;
-  font-weight: 500 !important;
-  font-size: var(--wp--preset--font-size--input-placeholder) !important;
-  line-height: 1.125rem !important;
-  color: var(--wp--preset--color--charcoal) !important;
-
-  &::placeholder {
-    color: var(--wp--preset--color--place-holder-grey) !important;
-  }
-
-  @include focus.ring;
+  @include forms.text-input($important: true);
 }
 
 textarea {

@@ -7,11 +7,18 @@
             @foreach ($items as $i => $item)
                 <li class="c-primary-nav__item">
                     @if (!empty($item['children']))
-                        <button type="button" class="c-primary-nav__link c-primary-nav__link--drill"
-                            data-open-panel="l1-{{ $i }}">
-                            <span>{{ $item['label'] }}</span>
-                            <x-icon name="chevron" class="c-primary-nav__chevron" />
-                        </button>
+                        {{-- Label + its own chevron button (see primary-nav-desktop). --}}
+                        <div class="c-primary-nav__split">
+                            @if (nav_item_has_link($item))
+                                <a href="{{ $item['href'] }}" class="c-primary-nav__link"><span>{{ $item['label'] }}</span></a>
+                            @else
+                                <span class="c-primary-nav__link" data-click-through><span>{{ $item['label'] }}</span></span>
+                            @endif
+                            <button type="button" class="c-primary-nav__toggle" data-open-panel="l1-{{ $i }}"
+                                aria-label="{{ sprintf(__('%s submenu', 'sage'), $item['label']) }}">
+                                <x-icon name="chevron" class="c-primary-nav__chevron" />
+                            </button>
+                        </div>
                     @else
                         <a href="{{ $item['href'] }}" class="c-primary-nav__link"><span>{{ $item['label'] }}</span></a>
                     @endif

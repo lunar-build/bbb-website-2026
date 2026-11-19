@@ -19,11 +19,18 @@
   color: var(--wp--preset--color--charcoal);
 }
 
+// Plain content under the image, no tinted panel (Figma 21:1321).
 .c-image-block__info-box {
-  margin-top: 1.25rem;
-  padding: 2rem;
-  border-radius: 1.25rem;
-  background: var(--wp--preset--color--blue-light);
+  margin-top: 2.75rem;
+}
+
+.c-image-block__info-box-about {
+  margin-top: 3.75rem;
+
+  // Alone (Rich text layout) it's the whole box, so no gap above.
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .c-image-block__info-box-content {
@@ -41,13 +48,13 @@
 
   @include bp.respond($min: bp.$md) {
     grid-template-columns: 1fr 1fr;
-    gap: 2.75rem;
+    gap: 2.25rem;
   }
 }
 
 .c-image-block__info-box-heading {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: 0.9375rem;
+  padding-bottom: 0.6875rem;
   border-bottom: 1px solid var(--wp--preset--color--blue-medium);
   color: var(--wp--preset--color--blue-dark);
 }
@@ -82,7 +89,7 @@
 // Adds the bottom border the shared .c-bullet-list heading lacks, to match the icon-rows divider.
 .c-image-block__info-box-bullet-list {
   .c-bullet-list__heading {
-    padding-bottom: 1rem;
+    padding-bottom: 0.6875rem;
     border-bottom: 1px solid var(--wp--preset--color--blue-medium);
     color: var(--wp--preset--color--blue-dark);
   }

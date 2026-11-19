@@ -1,4 +1,5 @@
-<section {{ $attributes->class(['c-link-card']) }}>
+{{-- No heading in this block, so a plain <div> rather than a <section> (a section is meant to have a heading). --}}
+<div {{ $attributes->class(['c-link-card']) }}>
 
 <div class="o-container">
   @foreach ($cards as $card)
@@ -25,12 +26,14 @@
           :url="$card['file']['url']"
           :label="$card['cta_label']"
           :file-size="$card['file_size']"
+          :button-style="$card['cta_style']"
           :id="'c-link-card__file-size-'.$loop->index"
         />
       @else
         <div class="c-link-card__cta">
-          <a class="c-link-card__cta-link u-cta-small" href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
-            {{ $card['link']['title'] }}
+          <a @class(['c-link-card__cta-link', 'u-cta-small', 'c-link-card__cta-link--yellow' => $card['cta_style'] === 'yellow']) href="{{ $card['link']['url'] }}" @if (($card['link']['target'] ?? '') === '_blank') target="_blank" rel="noopener" @endif>
+            {{-- Outer span is the flex item; the inner one stays inline so its highlight follows each line. --}}
+            <span><span class="c-link-card__cta-text">{{ $card['link']['title'] }}</span></span>
             @if (($card['link']['target'] ?? '') === '_blank')
               <span class="u-sr-only">(opens in a new tab)</span>
             @endif
@@ -42,4 +45,4 @@
   @endforeach
 </div>
 
-</section>
+</div>

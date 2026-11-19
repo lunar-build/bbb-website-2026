@@ -249,6 +249,16 @@ class LinkCard extends Block
                         'default_value' => 'link',
                         'ui' => true,
                     ])
+                    ->addSelect('cta_style', [
+                        'label' => 'Button style',
+                        'instructions' => 'How the CTA looks: the standard text link, or a yellow button.',
+                        'choices' => [
+                            'link' => 'Text link (default)',
+                            'yellow' => 'Yellow button',
+                        ],
+                        'default_value' => 'link',
+                        'ui' => true,
+                    ])
                     ->addLink('link', [
                         'label' => 'Link',
                         'instructions' => "Link's title is used as the CTA label.",
@@ -334,6 +344,7 @@ class LinkCard extends Block
 
         $card['logo'] = $logo;
         $card['cta_type'] = ($card['cta_type'] ?? 'link') === 'download' ? 'download' : 'link';
+        $card['cta_style'] = ($card['cta_style'] ?? 'link') === 'yellow' ? 'yellow' : 'link';
 
         if ($card['cta_type'] === 'download') {
             $card['file'] = is_array($card['file'] ?? null) ? $card['file'] : ['url' => '#', 'filename' => ''];

@@ -2,6 +2,7 @@
 
 namespace App\Blocks;
 
+use App\Fields\HeadingLevelSelect;
 use App\Blocks\Concerns\ResolvesFields;
 use App\Blocks\Concerns\HasBusinessCardFields;
 use Log1x\AcfComposer\Block;
@@ -183,11 +184,13 @@ class BusinessCard extends Block
     public function with(): array
     {
         return [
+            'headingLevel' => $this->resolveField('heading_level', 'h4'),
             'name' => $this->name(),
             'contactInfo' => $this->contactInfo(),
             'services' => $this->services(),
             'description' => $this->description(),
             'link' => $this->link(),
+            'ctaColour' => $this->resolveField('cta_colour', 'yellow') ?: 'yellow',
         ];
     }
 
@@ -197,6 +200,8 @@ class BusinessCard extends Block
     public function fields(): array
     {
         $fields = Builder::make('business_card');
+
+        $fields->addPartial(HeadingLevelSelect::class, ['default_level' => 'h4']);
 
         $this->addBusinessCardFields($fields);
 

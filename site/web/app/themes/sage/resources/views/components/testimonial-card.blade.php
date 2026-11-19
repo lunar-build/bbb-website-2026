@@ -15,6 +15,7 @@
     'body' => null,
     'link' => null,
     'portrait' => false,
+    'level' => 'h3',
 ])
 
 <div {{ $attributes->class(['c-testimonial-card', 'c-testimonial-card--portrait' => $portrait]) }}>
@@ -23,7 +24,7 @@
     </div>
 
     <div class="c-testimonial-card__content">
-        <x-heading level="h3" style="match" class="c-testimonial-card__name">
+        <x-heading :level="$level" style="match" class="c-testimonial-card__name">
             {{ $name }}
         </x-heading>
 
