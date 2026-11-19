@@ -35,3 +35,5 @@ wordpress_sites:
     # Public by design (Marker.io proxies the Trello credentials), so no vault needed
     env:
       MARKER_PROJECT_ID: 6adf384284936c1d0de1c19e
+      # Public container ID (BBB Staging GTM account). Production gets its own at launch, with Cookiebot.
+      GTM_CONTAINER_ID: GTM-5LLDTWB9

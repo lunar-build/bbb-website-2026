@@ -21,4 +21,5 @@ import './events-timetable.js';
 import './gravity-forms.js';
 import './file-upload.js';
 import './marker.js';
+import './analytics.js';
 import '../styles/app.scss';
