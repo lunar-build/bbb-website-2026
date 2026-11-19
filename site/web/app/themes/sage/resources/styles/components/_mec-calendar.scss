@@ -825,26 +825,31 @@
     background: none;
 
     // Stacked under the grid, the day's events are one column on a phone and two from tablet width.
-    // Beside the grid (wide) the list column is too narrow for two. Columns rather than a grid, as
-    // MEC's script sets `display` inline on the day it shows.
+    // Beside the grid (wide) the list column is too narrow for two. MEC's script sets `display`
+    // inline on the day it shows, so the grid is applied to the shown day only (hidden days keep
+    // their inline `display: none`). A grid, not CSS columns: the date heading gets its own full-width
+    // row and the events sit in line, row by row, whatever the browser's column balancing does.
     @include mec.narrow {
       @container mec (min-width: 30rem) {
-        columns: 2;
-        column-gap: 2rem;
-
-        > .mec-table-side-title {
-          column-span: all;
+        &[style*='display: block'] {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          column-gap: 2rem;
+          align-items: start;
         }
 
-        > .mec-event-article {
-          break-inside: avoid;
+        // The date heading: MEC prints it as the title, plus a separate day heading in some date formats.
+        > .mec-table-side-title,
+        > .mec-table-side-day {
+          grid-column: 1 / -1;
         }
       }
     }
   }
 
   .mec-calendar .mec-calendar-events-side .mec-table-side-title {
-    margin: 0 0 1rem;
+    // The heading for every event below it: a rule and room beneath, so the list reads as one group.
+    margin: 0 0 1.5rem;
     padding: 0 0 0.75rem;
     border-bottom: 2px solid var(--wp--preset--color--charcoal);
     color: var(--wp--preset--color--blue-dark);
