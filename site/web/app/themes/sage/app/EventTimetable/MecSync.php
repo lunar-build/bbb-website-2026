@@ -97,6 +97,8 @@ class MecSync
         }
         update_post_meta($timetableId, static::TIMETABLE_NOTICES, $notices);
 
+        TermCalendar::sync($timetableId, $deleting);
+
         return $notices;
     }
 

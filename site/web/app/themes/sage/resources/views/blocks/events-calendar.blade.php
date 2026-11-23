@@ -1,4 +1,8 @@
-<section {{ $attributes->class(['c-events-calendar'])->merge(['data-heading-level' => $headingLevel]) }}>
+<section {{ $attributes->class(['c-events-calendar'])->merge(array_filter([
+  'data-heading-level' => $headingLevel,
+  'data-term-first-day' => $termRange['first'] ?? null,
+  'data-term-last-day' => $termRange['last'] ?? null,
+])) }}>
 
 @if ($calendar)
   <div class="o-container">

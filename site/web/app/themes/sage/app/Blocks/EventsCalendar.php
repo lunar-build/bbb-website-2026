@@ -3,6 +3,7 @@
 namespace App\Blocks;
 
 use App\Blocks\Concerns\ResolvesFields;
+use App\EventTimetable\TermCalendar;
 use Log1x\AcfComposer\Block;
 use Log1x\AcfComposer\Builder;
 
@@ -173,6 +174,7 @@ class EventsCalendar extends Block
             'calendar' => $this->calendar(),
             'title' => $this->title(),
             'headingLevel' => $headingLevel,
+            'termRange' => TermCalendar::range($this->calendar()),
         ];
     }
 
