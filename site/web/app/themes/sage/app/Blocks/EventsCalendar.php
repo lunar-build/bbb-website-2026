@@ -172,6 +172,7 @@ class EventsCalendar extends Block
 
         return [
             'calendar' => $this->calendar(),
+            'calendarMissing' => $this->calendarMissing(),
             'title' => $this->title(),
             'headingLevel' => $headingLevel,
             'termRange' => TermCalendar::range($this->calendar()),
@@ -229,6 +230,19 @@ class EventsCalendar extends Block
     public function calendar()
     {
         return (int) $this->resolveField('mec_calendar', 0);
+    }
+
+    /**
+     * Whether a calendar was chosen but no longer exists, e.g. a term calendar whose timetable was
+     * deleted. A trashed one still exists and still renders, so it does not count.
+     *
+     * @return bool
+     */
+    public function calendarMissing()
+    {
+        $id = $this->calendar();
+
+        return $id > 0 && get_post_type($id) !== 'mec_calendars';
     }
 
     /**
