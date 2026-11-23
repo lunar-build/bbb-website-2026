@@ -9,7 +9,7 @@
           </div>
         @else
           <div class="c-form__image">
-            <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? '' }}" style="object-position: {{ $imagePosition }}">
+            <x-image :image="$image" size="large" style="object-position: {{ $imagePosition }}" />
           </div>
         @endif
 

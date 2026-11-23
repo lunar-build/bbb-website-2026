@@ -32,7 +32,7 @@
       <x-icon name="video-play" class="c-video-hero__toggle-icon" data-video-hero-icon="play" hidden />
     </button>
   @elseif ($poster['url'] ?? null)
-    <img class="c-video-hero__video" src="{{ $poster['url'] }}" alt="{{ $videoAlt }}">
+    <x-image class="c-video-hero__video" :image="$poster" :alt="$videoAlt" size="full" sizes="100vw" priority />
   @elseif ($block->preview)
     <div class="c-video-hero__placeholder">
       {{ __('Add a video and/or poster image…', 'sage') }}

@@ -2,9 +2,11 @@
 <div {{ $attributes->class(['c-table']) }}>
 
 <div class="o-container">
-  <div class="c-table__scroll" role="region" aria-label="{{ $caption }}" tabindex="0">
+  <div class="c-table__scroll" tabindex="0" @if ($caption) role="region" aria-label="{{ $caption }}" @endif>
     <table class="c-table__table">
-      <caption class="u-sr-only">{{ $caption }}</caption>
+      @if ($caption)
+        <caption class="u-sr-only">{{ $caption }}</caption>
+      @endif
       @if ($hasColumnHeadings)
         <thead>
           <tr>
