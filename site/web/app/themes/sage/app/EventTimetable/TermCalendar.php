@@ -7,7 +7,9 @@ namespace App\EventTimetable;
  * calendar can be picked in the Events Calendar block without building it by hand in MEC.
  *
  * MEC's skin and filter settings live in the database, so this is what makes the calendar
- * reproducible on every environment. Saving a timetable overwrites those settings.
+ * reproducible on every environment. The full settings are written once, when the shortcode is
+ * created; after that, saving a timetable only refreshes what comes from the timetable (its dates and
+ * category), so changes staff make to the shortcode's style or filters in MEC are kept.
  */
 class TermCalendar
 {
@@ -55,10 +57,17 @@ class TermCalendar
         } else {
             $calendarId = (int) wp_insert_post($postArguments);
             update_post_meta($timetableId, static::TIMETABLE_CALENDAR, $calendarId);
+            static::writeMeta($calendarId, static::defaults());
         }
 
         // After the post is saved: MEC's own save handler writes defaults to the same meta keys.
-        foreach (static::meta($schedule) as $key => $value) {
+        static::writeMeta($calendarId, static::fromTimetable($calendarId, $schedule));
+    }
+
+    /** @param  array<string, mixed>  $meta */
+    private static function writeMeta(int $calendarId, array $meta): void
+    {
+        foreach ($meta as $key => $value) {
             update_post_meta($calendarId, $key, $value);
         }
     }
@@ -83,24 +92,45 @@ class TermCalendar
     }
 
     /**
-     * The shortcode's meta, in the shape MEC itself saves: a monthly view in the Modern style
-     * starting on the term's first day, limited to the timetable's category, with a search form
-     * (category dropdown and text search). There is no month filter: it would let visitors jump
-     * past the term, and a term is only a few weeks long.
+     * What a term calendar takes from its timetable, refreshed on every save: the category, the
+     * term's dates, and the monthly view's start date (merged into the existing settings, so the
+     * rest of them are left as staff have them).
      *
      * @param  array{start: string, end: string, category: int}  $schedule
+     * @return array<string, mixed>
      */
-    public static function meta(array $schedule): array
+    public static function fromTimetable(int $calendarId, array $schedule): array
     {
-        $category = $schedule['category'] ? (string) $schedule['category'] : '';
+        $skinOptions = (array) get_post_meta($calendarId, 'sk-options', true);
+        $skinOptions['monthly_view'] = array_merge((array) ($skinOptions['monthly_view'] ?? []), [
+            'start_date_type' => 'date',
+            'start_date' => $schedule['start'],
+        ]);
+
+        return [
+            'sk-options' => $skinOptions,
+            'category' => $schedule['category'] ? (string) $schedule['category'] : '',
+            static::FIRST_DAY => $schedule['start'],
+            static::LAST_DAY => $schedule['end'],
+        ];
+    }
+
+    /**
+     * The shortcode's starting meta, in the shape MEC itself saves: a monthly view in the Modern
+     * style with a search form (category dropdown and text search). There is no month filter: it
+     * would let visitors jump past the term, and a term is only a few weeks long. Written once, on
+     * creation.
+     *
+     * @return array<string, mixed>
+     */
+    public static function defaults(): array
+    {
         $disabledFilter = ['type' => '0'];
 
         return [
             'skin' => 'monthly_view',
             'sk-options' => ['monthly_view' => [
                 'style' => 'modern',
-                'start_date_type' => 'date',
-                'start_date' => $schedule['start'],
                 'limit' => '',
                 'include_local_time' => '0',
                 'next_previous_button' => '1',
@@ -141,10 +171,7 @@ class TermCalendar
             'show_only_past_events' => 0,
             'show_ongoing_events' => 0,
             'show_only_ongoing_events' => 0,
-            'category' => $category,
             'ex_category' => '',
-            static::FIRST_DAY => $schedule['start'],
-            static::LAST_DAY => $schedule['end'],
         ];
     }
 }
