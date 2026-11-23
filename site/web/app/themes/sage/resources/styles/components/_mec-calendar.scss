@@ -607,6 +607,12 @@
     justify-self: end;
   }
 
+  // A term calendar's first/last month has nowhere to go on one side (mec-calendar.js). Keeps the grid column,
+  // and leaves the control out of the tab order and accessibility tree.
+  .mec-calendar .mec-calendar-side .mec-load-month[data-capped] {
+    visibility: hidden;
+  }
+
   // Weekday heads
   .mec-calendar .mec-calendar-table-head,
   .mec-calendar dl.mec-calendar-row {

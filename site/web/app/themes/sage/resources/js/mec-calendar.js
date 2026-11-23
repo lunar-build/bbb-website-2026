@@ -95,6 +95,25 @@ const setHeadingLevels = (wrap) => {
   wrap.querySelectorAll('.mec-table-side-title').forEach((heading) => heading.setAttribute('aria-level', Math.min(level + 1, 6)));
 };
 
+// MEC's monthly view has a start date but no end date, so a term calendar (generated from a timetable) would
+// let visitors page on past the term. The Events Calendar block records the term's first and last day; hide the
+// previous/next controls that lead outside those months. MEC redraws them on every month change, so redo each time.
+const monthIndex = (year, month) => Number(year) * 12 + Number(month);
+const monthIndexOf = (isoDate) => monthIndex(isoDate.slice(0, 4), isoDate.slice(5, 7));
+
+const capMonthNavigation = (wrap) => {
+  const term = wrap.closest('[data-term-first-day]');
+  if (!term) return;
+
+  const firstMonth = monthIndexOf(term.dataset.termFirstDay);
+  const lastMonth = monthIndexOf(term.dataset.termLastDay);
+
+  wrap.querySelectorAll('.mec-previous-month[data-mec-month], .mec-next-month[data-mec-month]').forEach((control) => {
+    const target = monthIndex(control.dataset.mecYear, control.dataset.mecMonth);
+    control.toggleAttribute('data-capped', target < firstMonth || target > lastMonth);
+  });
+};
+
 // settleMonth clicks a day, which only does anything once MEC (jQuery, on ready) has bound its handlers.
 let mecReady = document.readyState === 'complete';
 window.addEventListener('load', () => {
@@ -115,6 +134,7 @@ document.querySelectorAll('.mec-wrap').forEach((wrap) => {
     });
     enhanceTabs(wrap);
     setHeadingLevels(wrap);
+    capMonthNavigation(wrap);
   };
 
   new MutationObserver(() => {
